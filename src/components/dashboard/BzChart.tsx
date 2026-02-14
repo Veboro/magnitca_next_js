@@ -1,7 +1,5 @@
 import { useMagData } from "@/hooks/useSpaceWeather";
 import { Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis, ReferenceLine } from "recharts";
-import { HelpCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
@@ -25,19 +23,9 @@ export const BzChart = ({ className }: { className?: string }) => {
 
   return (
     <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`}>
-      <div className="mb-4 flex items-center gap-1.5">
-        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Компонент IMF Bz — 2 год
-        </h3>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
-          </TooltipTrigger>
-          <TooltipContent side="top" className="max-w-[250px] text-xs">
-            Вертикальна складова міжпланетного магнітного поля (нТ). Від'ємні значення (нижче 0) означають південний напрямок — це підсилює геомагнітні бурі.
-          </TooltipContent>
-        </Tooltip>
-      </div>
+      <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        Компонент IMF Bz — 2 год
+      </h3>
       {isLoading ? (
         <div className="flex h-[240px] items-center justify-center">
           <span className="font-mono text-sm text-muted-foreground animate-pulse-glow">Завантаження...</span>
@@ -54,6 +42,9 @@ export const BzChart = ({ className }: { className?: string }) => {
           </LineChart>
         </ResponsiveContainer>
       )}
+      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground/60 border-t border-border/30 pt-3">
+        Вертикальна складова міжпланетного магнітного поля (нТ). Від'ємні значення (південний напрямок) підсилюють геомагнітні бурі.
+      </p>
     </div>
   );
 };
