@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { useNoaaScales } from "@/hooks/useSpaceWeather";
+import { useQuery } from "@tanstack/react-query";
 import { CalendarDays } from "lucide-react";
 
 const gLevelInfo = [
@@ -20,21 +20,27 @@ const formatDate = (stamp: string) => {
 };
 
 export const ForecastCard = ({ className }: { className?: string }) => {
-  const { data: scales, isLoading } = useNoaaScales();
-
-  // keys "1", "2", "3" are forecast days
-  const days = scales
-    ? ["1", "2", "3"].map((key) => {
-        const raw = (scales as any).__raw?.[key];
-        if (!raw) return null;
-        return {
-          date: raw.DateStamp,
-          g: parseInt(raw.G?.Scale ?? "0"),
-          r: { minor: raw.R?.MinorProb, major: raw.R?.MajorProb },
-          s: { prob: raw.S?.Prob },
-        };
-      }).filter(Boolean)
-    : [];
+  const { data: days = [], isLoading } = useQuery<any[]>({
+    queryKey: ["forecast-3day"],
+    queryFn: async () => {
+      const res = await fetch("https://services.swpc.noaa.gov/products/noaa-scales.json");
+      const data = await res.json();
+      return ["1", "2", "3"]
+        .map((key) => {
+          const d = data[key];
+          if (!d) return null;
+          return {
+            date: d.DateStamp,
+            g: parseInt(d.G?.Scale ?? "0"),
+            r: { minor: d.R?.MinorProb, major: d.R?.MajorProb },
+            s: { prob: d.S?.Prob },
+          };
+        })
+        .filter(Boolean);
+    },
+    refetchInterval: 60000,
+    staleTime: 30000,
+  });
 
   return (
     <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
