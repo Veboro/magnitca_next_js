@@ -45,7 +45,7 @@ export const SiteHeader = () => {
             <span className="font-mono text-xs text-muted-foreground">НАЖИВО</span>
           </span>
           <span className="font-mono text-xs text-muted-foreground">
-            {new Date().toUTCString().slice(0, -4)} UTC
+            {new Date().toLocaleString("uk-UA", { timeZone: "Europe/Kyiv", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })} Київ
           </span>
         </div>
 
