@@ -5,8 +5,6 @@ import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
-import { NewsFeed } from "@/components/dashboard/NewsFeed";
-import { AdPlaceholder } from "@/components/dashboard/AdPlaceholder";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
 const getKpStatus = (kp: number) => {
@@ -33,9 +31,6 @@ const Index = () => {
       <main className="mx-auto max-w-7xl space-y-6 p-6">
         <StormStatusBanner />
 
-        {/* Top ad banner */}
-        <AdPlaceholder size="banner" />
-
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           <MetricCard icon={Gauge} title="Kp Індекс" value={Math.round(latestKp)} status={getKpStatus(latestKp)} trendValue={latestKp > 4 ? "Зростає" : "Стабільно"} trend="stable" />
           <MetricCard icon={Wind} title="Сон. вітер" value={Math.round(latestWind?.speed || 0)} unit="км/с" status={latestWind && latestWind.speed > 500 ? "strong" : "quiet"} trendValue={latestWind && latestWind.speed > 500 ? "Висока шв." : "Нормальна"} trend="stable" />
@@ -50,20 +45,9 @@ const Index = () => {
           <SolarWindChart className="lg:col-span-2" />
         </div>
 
-        {/* Inline ad */}
-        <AdPlaceholder size="inline" />
-
         <div className="grid gap-6 lg:grid-cols-3">
           <BzChart className="lg:col-span-2" />
           <ActivityTimeline className="lg:col-span-1" />
-        </div>
-
-        {/* News feed + sidebar ad */}
-        <div className="grid gap-6 lg:grid-cols-3">
-          <NewsFeed className="lg:col-span-2" />
-          <div className="space-y-4 lg:col-span-1">
-            <AdPlaceholder size="sidebar" />
-          </div>
         </div>
       </main>
     </div>
