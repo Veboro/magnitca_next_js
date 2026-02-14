@@ -91,13 +91,11 @@ export function useNoaaScales() {
     queryFn: async () => {
       const res = await fetch(`${SWPC_BASE}/products/noaa-scales.json`);
       const data = await res.json();
-      const result = {
+      return {
         r: data["-1"]?.R ?? { Scale: 0, Text: "none" },
         s: data["-1"]?.S ?? { Scale: 0, Text: "none" },
         g: data["-1"]?.G ?? { Scale: 0, Text: "none" },
-        __raw: data,
       };
-      return result as NoaaScales;
     },
     refetchInterval: 60000,
     staleTime: 30000,
