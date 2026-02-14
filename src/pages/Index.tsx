@@ -30,7 +30,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background grid-bg">
       <main className="mx-auto max-w-7xl space-y-6 p-6">
-        <StormStatusBanner />
+        <div className="grid gap-6 lg:grid-cols-2">
+          <StormStatusBanner />
+          <HumanImpact />
+        </div>
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           <MetricCard icon={Gauge} title="Kp Індекс" value={Math.round(latestKp)} status={getKpStatus(latestKp)} trendValue={latestKp > 4 ? "Зростає" : "Стабільно"} trend="stable" tooltip="Планетарний індекс магнітної активності (0–9). Значення ≥5 означає геомагнітну бурю." />
@@ -50,8 +53,6 @@ const Index = () => {
           <BzChart className="lg:col-span-2" />
           <ActivityTimeline className="lg:col-span-1" />
         </div>
-
-        <HumanImpact />
       </main>
     </div>
   );
