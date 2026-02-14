@@ -39,22 +39,22 @@ export const StormStatusBanner = () => {
       <div className="relative flex items-center justify-between p-6">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Zap className="h-5 w-5 text-accent animate-pulse-glow" />
-            <span className="text-xs font-medium uppercase tracking-wider text-accent">
+            <Zap className="h-5 w-5 text-primary animate-pulse-glow" />
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {gLevel > 0 ? "Геомагнітна буря" : "Моніторинг космічної погоди"}
             </span>
           </div>
-          <h1 className="font-display text-3xl font-bold text-foreground text-glow-cyan">
+          <h1 className="font-display text-3xl font-bold text-foreground">
             {gLabels[gLevel] || "Спокійно"}
           </h1>
           <p className="max-w-md text-sm text-muted-foreground">
             {gDescriptions[gLevel] || gDescriptions[0]}
           </p>
         </div>
-        <div className="hidden md:flex items-center gap-3 rounded-lg border border-accent/20 bg-accent/5 px-4 py-3">
-          <AlertTriangle className="h-8 w-8 text-accent" />
+        <div className="hidden md:flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+          <AlertTriangle className="h-8 w-8 text-primary" />
           <div>
-            <p className="font-mono text-lg font-bold text-accent text-glow-amber">
+            <p className="font-mono text-lg font-bold text-foreground">
               {gLevel > 0 ? "АКТИВНА" : "НОРМА"}
             </p>
             <p className="text-xs text-muted-foreground">
