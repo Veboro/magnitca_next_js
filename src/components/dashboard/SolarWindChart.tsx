@@ -1,5 +1,7 @@
 import { useSolarWind } from "@/hooks/useSpaceWeather";
-import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from "recharts";
+import { HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
@@ -28,9 +30,19 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
 
   return (
     <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`}>
-      <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Сонячний вітер — 2 год
-      </h3>
+      <div className="mb-4 flex items-center gap-1.5">
+        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Сонячний вітер — 2 год
+        </h3>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[250px] text-xs">
+            Графік швидкості (км/с) та густини (p/см³) сонячного вітру за останні 2 години. Різке зростання швидкості може спровокувати геомагнітну бурю.
+          </TooltipContent>
+        </Tooltip>
+      </div>
       {isLoading ? (
         <div className="flex h-[240px] items-center justify-center">
           <span className="font-mono text-sm text-muted-foreground animate-pulse-glow">Завантаження...</span>
@@ -51,7 +63,7 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
             <CartesianGrid strokeDasharray="3 3" stroke="hsla(200, 40%, 18%, 0.8)" />
             <XAxis dataKey="time" tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} tickLine={false} axisLine={false} />
             <YAxis tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} tickLine={false} axisLine={false} />
-            <Tooltip content={<CustomTooltip />} />
+            <RechartsTooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="speed" name="Швидкість" stroke="hsl(180, 100%, 50%)" fill="url(#speedGrad)" strokeWidth={2} />
             <Area type="monotone" dataKey="density" name="Густ." stroke="hsl(35, 100%, 55%)" fill="url(#densityGrad)" strokeWidth={2} />
           </AreaChart>
