@@ -147,9 +147,29 @@ const faqSections = [
   },
 ];
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqSections.flatMap((s) =>
+    s.items.map((item) => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a.replace(/\n/g, " ") },
+    }))
+  ),
+};
+
 const FAQ = () => {
   return (
     <main className="min-h-screen bg-background">
+      <head>
+        <title>FAQ — Магнітка | Часті питання про магнітні бурі</title>
+        <meta name="description" content="Відповіді на найпоширеніші питання про магнітні бурі, Kp індекс, вплив на здоров'я та техніку. Все простою мовою." />
+      </head>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       <div className="container max-w-4xl py-10 space-y-8">
         <div className="space-y-3">
           <div className="flex items-center gap-3">
