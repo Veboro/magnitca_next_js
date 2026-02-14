@@ -1,6 +1,7 @@
 import { AlertTriangle, Zap } from "lucide-react";
 import { useNoaaScales } from "@/hooks/useSpaceWeather";
 import heroBg from "@/assets/hero-bg.jpg";
+import ukraineOutline from "@/assets/ukraine-outline.png";
 
 const gLabels: Record<number, string> = {
   0: "Спокійно",
@@ -27,8 +28,12 @@ export const StormStatusBanner = () => {
   return (
     <div className="relative overflow-hidden rounded-lg border border-glow-cyan">
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-30"
+        className="absolute inset-0 bg-cover bg-center opacity-20"
         style={{ backgroundImage: `url(${heroBg})` }}
+      />
+      <div
+        className="absolute inset-0 bg-contain bg-no-repeat bg-right-bottom opacity-15 mix-blend-screen"
+        style={{ backgroundImage: `url(${ukraineOutline})` }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
       <div className="relative flex items-center justify-between p-6">
