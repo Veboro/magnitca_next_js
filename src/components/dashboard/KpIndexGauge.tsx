@@ -1,29 +1,24 @@
 import { cn } from "@/lib/utils";
+import { useKpIndex } from "@/hooks/useSpaceWeather";
 
-interface KpIndexGaugeProps {
-  value: number; // 0-9
-  className?: string;
-}
-
-const kpLabels = ["Quiet", "Quiet", "Low", "Unsettled", "Active", "Minor Storm", "Moderate", "Strong", "Severe", "Extreme"];
+const kpLabels = ["Спокійно", "Спокійно", "Низько", "Нестабільно", "Активно", "Мала буря", "Помірна", "Сильна", "Екстремальна", "Екстремальна"];
 const kpColors = [
-  "bg-storm-quiet",
-  "bg-storm-quiet",
-  "bg-storm-quiet",
-  "bg-storm-minor",
-  "bg-storm-minor",
-  "bg-storm-moderate",
-  "bg-storm-moderate",
+  "bg-storm-quiet", "bg-storm-quiet", "bg-storm-quiet",
+  "bg-storm-minor", "bg-storm-minor",
+  "bg-storm-moderate", "bg-storm-moderate",
   "bg-storm-strong",
-  "bg-storm-severe",
-  "bg-storm-severe",
+  "bg-storm-severe", "bg-storm-severe",
 ];
 
-export const KpIndexGauge = ({ value, className }: KpIndexGaugeProps) => {
+export const KpIndexGauge = ({ className }: { className?: string }) => {
+  const { data: kpData } = useKpIndex();
+  const latestKp = kpData && kpData.length > 0 ? kpData[kpData.length - 1].kp : 0;
+  const value = Math.min(9, Math.max(0, Math.round(latestKp)));
+
   return (
     <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)}>
       <h3 className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Planetary Kp Index
+        Планетарний Kp Індекс
       </h3>
       <div className="mt-4 flex items-end gap-1.5">
         {Array.from({ length: 10 }, (_, i) => (

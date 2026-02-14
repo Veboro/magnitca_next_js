@@ -5,23 +5,41 @@ import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
+import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
+
+const getKpStatus = (kp: number) => {
+  if (kp <= 2) return "quiet" as const;
+  if (kp <= 3) return "minor" as const;
+  if (kp <= 5) return "moderate" as const;
+  if (kp <= 7) return "strong" as const;
+  return "severe" as const;
+};
 
 const Index = () => {
+  const { data: kpData } = useKpIndex();
+  const { data: windData } = useSolarWind();
+  const { data: magData } = useMagData();
+  const { data: scales } = useNoaaScales();
+
+  const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
+  const latestWind = windData?.length ? windData[windData.length - 1] : null;
+  const latestMag = magData?.length ? magData[magData.length - 1] : null;
+  const gLevel = scales?.g?.Scale ?? 0;
+
   return (
     <div className="min-h-screen bg-background grid-bg">
-      {/* Header */}
       <header className="border-b border-border/50 px-6 py-4">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-3">
             <Activity className="h-6 w-6 text-primary animate-pulse-glow" />
             <h1 className="font-display text-xl font-bold text-foreground">
-              Magnetic<span className="text-primary">Storm</span>
+              Магнітна<span className="text-primary">Буря</span>
             </h1>
           </div>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
-              <span className="font-mono text-xs text-muted-foreground">LIVE</span>
+              <span className="font-mono text-xs text-muted-foreground">НАЖИВО</span>
             </span>
             <span className="font-mono text-xs text-muted-foreground">
               {new Date().toUTCString().slice(0, -4)} UTC
@@ -30,23 +48,20 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Main Content */}
       <main className="mx-auto max-w-7xl space-y-6 p-6">
         <StormStatusBanner />
 
-        {/* Metric Cards */}
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-          <MetricCard icon={Gauge} title="Kp Index" value={6} status="moderate" trendValue="Rising" trend="up" />
-          <MetricCard icon={Wind} title="Solar Wind" value={650} unit="km/s" status="strong" trendValue="High speed" trend="up" />
-          <MetricCard icon={Radio} title="Bz (IMF)" value={-15.3} unit="nT" status="moderate" trendValue="Southward" trend="down" />
-          <MetricCard icon={Sun} title="Proton Flux" value={120} unit="pfu" status="minor" trendValue="S1 Storm" trend="up" />
-          <MetricCard icon={Thermometer} title="Bt (IMF)" value={22.4} unit="nT" status="moderate" trendValue="Elevated" trend="up" />
-          <MetricCard icon={Activity} title="Dst Index" value={-87} unit="nT" status="moderate" trendValue="Depressed" trend="down" />
+          <MetricCard icon={Gauge} title="Kp Індекс" value={Math.round(latestKp)} status={getKpStatus(latestKp)} trendValue={latestKp > 4 ? "Зростає" : "Стабільно"} trend="stable" />
+          <MetricCard icon={Wind} title="Сон. вітер" value={Math.round(latestWind?.speed || 0)} unit="км/с" status={latestWind && latestWind.speed > 500 ? "strong" : "quiet"} trendValue={latestWind && latestWind.speed > 500 ? "Висока шв." : "Нормальна"} trend="stable" />
+          <MetricCard icon={Radio} title="Bz (IMF)" value={latestMag?.bz?.toFixed(1) || "—"} unit="нТ" status={latestMag && latestMag.bz < -10 ? "moderate" : "quiet"} trendValue={latestMag && latestMag.bz < 0 ? "Південний" : "Північний"} trend="stable" />
+          <MetricCard icon={Sun} title="R-шкала" value={`R${scales?.r?.Scale ?? 0}`} status={scales && scales.r.Scale > 2 ? "strong" : "quiet"} trendValue="Радіо" trend="stable" />
+          <MetricCard icon={Thermometer} title="Bt (IMF)" value={latestMag?.bt?.toFixed(1) || "—"} unit="нТ" status={latestMag && latestMag.bt > 15 ? "moderate" : "quiet"} trendValue={latestMag && latestMag.bt > 15 ? "Підвищений" : "Нормальний"} trend="stable" />
+          <MetricCard icon={Activity} title="G-шкала" value={`G${gLevel}`} status={gLevel > 2 ? "strong" : gLevel > 0 ? "moderate" : "quiet"} trendValue={gLevel > 0 ? "Буря" : "Спокійно"} trend="stable" />
         </div>
 
-        {/* Kp Index + Charts */}
         <div className="grid gap-6 lg:grid-cols-3">
-          <KpIndexGauge value={6} className="lg:col-span-1" />
+          <KpIndexGauge className="lg:col-span-1" />
           <SolarWindChart className="lg:col-span-2" />
         </div>
 
