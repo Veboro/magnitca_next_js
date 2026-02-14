@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { LucideIcon, HelpCircle } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 interface MetricCardProps {
   title: string;
@@ -56,14 +56,16 @@ export const MetricCard = ({
               {title}
             </p>
             {tooltip && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
-                </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-[220px] text-xs">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" className="inline-flex">
+                    <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="top" className="max-w-[220px] text-xs p-2">
                   {tooltip}
-                </TooltipContent>
-              </Tooltip>
+                </PopoverContent>
+              </Popover>
             )}
           </div>
           <div className="flex items-baseline gap-1.5">
