@@ -6,7 +6,7 @@ import logo from "@/assets/logo.png";
 const REFRESH_INTERVAL = 60;
 
 const navItems = [
-  { href: "/", label: "Дашборд", icon: Activity },
+  { href: "/", label: "Головна", icon: Activity },
   { href: "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
