@@ -37,7 +37,7 @@ export const ActivityTimeline = ({ className }: { className?: string }) => {
           {(alerts || []).map((alert, i) => {
             const severity = getSeverity(alert.product_id);
             const firstLine = alert.message.split("\n").find((l) => l.trim().length > 10) || alert.product_id;
-            const time = alert.issue_datetime?.slice(0, 19).replace("T", " ") || "";
+            const time = alert.issue_datetime ? new Date(alert.issue_datetime).toLocaleString("uk-UA", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short", timeZone: "Europe/Kyiv" }) : "";
             return (
               <div
                 key={i}
@@ -48,7 +48,7 @@ export const ActivityTimeline = ({ className }: { className?: string }) => {
               >
                 <div className="flex items-center gap-2">
                   <span className={cn("h-2 w-2 rounded-full", dotStyles[severity])} />
-                  <span className="font-mono text-[11px] text-muted-foreground">{time} UTC</span>
+                  <span className="font-mono text-[11px] text-muted-foreground">{time}</span>
                 </div>
                 <p className="mt-1 ml-4 text-xs text-muted-foreground line-clamp-2">{firstLine.trim()}</p>
               </div>

@@ -1,11 +1,16 @@
 import { useSolarWind } from "@/hooks/useSpaceWeather";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from "recharts";
 
+const toKyivTime = (utc: string) => {
+  const d = new Date(utc.includes("T") ? utc : utc.replace(" ", "T") + "Z");
+  return d.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
   return (
     <div className="rounded-md border border-border bg-card p-3 shadow-lg">
-      <p className="mb-1 font-mono text-xs text-muted-foreground">{label} UTC</p>
+      <p className="mb-1 font-mono text-xs text-muted-foreground">{label} Київ</p>
       {payload.map((entry: any, i: number) => (
         <p key={i} className="font-mono text-sm" style={{ color: entry.color }}>
           {entry.name}: {entry.value} {entry.name === "Швидкість" ? "км/с" : "p/см³"}
@@ -21,7 +26,7 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
   const chartData = (rawData || [])
     .filter((_, i) => i % 3 === 0) // thin out for readability
     .map((d) => ({
-      time: d.time_tag.slice(11, 16),
+      time: toKyivTime(d.time_tag),
       speed: d.speed,
       density: d.density,
     }));

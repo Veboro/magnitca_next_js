@@ -62,7 +62,7 @@ export const NewsFeed = ({ className }: { className?: string }) => {
             const lines = alert.message.split("\n").filter((l) => l.trim().length > 10);
             const title = lines[0]?.trim() || alert.product_id;
             const summary = lines.slice(1, 3).join(" ").trim().slice(0, 120);
-            const time = alert.issue_datetime?.slice(0, 16).replace("T", " ") || "";
+            const time = alert.issue_datetime ? new Date(alert.issue_datetime).toLocaleString("uk-UA", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "short", timeZone: "Europe/Kyiv" }) : "";
 
             return (
               <article
@@ -78,7 +78,7 @@ export const NewsFeed = ({ className }: { className?: string }) => {
                     {severityLabels[severity]}
                   </span>
                   <span className="font-mono text-[10px] text-muted-foreground/50 ml-auto">
-                    {time} UTC
+                    {time}
                   </span>
                 </div>
                 <h4 className="text-sm font-medium text-card-foreground line-clamp-1 group-hover:text-primary transition-colors">
