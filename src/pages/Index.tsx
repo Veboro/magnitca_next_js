@@ -5,6 +5,7 @@ import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
+import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
 const getKpStatus = (kp: number) => {
@@ -49,6 +50,8 @@ const Index = () => {
           <BzChart className="lg:col-span-2" />
           <ActivityTimeline className="lg:col-span-1" />
         </div>
+
+        <HumanImpact />
       </main>
     </div>
   );
