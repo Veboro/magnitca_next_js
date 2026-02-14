@@ -1,4 +1,4 @@
-import { RefreshCw, Moon, Sun, Activity, HelpCircle } from "lucide-react";
+import { RefreshCw, Moon, Sun, Activity, HelpCircle, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
@@ -13,6 +13,7 @@ const navItems = [
 export const SiteHeader = () => {
   const location = useLocation();
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark");
@@ -41,11 +42,25 @@ export const SiteHeader = () => {
     document.documentElement.classList.toggle("dark", prefersDark);
   }, []);
 
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         {/* Logo + Nav */}
         <div className="flex items-center gap-6">
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setMobileOpen(!mobileOpen)}
+            className="sm:hidden flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Меню"
+          >
+            {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
+
           <a href="/" className="flex items-center gap-2.5">
             <img src={logo} alt="Магнітка" className="h-7 w-7" />
             <span className="font-display text-lg font-bold text-foreground">
@@ -116,6 +131,29 @@ export const SiteHeader = () => {
           </span>
         </div>
       </div>
+
+      {/* Mobile dropdown menu */}
+      {mobileOpen && (
+        <nav className="sm:hidden border-t border-border/50 bg-background px-6 py-3 flex flex-col gap-1">
+          {navItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className={`flex items-center gap-2 rounded-md px-3 py-2.5 font-mono text-sm transition-all ${
+                  isActive
+                    ? "bg-primary/15 text-primary border border-primary/30"
+                    : "text-muted-foreground hover:text-foreground hover:bg-card"
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                {item.label}
+              </a>
+            );
+          })}
+        </nav>
+      )}
     </header>
   );
 };
