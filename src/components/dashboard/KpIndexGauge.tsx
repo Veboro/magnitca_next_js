@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useKpIndex } from "@/hooks/useSpaceWeather";
+import { HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const kpLabels = ["Спокійно", "Спокійно", "Низько", "Нестабільно", "Активно", "Мала буря", "Помірна", "Сильна", "Екстремальна", "Екстремальна"];
 const kpColors = [
@@ -17,9 +19,19 @@ export const KpIndexGauge = ({ className }: { className?: string }) => {
 
   return (
     <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)}>
-      <h3 className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Планетарний Kp Індекс
-      </h3>
+      <div className="mb-1 flex items-center gap-1.5">
+        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Планетарний Kp Індекс
+        </h3>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
+          </TooltipTrigger>
+          <TooltipContent side="top" className="max-w-[250px] text-xs">
+            Показує поточний рівень геомагнітної активності за шкалою 0–9. Оновлюється щохвилини на основі даних магнітометрів по всьому світу.
+          </TooltipContent>
+        </Tooltip>
+      </div>
       <div className="mt-4 flex items-end gap-1.5">
         {Array.from({ length: 10 }, (_, i) => (
           <div key={i} className="flex flex-1 flex-col items-center gap-1">
