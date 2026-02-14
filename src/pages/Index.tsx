@@ -6,6 +6,7 @@ import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ForecastCard } from "@/components/dashboard/ForecastCard";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
+import { TechImpact } from "@/components/dashboard/TechImpact";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
 const getKpStatus = (kp: number) => {
@@ -30,9 +31,10 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background grid-bg">
       <main className="mx-auto max-w-7xl space-y-6 p-6">
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-3">
           <StormStatusBanner />
           <HumanImpact />
+          <TechImpact />
         </div>
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
