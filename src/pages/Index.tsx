@@ -5,6 +5,8 @@ import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ActivityTimeline } from "@/components/dashboard/ActivityTimeline";
+import { NewsFeed } from "@/components/dashboard/NewsFeed";
+import { AdPlaceholder } from "@/components/dashboard/AdPlaceholder";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
 const getKpStatus = (kp: number) => {
@@ -28,28 +30,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background grid-bg">
-      <header className="border-b border-border/50 px-6 py-4">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Activity className="h-6 w-6 text-primary animate-pulse-glow" />
-            <h1 className="font-display text-xl font-bold text-foreground">
-              Магнітна<span className="text-primary">Буря</span>
-            </h1>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
-              <span className="font-mono text-xs text-muted-foreground">НАЖИВО</span>
-            </span>
-            <span className="font-mono text-xs text-muted-foreground">
-              {new Date().toUTCString().slice(0, -4)} UTC
-            </span>
-          </div>
-        </div>
-      </header>
-
       <main className="mx-auto max-w-7xl space-y-6 p-6">
         <StormStatusBanner />
+
+        {/* Top ad banner */}
+        <AdPlaceholder size="banner" />
 
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
           <MetricCard icon={Gauge} title="Kp Індекс" value={Math.round(latestKp)} status={getKpStatus(latestKp)} trendValue={latestKp > 4 ? "Зростає" : "Стабільно"} trend="stable" />
@@ -65,9 +50,20 @@ const Index = () => {
           <SolarWindChart className="lg:col-span-2" />
         </div>
 
+        {/* Inline ad */}
+        <AdPlaceholder size="inline" />
+
         <div className="grid gap-6 lg:grid-cols-3">
           <BzChart className="lg:col-span-2" />
           <ActivityTimeline className="lg:col-span-1" />
+        </div>
+
+        {/* News feed + sidebar ad */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          <NewsFeed className="lg:col-span-2" />
+          <div className="space-y-4 lg:col-span-1">
+            <AdPlaceholder size="sidebar" />
+          </div>
         </div>
       </main>
     </div>
