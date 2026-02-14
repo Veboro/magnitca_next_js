@@ -1,11 +1,16 @@
 import { useMagData } from "@/hooks/useSpaceWeather";
 import { Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis, ReferenceLine } from "recharts";
 
+const toKyivTime = (utc: string) => {
+  const d = new Date(utc.includes("T") ? utc : utc.replace(" ", "T") + "Z");
+  return d.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+};
+
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null;
   return (
     <div className="rounded-md border border-border bg-card p-3 shadow-lg">
-      <p className="font-mono text-xs text-muted-foreground">{label} UTC</p>
+      <p className="font-mono text-xs text-muted-foreground">{label} Київ</p>
       <p className="font-mono text-sm text-primary">Bz: {payload[0]?.value} нТ</p>
     </div>
   );
@@ -17,7 +22,7 @@ export const BzChart = ({ className }: { className?: string }) => {
   const chartData = (rawData || [])
     .filter((_, i) => i % 3 === 0)
     .map((d) => ({
-      time: d.time_tag.slice(11, 16),
+      time: toKyivTime(d.time_tag),
       bz: d.bz,
     }));
 
