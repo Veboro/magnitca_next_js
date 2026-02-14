@@ -1,20 +1,12 @@
 import { cn } from "@/lib/utils";
+import { useAlerts } from "@/hooks/useSpaceWeather";
 
-interface Event {
-  time: string;
-  title: string;
-  description: string;
-  severity: "info" | "warning" | "critical";
-}
-
-const events: Event[] = [
-  { time: "22:14 UTC", title: "X2.1 Solar Flare", description: "Major flare detected from AR 3842. CME expected.", severity: "critical" },
-  { time: "19:30 UTC", title: "Kp Index Rising", description: "Geomagnetic activity increasing. Kp now at 6.", severity: "warning" },
-  { time: "16:45 UTC", title: "CME Impact", description: "Coronal mass ejection arrived at L1. Solar wind surge detected.", severity: "critical" },
-  { time: "12:00 UTC", title: "Proton Event", description: "S1 minor solar radiation storm in progress.", severity: "warning" },
-  { time: "08:22 UTC", title: "Active Region Update", description: "Sunspot AR 3842 shows beta-gamma-delta configuration.", severity: "info" },
-  { time: "04:10 UTC", title: "Aurora Alert", description: "Aurora visible at mid-latitudes. G2 storm conditions.", severity: "warning" },
-];
+const getSeverity = (msg: string): "info" | "warning" | "critical" => {
+  const lower = msg.toLowerCase();
+  if (lower.includes("warning") || lower.includes("watch")) return "critical";
+  if (lower.includes("alert") || lower.includes("summary")) return "warning";
+  return "info";
+};
 
 const severityStyles = {
   info: "border-primary/40 bg-primary/5",
@@ -29,29 +21,41 @@ const dotStyles = {
 };
 
 export const ActivityTimeline = ({ className }: { className?: string }) => {
+  const { data: alerts, isLoading } = useAlerts();
+
   return (
     <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)}>
       <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        Recent Activity
+        Останні сповіщення
       </h3>
-      <div className="space-y-3 max-h-[380px] overflow-y-auto pr-2">
-        {events.map((event, i) => (
-          <div
-            key={i}
-            className={cn(
-              "rounded-md border p-3 transition-colors hover:bg-secondary/50",
-              severityStyles[event.severity]
-            )}
-          >
-            <div className="flex items-center gap-2">
-              <span className={cn("h-2 w-2 rounded-full", dotStyles[event.severity])} />
-              <span className="font-mono text-[11px] text-muted-foreground">{event.time}</span>
-              <span className="text-sm font-semibold text-foreground">{event.title}</span>
-            </div>
-            <p className="mt-1 ml-4 text-xs text-muted-foreground">{event.description}</p>
-          </div>
-        ))}
-      </div>
+      {isLoading ? (
+        <div className="flex h-20 items-center justify-center">
+          <span className="font-mono text-sm text-muted-foreground animate-pulse-glow">Завантаження...</span>
+        </div>
+      ) : (
+        <div className="space-y-3 max-h-[380px] overflow-y-auto pr-2">
+          {(alerts || []).map((alert, i) => {
+            const severity = getSeverity(alert.product_id);
+            const firstLine = alert.message.split("\n").find((l) => l.trim().length > 10) || alert.product_id;
+            const time = alert.issue_datetime?.slice(0, 19).replace("T", " ") || "";
+            return (
+              <div
+                key={i}
+                className={cn(
+                  "rounded-md border p-3 transition-colors hover:bg-secondary/50",
+                  severityStyles[severity]
+                )}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={cn("h-2 w-2 rounded-full", dotStyles[severity])} />
+                  <span className="font-mono text-[11px] text-muted-foreground">{time} UTC</span>
+                </div>
+                <p className="mt-1 ml-4 text-xs text-muted-foreground line-clamp-2">{firstLine.trim()}</p>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
