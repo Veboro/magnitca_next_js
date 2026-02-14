@@ -44,7 +44,7 @@ export const MetricCard = ({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-lg border bg-card p-5 transition-all hover:scale-[1.02]",
+        "relative rounded-lg border bg-card p-5 transition-all hover:scale-[1.02]",
         statusStyles[status],
         className
       )}
