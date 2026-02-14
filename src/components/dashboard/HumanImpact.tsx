@@ -69,17 +69,17 @@ export const HumanImpact = ({ className }: { className?: string }) => {
   const MoodIcon = impact.mood;
 
   return (
-    <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
-      <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+    <div className={cn("rounded-lg border border-border/50 bg-card p-4", className)}>
+      <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Вплив на організм
       </h3>
 
-      <div className="flex flex-col items-center gap-6 lg:flex-row lg:items-start">
+      <div className="flex items-center gap-4">
         {/* Silhouette */}
         <div className="relative flex-shrink-0">
           <svg
-            width="140"
-            height="260"
+            width="80"
+            height="150"
             viewBox="0 0 140 260"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -216,55 +216,46 @@ export const HumanImpact = ({ className }: { className?: string }) => {
         </div>
 
         {/* Info */}
-        <div className="flex-1 space-y-4 text-center lg:text-left">
+        <div className="flex-1 space-y-2">
           <div>
-            <div className="flex items-center justify-center gap-2 lg:justify-start">
-              <MoodIcon className="h-5 w-5 transition-colors duration-1000" style={{ color: impact.color }} />
+            <div className="flex items-center gap-2">
+              <MoodIcon className="h-4 w-4 transition-colors duration-1000" style={{ color: impact.color }} />
               <span
-                className="font-display text-lg font-bold transition-colors duration-1000"
+                className="font-display text-base font-bold transition-colors duration-1000"
                 style={{ color: impact.color }}
               >
                 {impact.label}
               </span>
             </div>
-            <p className="mt-1 text-sm text-muted-foreground">{impact.description}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{impact.description}</p>
           </div>
 
           {impact.symptoms.length > 0 && (
-            <div>
-              <p className="mb-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Можливі симптоми
-              </p>
-              <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-                {impact.symptoms.map((s) => (
-                  <span
-                    key={s}
-                    className="rounded-full border px-2.5 py-1 text-xs transition-colors duration-500"
-                    style={{
-                      borderColor: `${impact.color}33`,
-                      color: impact.color,
-                      backgroundColor: `${impact.color}10`,
-                    }}
-                  >
-                    {s}
-                  </span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-1.5">
+              {impact.symptoms.map((s) => (
+                <span
+                  key={s}
+                  className="rounded-full border px-2 py-0.5 text-[10px] transition-colors duration-500"
+                  style={{
+                    borderColor: `${impact.color}33`,
+                    color: impact.color,
+                    backgroundColor: `${impact.color}10`,
+                  }}
+                >
+                  {s}
+                </span>
+              ))}
             </div>
           )}
 
-          <div className="flex items-center gap-4 justify-center lg:justify-start">
-            <div className="flex items-center gap-1.5">
-              <Heart className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="font-mono text-xs text-muted-foreground">
-                Kp {latestKp.toFixed(1)}
-              </span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <Heart className="h-3 w-3 text-muted-foreground" />
+              <span className="font-mono text-[10px] text-muted-foreground">Kp {latestKp.toFixed(1)}</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <Brain className="h-3.5 w-3.5 text-muted-foreground" />
-              <span className="font-mono text-xs text-muted-foreground">
-                G{gLevel}
-              </span>
+            <div className="flex items-center gap-1">
+              <Brain className="h-3 w-3 text-muted-foreground" />
+              <span className="font-mono text-[10px] text-muted-foreground">G{gLevel}</span>
             </div>
           </div>
         </div>
