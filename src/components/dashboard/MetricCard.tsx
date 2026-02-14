@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, HelpCircle } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MetricCardProps {
   title: string;
@@ -10,6 +11,7 @@ interface MetricCardProps {
   trendValue?: string;
   status?: "quiet" | "minor" | "moderate" | "strong" | "severe";
   className?: string;
+  tooltip?: string;
 }
 
 const statusStyles = {
@@ -37,6 +39,7 @@ export const MetricCard = ({
   trendValue,
   status = "quiet",
   className,
+  tooltip,
 }: MetricCardProps) => {
   return (
     <div
@@ -48,9 +51,21 @@ export const MetricCard = ({
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {title}
-          </p>
+          <div className="flex items-center gap-1">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {title}
+            </p>
+            {tooltip && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-[220px] text-xs">
+                  {tooltip}
+                </TooltipContent>
+              </Tooltip>
+            )}
+          </div>
           <div className="flex items-baseline gap-1.5">
             <span className="font-mono text-3xl font-bold text-foreground">
               {value}
