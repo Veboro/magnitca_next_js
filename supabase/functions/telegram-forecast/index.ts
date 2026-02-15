@@ -9,6 +9,22 @@ const corsHeaders = {
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const SWPC_BASE = "https://services.swpc.noaa.gov";
 
+function gScaleToColor(g: number): string {
+  if (g >= 4) return "intense red-crimson";
+  if (g >= 3) return "deep orange";
+  if (g >= 2) return "amber-yellow";
+  if (g >= 1) return "soft yellow-green";
+  return "calm green";
+}
+
+function gScaleToLabel(g: number): string {
+  if (g >= 4) return "Сильна буря";
+  if (g >= 3) return "Помірна буря";
+  if (g >= 2) return "Слабка буря";
+  if (g >= 1) return "Незначна буря";
+  return "Спокійно";
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -37,12 +53,10 @@ Deno.serve(async (req) => {
     const scales = await scalesRes.json();
     const kpData = await kpRes.json();
 
-    // Current Kp
     const latestKp = kpData.length > 0
       ? parseFloat(kpData[kpData.length - 1].estimated_kp ?? kpData[kpData.length - 1].kp_index ?? "0")
       : 0;
 
-    // 3-day forecast
     const forecast = ["1", "2", "3"].map((key) => {
       const d = scales[key];
       if (!d) return null;
@@ -55,10 +69,9 @@ Deno.serve(async (req) => {
       };
     }).filter(Boolean);
 
-    // Current conditions
     const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0");
+    const maxForecastG = Math.max(currentG, ...forecast.map((f: any) => f.gScale));
 
-    // 2. Generate text with AI
     const today = new Date();
     const dateStr = today.toLocaleDateString("uk-UA", {
       weekday: "long",
@@ -67,7 +80,41 @@ Deno.serve(async (req) => {
       year: "numeric",
     });
 
-    const prompt = `Ти — експерт з космічної погоди. Напиши короткий прогноз магнітних бур українською мовою для Telegram-каналу.
+    // 2. Generate forecast image with AI
+    const bgColor = gScaleToColor(maxForecastG);
+    const stormLabel = gScaleToLabel(maxForecastG);
+
+    const imagePrompt = `Generate an image: a clean social media card (landscape 16:9). Background: smooth gradient in ${bgColor} tones with subtle aurora effects. Large bold white centered text: "Прогноз магнітних бур". Below: "${dateStr}". Below that: "G${maxForecastG} — ${stormLabel}". Bottom corner small text: "magnetic-storm-hub.lovable.app". Minimalist, space-themed, no faces.`;
+
+    const imageRes = await fetch(AI_GATEWAY, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-3-pro-image-preview",
+        messages: [{ role: "user", content: imagePrompt }],
+        modalities: ["image", "text"],
+      }),
+    });
+
+    if (!imageRes.ok) {
+      const errText = await imageRes.text();
+      console.error(`AI image error [${imageRes.status}]: ${errText}`);
+    }
+
+    const imageData = await imageRes.json();
+    console.log("AI image response keys:", JSON.stringify(Object.keys(imageData)));
+    console.log("AI image choices:", JSON.stringify(imageData.choices?.[0]?.message ? {
+      hasImages: !!imageData.choices[0].message.images,
+      imagesCount: imageData.choices[0].message.images?.length,
+      contentPreview: imageData.choices[0].message.content?.substring(0, 100),
+    } : "no message"));
+    const base64Image = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+
+    // 3. Generate text with AI
+    const textPrompt = `Ти — експерт з космічної погоди. Напиши короткий прогноз магнітних бур українською мовою для Telegram-каналу.
 
 Дані NOAA на ${dateStr}:
 - Поточний Kp-індекс: ${latestKp.toFixed(1)}
@@ -83,7 +130,7 @@ Deno.serve(async (req) => {
 
 Не використовуй markdown-форматування, тільки емодзі та простий текст. Максимум 500 символів.`;
 
-    const aiRes = await fetch(AI_GATEWAY, {
+    const textRes = await fetch(AI_GATEWAY, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -91,21 +138,21 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
-        messages: [{ role: "user", content: prompt }],
+        messages: [{ role: "user", content: textPrompt }],
         max_tokens: 600,
       }),
     });
 
-    if (!aiRes.ok) {
-      const errText = await aiRes.text();
-      throw new Error(`AI Gateway error [${aiRes.status}]: ${errText}`);
+    if (!textRes.ok) {
+      const errText = await textRes.text();
+      throw new Error(`AI text error [${textRes.status}]: ${errText}`);
     }
 
-    const aiData = await aiRes.json();
-    const messageText = aiData.choices?.[0]?.message?.content?.trim();
-    if (!messageText) throw new Error("AI returned empty response");
+    const textData = await textRes.json();
+    const messageText = textData.choices?.[0]?.message?.content?.trim();
+    if (!messageText) throw new Error("AI returned empty text");
 
-    // 3. Save to DB
+    // 4. Save to DB
     const title = `Прогноз магнітних бур — ${dateStr}`;
     const { error: dbError } = await supabase.from("news").insert({
       title,
@@ -115,27 +162,52 @@ Deno.serve(async (req) => {
     });
     if (dbError) console.error("DB insert error:", dbError);
 
-    // 4. Send to Telegram
-    const tgRes = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: messageText,
-          parse_mode: "HTML",
-        }),
-      }
-    );
+    // 5. Send to Telegram
+    let tgSuccess = false;
 
-    const tgData = await tgRes.json();
-    if (!tgData.ok) {
-      throw new Error(`Telegram error: ${JSON.stringify(tgData)}`);
+    // Try sending image with caption first
+    if (base64Image) {
+      try {
+        // Extract base64 data (remove data:image/png;base64, prefix)
+        const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
+        const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+
+        const formData = new FormData();
+        formData.append("chat_id", TELEGRAM_CHAT_ID);
+        formData.append("caption", messageText);
+        formData.append("photo", new Blob([binaryData], { type: "image/png" }), "forecast.png");
+
+        const tgRes = await fetch(
+          `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`,
+          { method: "POST", body: formData }
+        );
+        const tgData = await tgRes.json();
+        tgSuccess = tgData.ok;
+        if (!tgSuccess) console.error("Telegram photo error:", tgData);
+      } catch (imgErr) {
+        console.error("Image send failed, falling back to text:", imgErr);
+      }
+    }
+
+    // Fallback: send text only
+    if (!tgSuccess) {
+      const tgRes = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: messageText,
+          }),
+        }
+      );
+      const tgData = await tgRes.json();
+      if (!tgData.ok) throw new Error(`Telegram error: ${JSON.stringify(tgData)}`);
     }
 
     return new Response(
-      JSON.stringify({ success: true, message: messageText }),
+      JSON.stringify({ success: true, hasImage: !!base64Image, message: messageText }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
