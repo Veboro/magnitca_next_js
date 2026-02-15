@@ -27,7 +27,7 @@ export const BzChart = ({ className }: { className?: string }) => {
     }));
 
   return (
-    <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`}>
+    <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`} role="img" aria-label="Графік вертикальної складової міжпланетного магнітного поля Bz за останні 2 години">
       <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Компонент IMF Bz — 2 год
       </h3>
