@@ -1,33 +1,21 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { CalendarDays, Clock, ArrowLeft } from "lucide-react";
+import { CalendarDays, ArrowLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 interface NewsItem {
   id: string;
   title: string;
-  content: string;
-  source: string;
   published_at: string;
 }
 
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return d.toLocaleDateString("uk-UA", {
-    weekday: "long",
     day: "numeric",
     month: "long",
     year: "numeric",
-  });
-};
-
-const formatTime = (dateStr: string) => {
-  const d = new Date(dateStr);
-  return d.toLocaleTimeString("uk-UA", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Europe/Kyiv",
   });
 };
 
@@ -37,9 +25,9 @@ const News = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("news")
-        .select("*")
+        .select("id, title, published_at")
         .order("published_at", { ascending: false })
-        .limit(20);
+        .limit(30);
       if (error) throw error;
       return data ?? [];
     },
@@ -59,28 +47,23 @@ const News = () => {
             На головну
           </Link>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight font-mono">
-            Новини космічної погоди
+            Останні новини
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Щоденні прогнози та аналітика магнітних бур для України
+            Щоденні прогнози та аналітика магнітних бур
           </p>
         </div>
 
         {/* News list */}
         {isLoading ? (
-          <div className="space-y-6">
-            {[1, 2, 3].map((i) => (
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5].map((i) => (
               <div
                 key={i}
-                className="rounded-lg border border-border/50 bg-card p-6 animate-pulse"
+                className="rounded-lg border border-border/50 bg-card p-4 animate-pulse"
               >
-                <div className="h-5 bg-muted/30 rounded w-3/4 mb-4" />
-                <div className="h-3 bg-muted/20 rounded w-1/4 mb-6" />
-                <div className="space-y-2">
-                  <div className="h-3 bg-muted/20 rounded w-full" />
-                  <div className="h-3 bg-muted/20 rounded w-full" />
-                  <div className="h-3 bg-muted/20 rounded w-2/3" />
-                </div>
+                <div className="h-4 bg-muted/30 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-muted/20 rounded w-1/4" />
               </div>
             ))}
           </div>
@@ -89,39 +72,27 @@ const News = () => {
             <p className="text-muted-foreground">Новин поки немає</p>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="divide-y divide-border/40">
             {news.map((item, index) => (
-              <article
+              <Link
                 key={item.id}
+                to={`/news/${item.id}`}
                 className={cn(
-                  "rounded-lg border border-border/50 bg-card p-6 sm:p-8 transition-colors hover:border-primary/30",
-                  index === 0 && "border-primary/20 shadow-[var(--glow-cyan)]"
+                  "flex items-center justify-between gap-4 py-4 px-2 -mx-2 rounded-md transition-colors hover:bg-muted/30 group",
+                  index === 0 && "font-semibold"
                 )}
               >
-                <header className="mb-4">
-                  <h2 className="text-lg sm:text-xl font-semibold leading-tight mb-3">
+                <div className="min-w-0">
+                  <h2 className="text-sm sm:text-base leading-snug group-hover:text-primary transition-colors">
                     {item.title}
                   </h2>
-                  <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1.5">
-                      <CalendarDays className="h-3.5 w-3.5" />
-                      {formatDate(item.published_at)}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <Clock className="h-3.5 w-3.5" />
-                      {formatTime(item.published_at)}
-                    </span>
-                    {item.source === "ai" && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">
-                        Автоматичний прогноз
-                      </span>
-                    )}
-                  </div>
-                </header>
-                <div className="prose-sm text-sm leading-relaxed text-foreground/85 whitespace-pre-line">
-                  {item.content}
+                  <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground mt-1">
+                    <CalendarDays className="h-3 w-3" />
+                    {formatDate(item.published_at)}
+                  </span>
                 </div>
-              </article>
+                <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+              </Link>
             ))}
           </div>
         )}
