@@ -114,33 +114,28 @@ Deno.serve(async (req) => {
     const base64Image = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     // 3. Generate text with AI
-    const textPrompt = `Ти — експерт з космічної погоди та здоров'я. Напиши розгорнутий прогноз магнітних бур українською мовою для Telegram-каналу.
+    const textPrompt = `Ти — експерт з космічної погоди. Напиши стислий прогноз магнітних бур українською для Telegram.
 
 Дані NOAA на ${dateStr}:
-- Поточний Kp-індекс: ${latestKp.toFixed(1)}
-- Поточна G-шкала: G${currentG}
-- Прогноз на 3 дні: ${JSON.stringify(forecast)}
+- Kp-індекс: ${latestKp.toFixed(1)}, G-шкала: G${currentG}
+- Прогноз: ${JSON.stringify(forecast)}
 
-Структура тексту (використовуй саме цей формат):
+Формат (без привітань, одразу до справи):
 
-🌍 Магнітні бурі — прогноз на ${dateStr}
+🌍 Магнітні бурі — ${dateStr}
 
-Вступ (2-3 речення): звернення до метеозалежних українців, загальна оцінка ситуації в емпатичному тоні.
+📊 Показники:
+K-index: [значення] ([рівень])
+Ймовірність бурі: [%]
 
-📊 Основні показники:
-- K-index: [значення] балів ([колір] рівень, опис класу бурі)
-- Ймовірність бурі: [розрахуй на основі даних]%
-- Сонячний вітер: [швидкість] км/с
+Прогноз (🟢🟡🟠🔴):
+[дата]: [емодзі] [рівень]
 
-Прогноз на кожен день (емодзі: 🟢 спокійно, 🟡 слабка, 🟠 помірна, 🔴 сильна).
+🤕 Симптоми: коротко 1-2 речення.
 
-🤕 На що звернути увагу?
-Опиши можливі симптоми: головний біль, втома, безсоння, дратівливість тощо. Згадай що особливо це стосується мешканців північних та центральних регіонів.
+🔗 magnitca.com
 
-В самому кінці додай:
-🔗 Детальніше на magnitca.com
-
-Не використовуй markdown-форматування (без ** та __), тільки емодзі та простий текст. Максимум 900 символів.`;
+Без markdown, тільки емодзі. СТРОГО до 900 символів.`;
 
     const textRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -174,7 +169,9 @@ Deno.serve(async (req) => {
     });
     if (dbError) console.error("DB insert error:", dbError);
 
-    // 5. Send to Telegram — image first, then text as separate message
+    // 5. Send to Telegram — image with caption, fallback to text only
+    let tgSuccess = false;
+
     if (base64Image) {
       try {
         const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
@@ -182,33 +179,33 @@ Deno.serve(async (req) => {
 
         const formData = new FormData();
         formData.append("chat_id", TELEGRAM_CHAT_ID);
+        formData.append("caption", messageText);
         formData.append("photo", new Blob([binaryData], { type: "image/png" }), "forecast.png");
 
-        const tgPhotoRes = await fetch(
+        const tgRes = await fetch(
           `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`,
           { method: "POST", body: formData }
         );
-        const tgPhotoData = await tgPhotoRes.json();
-        if (!tgPhotoData.ok) console.error("Telegram photo error:", tgPhotoData);
+        const tgData = await tgRes.json();
+        tgSuccess = tgData.ok;
+        if (!tgSuccess) console.error("Telegram photo error:", tgData);
       } catch (imgErr) {
         console.error("Image send failed:", imgErr);
       }
     }
 
-    // Always send text as separate message
-    const tgTextRes = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: messageText,
-        }),
-      }
-    );
-    const tgTextData = await tgTextRes.json();
-    if (!tgTextData.ok) throw new Error(`Telegram error: ${JSON.stringify(tgTextData)}`);
+    if (!tgSuccess) {
+      const tgRes = await fetch(
+        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: messageText }),
+        }
+      );
+      const tgData = await tgRes.json();
+      if (!tgData.ok) throw new Error(`Telegram error: ${JSON.stringify(tgData)}`);
+    }
 
     return new Response(
       JSON.stringify({ success: true, hasImage: !!base64Image, message: messageText }),
