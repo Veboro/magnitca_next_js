@@ -209,8 +209,30 @@ K-index: [значення] ([рівень])
       if (!tgData.ok) throw new Error(`Telegram error: ${JSON.stringify(tgData)}`);
     }
 
+    // 6. Send Web Push notifications
+    let pushResult = null;
+    try {
+      const pushRes = await fetch(`${SUPABASE_URL}/functions/v1/send-push`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+        body: JSON.stringify({
+          title: "🌍 Прогноз магнітних бур",
+          body: messageText.substring(0, 200),
+          url: "/",
+          tag: "daily-forecast",
+        }),
+      });
+      pushResult = await pushRes.json();
+      console.log("Push result:", JSON.stringify(pushResult));
+    } catch (pushErr) {
+      console.error("Web Push error:", pushErr);
+    }
+
     return new Response(
-      JSON.stringify({ success: true, hasImage: !!base64Image, message: messageText }),
+      JSON.stringify({ success: true, hasImage: !!base64Image, message: messageText, push: pushResult }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

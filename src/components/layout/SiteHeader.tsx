@@ -1,6 +1,7 @@
-import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X, Rss } from "lucide-react";
+import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X, Rss, Bell, BellOff, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import logo from "@/assets/logo.png";
 
 const REFRESH_INTERVAL = 60;
@@ -13,6 +14,7 @@ const navItems = [
 ];
 
 export const SiteHeader = () => {
+  const { isSupported: pushSupported, isSubscribed: pushSubscribed, isLoading: pushLoading, toggle: togglePush } = usePushNotifications();
   const location = useLocation();
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -102,6 +104,24 @@ export const SiteHeader = () => {
           <a href={`https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/rss`} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="RSS">
             <Rss className="h-4 w-4" />
           </a>
+
+          {pushSupported && (
+            <button
+              onClick={togglePush}
+              disabled={pushLoading}
+              className="flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+              aria-label={pushSubscribed ? "Вимкнути сповіщення" : "Увімкнути сповіщення"}
+              title={pushSubscribed ? "Сповіщення увімкнено" : "Увімкнути пуш-сповіщення"}
+            >
+              {pushLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : pushSubscribed ? (
+                <Bell className="h-3.5 w-3.5 text-primary" />
+              ) : (
+                <BellOff className="h-3.5 w-3.5" />
+              )}
+            </button>
+          )}
 
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
