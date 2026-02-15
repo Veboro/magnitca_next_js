@@ -19,7 +19,7 @@ const formatDate = (stamp: string) => {
   return d.toLocaleDateString("uk-UA", { weekday: "short", day: "numeric", month: "short" });
 };
 
-export const ForecastCard = ({ className }: { className?: string }) => {
+export const ForecastCard = ({ className, layout = "vertical" }: { className?: string; layout?: "vertical" | "horizontal" }) => {
   const { data: days = [], isLoading } = useQuery<any[]>({
     queryKey: ["forecast-3day"],
     queryFn: async () => {
@@ -42,6 +42,8 @@ export const ForecastCard = ({ className }: { className?: string }) => {
     staleTime: 30000,
   });
 
+  const isHorizontal = layout === "horizontal";
+
   return (
     <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
       <div className="flex items-center gap-2 mb-4">
@@ -56,7 +58,7 @@ export const ForecastCard = ({ className }: { className?: string }) => {
           <span className="font-mono text-sm text-muted-foreground animate-pulse">Завантаження...</span>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className={cn(isHorizontal ? "grid grid-cols-1 sm:grid-cols-3 gap-4" : "space-y-3")}>
           {days.map((day: any, i) => {
             const info = gLevelInfo[Math.min(day.g, 5)];
             return (
