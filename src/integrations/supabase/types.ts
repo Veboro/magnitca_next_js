@@ -19,6 +19,7 @@ export type Database = {
           content: string
           created_at: string
           id: string
+          image_url: string | null
           published_at: string
           slug: string | null
           source: string | null
@@ -30,6 +31,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: string
+          image_url?: string | null
           published_at?: string
           slug?: string | null
           source?: string | null
@@ -41,6 +43,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: string
+          image_url?: string | null
           published_at?: string
           slug?: string | null
           source?: string | null

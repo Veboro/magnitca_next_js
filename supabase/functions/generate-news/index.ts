@@ -143,9 +143,50 @@ Deno.serve(async (req) => {
       };
     }
 
-    // 3. Save to DB
+    // 3. Generate cover image
+    let imageUrl: string | null = null;
+    try {
+      const imagePrompt = `Generate an image: a wide social media card (1200x600, landscape 2:1 aspect ratio). Background: smooth dark gradient with subtle aurora/northern lights and cosmic effects. Large bold white centered text: "${article.title}". Bottom right corner small text: "magnitca.com". Minimalist, space-themed, no faces, no photos of people. The text must be in Ukrainian language exactly as provided.`;
+
+      const imgRes = await fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-3-pro-image-preview",
+          messages: [{ role: "user", content: imagePrompt }],
+          modalities: ["image", "text"],
+        }),
+      });
+
+      if (imgRes.ok) {
+        const imgData = await imgRes.json();
+        const base64Image = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
+        if (base64Image) {
+          const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
+          const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
+          const fileName = `${slugify(article.title)}-${Date.now()}.png`;
+
+          const { error: uploadErr } = await supabase.storage
+            .from("news-images")
+            .upload(fileName, binaryData, { contentType: "image/png", upsert: true });
+
+          if (!uploadErr) {
+            const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(fileName);
+            imageUrl = urlData.publicUrl;
+          } else {
+            console.error("Upload error:", uploadErr);
+          }
+        }
+      }
+    } catch (imgErr) {
+      console.error("Image generation error:", imgErr);
+    }
+
+    // 4. Save to DB
     const baseSlug = slugify(article.title);
-    // Ensure unique slug by appending short id suffix if needed
     const { count } = await supabase.from("news").select("id", { count: "exact", head: true }).like("slug", `${baseSlug}%`);
     const slug = count && count > 0 ? `${baseSlug}-${count + 1}` : baseSlug;
 
@@ -153,6 +194,7 @@ Deno.serve(async (req) => {
       title: article.title,
       content: article.content,
       slug,
+      image_url: imageUrl,
       source: "ai",
       telegram_sent: false,
     }).select().single();

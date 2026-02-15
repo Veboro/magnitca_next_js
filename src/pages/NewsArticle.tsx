@@ -74,24 +74,33 @@ const NewsArticle = () => {
             <p className="text-muted-foreground">Новину не знайдено</p>
           </div>
         ) : (
-          <article className="rounded-lg border border-border/50 bg-card p-6 sm:p-8">
-            <header className="mb-6">
-              <h1 className="text-xl sm:text-2xl font-bold leading-tight mb-3">
-                {article.title}
-              </h1>
-              <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
-                <span className="inline-flex items-center gap-1.5">
-                  <CalendarDays className="h-3.5 w-3.5" />
-                  {formatDate(article.published_at)}
-                </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Clock className="h-3.5 w-3.5" />
-                  {formatTime(article.published_at)}
-                </span>
+          <article className="rounded-lg border border-border/50 bg-card overflow-hidden">
+            {article.image_url && (
+              <img
+                src={article.image_url}
+                alt={article.title}
+                className="w-full aspect-[2/1] object-cover"
+              />
+            )}
+            <div className="p-6 sm:p-8">
+              <header className="mb-6">
+                <h1 className="text-xl sm:text-2xl font-bold leading-tight mb-3">
+                  {article.title}
+                </h1>
+                <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    {formatDate(article.published_at)}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    {formatTime(article.published_at)}
+                  </span>
+                </div>
+              </header>
+              <div className="text-sm leading-relaxed text-foreground/85 whitespace-pre-line">
+                {article.content}
               </div>
-            </header>
-            <div className="text-sm leading-relaxed text-foreground/85 whitespace-pre-line">
-              {article.content}
             </div>
           </article>
         )}
