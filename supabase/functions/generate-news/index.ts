@@ -1,5 +1,26 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+const UA_TRANSLIT: Record<string, string> = {
+  а:"a",б:"b",в:"v",г:"h",ґ:"g",д:"d",е:"e",є:"ye",ж:"zh",з:"z",и:"y",і:"i",
+  ї:"yi",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",
+  ф:"f",х:"kh",ц:"ts",ч:"ch",ш:"sh",щ:"shch",ь:"",ю:"yu",я:"ya","'":"",ʼ:"",
+};
+
+function slugify(text: string): string {
+  const lower = text.toLowerCase();
+  let result = "";
+  for (const ch of lower) {
+    if (UA_TRANSLIT[ch] !== undefined) {
+      result += UA_TRANSLIT[ch];
+    } else if (/[a-z0-9]/.test(ch)) {
+      result += ch;
+    } else {
+      result += " ";
+    }
+  }
+  return result.trim().replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 80);
+}
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -123,9 +144,15 @@ Deno.serve(async (req) => {
     }
 
     // 3. Save to DB
+    const baseSlug = slugify(article.title);
+    // Ensure unique slug by appending short id suffix if needed
+    const { count } = await supabase.from("news").select("id", { count: "exact", head: true }).like("slug", `${baseSlug}%`);
+    const slug = count && count > 0 ? `${baseSlug}-${count + 1}` : baseSlug;
+
     const { data: inserted, error: dbError } = await supabase.from("news").insert({
       title: article.title,
       content: article.content,
+      slug,
       source: "ai",
       telegram_sent: false,
     }).select().single();
