@@ -6,7 +6,7 @@ import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ForecastCard } from "@/components/dashboard/ForecastCard";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
-import { TechImpact } from "@/components/dashboard/TechImpact";
+import { NewsWidget } from "@/components/dashboard/NewsWidget";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
 const getKpStatus = (kp: number) => {
@@ -65,8 +65,12 @@ const Index = () => {
 
           <div className="mt-6 grid gap-6 lg:grid-cols-3">
             <BzChart className="lg:col-span-2" />
-            <ForecastCard className="lg:col-span-1" />
+            <NewsWidget className="lg:col-span-1" />
           </div>
+        </section>
+
+        <section aria-label="Прогноз на 3 дні">
+          <ForecastCard layout="horizontal" />
         </section>
       </main>
 
