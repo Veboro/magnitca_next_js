@@ -11,6 +11,9 @@ import FAQ from "./pages/FAQ";
 import StormCalendar from "./pages/StormCalendar";
 import News from "./pages/News";
 import NewsArticle from "./pages/NewsArticle";
+import Contacts from "./pages/Contacts";
+import About from "./pages/About";
+import Privacy from "./pages/Privacy";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +30,9 @@ const App = () => (
           <Route path="/calendar" element={<StormCalendar />} />
           <Route path="/news" element={<News />} />
           <Route path="/news/:slug" element={<NewsArticle />} />
+          <Route path="/contacts" element={<Contacts />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/privacy" element={<Privacy />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
