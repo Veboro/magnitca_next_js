@@ -32,7 +32,7 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
     }));
 
   return (
-    <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`}>
+    <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`} role="img" aria-label="Графік швидкості та густини сонячного вітру за останні 2 години">
       <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Сонячний вітер — 2 год
       </h3>

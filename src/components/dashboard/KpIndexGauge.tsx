@@ -16,7 +16,7 @@ export const KpIndexGauge = ({ className }: { className?: string }) => {
   const value = Math.min(9, Math.max(0, Math.round(latestKp)));
 
   return (
-    <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)}>
+    <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)} role="img" aria-label={`Графік планетарного Kp індексу. Поточне значення: Kp ${value}, стан: ${kpLabels[value]}`}>
       <h3 className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Планетарний Kp Індекс
       </h3>
