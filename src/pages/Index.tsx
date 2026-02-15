@@ -73,7 +73,9 @@ const Index = () => {
 
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Про сервіс Магнітка">
         <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
-          <h2 className="text-lg font-display font-semibold text-foreground/90">Магнітні бурі сьогодні — прогноз геомагнітної активності</h2>
+          <h2 className="text-lg font-display font-semibold text-foreground/90">
+            Магнітні бурі сьогодні, {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })} — прогноз геомагнітної активності
+          </h2>
           <p>
             <strong>Магнітка</strong> — це безкоштовний український сервіс моніторингу магнітних бур у реальному часі. Ми показуємо актуальний <strong>Kp індекс</strong>, швидкість сонячного вітру, стан міжпланетного магнітного поля та прогноз геомагнітної активності на сьогодні й найближчі три дні. Усі дані оновлюються щохвилини з офіційних джерел <strong>NOAA Space Weather Prediction Center</strong>.
           </p>
