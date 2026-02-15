@@ -137,13 +137,10 @@ Deno.serve(async (req) => {
 🤕 На що звернути увагу?
 Опиши можливі симптоми: головний біль, втома, безсоння, дратівливість тощо. Згадай що особливо це стосується мешканців північних та центральних регіонів.
 
-💡 Як підтримати себе?
-Дай 4-5 конкретних порад з емодзі ✅ (пити воду, знизити навантаження, контрастний душ, лягти спати раніше тощо).
-
 В самому кінці додай:
 🔗 Детальніше на magnitca.com
 
-Не використовуй markdown-форматування (без ** та __), тільки емодзі та простий текст. Максимум 1200 символів.`;
+Не використовуй markdown-форматування (без ** та __), тільки емодзі та простий текст. Максимум 900 символів.`;
 
     const textRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -177,49 +174,41 @@ Deno.serve(async (req) => {
     });
     if (dbError) console.error("DB insert error:", dbError);
 
-    // 5. Send to Telegram
-    let tgSuccess = false;
-
-    // Try sending image with caption first
+    // 5. Send to Telegram — image first, then text as separate message
     if (base64Image) {
       try {
-        // Extract base64 data (remove data:image/png;base64, prefix)
         const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
         const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
 
         const formData = new FormData();
         formData.append("chat_id", TELEGRAM_CHAT_ID);
-        formData.append("caption", messageText);
         formData.append("photo", new Blob([binaryData], { type: "image/png" }), "forecast.png");
 
-        const tgRes = await fetch(
+        const tgPhotoRes = await fetch(
           `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`,
           { method: "POST", body: formData }
         );
-        const tgData = await tgRes.json();
-        tgSuccess = tgData.ok;
-        if (!tgSuccess) console.error("Telegram photo error:", tgData);
+        const tgPhotoData = await tgPhotoRes.json();
+        if (!tgPhotoData.ok) console.error("Telegram photo error:", tgPhotoData);
       } catch (imgErr) {
-        console.error("Image send failed, falling back to text:", imgErr);
+        console.error("Image send failed:", imgErr);
       }
     }
 
-    // Fallback: send text only
-    if (!tgSuccess) {
-      const tgRes = await fetch(
-        `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            text: messageText,
-          }),
-        }
-      );
-      const tgData = await tgRes.json();
-      if (!tgData.ok) throw new Error(`Telegram error: ${JSON.stringify(tgData)}`);
-    }
+    // Always send text as separate message
+    const tgTextRes = await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: messageText,
+        }),
+      }
+    );
+    const tgTextData = await tgTextRes.json();
+    if (!tgTextData.ok) throw new Error(`Telegram error: ${JSON.stringify(tgTextData)}`);
 
     return new Response(
       JSON.stringify({ success: true, hasImage: !!base64Image, message: messageText }),
