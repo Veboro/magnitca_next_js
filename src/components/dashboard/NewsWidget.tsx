@@ -68,7 +68,7 @@ export const NewsWidget = ({ className }: { className?: string }) => {
               className="flex items-center justify-between gap-2 py-2 -mx-2 px-2 rounded-md hover:bg-muted/30 transition-colors group"
             >
               <div className="min-w-0">
-                <p className="text-sm leading-snug truncate group-hover:text-primary transition-colors">
+                <p className="text-sm leading-snug group-hover:text-primary transition-colors">
                   {item.title}
                 </p>
                 <span className="text-[11px] text-muted-foreground/60 font-mono">

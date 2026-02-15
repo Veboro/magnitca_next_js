@@ -57,6 +57,10 @@ const Index = () => {
           </div>
         </section>
 
+        <section aria-label="Прогноз на 3 дні">
+          <ForecastCard layout="horizontal" />
+        </section>
+
         <section aria-label="Графіки та прогноз">
           <div className="grid gap-6 lg:grid-cols-3">
             <KpIndexGauge className="lg:col-span-1" />
@@ -67,10 +71,6 @@ const Index = () => {
             <BzChart className="lg:col-span-2" />
             <NewsWidget className="lg:col-span-1" />
           </div>
-        </section>
-
-        <section aria-label="Прогноз на 3 дні">
-          <ForecastCard layout="horizontal" />
         </section>
       </main>
 
