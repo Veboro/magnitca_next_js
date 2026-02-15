@@ -2,6 +2,7 @@ import { useEffect, useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar, StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
+import { uk } from "date-fns/locale";
 
 const levelColors: Record<StormLevel, string> = {
   none: "",
@@ -140,6 +141,7 @@ export default function StormCalendar() {
         <div className="flex justify-center">
           <Calendar
             mode="single"
+            locale={uk}
             numberOfMonths={1}
             defaultMonth={new Date(today.getFullYear(), today.getMonth())}
             modifiers={modifiers}
