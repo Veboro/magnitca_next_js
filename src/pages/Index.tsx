@@ -40,10 +40,9 @@ const Index = () => {
           </span>
         </div>
         <section aria-label="Статус геомагнітної активності">
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid gap-6 lg:grid-cols-2">
             <StormStatusBanner />
             <HumanImpact />
-            <TechImpact />
           </div>
         </section>
 
