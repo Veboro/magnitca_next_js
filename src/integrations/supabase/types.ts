@@ -20,6 +20,7 @@ export type Database = {
           created_at: string
           id: string
           published_at: string
+          slug: string | null
           source: string | null
           telegram_sent: boolean | null
           title: string
@@ -30,6 +31,7 @@ export type Database = {
           created_at?: string
           id?: string
           published_at?: string
+          slug?: string | null
           source?: string | null
           telegram_sent?: boolean | null
           title: string
@@ -40,6 +42,7 @@ export type Database = {
           created_at?: string
           id?: string
           published_at?: string
+          slug?: string | null
           source?: string | null
           telegram_sent?: boolean | null
           title?: string
