@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 interface NewsItem {
   id: string;
   title: string;
+  slug: string | null;
   published_at: string;
 }
 
@@ -25,7 +26,7 @@ const News = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("news")
-        .select("id, title, published_at")
+        .select("id, title, slug, published_at")
         .order("published_at", { ascending: false })
         .limit(30);
       if (error) throw error;
@@ -76,7 +77,7 @@ const News = () => {
             {news.map((item, index) => (
               <Link
                 key={item.id}
-                to={`/news/${item.id}`}
+                to={`/news/${item.slug || item.id}`}
                 className={cn(
                   "flex items-center justify-between gap-4 py-4 px-2 -mx-2 rounded-md transition-colors hover:bg-muted/30 group",
                   index === 0 && "font-semibold"

@@ -23,20 +23,29 @@ const formatTime = (dateStr: string) => {
 };
 
 const NewsArticle = () => {
-  const { id } = useParams<{ id: string }>();
+  const { slug } = useParams<{ slug: string }>();
 
   const { data: article, isLoading } = useQuery({
-    queryKey: ["news", id],
+    queryKey: ["news", slug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Try slug first, fallback to id
+      let { data, error } = await supabase
         .from("news")
         .select("*")
-        .eq("id", id!)
-        .single();
+        .eq("slug", slug!)
+        .maybeSingle();
+      
+      if (!data) {
+        ({ data, error } = await supabase
+          .from("news")
+          .select("*")
+          .eq("id", slug!)
+          .single());
+      }
       if (error) throw error;
       return data;
     },
-    enabled: !!id,
+    enabled: !!slug,
   });
 
   return (
