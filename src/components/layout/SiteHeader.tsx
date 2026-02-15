@@ -1,4 +1,4 @@
-import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Menu, X } from "lucide-react";
+import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import logo from "@/assets/logo.png";
@@ -7,6 +7,7 @@ const REFRESH_INTERVAL = 60;
 
 const navItems = [
   { href: "/", label: "Головна", icon: Activity },
+  { href: "/news", label: "Новини", icon: Newspaper },
   { href: "/calendar", label: "Календар", icon: CalendarDays },
   { href: "/faq", label: "FAQ", icon: HelpCircle },
 ];
