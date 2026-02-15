@@ -71,6 +71,21 @@ const Index = () => {
         </section>
       </main>
 
+      <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Про сервіс Магнітка">
+        <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
+          <h2 className="text-lg font-display font-semibold text-foreground/90">Магнітні бурі сьогодні — прогноз геомагнітної активності</h2>
+          <p>
+            <strong>Магнітка</strong> — це безкоштовний український сервіс моніторингу магнітних бур у реальному часі. Ми показуємо актуальний <strong>Kp індекс</strong>, швидкість сонячного вітру, стан міжпланетного магнітного поля та прогноз геомагнітної активності на сьогодні й найближчі три дні. Усі дані оновлюються щохвилини з офіційних джерел <strong>NOAA Space Weather Prediction Center</strong>.
+          </p>
+          <p>
+            Геомагнітні бурі виникають через потужні викиди сонячної плазми, що взаємодіють із магнітним полем Землі. Вони можуть впливати на самопочуття людей — спричиняти головний біль, підвищену втомлюваність, перепади тиску та порушення сну. Завдяки Магнітці ви завжди знатимете, чи очікується магнітна буря сьогодні, і зможете підготуватися заздалегідь.
+          </p>
+          <p>
+            Сервіс відображає ключові показники космічної погоди: <strong>Kp індекс</strong> (планетарний індекс магнітної активності від 0 до 9), <strong>G-шкалу NOAA</strong> (рівень геомагнітної бурі від G1 до G5), а також графіки сонячного вітру та компоненти Bz магнітного поля. Додатково доступний <strong>календар магнітних бур</strong> з архівом за останні дні та прогнозом на наступні.
+          </p>
+        </div>
+      </section>
+
       <footer className="mx-auto max-w-7xl px-6 py-8 border-t border-border/30">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-muted-foreground/60">
           <p>© {new Date().getFullYear()} Магнітка — моніторинг космічної погоди для України</p>
