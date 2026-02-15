@@ -98,20 +98,6 @@ const News = () => {
           </div>
         )}
 
-        {/* Footer */}
-        <footer className="mt-10 border-t border-border/30 pt-6 text-center">
-          <p className="text-xs text-muted-foreground/60">
-            Дані оновлюються автоматично на основі прогнозів{" "}
-            <a
-              href="https://www.swpc.noaa.gov/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary/70 hover:text-primary transition-colors"
-            >
-              NOAA SWPC
-            </a>
-          </p>
-        </footer>
       </div>
     </main>
   );
