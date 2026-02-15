@@ -29,10 +29,12 @@ const levelDotColors: Record<StormLevel, string> = {
 
 export default function StormCalendar() {
   useEffect(() => {
-    document.title = "Календар магнітних бур — Магнітка";
+    const now = new Date();
+    const monthName = now.toLocaleDateString("uk-UA", { month: "long", year: "numeric" });
+    document.title = `Календар магнітних бур на ${monthName} — Магнітка`;
     const meta = document.querySelector('meta[name="description"]');
     if (meta) {
-      meta.setAttribute("content", "Архів та прогноз магнітних бур на 2025–2026 рік. Дні з геомагнітними збуреннями позначені кольором за шкалою інтенсивності.");
+      meta.setAttribute("content", `Календар магнітних бур на ${monthName}. Дні з геомагнітними збуреннями позначені кольором за шкалою інтенсивності.`);
     }
   }, []);
 
@@ -96,16 +98,19 @@ export default function StormCalendar() {
 
   const today = new Date();
 
+  const monthNameGenitive = today.toLocaleDateString("uk-UA", { month: "long", year: "numeric" });
+  const monthNameTitle = monthNameGenitive.charAt(0).toUpperCase() + monthNameGenitive.slice(1);
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
       {/* Header */}
       <div className="mb-8 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 mb-4">
           <CalendarDays className="h-4 w-4 text-primary" />
-          <span className="font-mono text-xs text-primary">АРХІВ МАГНІТНИХ БУР</span>
+          <span className="font-mono text-xs text-primary">КАЛЕНДАР МАГНІТНИХ БУР</span>
         </div>
         <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">
-          Календар геомагнітної активності
+          Магнітні бурі — {monthNameTitle}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground max-w-lg mx-auto">
           Дні з магнітними бурями позначені кольором відповідно до інтенсивності. Пунктирна рамка — прогноз на найближчі дні.
@@ -135,13 +140,13 @@ export default function StormCalendar() {
         <div className="flex justify-center">
           <Calendar
             mode="single"
-            numberOfMonths={2}
-            defaultMonth={new Date(today.getFullYear(), today.getMonth() - 1)}
+            numberOfMonths={1}
+            defaultMonth={new Date(today.getFullYear(), today.getMonth())}
             modifiers={modifiers}
             modifiersStyles={modifiersStyles}
             className="rounded-xl border border-border/50 bg-card/50 p-4 pointer-events-auto"
             classNames={{
-              months: "flex flex-col sm:flex-row gap-6",
+              months: "flex flex-col gap-6",
               caption: "flex justify-center pt-1 relative items-center font-display font-semibold text-foreground",
               head_cell: "text-muted-foreground font-mono text-xs w-9",
               cell: "h-9 w-9 text-center text-sm relative",
@@ -195,6 +200,24 @@ export default function StormCalendar() {
         </div>
       )}
 
+      {/* SEO text */}
+      <section className="mt-10 border-t border-border/30 pt-8">
+        <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
+          <h2 className="text-lg font-display font-semibold text-foreground/90">
+            Календар магнітних бур на {monthNameTitle}
+          </h2>
+          <p>
+            На цій сторінці відображено <strong>календар магнітних бур на {monthNameGenitive}</strong> з даними про геомагнітну активність за кожен день. Дні з підвищеною активністю позначені кольором відповідно до рівня інтенсивності бурі: від слабких (Kp4) до екстремальних (Kp8–9). Прогнозні дні виділені пунктирною рамкою.
+          </p>
+          <p>
+            Геомагнітні бурі вимірюються за допомогою планетарного Kp-індексу та G-шкали NOAA. Коли Kp-індекс досягає 4 і вище, фіксується магнітна буря. Чим вищий рівень — тим більший вплив на здоров'я метеозалежних людей, роботу супутникового зв'язку, GPS-навігації та енергомереж.
+          </p>
+          <p>
+            Календар оновлюється автоматично на основі офіційних даних <strong>NOAA Space Weather Prediction Center</strong>. Використовуйте його для планування свого дня та контролю самопочуття в період підвищеної сонячної активності.
+          </p>
+        </div>
+      </section>
+
       {/* JSON-LD */}
       <script
         type="application/ld+json"
@@ -202,8 +225,8 @@ export default function StormCalendar() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "WebPage",
-            name: "Календар магнітних бур — Магнітка",
-            description: "Архів та прогноз магнітних бур. Дні з геомагнітними збуреннями позначені кольором за шкалою інтенсивності.",
+            name: `Календар магнітних бур на ${monthNameGenitive} — Магнітка`,
+            description: `Календар магнітних бур на ${monthNameGenitive}. Дні з геомагнітними збуреннями позначені кольором за шкалою інтенсивності.`,
             url: "https://magnetic-storm-hub.lovable.app/calendar",
           }),
         }}
