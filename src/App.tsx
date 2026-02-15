@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import FAQ from "./pages/FAQ";
 import StormCalendar from "./pages/StormCalendar";
 import News from "./pages/News";
+import NewsArticle from "./pages/NewsArticle";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/faq" element={<FAQ />} />
           <Route path="/calendar" element={<StormCalendar />} />
           <Route path="/news" element={<News />} />
+          <Route path="/news/:id" element={<NewsArticle />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
