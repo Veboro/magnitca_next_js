@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
     const bgColor = gScaleToColor(maxForecastG);
     const stormLabel = gScaleToLabel(maxForecastG);
 
-    const imagePrompt = `Generate an image: a clean social media card (landscape 16:9). Background: smooth gradient in ${bgColor} tones with subtle aurora effects. Large bold white centered text: "Прогноз магнітних бур". Below: "${dateStr}". Below that: "G${maxForecastG} — ${stormLabel}". Bottom corner small text: "magnetic-storm-hub.lovable.app". Minimalist, space-themed, no faces.`;
+    const imagePrompt = `Generate an image: a clean social media card (landscape 16:9). Background: smooth gradient in ${bgColor} tones with subtle aurora/northern lights effects. Large bold white centered text: "Прогноз магнітних бур". Below: "${dateStr}". Below that: "G${maxForecastG} — ${stormLabel}". Bottom right corner small text: "magnitca.com". Minimalist, space-themed, no faces, no photos of people.`;
 
     const imageRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -114,21 +114,36 @@ Deno.serve(async (req) => {
     const base64Image = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     // 3. Generate text with AI
-    const textPrompt = `Ти — експерт з космічної погоди. Напиши короткий прогноз магнітних бур українською мовою для Telegram-каналу.
+    const textPrompt = `Ти — експерт з космічної погоди та здоров'я. Напиши розгорнутий прогноз магнітних бур українською мовою для Telegram-каналу.
 
 Дані NOAA на ${dateStr}:
 - Поточний Kp-індекс: ${latestKp.toFixed(1)}
 - Поточна G-шкала: G${currentG}
 - Прогноз на 3 дні: ${JSON.stringify(forecast)}
 
-Формат:
+Структура тексту (використовуй саме цей формат):
+
 🌍 Магнітні бурі — прогноз на ${dateStr}
 
-Коротко опиши поточну ситуацію (1-2 речення).
-Потім прогноз на кожен день (використовуй емодзі для рівнів: 🟢 спокійно, 🟡 слабка, 🟠 помірна, 🔴 сильна).
-В кінці додай коротку пораду для метеозалежних людей.
+Вступ (2-3 речення): звернення до метеозалежних українців, загальна оцінка ситуації в емпатичному тоні.
 
-Не використовуй markdown-форматування, тільки емодзі та простий текст. Максимум 500 символів.`;
+📊 Основні показники:
+- K-index: [значення] балів ([колір] рівень, опис класу бурі)
+- Ймовірність бурі: [розрахуй на основі даних]%
+- Сонячний вітер: [швидкість] км/с
+
+Прогноз на кожен день (емодзі: 🟢 спокійно, 🟡 слабка, 🟠 помірна, 🔴 сильна).
+
+🤕 На що звернути увагу?
+Опиши можливі симптоми: головний біль, втома, безсоння, дратівливість тощо. Згадай що особливо це стосується мешканців північних та центральних регіонів.
+
+💡 Як підтримати себе?
+Дай 4-5 конкретних порад з емодзі ✅ (пити воду, знизити навантаження, контрастний душ, лягти спати раніше тощо).
+
+В самому кінці додай:
+🔗 Детальніше на magnitca.com
+
+Не використовуй markdown-форматування (без ** та __), тільки емодзі та простий текст. Максимум 1200 символів.`;
 
     const textRes = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -139,7 +154,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
         messages: [{ role: "user", content: textPrompt }],
-        max_tokens: 600,
+        max_tokens: 1500,
       }),
     });
 
