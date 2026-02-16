@@ -265,7 +265,7 @@ export const AiAssistant = () => {
           ) : noCredits ? (
             <div className="px-3 py-3 border-t border-border bg-card text-center space-y-2">
               <p className="text-xs text-muted-foreground">Бали закінчились</p>
-              {canShareToday && (
+              {canShareToday ? (
                 <button
                   onClick={claimShareBonus}
                   className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-[hsl(221,44%,41%)] text-white hover:bg-[hsl(221,44%,35%)] transition-colors"
@@ -273,14 +273,9 @@ export const AiAssistant = () => {
                   <Share2 className="h-3.5 w-3.5" />
                   Поділитись у Facebook — +3 бали
                 </button>
+              ) : (
+                <p className="text-[11px] text-muted-foreground/60">Нові бали з'являться завтра</p>
               )}
-              <a
-                href="/top-up"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                <Coins className="h-3.5 w-3.5" />
-                Поповнити баланс →
-              </a>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="px-3 py-2 border-t border-border bg-card">

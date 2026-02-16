@@ -22,7 +22,7 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import MeteoTest from "./pages/MeteoTest";
-import TopUp from "./pages/TopUp";
+
 
 const queryClient = new QueryClient();
 
@@ -48,7 +48,7 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/test" element={<MeteoTest />} />
-            <Route path="/top-up" element={<TopUp />} />
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
