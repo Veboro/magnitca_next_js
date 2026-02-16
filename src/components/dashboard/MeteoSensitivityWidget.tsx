@@ -103,7 +103,7 @@ export const MeteoSensitivityWidget = ({ className }: { className?: string }) =>
               Дізнайтесь свій рівень чутливості до магнітних бур
             </p>
             <a
-              href={user ? "/test" : "/auth?redirect=/test"}
+              href="/test"
               className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-1.5 font-mono text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
             >
               Пройти тест
