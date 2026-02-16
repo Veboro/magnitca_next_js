@@ -47,11 +47,12 @@ Deno.serve(async (req) => {
     // Fetch user's test results and current weather data in parallel
     const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const [testRes, kpRes, scalesRes, solarWindRes] = await Promise.all([
+    const [testRes, kpRes, scalesRes, solarWindRes, forecastRes] = await Promise.all([
       serviceClient.from("test_results").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
       fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
       fetch(`${SWPC_BASE}/products/noaa-scales.json`),
       fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
+      fetch(`${SWPC_BASE}/text/27-day-outlook.txt`),
     ]);
 
     // Parse NOAA data
@@ -67,7 +68,17 @@ Deno.serve(async (req) => {
     const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
     const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0");
 
-    // Build user context
+    // Parse 27-day forecast
+    const forecastText = await forecastRes.text();
+    const forecastLines = forecastText.split("\n")
+      .filter((line: string) => /^\d{4}\s/.test(line.trim()))
+      .slice(0, 14) // next 2 weeks
+      .map((line: string) => {
+        const parts = line.trim().split(/\s+/);
+        return `${parts[0]} ${parts[1]} ${parts[2]}: Kp до ${parts[5]}, A=${parts[4]}`;
+      })
+      .join("\n");
+
     const testResult = testRes.data?.[0];
     let userContext = "";
     if (testResult) {
@@ -95,6 +106,9 @@ Deno.serve(async (req) => {
 - G-шкала: G${currentG}
 - Швидкість сонячного вітру: ${windSpeed.toFixed(0)} км/с
 - Густина сонячного вітру: ${windDensity.toFixed(1)} p/cm³
+
+Прогноз на найближчі 14 днів (NOAA 27-Day Outlook):
+${forecastLines}
 ${userContext}
 
 Правила:
