@@ -89,7 +89,7 @@ export const AiAssistant = () => {
           aria-label="Відкрити ШІ-асистент"
         >
           <Sparkles className="h-5 w-5" />
-          <span className="hidden sm:inline text-sm font-medium">ШІ-асистент</span>
+          <span className="text-sm font-medium">Персональний асистент з космічної погоди</span>
         </button>
       )}
 
