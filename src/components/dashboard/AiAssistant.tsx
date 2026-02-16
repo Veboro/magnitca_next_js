@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles, LogIn } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, LogIn, Coins } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,8 +20,23 @@ export const AiAssistant = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [credits, setCredits] = useState<number | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Load credits when user is available
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("profiles")
+        .select("credits")
+        .eq("user_id", user.id)
+        .single()
+        .then(({ data }) => {
+          if (data) setCredits((data as any).credits ?? 5);
+        });
+    }
+  }, [user]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -39,7 +54,6 @@ export const AiAssistant = () => {
     scrollToBottom();
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const res = await supabase.functions.invoke("ai-assistant", {
         body: {
           message: text.trim(),
@@ -47,12 +61,32 @@ export const AiAssistant = () => {
         },
       });
 
-      if (res.error) throw res.error;
+      if (res.error) {
+        // Check for no_credits error
+        const errorBody = res.error as any;
+        if (errorBody?.context?.body) {
+          try {
+            const parsed = JSON.parse(new TextDecoder().decode(errorBody.context.body));
+            if (parsed.error === "no_credits") {
+              setCredits(0);
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: "На жаль, у вас закінчились бали. Поповніть баланс, щоб продовжити спілкування." },
+              ]);
+              return;
+            }
+          } catch {}
+        }
+        throw res.error;
+      }
 
       const assistantMsg: ChatMessage = {
         role: "assistant",
         content: res.data.reply,
       };
+      if (res.data.credits !== undefined) {
+        setCredits(res.data.credits);
+      }
       setMessages((prev) => [...prev, assistantMsg]);
     } catch (err) {
       console.error("AI Assistant error:", err);
@@ -78,6 +112,7 @@ export const AiAssistant = () => {
   }, [isOpen]);
 
   const isGuest = !user;
+  const noCredits = credits !== null && credits <= 0;
 
   return (
     <>
@@ -103,13 +138,21 @@ export const AiAssistant = () => {
               <span className="font-semibold text-sm">ШІ-асистент</span>
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-primary/10 text-primary font-mono">beta</span>
             </div>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="p-1 rounded-md hover:bg-secondary transition-colors"
-              aria-label="Закрити"
-            >
-              <X className="h-4 w-4" />
-            </button>
+            <div className="flex items-center gap-2">
+              {user && credits !== null && (
+                <span className="flex items-center gap-1 text-[11px] font-mono text-muted-foreground" title="Залишок балів">
+                  <Coins className="h-3 w-3" />
+                  {credits}
+                </span>
+              )}
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1 rounded-md hover:bg-secondary transition-colors"
+                aria-label="Закрити"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -160,13 +203,20 @@ export const AiAssistant = () => {
                       <p className="text-xs text-muted-foreground mt-1">
                         Я ваш персональний ШІ-асистент з космічної погоди. Запитуйте про магнітні бурі та їх вплив на ваше здоров'я.
                       </p>
+                      {credits !== null && (
+                        <p className="text-xs text-muted-foreground mt-1 flex items-center justify-center gap-1">
+                          <Coins className="h-3 w-3 text-primary" />
+                          У вас <span className="font-semibold text-foreground">{credits}</span> балів
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 w-full">
                       {SUGGESTIONS.map((s) => (
                         <button
                           key={s}
                           onClick={() => sendMessage(s)}
-                          className="text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-card hover:border-primary/30 transition-colors text-muted-foreground hover:text-foreground"
+                          disabled={noCredits}
+                          className="text-left text-xs px-3 py-2 rounded-lg border border-border hover:bg-card hover:border-primary/30 transition-colors text-muted-foreground hover:text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {s}
                         </button>
@@ -212,6 +262,17 @@ export const AiAssistant = () => {
             <div className="px-3 py-3 border-t border-border bg-card text-center">
               <a href="/auth" className="text-xs text-primary hover:underline font-medium">
                 Увійдіть, щоб почати розмову →
+              </a>
+            </div>
+          ) : noCredits ? (
+            <div className="px-3 py-3 border-t border-border bg-card text-center space-y-2">
+              <p className="text-xs text-muted-foreground">Бали закінчились</p>
+              <a
+                href="/top-up"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                <Coins className="h-3.5 w-3.5" />
+                Поповнити баланс →
               </a>
             </div>
           ) : (

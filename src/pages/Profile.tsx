@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw } from "lucide-react";
+import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw, Coins } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface TestResult {
@@ -69,6 +69,7 @@ const Profile = () => {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [testResults, setTestResults] = useState<TestResult[]>([]);
+  const [credits, setCredits] = useState<number>(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -79,13 +80,14 @@ const Profile = () => {
       // Load profile
       supabase
         .from("profiles")
-        .select("display_name, avatar_url")
+        .select("display_name, avatar_url, credits")
         .eq("user_id", user.id)
         .single()
         .then(({ data }) => {
           if (data) {
             setDisplayName(data.display_name || "");
             setAvatarUrl(data.avatar_url || "");
+            setCredits((data as any).credits ?? 0);
           }
         });
 
@@ -156,6 +158,25 @@ const Profile = () => {
               <p className="text-sm font-medium text-foreground">{displayName || "Користувач"}</p>
               <p className="text-xs text-muted-foreground">{user?.email}</p>
             </div>
+          </div>
+
+          {/* Credits */}
+          <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                <Coins className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-foreground">Баланс балів</p>
+                <p className="text-2xl font-bold font-mono text-primary">{credits}</p>
+              </div>
+            </div>
+            <Link
+              to="/top-up"
+              className="rounded-md bg-primary px-4 py-2 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Поповнити
+            </Link>
           </div>
 
           <form onSubmit={handleSave} className="space-y-4">
