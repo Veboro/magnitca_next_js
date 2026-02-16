@@ -41,11 +41,32 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Check credits
+    const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const { data: profile, error: profileError } = await serviceClient
+      .from("profiles")
+      .select("credits")
+      .eq("user_id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return new Response(JSON.stringify({ error: "Profile not found" }), {
+        status: 404,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (profile.credits <= 0) {
+      return new Response(JSON.stringify({ error: "no_credits", credits: 0 }), {
+        status: 402,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { message, history } = await req.json();
     if (!message) throw new Error("Message is required");
 
     // Fetch user's test results and current weather data in parallel
-    const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const [testRes, kpRes, scalesRes, solarWindRes, forecastRes] = await Promise.all([
       serviceClient.from("test_results").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
@@ -157,8 +178,15 @@ ${userContext}
     const reply = aiData.choices?.[0]?.message?.content?.trim();
     if (!reply) throw new Error("AI returned empty response");
 
+    // Deduct 1 credit
+    const newCredits = profile.credits - 1;
+    await serviceClient
+      .from("profiles")
+      .update({ credits: newCredits })
+      .eq("user_id", user.id);
+
     return new Response(
-      JSON.stringify({ reply }),
+      JSON.stringify({ reply, credits: newCredits }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
