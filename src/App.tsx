@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { AiAssistant } from "@/components/dashboard/AiAssistant";
+import { PwaInstallBanner } from "@/components/PwaInstallBanner";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FAQ from "./pages/FAQ";
@@ -51,6 +52,7 @@ const App = () => (
           </Routes>
           <SiteFooter />
           <AiAssistant />
+          <PwaInstallBanner />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
