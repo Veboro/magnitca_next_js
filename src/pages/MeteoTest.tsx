@@ -72,6 +72,14 @@ function getResultLabel(score: number) {
 
 type Step = "info" | "questions" | "calculating" | "result";
 
+const PENDING_TEST_KEY = "meteo_test_pending";
+
+interface PendingTest {
+  score: number;
+  personalInfo: PersonalInfo;
+  answers: number[];
+}
+
 const MeteoTest = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -89,6 +97,41 @@ const MeteoTest = () => {
     physicalActivity: "",
   });
   const [saving, setSaving] = useState(false);
+  const [restored, setRestored] = useState(false);
+
+  // Restore pending test after auth
+  useEffect(() => {
+    if (!user || restored) return;
+    const raw = localStorage.getItem(PENDING_TEST_KEY);
+    if (!raw) return;
+
+    try {
+      const pending: PendingTest = JSON.parse(raw);
+      localStorage.removeItem(PENDING_TEST_KEY);
+      setPersonalInfo(pending.personalInfo);
+      setAnswers(pending.answers);
+      setScore(pending.score);
+      setRestored(true);
+      setStep("result");
+
+      // Save to DB
+      setSaving(true);
+      supabase
+        .from("test_results")
+        .insert({
+          user_id: user.id,
+          score: pending.score,
+          name: pending.personalInfo.name,
+          age: parseInt(pending.personalInfo.age),
+          gender: pending.personalInfo.gender,
+          has_chronic: pending.personalInfo.hasChronic,
+          answers: pending.answers,
+        })
+        .then(() => setSaving(false));
+    } catch {
+      localStorage.removeItem(PENDING_TEST_KEY);
+    }
+  }, [user, restored]);
 
   // Calculating animation
   useEffect(() => {
@@ -110,12 +153,12 @@ const MeteoTest = () => {
     return () => clearInterval(interval);
   }, [step, answers, personalInfo]);
 
-  // Save result after auth
+  // Save result when user is already authed
   useEffect(() => {
-    if (step === "result" && user && score > 0 && !saving) {
+    if (step === "result" && user && score > 0 && !saving && !restored) {
       setSaving(true);
       supabase
-        .from("test_results" as any)
+        .from("test_results")
         .insert({
           user_id: user.id,
           score,
@@ -124,10 +167,10 @@ const MeteoTest = () => {
           gender: personalInfo.gender,
           has_chronic: personalInfo.hasChronic,
           answers,
-        } as any)
+        })
         .then(() => setSaving(false));
     }
-  }, [step, user, score]);
+  }, [step, user, score, restored]);
 
   const handleAnswer = (value: number) => {
     const newAnswers = [...answers, value];
@@ -376,13 +419,18 @@ const MeteoTest = () => {
                         Ваші відповіді збережено. Після реєстрації результат буде доступний у вашому кабінеті.
                       </p>
                     </div>
-                    <a
-                      href="/auth"
+                    <button
+                      onClick={() => {
+                        // Save pending test to localStorage
+                        const pending: PendingTest = { score, personalInfo, answers };
+                        localStorage.setItem(PENDING_TEST_KEY, JSON.stringify(pending));
+                        navigate("/auth?redirect=/test");
+                      }}
                       className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-2.5 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                     >
                       <User className="h-4 w-4" />
                       Зареєструватися
-                    </a>
+                    </button>
                   </div>
                 </>
               ) : (
