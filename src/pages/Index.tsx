@@ -35,8 +35,12 @@ const Index = () => {
       <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
         <h1 className="sr-only">Магнітка — моніторинг магнітних бур в реальному часі</h1>
 
-        <div className="flex items-baseline gap-3">
-          <h2 className="font-display text-xl font-bold text-foreground">Прогноз на сьогодні</h2>
+        <div className="flex items-center gap-3">
+          <h2 className="font-display text-xl font-bold text-foreground">Поточна ситуація</h2>
+          <span className="flex items-center gap-1.5">
+            <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
+            <span className="font-mono text-xs text-muted-foreground">НАЖИВО</span>
+          </span>
           <span className="font-mono text-sm text-muted-foreground">
             {new Date().toLocaleDateString("uk-UA", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
           </span>
