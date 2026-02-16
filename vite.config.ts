@@ -22,8 +22,8 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,woff,woff2}"],
         navigateFallbackDenylist: [/^\/~oauth/],
-        // Don't precache the push SW — it's registered separately
-        globIgnores: ["**/sw.js"],
+        globIgnores: ["**/sw.js", "**/og-image.png"],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
       manifest: {
         name: "Магнітка — космічна погода",
