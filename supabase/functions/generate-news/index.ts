@@ -167,11 +167,12 @@ Deno.serve(async (req) => {
         if (base64Image) {
           const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
           const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-          const fileName = `${slugify(article.title)}-${Date.now()}.png`;
+          // Convert to WebP for smaller file size
+          const fileName = `${slugify(article.title)}-${Date.now()}.webp`;
 
           const { error: uploadErr } = await supabase.storage
             .from("news-images")
-            .upload(fileName, binaryData, { contentType: "image/png", upsert: true });
+            .upload(fileName, binaryData, { contentType: "image/webp", upsert: true });
 
           if (!uploadErr) {
             const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(fileName);
