@@ -68,7 +68,7 @@ export const Forecast27Day = ({ className }: { className?: string }) => {
   if (!user) {
     return (
       <div className={cn("rounded-lg border border-border/50 bg-card p-6 relative overflow-hidden", className)}>
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-4 relative z-10">
           <CalendarDays className="h-4 w-4 text-primary" />
           <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Розширений прогноз на 27 днів
@@ -100,7 +100,7 @@ export const Forecast27Day = ({ className }: { className?: string }) => {
         </div>
 
         {/* CTA overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-[2px]">
+        <div className="absolute inset-x-0 top-12 bottom-0 flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-[2px]">
           <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
             <Lock className="h-5 w-5 text-primary" />
           </div>
