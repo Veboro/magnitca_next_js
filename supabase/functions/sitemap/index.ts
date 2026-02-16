@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const SITE_URL = "https://magnetic-storm-hub.lovable.app";
+const SITE_URL = "https://magnitca.com";
 
 const STATIC_PAGES = [
   { loc: "/", changefreq: "hourly", priority: "1.0" },
