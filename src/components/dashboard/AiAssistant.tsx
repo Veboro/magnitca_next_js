@@ -124,9 +124,27 @@ export const AiAssistant = () => {
                     <div>
                       <p className="text-sm font-medium text-foreground">Вітаю! 👋</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Я ШІ-асистент з космічної погоди. Щоб отримати персоналізовані поради щодо впливу магнітних бур на ваше здоров'я, увійдіть або зареєструйтесь.
+                        Я ШІ-асистент з космічної погоди. Зареєструйтесь, щоб отримати доступ до:
                       </p>
                     </div>
+                    <ul className="text-xs text-muted-foreground text-left space-y-1.5 w-full px-2">
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-0.5">✦</span>
+                        <span>Персональні поради щодо впливу магнітних бур на ваше здоров'я</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-0.5">✦</span>
+                        <span>Детальний <strong>27-денний прогноз</strong> Kp-індексу</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-0.5">✦</span>
+                        <span><strong>Тест на метеозалежність</strong> з персональними рекомендаціями</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-primary mt-0.5">✦</span>
+                        <span>ШІ-асистент, що враховує ваш стан здоров'я</span>
+                      </li>
+                    </ul>
                     <a
                       href="/auth"
                       className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
