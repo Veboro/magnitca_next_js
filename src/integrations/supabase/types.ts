@@ -104,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      test_results: {
+        Row: {
+          age: number
+          answers: Json
+          created_at: string
+          gender: string
+          has_chronic: boolean
+          id: string
+          name: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          age: number
+          answers?: Json
+          created_at?: string
+          gender: string
+          has_chronic?: boolean
+          id?: string
+          name: string
+          score: number
+          user_id: string
+        }
+        Update: {
+          age?: number
+          answers?: Json
+          created_at?: string
+          gender?: string
+          has_chronic?: boolean
+          id?: string
+          name?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
