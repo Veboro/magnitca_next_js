@@ -1,4 +1,4 @@
-import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X, Rss, Bell, BellOff, Loader2, LogIn, LogOut, User } from "lucide-react";
+import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X, Rss, Bell, BellOff, Loader2, LogIn, LogOut, User, ClipboardCheck } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -11,6 +11,7 @@ const navItems = [
   { href: "/", label: "Головна", icon: Activity },
   { href: "/news", label: "Новини", icon: Newspaper },
   { href: "/calendar", label: "Календар", icon: CalendarDays },
+  { href: "/test", label: "Тест", icon: ClipboardCheck },
   { href: "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
