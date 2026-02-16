@@ -128,11 +128,6 @@ export const SiteHeader = () => {
             {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
 
-          <span className="flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
-            <span className="font-mono text-xs text-muted-foreground">НАЖИВО</span>
-          </span>
-
           <span className="hidden sm:flex items-center gap-1.5">
             <RefreshCw
               className="h-3 w-3 text-muted-foreground/60 transition-transform"
