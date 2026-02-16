@@ -1,8 +1,32 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Loader2, User, Save } from "lucide-react";
+import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw } from "lucide-react";
+
+interface TestResult {
+  id: string;
+  score: number;
+  name: string;
+  age: number;
+  gender: string;
+  has_chronic: boolean;
+  created_at: string;
+}
+
+const getScoreColor = (score: number) => {
+  if (score <= 30) return "text-green-400";
+  if (score <= 60) return "text-yellow-400";
+  return "text-red-400";
+};
+
+const getScoreLabel = (score: number) => {
+  if (score <= 20) return "Мінімальна";
+  if (score <= 40) return "Низька";
+  if (score <= 60) return "Помірна";
+  if (score <= 80) return "Висока";
+  return "Дуже висока";
+};
 
 const Profile = () => {
   const { user, loading: authLoading } = useAuth();
@@ -12,6 +36,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [testResults, setTestResults] = useState<TestResult[]>([]);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -30,6 +55,16 @@ const Profile = () => {
             setDisplayName(data.display_name || "");
             setAvatarUrl(data.avatar_url || "");
           }
+        });
+
+      // Load test results
+      supabase
+        .from("test_results")
+        .select("id, score, name, age, gender, has_chronic, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false })
+        .then(({ data }) => {
+          if (data) setTestResults(data);
         });
     }
   }, [user, authLoading, navigate]);
@@ -125,6 +160,65 @@ const Profile = () => {
               Зберегти
             </button>
           </form>
+        </div>
+
+        {/* Test Results */}
+        <div className="rounded-lg border border-border/50 bg-card p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="font-display text-xl font-bold text-foreground flex items-center gap-2">
+              <Activity className="h-5 w-5 text-primary" />
+              Результати тесту
+            </h2>
+            <Link
+              to="/test"
+              className="flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+              Пройти знову
+            </Link>
+          </div>
+
+          {testResults.length === 0 ? (
+            <div className="text-center py-8 space-y-3">
+              <Activity className="h-10 w-10 text-muted-foreground/30 mx-auto" />
+              <p className="text-sm text-muted-foreground">Ви ще не проходили тест</p>
+              <Link
+                to="/test"
+                className="inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Пройти тест
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {testResults.map((result) => (
+                <div
+                  key={result.id}
+                  className="flex items-center gap-4 rounded-md border border-border/30 bg-secondary/10 p-4"
+                >
+                  <div className="flex-shrink-0 text-center">
+                    <p className={`text-2xl font-bold font-mono ${getScoreColor(result.score)}`}>
+                      {result.score}%
+                    </p>
+                    <p className={`text-[10px] font-mono ${getScoreColor(result.score)}`}>
+                      {getScoreLabel(result.score)}
+                    </p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">{result.name}</p>
+                    <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(result.created_at).toLocaleDateString("uk-UA", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </main>
     </div>
