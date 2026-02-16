@@ -6,7 +6,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const SITE_URL = "https://magnetic-storm-hub.lovable.app";
+const SITE_URL = "https://magnitca.com";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
