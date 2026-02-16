@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles, LogIn, Coins } from "lucide-react";
+import { X, Send, Loader2, Sparkles, LogIn, Coins, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useCredits } from "@/hooks/useCredits";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -20,23 +21,9 @@ export const AiAssistant = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [credits, setCredits] = useState<number | null>(null);
+  const { credits, setCredits, canShareToday, claimShareBonus } = useCredits(user);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // Load credits when user is available
-  useEffect(() => {
-    if (user) {
-      supabase
-        .from("profiles")
-        .select("credits")
-        .eq("user_id", user.id)
-        .single()
-        .then(({ data }) => {
-          if (data) setCredits((data as any).credits ?? 5);
-        });
-    }
-  }, [user]);
 
   const scrollToBottom = () => {
     setTimeout(() => {
@@ -209,6 +196,17 @@ export const AiAssistant = () => {
                           У вас <span className="font-semibold text-foreground">{credits}</span> балів
                         </p>
                       )}
+                      {canShareToday && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          <button
+                            onClick={claimShareBonus}
+                            className="inline-flex items-center gap-1 text-primary hover:text-primary/80 transition-colors font-medium"
+                          >
+                            <Share2 className="h-3 w-3" />
+                            +3 бали за шеринг у Facebook
+                          </button>
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 w-full">
                       {SUGGESTIONS.map((s) => (
@@ -267,6 +265,15 @@ export const AiAssistant = () => {
           ) : noCredits ? (
             <div className="px-3 py-3 border-t border-border bg-card text-center space-y-2">
               <p className="text-xs text-muted-foreground">Бали закінчились</p>
+              {canShareToday && (
+                <button
+                  onClick={claimShareBonus}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg bg-[hsl(221,44%,41%)] text-white hover:bg-[hsl(221,44%,35%)] transition-colors"
+                >
+                  <Share2 className="h-3.5 w-3.5" />
+                  Поділитись у Facebook — +3 бали
+                </button>
+              )}
               <a
                 href="/top-up"
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors"
