@@ -7,6 +7,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { AiAssistant } from "@/components/dashboard/AiAssistant";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import FAQ from "./pages/FAQ";
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <SiteFooter />
+          <AiAssistant />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>
