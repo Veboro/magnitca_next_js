@@ -23,6 +23,7 @@ export const NewsWidget = ({ className }: { className?: string }) => {
       const { data, error } = await supabase
         .from("news")
         .select("id, title, slug, published_at")
+        .eq("telegram_sent", false)
         .order("published_at", { ascending: false })
         .limit(5);
       if (error) throw error;
