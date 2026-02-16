@@ -1,12 +1,17 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
 import { Mail, Lock, User, Loader2, ArrowLeft } from "lucide-react";
-import { useEffect } from "react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Auth = () => {
+  usePageMeta(
+    "Вхід або реєстрація — Магнітка",
+    "Увійдіть або зареєструйтесь на Магнітці для доступу до розширеного 27-денного прогнозу магнітних бур."
+  );
+
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

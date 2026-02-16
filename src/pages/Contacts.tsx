@@ -1,7 +1,14 @@
 import { ArrowLeft, Mail, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
-const Contacts = () => (
+const Contacts = () => {
+  usePageMeta(
+    "Контакти — Магнітка",
+    "Зв'яжіться з командою Магнітки: email, Telegram. Питання, пропозиції та повідомлення про помилки."
+  );
+
+  return (
   <main className="min-h-screen bg-background pt-20 pb-12">
     <div className="mx-auto max-w-3xl px-4 sm:px-6">
       <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors mb-4">
@@ -21,6 +28,7 @@ const Contacts = () => (
       </div>
     </div>
   </main>
-);
+  );
+};
 
 export default Contacts;
