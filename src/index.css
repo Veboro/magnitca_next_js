@@ -9,67 +9,67 @@
 
 @layer base {
   :root {
-    --background: 209 40% 96%;
-    --foreground: 222 47% 11%;
+    --background: 340 40% 96%;
+    --foreground: 240 10% 10%;
 
-    --card: 210 40% 98%;
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
 
-    --popover: 214 31% 91%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 10%;
 
-    --primary: 200 98% 39%;
-    --primary-foreground: 204 100% 97%;
+    --primary: 340 82% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 24% 26%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 340 20% 92%;
+    --secondary-foreground: 240 10% 20%;
 
-    --muted: 215 20% 65%;
-    --muted-foreground: 222 47% 11%;
+    --muted: 340 15% 92%;
+    --muted-foreground: 240 5% 45%;
 
-    --accent: 210 40% 98%;
-    --accent-foreground: 215 19% 34%;
+    --accent: 340 30% 95%;
+    --accent-foreground: 340 70% 45%;
 
     --destructive: 0 72% 50%;
     --destructive-foreground: 0 85% 97%;
 
-    --border: 212 26% 83%;
-    --input: 212 26% 83%;
-    --ring: 200 98% 39%;
+    --border: 340 15% 88%;
+    --input: 340 15% 88%;
+    --ring: 340 82% 55%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --glow-cyan: 0 0 15px hsla(262, 50%, 55%, 0.12);
+    --glow-cyan: 0 0 15px hsla(340, 60%, 55%, 0.12);
     --glow-amber: 0 0 15px hsla(35, 70%, 50%, 0.12);
     --glow-red: 0 0 15px hsla(0, 70%, 50%, 0.12);
     --glow-green: 0 0 15px hsla(145, 60%, 40%, 0.12);
 
-    --chart-1: 198 93% 59%;
-    --chart-2: 213 93% 67%;
-    --chart-3: 215 20% 65%;
-    --chart-4: 215 16% 46%;
-    --chart-5: 215 19% 34%;
+    --chart-1: 340 82% 55%;
+    --chart-2: 210 80% 55%;
+    --chart-3: 340 20% 65%;
+    --chart-4: 210 16% 46%;
+    --chart-5: 340 30% 40%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 200 98% 39%;
-    --sidebar-primary-foreground: 204 100% 97%;
-    --sidebar-accent: 215 24% 26%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 212 26% 83%;
-    --sidebar-ring: 200 98% 39%;
-    --sidebar: 210 40% 98%;
+    --sidebar-foreground: 240 10% 10%;
+    --sidebar-primary: 340 82% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 340 20% 92%;
+    --sidebar-accent-foreground: 340 70% 45%;
+    --sidebar-border: 340 15% 88%;
+    --sidebar-ring: 340 82% 55%;
+    --sidebar: 0 0% 100%;
     --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: 'Lora', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 1px 2px -1px hsl(0 0% 0% / 0.1);
-    --shadow-md: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.1);
-    --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
-    --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
-    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.04);
+    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.04);
+    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.06), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
+    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.06), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
+    --shadow-md: 0 2px 6px 0px hsl(0 0% 0% / 0.06), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
+    --shadow-lg: 0 4px 12px 0px hsl(0 0% 0% / 0.06), 0 4px 6px -1px hsl(0 0% 0% / 0.06);
+    --shadow-xl: 0 8px 20px 0px hsl(0 0% 0% / 0.08), 0 8px 10px -1px hsl(0 0% 0% / 0.08);
+    --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.2);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
   }
@@ -177,6 +177,12 @@
     background-image: 
       linear-gradient(hsla(180, 100%, 50%, 0.03) 1px, transparent 1px),
       linear-gradient(90deg, hsla(180, 100%, 50%, 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+  :root .grid-bg {
+    background-image: 
+      linear-gradient(hsla(340, 80%, 55%, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, hsla(340, 80%, 55%, 0.04) 1px, transparent 1px);
     background-size: 40px 40px;
   }
 }
