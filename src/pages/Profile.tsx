@@ -20,12 +20,38 @@ const getScoreColor = (score: number) => {
   return "text-red-400";
 };
 
+const getScoreBgColor = (score: number) => {
+  if (score <= 30) return "bg-green-400/10 border-green-400/20";
+  if (score <= 60) return "bg-yellow-400/10 border-yellow-400/20";
+  return "bg-red-400/10 border-red-400/20";
+};
+
 const getScoreLabel = (score: number) => {
   if (score <= 20) return "Мінімальна";
   if (score <= 40) return "Низька";
   if (score <= 60) return "Помірна";
   if (score <= 80) return "Висока";
   return "Дуже висока";
+};
+
+const getScoreDescription = (score: number) => {
+  if (score <= 20)
+    return "Ваш організм практично не реагує на зміни геомагнітної активності. Ви належите до найменш метеозалежної групи людей.";
+  if (score <= 40)
+    return "Ви маєте незначну чутливість до магнітних бур. Іноді можете відчувати легкий дискомфорт під час сильних геомагнітних збурень.";
+  if (score <= 60)
+    return "Ваш організм помітно реагує на магнітні бурі. Рекомендуємо стежити за прогнозом і планувати навантаження з урахуванням геомагнітної ситуації.";
+  if (score <= 80)
+    return "Ви маєте високу метеозалежність. Під час магнітних бур можуть виникати головний біль, порушення сну та коливання тиску. Зверніть увагу на профілактику.";
+  return "Ваш організм дуже чутливий до геомагнітних змін. Наполегливо рекомендуємо консультацію з лікарем та регулярний моніторинг космічної погоди.";
+};
+
+const getGenderLabel = (gender: string) => {
+  switch (gender) {
+    case "male": return "Чоловіча";
+    case "female": return "Жіноча";
+    default: return "Інша";
+  }
 };
 
 const Profile = () => {
@@ -190,30 +216,43 @@ const Profile = () => {
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {testResults.map((result) => (
                 <div
                   key={result.id}
-                  className="flex items-center gap-4 rounded-md border border-border/30 bg-secondary/10 p-4"
+                  className={`rounded-lg border p-5 space-y-3 ${getScoreBgColor(result.score)}`}
                 >
-                  <div className="flex-shrink-0 text-center">
-                    <p className={`text-2xl font-bold font-mono ${getScoreColor(result.score)}`}>
-                      {result.score}%
-                    </p>
-                    <p className={`text-[10px] font-mono ${getScoreColor(result.score)}`}>
-                      {getScoreLabel(result.score)}
-                    </p>
+                  {/* Header row */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex-shrink-0 text-center min-w-[64px]">
+                      <p className={`text-3xl font-bold font-mono ${getScoreColor(result.score)}`}>
+                        {result.score}%
+                      </p>
+                      <p className={`text-xs font-mono font-medium ${getScoreColor(result.score)}`}>
+                        {getScoreLabel(result.score)}
+                      </p>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground">{result.name}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {getScoreDescription(result.score)}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{result.name}</p>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+
+                  {/* Details row */}
+                  <div className="flex flex-wrap gap-x-4 gap-y-1 pt-2 border-t border-border/20 text-[11px] font-mono text-muted-foreground">
+                    <span>Вік: {result.age}</span>
+                    <span>Стать: {getGenderLabel(result.gender)}</span>
+                    <span>Хронічні захворювання: {result.has_chronic ? "Так" : "Ні"}</span>
+                    <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {new Date(result.created_at).toLocaleDateString("uk-UA", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
                       })}
-                    </p>
+                    </span>
                   </div>
                 </div>
               ))}
