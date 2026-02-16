@@ -55,20 +55,56 @@ export const Forecast27Day = ({ className }: { className?: string }) => {
   });
 
   // CTA for non-logged users
+  // Generate fake blurred data for non-logged users
+  const fakeDays = Array.from({ length: 27 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return {
+      date: d.toISOString().slice(0, 10),
+      kp: Math.round((Math.sin(i * 0.7) + 1.5) * 2 * 10) / 10,
+    };
+  });
+
   if (!user) {
     return (
-      <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
+      <div className={cn("rounded-lg border border-border/50 bg-card p-6 relative overflow-hidden", className)}>
         <div className="flex items-center gap-2 mb-4">
           <CalendarDays className="h-4 w-4 text-primary" />
           <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Розширений прогноз на 27 днів
           </h3>
         </div>
-        <div className="flex flex-col items-center gap-4 py-6 text-center">
+
+        {/* Blurred fake data background */}
+        <div className="select-none pointer-events-none blur-[6px] opacity-60">
+          <div className="grid grid-cols-7 gap-1.5">
+            {fakeDays.map((day) => {
+              const d = new Date(day.date);
+              return (
+                <div
+                  key={day.date}
+                  className={cn(
+                    "rounded-md border p-1.5 text-center text-[10px] font-mono",
+                    kpColor(day.kp)
+                  )}
+                >
+                  <div className="text-muted-foreground/70">
+                    {d.toLocaleDateString("uk-UA", { weekday: "narrow" })}
+                  </div>
+                  <div className="text-xs font-bold">{d.getDate()}</div>
+                  <div className="text-[9px] opacity-80">Kp {day.kp}</div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* CTA overlay */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-card/60 backdrop-blur-[2px]">
           <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
             <Lock className="h-5 w-5 text-primary" />
           </div>
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 text-center">
             <p className="text-sm font-medium text-foreground">
               Доступно після реєстрації
             </p>
