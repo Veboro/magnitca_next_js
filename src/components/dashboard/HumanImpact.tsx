@@ -232,19 +232,24 @@ export const HumanImpact = ({ className }: { className?: string }) => {
 
           {impact.symptoms.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
-              {impact.symptoms.map((s) => (
-                <span
-                  key={s}
-                  className="rounded-full border px-2 py-0.5 text-[10px] transition-colors duration-500"
-                  style={{
-                    borderColor: `${impact.color}33`,
-                    color: impact.color,
-                    backgroundColor: `${impact.color}10`,
-                  }}
-                >
-                  {s}
-                </span>
-              ))}
+              {impact.symptoms.map((s) => {
+                // Extract HSL values for proper alpha support
+                const hslMatch = impact.color.match(/hsl\(([^)]+)\)/);
+                const hslValues = hslMatch ? hslMatch[1] : "0, 0%, 50%";
+                return (
+                  <span
+                    key={s}
+                    className="rounded-full border px-2 py-0.5 text-[10px] font-medium transition-colors duration-500"
+                    style={{
+                      borderColor: `hsla(${hslValues}, 0.2)`,
+                      color: impact.color,
+                      backgroundColor: `hsla(${hslValues}, 0.1)`,
+                    }}
+                  >
+                    {s}
+                  </span>
+                );
+              })}
             </div>
           )}
 
