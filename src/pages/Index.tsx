@@ -7,6 +7,7 @@ import { BzChart } from "@/components/dashboard/BzChart";
 import { ForecastCard } from "@/components/dashboard/ForecastCard";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
+import { UserProfileCard } from "@/components/dashboard/UserProfileCard";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
@@ -41,9 +42,10 @@ const Index = () => {
           </span>
         </div>
         <section aria-label="Статус геомагнітної активності">
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-[1fr_1fr_auto]">
             <StormStatusBanner />
             <HumanImpact />
+            <UserProfileCard className="lg:w-56" />
           </div>
         </section>
 

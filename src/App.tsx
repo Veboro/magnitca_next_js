@@ -18,6 +18,7 @@ import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
