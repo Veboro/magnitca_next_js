@@ -5,6 +5,7 @@ import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
 import { ForecastCard } from "@/components/dashboard/ForecastCard";
+import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
@@ -59,6 +60,10 @@ const Index = () => {
 
         <section aria-label="Прогноз на 3 дні">
           <ForecastCard layout="horizontal" />
+        </section>
+
+        <section aria-label="Розширений прогноз на 27 днів">
+          <Forecast27Day />
         </section>
 
         <section aria-label="Графіки та прогноз">

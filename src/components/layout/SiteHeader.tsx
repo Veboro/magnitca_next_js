@@ -1,7 +1,8 @@
-import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X, Rss, Bell, BellOff, Loader2 } from "lucide-react";
+import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Menu, X, Rss, Bell, BellOff, Loader2, LogIn, LogOut, User } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
+import { useAuth } from "@/hooks/useAuth";
 import logo from "@/assets/logo.png";
 
 const REFRESH_INTERVAL = 60;
@@ -14,6 +15,7 @@ const navItems = [
 ];
 
 export const SiteHeader = () => {
+  const { user, signOut, loading: authLoading } = useAuth();
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, isLoading: pushLoading, toggle: togglePush } = usePushNotifications();
   const location = useLocation();
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
@@ -121,6 +123,29 @@ export const SiteHeader = () => {
                 <BellOff className="h-3.5 w-3.5" />
               )}
             </button>
+          )}
+
+          {/* Auth button */}
+          {!authLoading && (
+            user ? (
+              <button
+                onClick={() => signOut()}
+                className="flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Вийти"
+                title="Вийти з акаунту"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+              </button>
+            ) : (
+              <a
+                href="/auth"
+                className="flex items-center justify-center h-7 w-7 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                aria-label="Увійти"
+                title="Увійти / Зареєструватися"
+              >
+                <LogIn className="h-3.5 w-3.5" />
+              </a>
+            )
           )}
 
           <span className="flex items-center gap-1.5">
