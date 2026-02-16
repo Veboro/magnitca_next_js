@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, ArrowRight, User, Lock, Loader2, Activity } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 // ─── Personal info step types ───
 interface PersonalInfo {
@@ -81,6 +82,11 @@ interface PendingTest {
 }
 
 const MeteoTest = () => {
+  usePageMeta(
+    "Тест на метеозалежність — Магнітка",
+    "Безкоштовний тест на метеочутливість. Дізнайтесь, наскільки ваш організм чутливий до магнітних бур та геомагнітної активності."
+  );
+
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>("info");

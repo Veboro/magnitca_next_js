@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 interface TestResult {
   id: string;
@@ -55,6 +56,11 @@ const getGenderLabel = (gender: string) => {
 };
 
 const Profile = () => {
+  usePageMeta(
+    "Профіль — Магнітка",
+    "Налаштування профілю та результати тесту на метеозалежність."
+  );
+
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [displayName, setDisplayName] = useState("");

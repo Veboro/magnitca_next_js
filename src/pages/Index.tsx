@@ -1,4 +1,5 @@
 import { Wind, Gauge, Radio, Sun, Activity, Thermometer } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
@@ -20,6 +21,11 @@ const getKpStatus = (kp: number) => {
 };
 
 const Index = () => {
+  usePageMeta(
+    "Магнітка — магнітні бурі сьогодні, прогноз Kp індексу",
+    "Магнітка — моніторинг магнітних бур в реальному часі. Kp індекс, сонячний вітер, прогноз геомагнітної активності та вплив на здоров'я. Дані NOAA щохвилини."
+  );
+
   const { data: kpData } = useKpIndex();
   const { data: windData } = useSolarWind();
   const { data: magData } = useMagData();

@@ -5,6 +5,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { HelpCircle, Zap, Heart, Wifi, Sun, Shield, Globe, Activity } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const faqSections = [
   {
@@ -160,12 +161,13 @@ const faqJsonLd = {
 };
 
 const FAQ = () => {
+  usePageMeta(
+    "FAQ — Магнітка | Часті питання про магнітні бурі",
+    "Відповіді на найпоширеніші питання про магнітні бурі, Kp індекс, вплив на здоров'я та техніку. Все простою мовою."
+  );
+
   return (
     <main className="min-h-screen bg-background">
-      <head>
-        <title>FAQ — Магнітка | Часті питання про магнітні бурі</title>
-        <meta name="description" content="Відповіді на найпоширеніші питання про магнітні бурі, Kp індекс, вплив на здоров'я та техніку. Все простою мовою." />
-      </head>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}

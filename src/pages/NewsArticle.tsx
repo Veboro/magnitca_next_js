@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, Clock, ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
@@ -47,6 +48,14 @@ const NewsArticle = () => {
     },
     enabled: !!slug,
   });
+
+  const articleTitle = article?.title || "Новина";
+  const articleDesc = article?.content?.slice(0, 150)?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
+
+  usePageMeta(
+    `${articleTitle} — Магнітка`,
+    articleDesc
+  );
 
   return (
     <main className="min-h-screen bg-background pt-20 pb-12">

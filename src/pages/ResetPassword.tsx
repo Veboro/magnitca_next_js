@@ -2,8 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Lock, Loader2 } from "lucide-react";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const ResetPassword = () => {
+  usePageMeta(
+    "Зміна пароля — Магнітка",
+    "Створіть новий пароль для вашого облікового запису на Магнітці."
+  );
+
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

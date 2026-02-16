@@ -1,8 +1,9 @@
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar, StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
 import { uk } from "date-fns/locale";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const levelColors: Record<StormLevel, string> = {
   none: "",
@@ -29,15 +30,13 @@ const levelDotColors: Record<StormLevel, string> = {
 };
 
 export default function StormCalendar() {
-  useEffect(() => {
-    const now = new Date();
-    const monthName = now.toLocaleDateString("uk-UA", { month: "long", year: "numeric" });
-    document.title = `Календар магнітних бур на ${monthName} — Магнітка`;
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) {
-      meta.setAttribute("content", `Календар магнітних бур на ${monthName}. Дні з геомагнітними збуреннями позначені кольором за шкалою інтенсивності.`);
-    }
-  }, []);
+  const now = new Date();
+  const monthName = now.toLocaleDateString("uk-UA", { month: "long", year: "numeric" });
+
+  usePageMeta(
+    `Календар магнітних бур на ${monthName} — Магнітка`,
+    `Календар магнітних бур на ${monthName}. Дні з геомагнітними збуреннями позначені кольором за шкалою інтенсивності.`
+  );
 
   const { data: stormDays, isLoading } = useStormCalendar();
 
