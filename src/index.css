@@ -151,9 +151,12 @@
     letter-spacing: 0.01em;
   }
 
-  :root:not(.dark) .text-xs, :root:not(.dark) .text-\[10px\], :root:not(.dark) .text-\[11px\], :root:not(.dark) .text-\[9px\], :root:not(.dark) .text-sm {
+  :root:not(.dark) .text-xs,
+  :root:not(.dark) .text-\[10px\],
+  :root:not(.dark) .text-\[11px\],
+  :root:not(.dark) .text-\[9px\],
+  :root:not(.dark) .text-sm {
     font-weight: 600;
-    color: hsl(240 10% 25%);
   }
 
   :root:not(.dark) .text-muted-foreground {

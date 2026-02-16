@@ -228,38 +228,37 @@ const MeteoTest = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Вік</label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="120"
-                    value={personalInfo.age}
-                    onChange={(e) => setPersonalInfo({ ...personalInfo, age: e.target.value })}
-                    className="w-full rounded-md border border-border/50 bg-secondary/20 py-2.5 px-4 font-mono text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-                    placeholder="Вік"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Стать</label>
-                  <div className="flex gap-2">
-                    {genderOptions.map((g) => (
-                      <button
-                        key={g}
-                        type="button"
-                        onClick={() => setPersonalInfo({ ...personalInfo, gender: g })}
-                        className={cn(
-                          "flex-1 rounded-md border px-3 py-2.5 font-mono text-xs transition-colors",
-                          personalInfo.gender === g
-                            ? "border-primary bg-primary/15 text-primary"
-                            : "border-border/50 bg-secondary/20 text-muted-foreground hover:text-foreground hover:bg-secondary/40"
-                        )}
-                      >
-                        {g}
-                      </button>
-                    ))}
-                  </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Вік</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="120"
+                  value={personalInfo.age}
+                  onChange={(e) => setPersonalInfo({ ...personalInfo, age: e.target.value })}
+                  className="w-full rounded-md border border-border/50 bg-secondary/20 py-2.5 px-4 font-mono text-sm text-foreground placeholder:text-muted-foreground/50 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="Вік"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Стать</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {genderOptions.map((g) => (
+                    <button
+                      key={g}
+                      type="button"
+                      onClick={() => setPersonalInfo({ ...personalInfo, gender: g })}
+                      className={cn(
+                        "rounded-md border px-2 py-2.5 font-mono text-xs transition-colors text-center",
+                        personalInfo.gender === g
+                          ? "border-primary bg-primary/15 text-primary"
+                          : "border-border/50 bg-secondary/20 text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+                      )}
+                    >
+                      {g}
+                    </button>
+                  ))}
                 </div>
               </div>
 
@@ -300,7 +299,7 @@ const MeteoTest = () => {
             <button
               onClick={() => setStep("questions")}
               disabled={!isInfoValid}
-              className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-mono text-sm font-semibold text-primary-foreground shadow-md transition-colors hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Почати тест
               <ArrowRight className="h-4 w-4" />
