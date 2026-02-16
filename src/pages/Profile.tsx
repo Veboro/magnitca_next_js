@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw, Coins } from "lucide-react";
+import { useCredits } from "@/hooks/useCredits";
+import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw, Coins, Share2 } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { toast } from "sonner";
 
 interface TestResult {
   id: string;
@@ -61,15 +63,15 @@ const Profile = () => {
     "Налаштування профілю та результати тесту на метеозалежність."
   );
 
-  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
+  const { credits, canShareToday, claimShareBonus } = useCredits(user);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
   const [testResults, setTestResults] = useState<TestResult[]>([]);
-  const [credits, setCredits] = useState<number>(0);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -80,14 +82,13 @@ const Profile = () => {
       // Load profile
       supabase
         .from("profiles")
-        .select("display_name, avatar_url, credits")
+        .select("display_name, avatar_url")
         .eq("user_id", user.id)
         .single()
         .then(({ data }) => {
           if (data) {
             setDisplayName(data.display_name || "");
             setAvatarUrl(data.avatar_url || "");
-            setCredits((data as any).credits ?? 0);
           }
         });
 
@@ -161,22 +162,33 @@ const Profile = () => {
           </div>
 
           {/* Credits */}
-          <div className="flex items-center justify-between rounded-lg border border-primary/20 bg-primary/5 p-4">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
                 <Coins className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm font-medium text-foreground">Баланс балів</p>
-                <p className="text-2xl font-bold font-mono text-primary">{credits}</p>
+                <p className="text-2xl font-bold font-mono text-primary">{credits ?? 0}</p>
+                <p className="text-[11px] text-muted-foreground">Щодня ви отримуєте 3 безкоштовні бали</p>
               </div>
             </div>
-            <Link
-              to="/top-up"
-              className="rounded-md bg-primary px-4 py-2 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Поповнити
-            </Link>
+            {canShareToday && (
+              <button
+                onClick={async () => {
+                  const success = await claimShareBonus();
+                  if (success) toast.success("Дякуємо за шеринг! +3 бали додано.");
+                }}
+                className="w-full flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 p-3 transition-all hover:scale-[1.01] active:scale-[0.99]"
+              >
+                <div className="flex items-center gap-2">
+                  <Share2 className="h-4 w-4 text-[hsl(221,44%,41%)]" />
+                  <span className="text-sm font-medium text-foreground">Поділитись у Facebook</span>
+                  <span className="text-xs text-muted-foreground">раз на день</span>
+                </div>
+                <span className="font-display text-base font-bold text-primary">+3</span>
+              </button>
+            )}
           </div>
 
           <form onSubmit={handleSave} className="space-y-4">
