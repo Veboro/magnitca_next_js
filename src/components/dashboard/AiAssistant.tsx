@@ -278,27 +278,38 @@ export const AiAssistant = () => {
               )}
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="px-3 py-2 border-t border-border bg-card">
-              <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  placeholder="Запитайте про магнітні бурі..."
-                  className="flex-1 bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
-                  disabled={isLoading}
-                />
+            <div className="border-t border-border bg-card">
+              {canShareToday && (
                 <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40"
-                  aria-label="Надіслати"
+                  onClick={claimShareBonus}
+                  className="w-full flex items-center justify-center gap-1.5 text-xs font-medium px-3 py-1.5 bg-[hsl(221,44%,41%)]/10 text-[hsl(221,44%,41%)] hover:bg-[hsl(221,44%,41%)]/20 transition-colors"
                 >
-                  <Send className="h-4 w-4" />
+                  <Share2 className="h-3 w-3" />
+                  Поділитись у Facebook — +3 бали
                 </button>
-              </div>
-            </form>
+              )}
+              <form onSubmit={handleSubmit} className="px-3 py-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Запитайте про магнітні бурі..."
+                    className="flex-1 bg-secondary/50 border border-border rounded-lg px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || isLoading}
+                    className="p-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-40"
+                    aria-label="Надіслати"
+                  >
+                    <Send className="h-4 w-4" />
+                  </button>
+                </div>
+              </form>
+            </div>
           )}
         </div>
       )}
