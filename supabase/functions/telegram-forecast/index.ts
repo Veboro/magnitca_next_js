@@ -48,18 +48,24 @@ Deno.serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // 1. Fetch NOAA data
-    const [scalesRes, kpRes] = await Promise.all([
+    // 1. Fetch NOAA data (including solar wind like the news function)
+    const [scalesRes, kpRes, solarWindRes] = await Promise.all([
       fetch(`${SWPC_BASE}/products/noaa-scales.json`),
       fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
+      fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
     ]);
 
     const scales = await scalesRes.json();
     const kpData = await kpRes.json();
+    const solarWindRaw: string[][] = await solarWindRes.json();
 
     const latestKp = kpData.length > 0
       ? parseFloat(kpData[kpData.length - 1].estimated_kp ?? kpData[kpData.length - 1].kp_index ?? "0")
       : 0;
+
+    const lastWind = solarWindRaw.length > 1 ? solarWindRaw[solarWindRaw.length - 1] : null;
+    const windSpeed = lastWind ? parseFloat(lastWind[2]) || 0 : 0;
+    const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
 
     const forecast = ["1", "2", "3"].map((key) => {
       const d = scales[key];
@@ -116,30 +122,34 @@ Deno.serve(async (req) => {
     } : "no message"));
     const base64Image = imageData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
-    // 3. Generate text with AI
-    const textPrompt = `Ти — експерт з космічної погоди. Напиши стислий але людяний прогноз магнітних бур українською для Telegram.
+    // 3. Generate text with AI (same model and data quality as news)
+    const textPrompt = `Ти — журналіст українського новинного порталу. Напиши стислий прогноз магнітних бур українською для Telegram-каналу на основі даних NOAA.
 
-Дані NOAA на ${dateStr}:
+Дані на ${dateStr}:
 - Kp-індекс: ${latestKp.toFixed(1)}, G-шкала: G${currentG}
+- Сонячний вітер: ${windSpeed.toFixed(0)} км/с, густина: ${windDensity.toFixed(1)} p/cm³
 - Прогноз: ${JSON.stringify(forecast)}
 
 Формат (без привітань, одразу до справи):
 
 🌍 Магнітні бурі — ${dateStr}
 
-2-3 речення простою мовою: є буря чи ні, наскільки сильна, чи варто хвилюватися. Якщо спокійно — заспокой читача. Якщо буря — поясни що це означає для звичайної людини.
+Абзац 1 (2-3 речення): сьогоднішній рівень бурі G${currentG}, Kp-індекс ${latestKp.toFixed(1)}, чи є загроза. Якщо G0 — чітко скажи що бур не очікується. Якщо G1+ — поясни що це означає.
+
+Абзац 2 (2 речення): сонячний вітер ${windSpeed.toFixed(0)} км/с, прогноз на найближчі дні.
 
 📊 Показники:
-K-index: [значення] ([рівень])
-Ймовірність бурі: [%]
+K-index: ${latestKp.toFixed(1)}
+Сонячний вітер: ${windSpeed.toFixed(0)} км/с
 
 Прогноз (🟢🟡🟠🔴):
-[дата]: [емодзі] [рівень]
+[дата]: [емодзі] G[рівень]
 
-🤕 Коротко (1 речення) про можливі симптоми або що все ок.
+🤕 Коротко (1 речення) про вплив на самопочуття.
 
 🔗 magnitca.com
 
+ВАЖЛИВО: Картинка показує G${currentG} — текст ПОВИНЕН відповідати цьому рівню. Не суперечити!
 Без markdown, тільки емодзі. СТРОГО до 950 символів.`;
 
     const textRes = await fetch(AI_GATEWAY, {
@@ -149,7 +159,7 @@ K-index: [значення] ([рівень])
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "google/gemini-2.5-flash",
         messages: [{ role: "user", content: textPrompt }],
         max_tokens: 1500,
       }),
