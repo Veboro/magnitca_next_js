@@ -1,4 +1,4 @@
-import { RefreshCw, Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -6,7 +6,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
-const REFRESH_INTERVAL = 60;
 
 const navItems = [
   { href: "/", label: "Головна", icon: Activity },
@@ -20,7 +19,6 @@ export const SiteHeader = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, isLoading: pushLoading, toggle: togglePush } = usePushNotifications();
   const location = useLocation();
-  const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
       return document.documentElement.classList.contains("dark");
@@ -31,12 +29,6 @@ export const SiteHeader = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCountdown((prev) => (prev <= 1 ? REFRESH_INTERVAL : prev - 1));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
 
   useEffect(() => {
     if (!user) { setDisplayName(null); return; }
@@ -149,21 +141,6 @@ export const SiteHeader = () => {
             )
           )}
 
-          <span className="hidden sm:flex items-center gap-1.5">
-            <RefreshCw
-              className="h-3 w-3 text-muted-foreground/60 transition-transform"
-              style={{
-                animation: countdown <= 3 ? "spin 1s linear infinite" : "none",
-              }}
-            />
-            <span className="font-mono text-[10px] text-muted-foreground/60">
-              {countdown}с
-            </span>
-            <span
-              className="h-[3px] rounded-full bg-primary/40 transition-all duration-1000 ease-linear"
-              style={{ width: `${(countdown / REFRESH_INTERVAL) * 40}px` }}
-            />
-          </span>
         </div>
       </div>
 
