@@ -39,25 +39,48 @@ serve(async (req) => {
     const scalesData = await scalesRes.json();
     const kpData = await kpRes.json();
 
-    // Get current G-scale from NOAA (same as main page)
-    let stormLevel = 0;
-    if (scalesData?.["-1"]?.G?.Scale != null) {
-      stormLevel = parseInt(scalesData["-1"].G.Scale) || 0;
+    // Get CURRENT G-scale (key "0") — not observed/past (key "-1")
+    // Key "0" = current conditions, "-1" = last 24h observed max
+    let currentG = 0;
+    if (scalesData?.["0"]?.G?.Scale != null) {
+      currentG = parseInt(scalesData["0"].G.Scale) || 0;
     }
 
-    // Get current Kp from latest measurement
+    // Also check today's forecast (key "1")
+    let forecastG = 0;
+    if (scalesData?.["1"]?.G?.Scale != null) {
+      forecastG = parseInt(scalesData["1"].G.Scale) || 0;
+    }
+
+    // Use the higher of current vs forecast
+    let stormLevel = Math.max(currentG, forecastG);
+
+    // Get max Kp from last 3 hours (not just latest minute)
     let maxKp = 0;
     if (Array.isArray(kpData) && kpData.length > 0) {
-      const latest = kpData[kpData.length - 1];
-      maxKp = parseFloat(latest.estimated_kp ?? latest.kp_index ?? latest.kp ?? 0);
+      // Take last 180 entries (~3 hours of 1-min data)
+      const recent = kpData.slice(-180);
+      for (const entry of recent) {
+        const kp = parseFloat(entry.estimated_kp ?? entry.kp_index ?? entry.kp ?? 0);
+        if (!isNaN(kp) && kp > maxKp) maxKp = kp;
+      }
     }
 
-    // 3. Skip if no significant storm
-    if (stormLevel < 1 && maxKp < 5) {
-      return new Response(JSON.stringify({ message: "No storm detected", maxKp, stormLevel }), {
+    // 3. Conservative threshold: only alert for G2+ OR Kp >= 6
+    // G1 is too minor for alerts, and we need BOTH indicators to agree
+    const isSignificant = stormLevel >= 2 || maxKp >= 6;
+
+    if (!isSignificant) {
+      return new Response(JSON.stringify({ 
+        message: "No significant storm", maxKp, stormLevel, currentG, forecastG,
+        observedG: parseInt(scalesData?.["-1"]?.G?.Scale) || 0
+      }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    // If G comes from forecast but Kp is very low, include forecast context
+    const isFromForecast = forecastG > currentG;
 
     // 4. Generate AI message
     const gLabels: Record<number, string> = {
@@ -85,7 +108,7 @@ serve(async (req) => {
           },
           {
             role: "user",
-            content: `Створи сповіщення про магнітну бурю. Рівень: ${title}. Максимальний Kp-індекс: ${maxKp}. Дата: ${today}. Включи: 1) Короткий опис ситуації 2) Можливі симптоми для метеозалежних 3) Практичні рекомендації (вода, відпочинок, ліки, сон). Не використовуй markdown форматування.`,
+            content: `Створи сповіщення про магнітну бурю. Рівень: ${title}. Поточний максимальний Kp-індекс за останні 3 години: ${maxKp.toFixed(1)}. ${isFromForecast ? "Це прогноз на сьогодні, буря ще не почалась." : "Буря зараз активна."} Дата: ${today}. Включи: 1) Короткий опис ситуації 2) Можливі симптоми для метеозалежних 3) Практичні рекомендації (вода, відпочинок, ліки, сон). Не використовуй markdown форматування.`,
           },
         ],
       }),
