@@ -7,11 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AdminGuard } from "@/components/admin/AdminGuard";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Eye } from "lucide-react";
+import { ArrowLeft, Save } from "lucide-react";
 
 const transliterate = (text: string): string => {
   const map: Record<string, string> = {
@@ -204,51 +205,21 @@ const AdminNewsEditor = () => {
               </div>
             </div>
 
-            {/* Content with preview */}
+            {/* Content - Rich Text Editor */}
             <div className="space-y-1.5">
               <Label>Контент *</Label>
-              <Tabs defaultValue="edit">
-                <TabsList className="mb-2">
-                  <TabsTrigger value="edit">Редагувати</TabsTrigger>
-                  <TabsTrigger value="preview">
-                    <Eye className="h-3.5 w-3.5 mr-1" />
-                    Попередній перегляд
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="edit">
-                  <Textarea
-                    value={form.content}
-                    onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
-                    placeholder="Текст новини..."
-                    className="min-h-[250px] font-mono text-sm"
-                  />
-                </TabsContent>
-                <TabsContent value="preview">
-                  <div className="rounded-md border border-border/50 bg-card p-4 min-h-[250px] text-sm leading-relaxed text-foreground/85 whitespace-pre-line">
-                    {form.content || <span className="text-muted-foreground italic">Порожньо</span>}
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <RichTextEditor
+                content={form.content}
+                onChange={(html) => setForm((f) => ({ ...f, content: html }))}
+                placeholder="Текст новини..."
+              />
             </div>
 
-            {/* Image URL */}
-            <div className="space-y-1.5">
-              <Label htmlFor="image_url">URL зображення</Label>
-              <Input
-                id="image_url"
-                value={form.image_url}
-                onChange={(e) => setForm((f) => ({ ...f, image_url: e.target.value }))}
-                placeholder="https://..."
-              />
-              {form.image_url && (
-                <img
-                  src={form.image_url}
-                  alt="Попередній перегляд"
-                  className="mt-2 rounded-md max-h-40 object-cover"
-                  onError={(e) => (e.currentTarget.style.display = "none")}
-                />
-              )}
-            </div>
+            {/* Image Upload */}
+            <ImageUpload
+              value={form.image_url}
+              onChange={(url) => setForm((f) => ({ ...f, image_url: url }))}
+            />
 
             {/* Published at */}
             <div className="space-y-1.5">
