@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /auth
+Disallow: /profile
+Disallow: /reset-password
+
 Sitemap: https://magnitca.com/sitemap.xml
