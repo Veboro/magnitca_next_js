@@ -2,20 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
-const DAILY_CREDITS = 3;
-const SHARE_BONUS = 3;
-
-function isNewDay(dateStr: string | null): boolean {
-  if (!dateStr) return true;
-  const last = new Date(dateStr);
-  const now = new Date();
-  return (
-    last.getUTCFullYear() !== now.getUTCFullYear() ||
-    last.getUTCMonth() !== now.getUTCMonth() ||
-    last.getUTCDate() !== now.getUTCDate()
-  );
-}
-
 export function useCredits(user: User | null) {
   const [credits, setCredits] = useState<number | null>(null);
   const [canShareToday, setCanShareToday] = useState(false);
@@ -25,32 +11,19 @@ export function useCredits(user: User | null) {
     if (!user) return;
     setLoadingCredits(true);
     try {
-      const { data } = await supabase
-        .from("profiles")
-        .select("credits, credits_reset_at, last_share_bonus_at")
-        .eq("user_id", user.id)
-        .single();
-
-      if (!data) return;
-
-      const profile = data as any;
-      const needsReset = isNewDay(profile.credits_reset_at);
-
-      if (needsReset) {
-        // Reset credits to daily amount
-        const { data: updated } = await supabase
-          .from("profiles")
-          .update({ credits: DAILY_CREDITS, credits_reset_at: new Date().toISOString() })
-          .eq("user_id", user.id)
-          .select("credits")
-          .single();
-        setCredits(updated ? (updated as any).credits : DAILY_CREDITS);
-        // New day = can share again
-        setCanShareToday(true);
-      } else {
-        setCredits(profile.credits ?? DAILY_CREDITS);
-        setCanShareToday(isNewDay(profile.last_share_bonus_at));
+      // Server-side daily reset check via SECURITY DEFINER function
+      const { data, error } = await supabase.rpc("reset_daily_credits");
+      if (error) {
+        console.error("reset_daily_credits error:", error);
+        return;
       }
+      const result = data as any;
+      if (result?.error) {
+        console.error("reset_daily_credits:", result.error);
+        return;
+      }
+      setCredits(result.credits ?? 3);
+      setCanShareToday(result.can_share ?? false);
     } finally {
       setLoadingCredits(false);
     }
@@ -72,17 +45,24 @@ export function useCredits(user: User | null) {
       "width=600,height=400"
     );
 
-    // Grant bonus immediately (no verification)
-    const newCredits = (credits ?? 0) + SHARE_BONUS;
-    await supabase
-      .from("profiles")
-      .update({ credits: newCredits, last_share_bonus_at: new Date().toISOString() })
-      .eq("user_id", user.id);
-
-    setCredits(newCredits);
-    setCanShareToday(false);
-    return true;
-  }, [user, canShareToday, credits]);
+    // Server-side bonus claim via SECURITY DEFINER function
+    const { data, error } = await supabase.rpc("claim_share_bonus");
+    if (error) {
+      console.error("claim_share_bonus error:", error);
+      return false;
+    }
+    const result = data as any;
+    if (result?.error) {
+      console.error("claim_share_bonus:", result.error);
+      return false;
+    }
+    if (result?.success) {
+      setCredits(result.credits);
+      setCanShareToday(false);
+      return true;
+    }
+    return false;
+  }, [user, canShareToday]);
 
   return { credits, setCredits, canShareToday, claimShareBonus, loadingCredits };
 }
