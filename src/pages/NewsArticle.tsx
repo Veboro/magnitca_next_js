@@ -49,8 +49,8 @@ const NewsArticle = () => {
     enabled: !!slug,
   });
 
-  const articleTitle = article?.title || "Новина";
-  const articleDesc = article?.content?.slice(0, 150)?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
+  const articleTitle = (article as any)?.meta_title || article?.title || "Новина";
+  const articleDesc = (article as any)?.meta_description || article?.content?.slice(0, 150)?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
 
   usePageMeta(
     `${articleTitle} — Магнітка`,

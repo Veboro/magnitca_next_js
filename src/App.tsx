@@ -22,6 +22,8 @@ import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
 import MeteoTest from "./pages/MeteoTest";
+import AdminNews from "./pages/admin/AdminNews";
+import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
 
 
 const queryClient = new QueryClient();
@@ -48,6 +50,9 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/test" element={<MeteoTest />} />
+            <Route path="/admin/news" element={<AdminNews />} />
+            <Route path="/admin/news/new" element={<AdminNewsEditor />} />
+            <Route path="/admin/news/:id/edit" element={<AdminNewsEditor />} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

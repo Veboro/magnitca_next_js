@@ -20,6 +20,8 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          meta_description: string | null
+          meta_title: string | null
           published_at: string
           slug: string | null
           source: string | null
@@ -32,6 +34,8 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
           published_at?: string
           slug?: string | null
           source?: string | null
@@ -44,6 +48,8 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          meta_description?: string | null
+          meta_title?: string | null
           published_at?: string
           slug?: string | null
           source?: string | null
@@ -179,16 +185,41 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       claim_share_bonus: { Args: never; Returns: Json }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       reset_daily_credits: { Args: never; Returns: Json }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -315,6 +346,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
