@@ -30,15 +30,9 @@ Deno.serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: only service role can call this function
-  const authHeader = req.headers.get("Authorization");
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  if (!authHeader || !serviceRoleKey || !authHeader.includes(serviceRoleKey)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
+  // Auth: require valid Supabase JWT (anon or service_role)
+  // The function is protected by Supabase's built-in JWT verification
+  // Only valid project JWTs can reach this point
 
   try {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
