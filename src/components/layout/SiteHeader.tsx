@@ -144,7 +144,7 @@ export const SiteHeader = () => {
                 aria-label="Увійти"
                 title="Увійти / Зареєструватися"
               >
-                <LogIn className="h-3.5 w-3.5" />
+                <User className="h-3.5 w-3.5" />
               </a>
             )
           )}
