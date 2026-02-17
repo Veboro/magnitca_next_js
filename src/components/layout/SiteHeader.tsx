@@ -1,4 +1,4 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -28,14 +28,17 @@ export const SiteHeader = () => {
     return true;
   });
   const [displayName, setDisplayName] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
 
   useEffect(() => {
-    if (!user) { setDisplayName(null); return; }
+    if (!user) { setDisplayName(null); setIsAdmin(false); return; }
     supabase.from("profiles").select("display_name").eq("user_id", user.id).single()
       .then(({ data }) => setDisplayName(data?.display_name || null));
+    supabase.from("user_roles" as any).select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
+      .then(({ data }) => setIsAdmin(!!data));
   }, [user]);
 
   useEffect(() => {
@@ -135,6 +138,16 @@ export const SiteHeader = () => {
                       <User className="h-3.5 w-3.5" />
                       Мій кабінет
                     </a>
+                    {isAdmin && (
+                      <a
+                        href="/admin/news"
+                        className="flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-accent transition-colors"
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <Shield className="h-3.5 w-3.5" />
+                        Адмін-панель
+                      </a>
+                    )}
                     <button
                       onClick={() => { signOut(); setMenuOpen(false); }}
                       className="flex items-center gap-2 w-full px-3 py-2 text-xs text-destructive hover:bg-accent transition-colors"
