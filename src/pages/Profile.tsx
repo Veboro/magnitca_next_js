@@ -3,9 +3,11 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useCredits } from "@/hooks/useCredits";
+import { useNotifications } from "@/hooks/useNotifications";
 import { ArrowLeft, Loader2, User, Save, Activity, Calendar, RefreshCw, Coins, Share2 } from "lucide-react";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { toast } from "sonner";
+import { NotificationsInbox } from "@/components/dashboard/NotificationsInbox";
 
 interface TestResult {
   id: string;
@@ -66,6 +68,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const { credits, canShareToday, claimShareBonus } = useCredits(user);
+  const { notifications, unreadCount, loading: notifLoading, markAsRead, markAllAsRead } = useNotifications(user);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -226,6 +229,15 @@ const Profile = () => {
             </button>
           </form>
         </div>
+
+        {/* Notifications */}
+        <NotificationsInbox
+          notifications={notifications}
+          loading={notifLoading}
+          onMarkAsRead={markAsRead}
+          onMarkAllAsRead={markAllAsRead}
+          unreadCount={unreadCount}
+        />
 
         {/* Test Results */}
         <div className="rounded-lg border border-border/50 bg-card p-8 space-y-4">
