@@ -74,7 +74,6 @@ Deno.serve(async (req) => {
     }).filter(Boolean);
 
     const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0");
-    const maxForecastG = Math.max(currentG, ...forecast.map((f: any) => f.gScale));
 
     const today = new Date();
     const dateStr = today.toLocaleDateString("uk-UA", {
@@ -84,11 +83,11 @@ Deno.serve(async (req) => {
       year: "numeric",
     });
 
-    // 2. Generate forecast image with AI
-    const bgColor = gScaleToColor(maxForecastG);
-    const stormLabel = gScaleToLabel(maxForecastG);
+    // 2. Generate forecast image with AI — focus on TODAY's level
+    const bgColor = gScaleToColor(currentG);
+    const stormLabel = gScaleToLabel(currentG);
 
-    const imagePrompt = `Generate an image: a clean social media card (landscape 16:9). Background: smooth gradient in ${bgColor} tones with subtle aurora/northern lights effects. Large bold white centered text: "Прогноз магнітних бур". Below: "${dateStr}". Below that: "G${maxForecastG} — ${stormLabel}". Bottom right corner small text: "magnitca.com". Minimalist, space-themed, no faces, no photos of people.`;
+    const imagePrompt = `Generate an image: a clean social media card (landscape 16:9). Background: smooth gradient in ${bgColor} tones with subtle aurora/northern lights effects. Large bold white centered text: "Прогноз магнітних бур". Below: "${dateStr}". Below that: "G${currentG} — ${stormLabel}". Bottom right corner small text: "magnitca.com". Minimalist, space-themed, no faces, no photos of people.`;
 
     const imageRes = await fetch(AI_GATEWAY, {
       method: "POST",
