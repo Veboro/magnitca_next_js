@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, Clock, ArrowLeft } from "lucide-react";
@@ -50,12 +51,29 @@ const NewsArticle = () => {
   });
 
   const articleTitle = (article as any)?.meta_title || article?.title || "Новина";
-  const articleDesc = (article as any)?.meta_description || article?.content?.slice(0, 150)?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
+  const articleDescRaw = (article as any)?.meta_description || article?.content?.slice(0, 150)?.replace(/<[^>]*>/g, "")?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
+  const articleSlugOrId = article?.slug || article?.id || slug;
 
   usePageMeta(
     `${articleTitle} — Магнітка`,
-    articleDesc
+    articleDescRaw,
+    `/news/${articleSlugOrId}`
   );
+
+  // Update OG image if article has one
+  useEffect(() => {
+    if (!article?.image_url) return;
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    const twImage = document.querySelector('meta[name="twitter:image"]');
+    const prevOg = ogImage?.getAttribute("content") || "";
+    const prevTw = twImage?.getAttribute("content") || "";
+    ogImage?.setAttribute("content", article.image_url);
+    twImage?.setAttribute("content", article.image_url);
+    return () => {
+      ogImage?.setAttribute("content", prevOg);
+      twImage?.setAttribute("content", prevTw);
+    };
+  }, [article?.image_url]);
 
   // JSON-LD NewsArticle schema
   const jsonLd = article ? {
@@ -64,7 +82,7 @@ const NewsArticle = () => {
     "headline": article.title,
     "datePublished": article.published_at,
     "dateModified": article.updated_at,
-    "description": articleDesc,
+    "description": articleDescRaw,
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": `https://magnitca.com/news/${article.slug || article.id}`,
