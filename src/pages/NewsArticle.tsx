@@ -57,7 +57,39 @@ const NewsArticle = () => {
     articleDesc
   );
 
+  // JSON-LD NewsArticle schema
+  const jsonLd = article ? {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": article.title,
+    "datePublished": article.published_at,
+    "dateModified": article.updated_at,
+    "description": articleDesc,
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://magnitca.com/news/${article.slug || article.id}`,
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Магнітка",
+      "url": "https://magnitca.com",
+    },
+    ...(article.image_url ? {
+      "image": {
+        "@type": "ImageObject",
+        "url": article.image_url,
+      },
+    } : {}),
+  } : null;
+
   return (
+    <>
+      {jsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      )}
     <main className="min-h-screen bg-background pt-20 pb-12">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <Link
@@ -115,6 +147,7 @@ const NewsArticle = () => {
         )}
       </div>
     </main>
+    </>
   );
 };
 
