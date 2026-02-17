@@ -12,6 +12,15 @@ const gLabels: Record<number, string> = {
   5: "G5 — Екстремальна буря",
 };
 
+const gColors: Record<number, string> = {
+  0: "hsl(145, 80%, 45%)",
+  1: "hsl(55, 90%, 50%)",
+  2: "hsl(35, 100%, 55%)",
+  3: "hsl(15, 90%, 50%)",
+  4: "hsl(0, 80%, 55%)",
+  5: "hsl(0, 80%, 55%)",
+};
+
 const gDescriptions: Record<number, string> = {
   0: "Геомагнітна активність у нормі. Значних збурень не очікується.",
   1: "Можливі слабкі коливання в енергомережах. Полярне сяйво на широтах 60°+.",
@@ -52,16 +61,21 @@ export const StormStatusBanner = () => {
               {gDescriptions[gLevel] || gDescriptions[0]}
             </p>
           </div>
-          <div className="hidden md:flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
-            <AlertTriangle className="h-8 w-8 text-primary" />
-            <div>
-              <p className="font-mono text-lg font-bold text-foreground">
-                {gLevel > 0 ? "АКТИВНА" : "НОРМА"}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                R{scales?.r?.Scale ?? 0} S{scales?.s?.Scale ?? 0} G{gLevel}
-              </p>
-            </div>
+          <div
+            className="hidden md:flex flex-col items-center justify-center rounded-full border border-primary/20 w-24 h-24 ml-6 flex-shrink-0 transition-colors duration-700"
+            style={{
+              backgroundColor: `${gColors[gLevel] || gColors[0]}15`,
+              borderColor: `${gColors[gLevel] || gColors[0]}40`,
+              boxShadow: `0 0 20px ${gColors[gLevel] || gColors[0]}20`,
+            }}
+          >
+            <AlertTriangle className="h-6 w-6 transition-colors duration-700" style={{ color: gColors[gLevel] || gColors[0] }} />
+            <p className="font-mono text-xs font-bold text-foreground mt-1">
+              {gLevel > 0 ? "АКТИВНА" : "НОРМА"}
+            </p>
+            <p className="text-[10px] text-muted-foreground">
+              R{scales?.r?.Scale ?? 0} S{scales?.s?.Scale ?? 0} G{gLevel}
+            </p>
           </div>
         </div>
         <a
