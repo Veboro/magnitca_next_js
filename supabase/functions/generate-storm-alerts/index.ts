@@ -30,43 +30,26 @@ serve(async (req) => {
       });
     }
 
-    // 2. Fetch NOAA data
-    const [kpRes, alertRes] = await Promise.all([
-      fetch("https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json"),
-      fetch("https://services.swpc.noaa.gov/products/alerts.json"),
+    // 2. Fetch NOAA data — use same sources as main page
+    const [scalesRes, kpRes] = await Promise.all([
+      fetch("https://services.swpc.noaa.gov/products/noaa-scales.json"),
+      fetch("https://services.swpc.noaa.gov/json/planetary_k_index_1m.json"),
     ]);
 
+    const scalesData = await scalesRes.json();
     const kpData = await kpRes.json();
-    const alerts = await alertRes.json();
 
-    // Find max Kp from forecast
-    let maxKp = 0;
+    // Get current G-scale from NOAA (same as main page)
     let stormLevel = 0;
-
-    if (Array.isArray(kpData)) {
-      for (const row of kpData.slice(1)) {
-        const kp = parseFloat(row[1]);
-        if (!isNaN(kp) && kp > maxKp) maxKp = kp;
-      }
+    if (scalesData?.["-1"]?.G?.Scale != null) {
+      stormLevel = parseInt(scalesData["-1"].G.Scale) || 0;
     }
 
-    // Determine G-scale from Kp
-    if (maxKp >= 9) stormLevel = 5;
-    else if (maxKp >= 8) stormLevel = 4;
-    else if (maxKp >= 7) stormLevel = 3;
-    else if (maxKp >= 6) stormLevel = 2;
-    else if (maxKp >= 5) stormLevel = 1;
-
-    // Check NOAA alerts for G-scale mentions
-    if (Array.isArray(alerts)) {
-      for (const alert of alerts) {
-        const msg = alert.message || "";
-        const gMatch = msg.match(/G([1-5])/);
-        if (gMatch) {
-          const g = parseInt(gMatch[1]);
-          if (g > stormLevel) stormLevel = g;
-        }
-      }
+    // Get current Kp from latest measurement
+    let maxKp = 0;
+    if (Array.isArray(kpData) && kpData.length > 0) {
+      const latest = kpData[kpData.length - 1];
+      maxKp = parseFloat(latest.estimated_kp ?? latest.kp_index ?? latest.kp ?? 0);
     }
 
     // 3. Skip if no significant storm
