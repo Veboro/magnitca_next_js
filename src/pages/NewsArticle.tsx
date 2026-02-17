@@ -139,10 +139,16 @@ const NewsArticle = () => {
                   </span>
                 </div>
               </header>
-              <div
-                className="text-sm leading-relaxed text-foreground/85 prose prose-sm dark:prose-invert max-w-none"
-                dangerouslySetInnerHTML={{ __html: article.content }}
-              />
+              {article.content.includes("<") && article.content.includes(">") ? (
+                <div
+                  className="text-sm leading-relaxed text-foreground/85 prose prose-sm dark:prose-invert max-w-none"
+                  dangerouslySetInnerHTML={{ __html: article.content }}
+                />
+              ) : (
+                <div className="text-sm leading-relaxed text-foreground/85 whitespace-pre-line">
+                  {article.content}
+                </div>
+              )}
             </div>
           </article>
         )}
