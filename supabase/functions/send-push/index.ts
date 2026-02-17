@@ -57,8 +57,22 @@ Deno.serve(async (req) => {
     const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    const { title, body, url: pushUrl, tag } = await req.json();
-    if (!title || !body) throw new Error("title and body are required");
+    // Parse and validate input
+    let parsedBody: any;
+    try {
+      const text = await req.text();
+      if (text.length > 10_000) throw new Error("Payload too large");
+      parsedBody = JSON.parse(text);
+    } catch {
+      return new Response(JSON.stringify({ success: false, error: "Invalid or oversized JSON" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { title, body, url: pushUrl, tag } = parsedBody;
+    if (!title || typeof title !== "string" || title.length > 200) throw new Error("Invalid title");
+    if (!body || typeof body !== "string" || body.length > 1000) throw new Error("Invalid body");
 
     const vapidKeys = await importVapidKeys(JSON.parse(VAPID_KEYS));
 
