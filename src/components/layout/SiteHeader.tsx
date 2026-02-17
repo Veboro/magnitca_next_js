@@ -1,8 +1,9 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
+import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
@@ -18,6 +19,7 @@ const navItems = [
 export const SiteHeader = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, isLoading: pushLoading, toggle: togglePush } = usePushNotifications();
+  const { unreadCount } = useNotifications(user);
   const location = useLocation();
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
@@ -97,13 +99,27 @@ export const SiteHeader = () => {
 
           {!authLoading && (
             user ? (
-              <div className="relative" ref={menuRef}>
-                <button
-                  onClick={() => setMenuOpen((v) => !v)}
-                  className="flex items-center gap-1.5 h-7 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors px-2"
-                  aria-label="Кабінет"
+              <>
+                <a
+                  href="/profile"
+                  className="relative flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label="Сповіщення"
+                  title="Сповіщення"
                 >
-                  <User className="h-3.5 w-3.5" />
+                  <Mail className="h-3.5 w-3.5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </a>
+                <div className="relative" ref={menuRef}>
+                  <button
+                    onClick={() => setMenuOpen((v) => !v)}
+                    className="flex items-center gap-1.5 h-7 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors px-2"
+                    aria-label="Кабінет"
+                  >
+                    <User className="h-3.5 w-3.5" />
                   <span className="hidden sm:inline text-xs font-medium max-w-[100px] truncate">
                     {displayName || user.email?.split("@")[0] || "Кабінет"}
                   </span>
@@ -127,8 +143,9 @@ export const SiteHeader = () => {
                       Вийти
                     </button>
                   </div>
-                )}
-              </div>
+                  )}
+                </div>
+              </>
             ) : (
               <a
                 href="/auth"
