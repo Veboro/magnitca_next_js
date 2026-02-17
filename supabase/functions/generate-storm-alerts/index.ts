@@ -117,7 +117,8 @@ serve(async (req) => {
     const aiData = await aiRes.json();
     const body = aiData.choices?.[0]?.message?.content || `Очікується магнітна буря рівня G${stormLevel}. Kp-індекс: ${maxKp}. Рекомендуємо бути уважними до свого самопочуття, пити більше води та уникати стресових ситуацій.`;
 
-    // 5. Get all user IDs
+    // 5. Get all users with emails
+    const { data: authUsers } = await supabase.auth.admin.listUsers({ perPage: 1000 });
     const { data: profiles } = await supabase
       .from("profiles")
       .select("user_id");
@@ -145,8 +146,75 @@ serve(async (req) => {
       throw new Error(insertError.message);
     }
 
+    // 7. Send emails via Resend
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    let emailsSent = 0;
+
+    if (resendApiKey && authUsers?.users) {
+      const emailMap = new Map<string, string>();
+      for (const u of authUsers.users) {
+        if (u.email) emailMap.set(u.id, u.email);
+      }
+
+      const emailBody = `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 12px; padding: 24px; color: #e0e0e0;">
+            <div style="text-align: center; margin-bottom: 16px;">
+              <span style="font-size: 28px;">⚡</span>
+              <h1 style="color: #ffd700; font-size: 20px; margin: 8px 0 4px;">${title}</h1>
+              <p style="color: #888; font-size: 12px; margin: 0;">${today}</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 8px; padding: 16px; margin: 16px 0; line-height: 1.6; font-size: 14px;">
+              ${body.replace(/\n/g, '<br>')}
+            </div>
+            <div style="text-align: center; margin-top: 16px;">
+              <a href="https://magnetic-storm-hub.lovable.app/profile" style="display: inline-block; background: #4a6cf7; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
+                Відкрити кабінет
+              </a>
+            </div>
+            <p style="text-align: center; color: #666; font-size: 11px; margin-top: 16px;">
+              Магнітка — моніторинг космічної погоди
+            </p>
+          </div>
+        </div>
+      `;
+
+      // Send emails in batches
+      for (const profile of profiles) {
+        const email = emailMap.get(profile.user_id);
+        if (!email) continue;
+
+        try {
+          const emailRes = await fetch("https://api.resend.com/emails", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${resendApiKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              from: "Магнітка <onboarding@resend.dev>",
+              to: [email],
+              subject: `⚡ ${title}`,
+              html: emailBody,
+            }),
+          });
+
+          if (emailRes.ok) {
+            emailsSent++;
+          } else {
+            const errText = await emailRes.text();
+            console.error(`Email error for ${email}:`, errText);
+          }
+        } catch (emailErr) {
+          console.error(`Email send error:`, emailErr);
+        }
+      }
+    } else {
+      console.log("RESEND_API_KEY not configured, skipping emails");
+    }
+
     return new Response(
-      JSON.stringify({ message: "Alerts sent", users: profiles.length, stormLevel, maxKp }),
+      JSON.stringify({ message: "Alerts sent", users: profiles.length, emailsSent, stormLevel, maxKp }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
