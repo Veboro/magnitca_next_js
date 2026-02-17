@@ -1,4 +1,5 @@
-import { Wind, Gauge, Radio, Sun, Activity, Thermometer } from "lucide-react";
+import { Wind, Gauge, Radio, Sun, Activity, Thermometer, RefreshCw } from "lucide-react";
+import { useState, useEffect } from "react";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MetricCard } from "@/components/dashboard/MetricCard";
@@ -21,10 +22,20 @@ const getKpStatus = (kp: number) => {
 };
 
 const Index = () => {
+  const REFRESH_INTERVAL = 60;
+  const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
+
   usePageMeta(
     "Магнітка — магнітні бурі сьогодні, прогноз Kp індексу",
     "Магнітка — моніторинг магнітних бур в реальному часі. Kp індекс, сонячний вітер, прогноз геомагнітної активності та вплив на здоров'я. Дані NOAA щохвилини."
   );
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev <= 1 ? REFRESH_INTERVAL : prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const { data: kpData } = useKpIndex();
   const { data: windData } = useSolarWind();
@@ -49,6 +60,21 @@ const Index = () => {
           </span>
           <span className="font-mono text-sm text-muted-foreground">
             {new Date().toLocaleDateString("uk-UA", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
+          </span>
+          <span className="flex items-center gap-1.5 ml-auto">
+            <RefreshCw
+              className="h-3 w-3 text-muted-foreground/60 transition-transform"
+              style={{
+                animation: countdown <= 3 ? "spin 1s linear infinite" : "none",
+              }}
+            />
+            <span className="font-mono text-[10px] text-muted-foreground/60">
+              {countdown}с
+            </span>
+            <span
+              className="h-[3px] rounded-full bg-primary/40 transition-all duration-1000 ease-linear"
+              style={{ width: `${(countdown / REFRESH_INTERVAL) * 40}px` }}
+            />
           </span>
         </div>
         <section aria-label="Статус геомагнітної активності">
