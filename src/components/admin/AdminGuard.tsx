@@ -12,24 +12,23 @@ export const AdminGuard = ({ children }: AdminGuardProps) => {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (authLoading) return;
+    
     if (!user) {
       setIsAdmin(false);
       return;
     }
 
     const checkAdmin = async () => {
-      const { data, error } = await supabase
-        .from("user_roles" as any)
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .maybeSingle();
-
-      setIsAdmin(!error && !!data);
+      const { data, error } = await supabase.rpc("has_role" as any, {
+        _user_id: user.id,
+        _role: "admin",
+      });
+      setIsAdmin(!error && data === true);
     };
 
     checkAdmin();
-  }, [user]);
+  }, [user, authLoading]);
 
   if (authLoading || isAdmin === null) {
     return (

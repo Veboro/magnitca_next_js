@@ -37,8 +37,8 @@ export const SiteHeader = () => {
     if (!user) { setDisplayName(null); setIsAdmin(false); return; }
     supabase.from("profiles").select("display_name").eq("user_id", user.id).single()
       .then(({ data }) => setDisplayName(data?.display_name || null));
-    supabase.from("user_roles" as any).select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle()
-      .then(({ data }) => setIsAdmin(!!data));
+    supabase.rpc("has_role" as any, { _user_id: user.id, _role: "admin" })
+      .then(({ data }) => setIsAdmin(data === true));
   }, [user]);
 
   useEffect(() => {
