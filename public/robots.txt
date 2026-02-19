@@ -4,4 +4,4 @@ Disallow: /auth
 Disallow: /profile
 Disallow: /reset-password
 
-Sitemap: https://magnitca.com/sitemap.xml
+Sitemap: https://vipkucckidwsurcgxedw.supabase.co/functions/v1/sitemap
