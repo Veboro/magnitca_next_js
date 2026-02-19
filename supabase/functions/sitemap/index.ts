@@ -5,9 +5,9 @@ const SITE_URL = "https://magnitca.com";
 const STATIC_PAGES = [
   { loc: "/", changefreq: "hourly", priority: "1.0" },
   { loc: "/news", changefreq: "hourly", priority: "0.9" },
-  { loc: "/storm-calendar", changefreq: "daily", priority: "0.8" },
+  { loc: "/calendar", changefreq: "daily", priority: "0.8" },
   { loc: "/faq", changefreq: "weekly", priority: "0.7" },
-  { loc: "/meteo-test", changefreq: "monthly", priority: "0.6" },
+  { loc: "/test", changefreq: "monthly", priority: "0.6" },
   { loc: "/about", changefreq: "monthly", priority: "0.5" },
   { loc: "/contacts", changefreq: "monthly", priority: "0.5" },
   { loc: "/privacy", changefreq: "monthly", priority: "0.3" },
