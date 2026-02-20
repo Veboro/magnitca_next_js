@@ -49,7 +49,8 @@ const groupByDay = (entries: KpForecastEntry[]) => {
 
 export const KpForecast3Day = ({ className }: { className?: string }) => {
   const { data: entries = [], isLoading } = useKpForecast();
-  const days = groupByDay(entries);
+  const allDays = groupByDay(entries);
+  const days = allDays.slice(-3);
   const MAX_KP = 9;
 
   return (
