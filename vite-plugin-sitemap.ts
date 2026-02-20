@@ -5,15 +5,25 @@ import { resolve } from "path";
 
 const SITE_URL = "https://magnitca.com";
 
+const CITY_SLUGS = [
+  "kyiv", "vinnytsia", "dnipro", "donetsk", "zhytomyr", "zaporizhzhia",
+  "ivano-frankivsk", "kropyvnytskyi", "luhansk", "lutsk", "lviv",
+  "mykolaiv", "odesa", "poltava", "rivne", "sevastopol", "simferopol",
+  "sumy", "ternopil", "uzhhorod", "kharkiv", "kherson", "khmelnytskyi",
+  "cherkasy", "chernivtsi", "chernihiv",
+];
+
 const STATIC_PAGES = [
   { loc: "/", changefreq: "hourly", priority: "1.0" },
   { loc: "/news", changefreq: "hourly", priority: "0.9" },
   { loc: "/calendar", changefreq: "daily", priority: "0.8" },
+  { loc: "/kp-index", changefreq: "hourly", priority: "0.8" },
   { loc: "/faq", changefreq: "weekly", priority: "0.7" },
   { loc: "/test", changefreq: "monthly", priority: "0.6" },
   { loc: "/about", changefreq: "monthly", priority: "0.5" },
   { loc: "/contacts", changefreq: "monthly", priority: "0.5" },
   { loc: "/privacy", changefreq: "monthly", priority: "0.3" },
+  ...CITY_SLUGS.map((slug) => ({ loc: `/city/${slug}`, changefreq: "hourly" as const, priority: "0.7" })),
 ];
 
 export function sitemapPlugin(): Plugin {
