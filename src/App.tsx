@@ -25,6 +25,7 @@ import MeteoTest from "./pages/MeteoTest";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
 import KpIndex from "./pages/KpIndex";
+import CityKyiv from "./pages/CityKyiv";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +41,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/kp-index" element={<KpIndex />} />
+            <Route path="/city/kyiv" element={<CityKyiv />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/calendar" element={<StormCalendar />} />
             <Route path="/news" element={<News />} />
