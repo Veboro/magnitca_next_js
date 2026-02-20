@@ -1,4 +1,4 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -13,6 +13,7 @@ const navItems = [
   { href: "/news", label: "Новини", icon: Newspaper },
   { href: "/calendar", label: "Календар", icon: CalendarDays },
   { href: "/test", label: "Тест", icon: ClipboardCheck },
+  { href: "/city/kyiv", label: "Київ", icon: MapPin },
   { href: "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
