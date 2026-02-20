@@ -225,9 +225,16 @@ const CityKyiv = () => {
           {forecastLoading ? (
             <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
           ) : forecast && forecast.length > 0 ? (() => {
+            const todayDate = new Date();
+            const todayKey = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}-${String(todayDate.getDate()).padStart(2, "0")}`;
+            const filtered = forecast.filter((row) => {
+              const d = new Date(row.time_tag + "Z");
+              const kyivStr = d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+              return kyivStr >= todayKey;
+            });
             const grouped = new Map<string, typeof forecast>();
-            forecast.forEach((row) => {
-              const dateKey = new Date(row.time_tag).toLocaleDateString("uk-UA", {
+            filtered.forEach((row) => {
+              const dateKey = new Date(row.time_tag + "Z").toLocaleDateString("uk-UA", {
                 weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv",
               });
               if (!grouped.has(dateKey)) grouped.set(dateKey, []);
@@ -259,7 +266,7 @@ const CityKyiv = () => {
                           return (
                             <div key={j} className="flex items-center justify-between text-xs">
                               <span className="text-muted-foreground font-mono">
-                                {new Date(row.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Kyiv" })}
+                                {new Date(row.time_tag + "Z").toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Kyiv" })}
                               </span>
                               <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
                                 <div
