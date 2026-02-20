@@ -175,44 +175,74 @@ const KpIndex = () => {
           </div>
           {forecastLoading ? (
             <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
-          ) : forecast && forecast.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs font-mono">
-                <thead>
-                  <tr className="border-b border-border/30">
-                    <th className="text-left py-2 pr-4 text-muted-foreground font-medium">Дата / Час (UTC)</th>
-                    <th className="text-center py-2 px-2 text-muted-foreground font-medium">Kp</th>
-                    <th className="text-left py-2 pl-4 text-muted-foreground font-medium">Рівень</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {forecast.map((row, i) => {
-                    const kpVal = Math.min(9, Math.max(0, Math.round(row.kp)));
-                    const level = kpLevels[Math.min(kpVal, 7)];
-                    return (
-                      <tr key={i} className="border-b border-border/10 hover:bg-muted/30 transition-colors">
-                        <td className="py-1.5 pr-4 text-muted-foreground">
-                          {new Date(row.time_tag).toLocaleDateString("uk-UA", { day: "2-digit", month: "2-digit" })}{" "}
-                          {new Date(row.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" })}
-                        </td>
-                        <td className="py-1.5 px-2 text-center">
-                          <span className={cn(
-                            "inline-flex items-center justify-center w-8 h-6 rounded text-xs font-bold",
-                            kpVal >= 5 ? "bg-storm-severe/20 text-storm-severe" :
-                            kpVal >= 4 ? "bg-storm-moderate/20 text-storm-moderate" :
-                            "bg-storm-quiet/20 text-storm-quiet"
-                          )}>
-                            {row.kp.toFixed(1)}
-                          </span>
-                        </td>
-                        <td className="py-1.5 pl-4 text-muted-foreground/80">{level.status}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
+          ) : forecast && forecast.length > 0 ? (() => {
+            // Group forecast entries by date
+            const grouped = new Map<string, typeof forecast>();
+            forecast.forEach((row) => {
+              const dateKey = new Date(row.time_tag).toLocaleDateString("uk-UA", {
+                weekday: "short", day: "numeric", month: "short", timeZone: "UTC",
+              });
+              if (!grouped.has(dateKey)) grouped.set(dateKey, []);
+              grouped.get(dateKey)!.push(row);
+            });
+            const days = Array.from(grouped.entries()).slice(0, 3);
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {days.map(([dateLabel, rows]) => {
+                  const maxKp = Math.max(...rows.map((r) => r.kp));
+                  const maxKpRound = Math.min(9, Math.max(0, Math.round(maxKp)));
+                  return (
+                    <div key={dateLabel} className="rounded-md border border-border/30 bg-muted/10 p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-mono text-xs font-medium text-foreground">{dateLabel}</span>
+                        <span className={cn(
+                          "text-[10px] font-mono px-1.5 py-0.5 rounded",
+                          maxKpRound >= 5 ? "bg-storm-severe/20 text-storm-severe" :
+                          maxKpRound >= 4 ? "bg-storm-moderate/20 text-storm-moderate" :
+                          "bg-storm-quiet/20 text-storm-quiet"
+                        )}>
+                          макс. Kp {maxKp.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        {rows.map((row, j) => {
+                          const kpVal = Math.min(9, Math.max(0, Math.round(row.kp)));
+                          return (
+                            <div key={j} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground font-mono">
+                                {new Date(row.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" })}
+                              </span>
+                              <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all",
+                                    kpVal >= 5 ? "bg-storm-severe" :
+                                    kpVal >= 4 ? "bg-storm-moderate" :
+                                    kpVal >= 2 ? "bg-storm-minor" :
+                                    "bg-storm-quiet"
+                                  )}
+                                  style={{ width: `${(row.kp / 9) * 100}%` }}
+                                />
+                              </div>
+                              <span className={cn(
+                                "font-mono font-bold w-8 text-right",
+                                kpVal >= 5 ? "text-storm-severe" :
+                                kpVal >= 4 ? "text-storm-moderate" :
+                                "text-muted-foreground"
+                              )}>
+                                {row.kp.toFixed(1)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })() : (
             <p className="text-sm text-muted-foreground">Дані прогнозу недоступні.</p>
           )}
         </section>
