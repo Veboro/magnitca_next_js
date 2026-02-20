@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useKpIndex } from "@/hooks/useSpaceWeather";
+import { Link } from "react-router-dom";
+import { ArrowRight } from "lucide-react";
 
 const kpLabels = ["Спокійно", "Спокійно", "Низько", "Нестабільно", "Активно", "Мала буря", "Помірна", "Сильна", "Екстремальна", "Екстремальна"];
 const kpColors = [
@@ -44,9 +46,18 @@ export const KpIndexGauge = ({ className }: { className?: string }) => {
         </div>
         <span className="text-sm font-medium text-muted-foreground">{kpLabels[value]}</span>
       </div>
-      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground/60 border-t border-border/30 pt-3">
-        Рівень геомагнітної активності за шкалою 0–9. Оновлюється щохвилини на основі даних магнітометрів по всьому світу.
-      </p>
+      <div className="mt-3 flex items-center justify-between border-t border-border/30 pt-3">
+        <p className="text-[11px] leading-relaxed text-muted-foreground/60">
+          Рівень геомагнітної активності за шкалою 0–9. Оновлюється щохвилини.
+        </p>
+        <Link
+          to="/kp-index"
+          className="inline-flex items-center gap-1 shrink-0 ml-3 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          Детальніше
+          <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
     </div>
   );
 };
