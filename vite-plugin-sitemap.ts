@@ -34,8 +34,7 @@ export function sitemapPlugin(): Plugin {
         const supabase = createClient(supabaseUrl, supabaseKey);
         const { data: news, error } = await supabase
           .from("news")
-          .select("slug, id, published_at, updated_at, telegram_sent")
-          .eq("telegram_sent", false)
+          .select("slug, id, published_at, updated_at")
           .order("published_at", { ascending: false })
           .limit(1000);
 
