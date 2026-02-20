@@ -118,10 +118,10 @@ const Index = () => {
       </main>
 
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Магнітні бурі по містах України">
-        <h2 className="text-lg font-display font-semibold text-foreground/90 mb-4">
+        <h2 className="text-lg font-display font-semibold text-foreground/90 mb-5">
           Магнітні бурі по містах України
         </h2>
-        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-3 text-sm">
           {[
             { name: "Вінниця", slug: "vinnytsia" },
             { name: "Дніпро", slug: "dnipro" },
@@ -132,8 +132,8 @@ const Index = () => {
             { name: "Київ", slug: "kyiv", active: true },
             { name: "Кропивницький", slug: "kropyvnytskyi" },
             { name: "Луганськ", slug: "luhansk" },
-            { name: "Львів", slug: "lviv" },
             { name: "Луцьк", slug: "lutsk" },
+            { name: "Львів", slug: "lviv" },
             { name: "Миколаїв", slug: "mykolaiv" },
             { name: "Одеса", slug: "odesa" },
             { name: "Полтава", slug: "poltava" },
