@@ -117,6 +117,59 @@ const Index = () => {
         </section>
       </main>
 
+      <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Магнітні бурі по містах України">
+        <h2 className="text-lg font-display font-semibold text-foreground/90 mb-4">
+          Магнітні бурі по містах України
+        </h2>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+          {[
+            { name: "Вінниця", slug: "vinnytsia" },
+            { name: "Дніпро", slug: "dnipro" },
+            { name: "Донецьк", slug: "donetsk" },
+            { name: "Житомир", slug: "zhytomyr" },
+            { name: "Запоріжжя", slug: "zaporizhzhia" },
+            { name: "Івано-Франківськ", slug: "ivano-frankivsk" },
+            { name: "Київ", slug: "kyiv", active: true },
+            { name: "Кропивницький", slug: "kropyvnytskyi" },
+            { name: "Луганськ", slug: "luhansk" },
+            { name: "Львів", slug: "lviv" },
+            { name: "Луцьк", slug: "lutsk" },
+            { name: "Миколаїв", slug: "mykolaiv" },
+            { name: "Одеса", slug: "odesa" },
+            { name: "Полтава", slug: "poltava" },
+            { name: "Рівне", slug: "rivne" },
+            { name: "Севастополь", slug: "sevastopol" },
+            { name: "Сімферополь", slug: "simferopol" },
+            { name: "Суми", slug: "sumy" },
+            { name: "Тернопіль", slug: "ternopil" },
+            { name: "Ужгород", slug: "uzhhorod" },
+            { name: "Харків", slug: "kharkiv" },
+            { name: "Херсон", slug: "kherson" },
+            { name: "Хмельницький", slug: "khmelnytskyi" },
+            { name: "Черкаси", slug: "cherkasy" },
+            { name: "Чернівці", slug: "chernivtsi" },
+            { name: "Чернігів", slug: "chernihiv" },
+          ].map((city) => (
+            city.active ? (
+              <a
+                key={city.slug}
+                href={`/city/${city.slug}`}
+                className="text-primary hover:underline whitespace-nowrap"
+              >
+                магнітні бурі <span className="font-semibold">{city.name}</span>
+              </a>
+            ) : (
+              <span
+                key={city.slug}
+                className="text-muted-foreground/60 whitespace-nowrap cursor-default"
+              >
+                магнітні бурі <span className="font-semibold">{city.name}</span>
+              </span>
+            )
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Про сервіс Магнітка">
         <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
           <h2 className="text-lg font-display font-semibold text-foreground/90">
