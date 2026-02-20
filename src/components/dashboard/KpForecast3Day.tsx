@@ -71,7 +71,7 @@ export const KpForecast3Day = ({ className }: { className?: string }) => {
           {days.map((dayEntries, dayIdx) => {
             const maxKp = Math.max(...dayEntries.map((e) => e.kp));
             return (
-              <div key={dayIdx}>
+              <div key={dayIdx} className="rounded-lg border border-border/40 bg-background/50 p-4">
                 {/* Day header */}
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono text-xs font-medium text-foreground">
