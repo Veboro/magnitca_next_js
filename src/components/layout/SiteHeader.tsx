@@ -13,7 +13,6 @@ const navItems = [
   { href: "/news", label: "Новини", icon: Newspaper },
   { href: "/calendar", label: "Календар", icon: CalendarDays },
   { href: "/test", label: "Тест", icon: ClipboardCheck },
-  { href: "/city/kyiv", label: "Київ", icon: MapPin },
   { href: "/faq", label: "FAQ", icon: HelpCircle },
 ];
 
