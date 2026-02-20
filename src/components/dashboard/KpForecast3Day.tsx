@@ -1,30 +1,29 @@
 import { useKpForecast, KpForecastEntry } from "@/hooks/useKpForecast";
-import { CalendarDays } from "lucide-react";
+import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const kpColor = (kp: number) => {
-  if (kp < 4) return "bg-green-500";
-  if (kp < 5) return "bg-yellow-500";
+const kpBarColor = (kp: number) => {
+  if (kp < 2) return "bg-green-500/60";
+  if (kp < 4) return "bg-yellow-500";
+  if (kp < 5) return "bg-orange-400";
   if (kp < 6) return "bg-orange-500";
   if (kp < 7) return "bg-red-500";
   return "bg-red-700";
 };
 
 const kpTextColor = (kp: number) => {
-  if (kp < 4) return "text-green-400";
+  if (kp < 4) return "text-foreground/80";
   if (kp < 5) return "text-yellow-400";
   if (kp < 6) return "text-orange-400";
   if (kp < 7) return "text-red-400";
   return "text-red-500";
 };
 
-const gLevel = (kp: number) => {
-  if (kp < 4) return { g: 0, label: "Спокійно" };
-  if (kp < 5) return { g: 1, label: "Слабка буря" };
-  if (kp < 6) return { g: 2, label: "Помірна буря" };
-  if (kp < 7) return { g: 3, label: "Сильна буря" };
-  if (kp < 8) return { g: 4, label: "Дуже сильна" };
-  return { g: 5, label: "Екстремальна" };
+const kpBadgeBg = (kp: number) => {
+  if (kp < 4) return "bg-green-500/15 text-green-400 border-green-500/30";
+  if (kp < 5) return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
+  if (kp < 6) return "bg-orange-500/15 text-orange-400 border-orange-500/30";
+  return "bg-red-500/15 text-red-400 border-red-500/30";
 };
 
 const formatHour = (timeTag: string) => {
@@ -50,15 +49,15 @@ const groupByDay = (entries: KpForecastEntry[]) => {
 
 export const KpForecast3Day = ({ className }: { className?: string }) => {
   const { data: entries = [], isLoading } = useKpForecast();
-
   const days = groupByDay(entries);
+  const MAX_KP = 9;
 
   return (
     <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
       <div className="flex items-center gap-2 mb-5">
-        <CalendarDays className="h-4 w-4 text-primary" />
+        <Info className="h-4 w-4 text-primary" />
         <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Погодинний прогноз Kp-індексу на 3 дні
+          Прогноз Kp індексу на 3 дні (по 3-годинних інтервалах)
         </h3>
       </div>
 
@@ -67,42 +66,42 @@ export const KpForecast3Day = ({ className }: { className?: string }) => {
           <span className="font-mono text-sm text-muted-foreground animate-pulse">Завантаження...</span>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           {days.map((dayEntries, dayIdx) => {
             const maxKp = Math.max(...dayEntries.map((e) => e.kp));
-            const dayLevel = gLevel(maxKp);
-
             return (
               <div key={dayIdx}>
-                <div className="flex items-center justify-between mb-2">
+                {/* Day header */}
+                <div className="flex items-center justify-between mb-3">
                   <span className="font-mono text-xs font-medium text-foreground">
                     {formatDayHeader(dayEntries[0].time_tag)}
                   </span>
-                  <span className={cn("text-xs font-bold", kpTextColor(maxKp))}>
-                    G{dayLevel.g} — {dayLevel.label}
+                  <span className={cn("text-[10px] font-bold font-mono px-2 py-0.5 rounded border", kpBadgeBg(maxKp))}>
+                    макс. Kp {maxKp.toFixed(1)}
                   </span>
                 </div>
-                <div className="grid grid-cols-8 gap-1">
-                  {dayEntries.map((entry, i) => (
-                    <div
-                      key={i}
-                      className="flex flex-col items-center gap-1 rounded-md border border-border/30 bg-background/50 py-1.5 px-0.5"
-                    >
-                      <span className="text-[10px] text-muted-foreground/70 font-mono">
-                        {formatHour(entry.time_tag)}
-                      </span>
-                      <div
-                        className={cn(
-                          "w-full rounded-sm transition-all",
-                          kpColor(entry.kp)
-                        )}
-                        style={{ height: `${Math.max(entry.kp * 4, 4)}px` }}
-                      />
-                      <span className={cn("text-xs font-bold font-mono", kpTextColor(entry.kp))}>
-                        {entry.kp.toFixed(entry.kp % 1 ? 2 : 0)}
-                      </span>
-                    </div>
-                  ))}
+
+                {/* Hourly rows */}
+                <div className="space-y-1.5">
+                  {dayEntries.map((entry, i) => {
+                    const barWidth = Math.max((entry.kp / MAX_KP) * 100, 3);
+                    return (
+                      <div key={i} className="flex items-center gap-2">
+                        <span className="font-mono text-[11px] text-muted-foreground/70 w-10 shrink-0">
+                          {formatHour(entry.time_tag)}
+                        </span>
+                        <div className="flex-1 h-3 bg-muted/20 rounded-sm overflow-hidden">
+                          <div
+                            className={cn("h-full rounded-sm transition-all", kpBarColor(entry.kp))}
+                            style={{ width: `${barWidth}%` }}
+                          />
+                        </div>
+                        <span className={cn("font-mono text-xs font-bold w-7 text-right shrink-0", kpTextColor(entry.kp))}>
+                          {entry.kp.toFixed(entry.kp % 1 ? 1 : 0)}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
