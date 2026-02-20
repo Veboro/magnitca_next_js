@@ -47,7 +47,9 @@ export const Forecast27Day = ({ className }: { className?: string }) => {
         }
       }
 
-      return result;
+      // Filter: show only from today onwards
+      const today = new Date().toISOString().slice(0, 10);
+      return result.filter((d) => d.date >= today);
     },
     enabled: !!user,
     refetchInterval: 600000,
