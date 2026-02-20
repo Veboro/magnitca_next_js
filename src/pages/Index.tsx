@@ -129,7 +129,7 @@ const Index = () => {
             { name: "Житомир", slug: "zhytomyr" },
             { name: "Запоріжжя", slug: "zaporizhzhia" },
             { name: "Івано-Франківськ", slug: "ivano-frankivsk" },
-            { name: "Київ", slug: "kyiv", active: true },
+            { name: "Київ", slug: "kyiv" },
             { name: "Кропивницький", slug: "kropyvnytskyi" },
             { name: "Луганськ", slug: "luhansk" },
             { name: "Луцьк", slug: "lutsk" },
@@ -150,22 +150,13 @@ const Index = () => {
             { name: "Чернівці", slug: "chernivtsi" },
             { name: "Чернігів", slug: "chernihiv" },
           ].map((city) => (
-            city.active ? (
-              <a
-                key={city.slug}
-                href={`/city/${city.slug}`}
-                className="text-primary hover:underline whitespace-nowrap"
-              >
-                магнітні бурі <span className="font-semibold">{city.name}</span>
-              </a>
-            ) : (
-              <span
-                key={city.slug}
-                className="text-muted-foreground/60 whitespace-nowrap cursor-default"
-              >
-                магнітні бурі <span className="font-semibold">{city.name}</span>
-              </span>
-            )
+            <a
+              key={city.slug}
+              href={`/city/${city.slug}`}
+              className="text-primary hover:underline whitespace-nowrap"
+            >
+              магнітні бурі <span className="font-semibold">{city.name}</span>
+            </a>
           ))}
         </div>
       </section>
