@@ -52,59 +52,50 @@ const CityKyiv = () => {
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-3 max-w-lg">
                 <div className="flex items-center gap-2">
-                  <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
-                  <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
-                    Київ • {today}
+                  <Activity className="h-5 w-5 text-primary animate-pulse-glow" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                    {gLevel > 0 ? "Геомагнітна буря • Київ" : "Моніторинг магнітних бур • Київ"}
                   </span>
                 </div>
 
-                {isLoading ? (
-                  <Skeleton className="h-16 w-48" />
-                ) : data?.current ? (
-                  <>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-5xl md:text-6xl font-display font-bold text-foreground">
-                        {Math.round(data.current.temperature)}°
-                      </span>
-                      <span className="text-2xl">{getWeatherEmoji(data.current.weatherCode)}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {getWeatherLabel(data.current.weatherCode)} • Відчувається як {Math.round(data.current.feelsLike)}°
-                    </p>
-                  </>
-                ) : null}
-
-                {/* Magnetic storm mini-status */}
-                <div className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium"
-                  style={{
-                    borderColor: `${kpStatus.color}40`,
-                    backgroundColor: `${kpStatus.color}10`,
-                    color: kpStatus.color,
-                  }}
-                >
-                  <Activity className="h-3.5 w-3.5" />
+                <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
                   Kp {Math.round(latestKp)} — {kpStatus.label}
-                  {gLevel > 0 && <span className="ml-1">• G{gLevel}</span>}
-                </div>
+                </h2>
+
+                <p className="max-w-md text-sm text-muted-foreground">
+                  {gLevel >= 3
+                    ? "Можливі перебої з GPS та радіозв'язком у Києві. Метеозалежні люди можуть відчувати нездужання."
+                    : gLevel > 0
+                    ? "Слабка геомагнітна активність. Метеочутливі люди можуть відчувати незначний вплив."
+                    : "Геомагнітна обстановка в Києві спокійна. Значних збурень не очікується."}
+                </p>
+
+                {/* Weather mini-badge */}
+                {data?.current && (
+                  <div className="inline-flex items-center gap-3 rounded-md border border-border/50 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground">
+                    <span>{getWeatherEmoji(data.current.weatherCode)} {Math.round(data.current.temperature)}° • {getWeatherLabel(data.current.weatherCode)}</span>
+                    <span className="border-l border-border/50 pl-3">{today}</span>
+                  </div>
+                )}
               </div>
 
-              {/* Sun times */}
-              {data?.current && (
-                <div className="hidden md:flex flex-col gap-2 text-right shrink-0">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Sunrise className="h-4 w-4 text-amber-400" />
-                    <span className="font-mono">{new Date(data.current.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Sunset className="h-4 w-4 text-orange-400" />
-                    <span className="font-mono">{new Date(data.current.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Sun className="h-4 w-4 text-yellow-400" />
-                    <span className="font-mono text-xs">{data.current.dayLength}</span>
-                  </div>
-                </div>
-              )}
+              {/* G-level indicator (like main page) */}
+              <div
+                className="hidden md:flex flex-col items-center justify-center rounded-full border w-24 h-24 ml-6 shrink-0 transition-colors duration-700"
+                style={{
+                  backgroundColor: `${kpStatus.color}15`,
+                  borderColor: `${kpStatus.color}40`,
+                  boxShadow: `0 0 20px ${kpStatus.color}20`,
+                }}
+              >
+                <AlertTriangle className="h-6 w-6 transition-colors duration-700" style={{ color: kpStatus.color }} />
+                <p className="font-mono text-xs font-bold text-foreground mt-1">
+                  {gLevel > 0 ? "БУРЯ" : "НОРМА"}
+                </p>
+                <p className="text-[10px] text-muted-foreground">
+                  Kp {Math.round(latestKp)} • G{gLevel}
+                </p>
+              </div>
             </div>
           </div>
         </section>
