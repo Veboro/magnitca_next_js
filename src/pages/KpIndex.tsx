@@ -180,7 +180,7 @@ const KpIndex = () => {
             const grouped = new Map<string, typeof forecast>();
             forecast.forEach((row) => {
               const dateKey = new Date(row.time_tag).toLocaleDateString("uk-UA", {
-                weekday: "short", day: "numeric", month: "short", timeZone: "UTC",
+                weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv",
               });
               if (!grouped.has(dateKey)) grouped.set(dateKey, []);
               grouped.get(dateKey)!.push(row);
@@ -211,7 +211,7 @@ const KpIndex = () => {
                           return (
                             <div key={j} className="flex items-center justify-between text-xs">
                               <span className="text-muted-foreground font-mono">
-                                {new Date(row.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" })}
+                                {new Date(row.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Kyiv" })}
                               </span>
                               <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
                                 <div

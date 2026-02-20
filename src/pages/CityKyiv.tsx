@@ -1,8 +1,10 @@
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
+import { useKpForecast } from "@/hooks/useKpForecast";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Thermometer, Activity, AlertTriangle, MapPin } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, AlertTriangle, MapPin, Info } from "lucide-react";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return { label: "Спокійно", color: "hsl(145, 80%, 45%)" };
@@ -21,6 +23,7 @@ const CityKyiv = () => {
   const { data, isLoading } = useCityWeather();
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
+  const { data: forecast, isLoading: forecastLoading } = useKpForecast();
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
   const kpStatus = getKpStatus(latestKp);
@@ -211,74 +214,89 @@ const CityKyiv = () => {
           </section>
         )}
 
-        {/* 7-day forecast */}
-        {data?.daily && data.daily.length > 0 && (
-          <section aria-label="Прогноз на 7 днів">
-            <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
-              <div className="flex items-center gap-3">
-                <Thermometer className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-lg font-bold text-foreground">Прогноз на 7 днів</h2>
-              </div>
-              <div className="space-y-2">
-                {data.daily.map((d) => (
-                  <div key={d.date} className="flex items-center gap-3 rounded-md px-3 py-2 hover:bg-accent/30 transition-colors">
-                    <span className="w-16 font-mono text-xs text-muted-foreground shrink-0">
-                      {new Date(d.date).toLocaleDateString("uk-UA", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv" })}
-                    </span>
-                    <span className="text-lg w-8 text-center">{getWeatherEmoji(d.weatherCode)}</span>
-                    <span className="text-xs text-muted-foreground w-24 hidden sm:block">{getWeatherLabel(d.weatherCode)}</span>
-                    <div className="flex-1 flex items-center gap-2">
-                      <span className="font-mono text-xs text-muted-foreground w-8 text-right">{Math.round(d.tempMin)}°</span>
-                      <div className="flex-1 h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className="h-full rounded-full bg-gradient-to-r from-blue-400 to-orange-400 transition-all"
-                          style={{
-                            marginLeft: `${((d.tempMin + 30) / 70) * 100}%`,
-                            width: `${((d.tempMax - d.tempMin) / 70) * 100}%`,
-                          }}
-                        />
-                      </div>
-                      <span className="font-mono text-xs font-medium text-foreground w-8">{Math.round(d.tempMax)}°</span>
-                    </div>
-                    <div className="hidden md:flex items-center gap-3 shrink-0 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1">
-                        <Sunrise className="h-3 w-3 text-amber-400" />
-                        {new Date(d.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Sunset className="h-3 w-3 text-orange-400" />
-                        {new Date(d.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
+        {/* 3-day Kp forecast */}
+        <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label="Прогноз Kp індексу на 3 дні">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-primary" />
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Прогноз Kp індексу на 3 дні (по 3-годинних інтервалах)
+            </h2>
+          </div>
+          {forecastLoading ? (
+            <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
+          ) : forecast && forecast.length > 0 ? (() => {
+            const grouped = new Map<string, typeof forecast>();
+            forecast.forEach((row) => {
+              const dateKey = new Date(row.time_tag).toLocaleDateString("uk-UA", {
+                weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv",
+              });
+              if (!grouped.has(dateKey)) grouped.set(dateKey, []);
+              grouped.get(dateKey)!.push(row);
+            });
+            const days = Array.from(grouped.entries()).slice(0, 3);
 
-        {/* Hourly forecast */}
-        {data?.hourly && data.hourly.length > 0 && (
-          <section aria-label="Погодинний прогноз">
-            <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
-              <h2 className="font-display text-lg font-bold text-foreground">Погодинний прогноз</h2>
-              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
-                {data.hourly.map((h) => (
-                  <div key={h.time} className="flex flex-col items-center gap-1.5 shrink-0 min-w-[52px]">
-                    <span className="font-mono text-[10px] text-muted-foreground">
-                      {new Date(h.time).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
-                    </span>
-                    <span className="text-base">{getWeatherEmoji(h.weatherCode)}</span>
-                    <span className="font-mono text-xs font-medium text-foreground">{Math.round(h.temperature)}°</span>
-                    {h.precipitation > 0 && (
-                      <span className="font-mono text-[9px] text-blue-400">{h.precipitation}мм</span>
-                    )}
-                  </div>
-                ))}
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {days.map(([dateLabel, rows]) => {
+                  const maxKp = Math.max(...rows.map((r) => r.kp));
+                  const maxKpRound = Math.min(9, Math.max(0, Math.round(maxKp)));
+                  return (
+                    <div key={dateLabel} className="rounded-md border border-border/30 bg-muted/10 p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-mono text-xs font-medium text-foreground">{dateLabel}</span>
+                        <span className={cn(
+                          "text-[10px] font-mono px-1.5 py-0.5 rounded",
+                          maxKpRound >= 5 ? "bg-storm-severe/20 text-storm-severe" :
+                          maxKpRound >= 4 ? "bg-storm-moderate/20 text-storm-moderate" :
+                          "bg-storm-quiet/20 text-storm-quiet"
+                        )}>
+                          макс. Kp {maxKp.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        {rows.map((row, j) => {
+                          const kpVal = Math.min(9, Math.max(0, Math.round(row.kp)));
+                          return (
+                            <div key={j} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground font-mono">
+                                {new Date(row.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Kyiv" })}
+                              </span>
+                              <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all",
+                                    kpVal >= 5 ? "bg-storm-severe" :
+                                    kpVal >= 4 ? "bg-storm-moderate" :
+                                    kpVal >= 2 ? "bg-storm-minor" :
+                                    "bg-storm-quiet"
+                                  )}
+                                  style={{ width: `${(row.kp / 9) * 100}%` }}
+                                />
+                              </div>
+                              <span className={cn(
+                                "font-mono font-bold w-8 text-right",
+                                kpVal >= 5 ? "text-storm-severe" :
+                                kpVal >= 4 ? "text-storm-moderate" :
+                                "text-muted-foreground"
+                              )}>
+                                {row.kp.toFixed(1)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          </section>
-        )}
+            );
+          })() : (
+            <p className="text-sm text-muted-foreground">Дані прогнозу недоступні.</p>
+          )}
+          <p className="text-[11px] text-muted-foreground/60 border-t border-border/30 pt-3">
+            Прогноз Kp індексу для Києва (50.45°N) від NOAA Space Weather Prediction Center. Час — київський (UTC+2).
+          </p>
+        </section>
 
         {/* SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label="Про сторінку">
