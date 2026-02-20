@@ -6,7 +6,7 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
 import { BzChart } from "@/components/dashboard/BzChart";
-import { ForecastCard } from "@/components/dashboard/ForecastCard";
+import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
@@ -96,8 +96,8 @@ const Index = () => {
           </div>
         </section>
 
-        <section aria-label="Прогноз на 3 дні">
-          <ForecastCard layout="horizontal" />
+        <section aria-label="Прогноз Kp індексу на 3 дні">
+          <KpForecast3Day />
         </section>
 
         <section aria-label="Розширений прогноз на 27 днів">
