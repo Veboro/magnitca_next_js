@@ -3,7 +3,7 @@ import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Thermometer, Activity, AlertTriangle } from "lucide-react";
-import kyivOutline from "@/assets/kyiv-outline.png";
+import kyivOutline from "@/assets/kyiv-outline.svg";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return { label: "Спокійно", color: "hsl(145, 80%, 45%)" };
@@ -43,8 +43,8 @@ const CityKyiv = () => {
         <section className="relative overflow-hidden rounded-lg border border-glow-cyan" aria-label="Статус Києва">
           <div className="absolute inset-0 bg-gradient-to-br from-card via-card/90 to-card/60" />
           <div
-            className="absolute inset-0 bg-contain bg-no-repeat bg-right opacity-[0.07] mix-blend-screen"
-            style={{ backgroundImage: `url(${kyivOutline})`, backgroundPosition: "85% center" }}
+            className="absolute inset-0 bg-contain bg-no-repeat opacity-[0.12] mix-blend-screen"
+            style={{ backgroundImage: `url(${kyivOutline})`, backgroundPosition: "80% center", backgroundSize: "55%" }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-card via-card/70 to-transparent" />
 
