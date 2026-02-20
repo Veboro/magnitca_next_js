@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => ({
       includeAssets: ["favicon.ico", "pwa-icon-192.png", "pwa-icon-512.png"],
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,woff,woff2}"],
-        navigateFallbackDenylist: [/^\/~oauth/],
+        navigateFallbackDenylist: [/^\/~oauth/, /^\/robots\.txt$/, /^\/sitemap\.xml$/],
         globIgnores: ["**/sw.js", "**/og-image.png"],
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
