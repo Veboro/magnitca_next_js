@@ -7,7 +7,7 @@ import { ScrollToTop } from "@/components/ScrollToTop";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
-import { AiAssistant } from "@/components/dashboard/AiAssistant";
+
 import { PwaInstallBanner } from "@/components/PwaInstallBanner";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -63,7 +63,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           <SiteFooter />
-          <AiAssistant />
+          
           <PwaInstallBanner />
         </BrowserRouter>
       </TooltipProvider>
