@@ -2,8 +2,7 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Thermometer, Activity, AlertTriangle } from "lucide-react";
-import kyivOutline from "@/assets/kyiv-outline.svg";
+import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Thermometer, Activity, AlertTriangle, MapPin } from "lucide-react";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return { label: "Спокійно", color: "hsl(145, 80%, 45%)" };
@@ -39,18 +38,12 @@ const CityKyiv = () => {
       <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
         <h1 className="sr-only">Магнітні бурі в Києві — погода та якість повітря</h1>
 
-        {/* Hero banner with Kyiv outline */}
-        <section className="relative overflow-hidden rounded-lg border border-glow-cyan" aria-label="Статус Києва">
-          <div className="absolute inset-0 bg-gradient-to-br from-card via-card/90 to-card/60" />
-          <div
-            className="absolute inset-0 bg-contain bg-no-repeat opacity-[0.12] mix-blend-screen"
-            style={{ backgroundImage: `url(${kyivOutline})`, backgroundPosition: "80% center", backgroundSize: "55%" }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-card via-card/70 to-transparent" />
-
-          <div className="relative p-6 md:p-8">
+        {/* Two-column hero */}
+        <section className="grid gap-4 lg:grid-cols-[1fr_auto]" aria-label="Статус Києва">
+          {/* Left: Storm status */}
+          <div className="rounded-lg border border-glow-cyan bg-card p-6 space-y-3">
             <div className="flex items-start justify-between gap-4">
-              <div className="space-y-3 max-w-lg">
+              <div className="space-y-3">
                 <div className="flex items-center gap-2">
                   <Activity className="h-5 w-5 text-primary animate-pulse-glow" />
                   <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
@@ -79,7 +72,7 @@ const CityKyiv = () => {
                 )}
               </div>
 
-              {/* G-level indicator (like main page) */}
+              {/* G-level indicator */}
               <div
                 className="hidden md:flex flex-col items-center justify-center rounded-full border w-24 h-24 ml-6 shrink-0 transition-colors duration-700"
                 style={{
@@ -95,6 +88,63 @@ const CityKyiv = () => {
                 <p className="text-[10px] text-muted-foreground">
                   Kp {Math.round(latestKp)} • G{gLevel}
                 </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Sun & coordinates */}
+          <div className="rounded-lg border border-border/50 bg-card p-6 lg:w-64 space-y-5">
+            {data?.current && (
+              <div className="space-y-3">
+                <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
+                  <Sun className="h-4 w-4 text-primary" />
+                  Схід і захід сонця
+                </h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Sunrise className="h-4 w-4 text-amber-400" />
+                      <span>Схід</span>
+                    </div>
+                    <span className="font-mono text-sm font-medium text-foreground">
+                      {new Date(data.current.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Sunset className="h-4 w-4 text-orange-400" />
+                      <span>Захід</span>
+                    </div>
+                    <span className="font-mono text-sm font-medium text-foreground">
+                      {new Date(data.current.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-border/30 pt-2">
+                    <span className="text-xs text-muted-foreground">Тривалість дня</span>
+                    <span className="font-mono text-xs font-medium text-foreground">{data.current.dayLength}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3 border-t border-border/30 pt-4">
+              <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
+                <MapPin className="h-4 w-4 text-primary" />
+                Координати
+              </h3>
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Широта</span>
+                  <span className="font-mono text-xs text-foreground">50.4501° Пн</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Довгота</span>
+                  <span className="font-mono text-xs text-foreground">30.5234° Сх</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Часовий пояс</span>
+                  <span className="font-mono text-xs text-foreground">UTC+2 (EET)</span>
+                </div>
               </div>
             </div>
           </div>
