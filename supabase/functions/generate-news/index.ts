@@ -86,31 +86,27 @@ Deno.serve(async (req) => {
       year: "numeric",
     });
 
-    // 2. Generate article with AI
-    const prompt = `Ти — журналіст українського новинного порталу про космічну погоду. Напиши новину українською мовою на основі реальних даних NOAA.
+    // 2. Generate article with AI — two separate calls for reliability
+    const contentPrompt = `Ти — журналіст українського новинного порталу про космічну погоду. Напиши новину українською мовою на основі реальних даних NOAA.
 
 Дані на ${dateStr}:
 - Поточний Kp-індекс: ${latestKp.toFixed(1)}, G-шкала: G${currentG}
 - Сонячний вітер: швидкість ${windSpeed.toFixed(0)} км/с, густина ${windDensity.toFixed(1)} p/cm³
 - Прогноз на найближчі дні: ${JSON.stringify(forecast)}
 
-Повертай ТІЛЬКИ JSON без markdown:
-{"title": "заголовок", "content": "текст новини"}
-
 Стиль і структура — як у реальних українських новинних порталах:
 
-1. Заголовок: стислий, інформативний, 50-80 символів. Приклади: "Магнітні бурі 20 лютого: прогноз геомагнітної активності", "Сонячна активність 20 лютого: чого очікувати".
+1. Перший абзац: головна новина дня — який K-індекс, який рівень (зелений/жовтий/помаранчевий/червоний), чи очікується магнітна буря. 2-3 речення.
 
-2. Перший абзац: головна новина дня — який K-індекс, який рівень (зелений/жовтий/помаранчевий/червоний), чи очікується магнітна буря. 2-3 речення.
+2. Другий абзац: деталі — швидкість сонячного вітру, густина плазми, що відбувалося на Сонці за останню добу. Якщо G0 — зазнач що суттєвих спалахів не зафіксовано. 2-3 речення.
 
-3. Другий абзац: деталі — швидкість сонячного вітру, густина плазми, що відбувалося на Сонці за останню добу. Якщо G0 — зазнач що суттєвих спалахів не зафіксовано. 2-3 речення.
+3. Третій абзац: прогноз на найближчі 1-2 дні з конкретними значеннями K-індексу з даних прогнозу. Можна згадати "за даними NOAA". 2-3 речення.
 
-4. Третій абзац: прогноз на найближчі 1-2 дні з конкретними значеннями K-індексу з даних прогнозу. Можна згадати "за даними NOAA". 2-3 речення.
-
-5. Четвертий абзац: короткий дисклеймер що прогнози можуть змінюватися, бо дані оновлюються що три години, і найточніші прогнози — на один день наперед. Якщо K-індекс ≥ 4, додай пораду для метеозалежних. 1-2 речення.
+4. Четвертий абзац: короткий дисклеймер що прогнози можуть змінюватися, бо дані оновлюються що три години, і найточніші прогнози — на один день наперед. Якщо K-індекс ≥ 4, додай пораду для метеозалежних. 1-2 речення.
 
 Критичні вимоги:
-- Абзаци розділені \\n\\n
+- Поверни ТІЛЬКИ текст новини, без заголовка, без JSON, без markdown
+- Абзаци розділені подвійним переносом рядка
 - Загальна довжина: 800-1200 символів
 - Стиль: стриманий, інформативний, журналістський
 - НЕ використовуй емодзі, markdown, списки
@@ -118,62 +114,37 @@ Deno.serve(async (req) => {
 - НЕ згадуй сайт magnitca.com
 - НЕ посилайся на інші джерела крім NOAA — ми самі є джерелом`;
 
-    const aiRes = await fetch(AI_GATEWAY, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 1500,
+    const titlePrompt = `Придумай стислий заголовок для новини про магнітні бурі на ${dateStr}. Kp=${latestKp.toFixed(1)}, G${currentG}.
+Приклади: "Магнітні бурі 20 лютого: прогноз геомагнітної активності", "Сонячна активність 20 лютого: чого очікувати".
+Поверни ТІЛЬКИ заголовок, 50-80 символів, без лапок, без markdown.`;
+
+    // Fire both requests in parallel
+    const [contentRes, titleRes] = await Promise.all([
+      fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "google/gemini-2.5-flash", messages: [{ role: "user", content: contentPrompt }], max_tokens: 2000 }),
       }),
-    });
+      fetch(AI_GATEWAY, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "google/gemini-2.5-flash-lite", messages: [{ role: "user", content: titlePrompt }], max_tokens: 200 }),
+      }),
+    ]);
 
-    if (!aiRes.ok) {
-      const errText = await aiRes.text();
-      throw new Error(`AI error [${aiRes.status}]: ${errText}`);
+    if (!contentRes.ok) throw new Error(`AI content error [${contentRes.status}]: ${await contentRes.text()}`);
+    if (!titleRes.ok) throw new Error(`AI title error [${titleRes.status}]: ${await titleRes.text()}`);
+
+    const [contentData, titleData] = await Promise.all([contentRes.json(), titleRes.json()]);
+    
+    const articleContent = contentData.choices?.[0]?.message?.content?.trim();
+    const articleTitle = titleData.choices?.[0]?.message?.content?.trim()?.replace(/^["«]|["»]$/g, "") || `Прогноз магнітних бур — ${dateStr}`;
+    
+    if (!articleContent || articleContent.length < 200) {
+      throw new Error(`AI returned insufficient content (${articleContent?.length || 0} chars)`);
     }
 
-    const aiData = await aiRes.json();
-    const rawContent = aiData.choices?.[0]?.message?.content?.trim();
-    if (!rawContent) throw new Error("AI returned empty response");
-
-    // Parse JSON from AI response (robust extraction)
-    let article: { title: string; content: string };
-    try {
-      // Strip markdown code fences anywhere in text
-      let cleaned = rawContent
-        .replace(/```json\s*/gi, "")
-        .replace(/```\s*/g, "")
-        .trim();
-
-      // Find JSON object boundaries
-      const jsonStart = cleaned.indexOf("{");
-      const jsonEnd = cleaned.lastIndexOf("}");
-      if (jsonStart === -1 || jsonEnd === -1) throw new Error("No JSON found");
-      cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
-
-      // Fix common LLM issues
-      cleaned = cleaned
-        .replace(/,\s*}/g, "}")
-        .replace(/[\x00-\x1F\x7F]/g, (ch) => ch === "\n" || ch === "\t" ? ch : "");
-
-      article = JSON.parse(cleaned);
-      if (!article.title || !article.content) throw new Error("Missing fields");
-    } catch {
-      // Fallback: use raw text
-      article = {
-        title: `Прогноз магнітних бур — ${dateStr}`,
-        content: rawContent
-          .replace(/```json\s*/gi, "")
-          .replace(/```\s*/g, "")
-          .replace(/^\s*\{[\s\S]*?"content"\s*:\s*"/, "")
-          .replace(/"\s*\}\s*$/, "")
-          .trim() || rawContent,
-      };
-    }
+    const article = { title: articleTitle, content: articleContent };
 
     // 3. Generate cover image
     let imageUrl: string | null = null;
