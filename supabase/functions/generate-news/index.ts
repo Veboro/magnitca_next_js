@@ -140,17 +140,38 @@ Deno.serve(async (req) => {
     const rawContent = aiData.choices?.[0]?.message?.content?.trim();
     if (!rawContent) throw new Error("AI returned empty response");
 
-    // Parse JSON from AI response
+    // Parse JSON from AI response (robust extraction)
     let article: { title: string; content: string };
     try {
-      // Remove possible markdown code fences
-      const cleaned = rawContent.replace(/^```json?\s*/, "").replace(/\s*```$/, "");
+      // Strip markdown code fences anywhere in text
+      let cleaned = rawContent
+        .replace(/```json\s*/gi, "")
+        .replace(/```\s*/g, "")
+        .trim();
+
+      // Find JSON object boundaries
+      const jsonStart = cleaned.indexOf("{");
+      const jsonEnd = cleaned.lastIndexOf("}");
+      if (jsonStart === -1 || jsonEnd === -1) throw new Error("No JSON found");
+      cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
+
+      // Fix common LLM issues
+      cleaned = cleaned
+        .replace(/,\s*}/g, "}")
+        .replace(/[\x00-\x1F\x7F]/g, (ch) => ch === "\n" || ch === "\t" ? ch : "");
+
       article = JSON.parse(cleaned);
+      if (!article.title || !article.content) throw new Error("Missing fields");
     } catch {
       // Fallback: use raw text
       article = {
         title: `Прогноз магнітних бур — ${dateStr}`,
-        content: rawContent,
+        content: rawContent
+          .replace(/```json\s*/gi, "")
+          .replace(/```\s*/g, "")
+          .replace(/^\s*\{[\s\S]*?"content"\s*:\s*"/, "")
+          .replace(/"\s*\}\s*$/, "")
+          .trim() || rawContent,
       };
     }
 
