@@ -46,15 +46,17 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // 1. Fetch NOAA data
-    const [scalesRes, kpRes, solarWindRes] = await Promise.all([
+    const [scalesRes, kpRes, solarWindRes, kpForecastRes] = await Promise.all([
       fetch(`${SWPC_BASE}/products/noaa-scales.json`),
       fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
       fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
+      fetch(`${SWPC_BASE}/products/noaa-planetary-k-index-forecast.json`),
     ]);
 
     const scales = await scalesRes.json();
     const kpData = await kpRes.json();
     const solarWindRaw: string[][] = await solarWindRes.json();
+    const kpForecastRaw: string[][] = await kpForecastRes.json();
 
     const latestKp = kpData.length > 0
       ? parseFloat(kpData[kpData.length - 1].estimated_kp ?? kpData[kpData.length - 1].kp_index ?? "0")
@@ -64,17 +66,26 @@ Deno.serve(async (req) => {
     const windSpeed = lastWind ? parseFloat(lastWind[2]) || 0 : 0;
     const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
 
-    const forecast = ["1", "2", "3"].map((key) => {
-      const d = scales[key];
-      if (!d) return null;
-      return {
-        date: d.DateStamp,
-        gScale: parseInt(d.G?.Scale ?? "0"),
-        rMinor: d.R?.MinorProb,
-        rMajor: d.R?.MajorProb,
-        sProb: d.S?.Prob,
-      };
-    }).filter(Boolean);
+    // Build per-day Kp forecast from the actual forecast endpoint
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const dayKpMap: Record<string, number[]> = {};
+    for (const row of kpForecastRaw.slice(1)) {
+      const [timeTag, kpVal, observed] = row;
+      if (observed === "observed") continue;
+      const day = timeTag.slice(0, 10);
+      const kp = parseFloat(kpVal);
+      if (!isNaN(kp)) {
+        if (!dayKpMap[day]) dayKpMap[day] = [];
+        dayKpMap[day].push(kp);
+      }
+    }
+
+    const forecast = Object.entries(dayKpMap).slice(0, 3).map(([date, kps]) => ({
+      date,
+      maxKp: Math.max(...kps).toFixed(1),
+      avgKp: (kps.reduce((a, b) => a + b, 0) / kps.length).toFixed(1),
+      gScale: Math.max(...kps) >= 5 ? Math.min(Math.floor(Math.max(...kps) - 4), 5) : 0,
+    }));
 
     const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0");
 
@@ -92,7 +103,8 @@ Deno.serve(async (req) => {
 Дані на ${dateStr}:
 - Поточний Kp-індекс: ${latestKp.toFixed(1)}, G-шкала: G${currentG}
 - Сонячний вітер: швидкість ${windSpeed.toFixed(0)} км/с, густина ${windDensity.toFixed(1)} p/cm³
-- Прогноз на найближчі дні: ${JSON.stringify(forecast)}
+- Прогноз Kp-індексу на найближчі дні:
+${forecast.map(f => `  ${f.date}: макс Kp=${f.maxKp}, середній Kp=${f.avgKp}, G-шкала: G${f.gScale}${f.gScale >= 1 ? " (магнітна буря)" : " (без бурі)"}`).join("\n")}
 
 Стиль і структура — як у реальних українських новинних порталах:
 
