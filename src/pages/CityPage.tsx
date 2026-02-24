@@ -85,9 +85,14 @@ const CityPage = () => {
   const gLevel = scales?.g?.Scale ?? 0;
   const kpStatus = getKpStatus(latestKp);
 
+  const todayDate = new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric" });
+  const dynamicDescription = city
+    ? `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
+    : "";
+
   usePageMeta(
     city?.seoTitle ?? "Магнітні бурі — місто не знайдено",
-    city?.seoDescription ?? ""
+    dynamicDescription || city?.seoDescription || ""
   );
 
   if (!city) return <Navigate to="/404" replace />;
