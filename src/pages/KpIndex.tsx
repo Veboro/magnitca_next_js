@@ -64,10 +64,17 @@ const KpIndex = () => {
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const kpRound = Math.min(9, Math.max(0, Math.round(latestKp)));
 
-  const chartData = kpData?.map((d) => ({
+  // Sample every 10th point for smoother chart
+  const sampled = kpData?.filter((_, i) => i % 10 === 0) ?? [];
+  const chartData = sampled.map((d) => ({
     time: new Date(d.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" }),
     kp: d.kp,
-  })) ?? [];
+  }));
+
+  // Calculate actual time range for the title
+  const chartHours = kpData && kpData.length >= 2
+    ? Math.round((new Date(kpData[kpData.length - 1].time_tag).getTime() - new Date(kpData[0].time_tag).getTime()) / 3600000)
+    : 0;
 
   // JSON-LD FAQ
   const faqLd = {
@@ -133,7 +140,7 @@ const KpIndex = () => {
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="h-4 w-4 text-primary" />
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Kp індекс за останні 24 години
+              Kp індекс за останні {chartHours > 0 ? `${chartHours} год` : "години"}
             </h2>
           </div>
           <div className="h-64">
