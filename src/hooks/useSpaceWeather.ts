@@ -16,7 +16,7 @@ export function useKpIndex() {
       const res = await fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`);
       const data = await res.json();
       // Each entry: { time_tag, kp_index, estimated_kp, ... }
-      return data.slice(-24).map((d: any) => ({
+      return data.map((d: any) => ({
         time_tag: d.time_tag,
         kp: parseFloat(d.estimated_kp ?? d.kp_index ?? d.kp ?? 0),
       }));
