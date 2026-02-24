@@ -2,9 +2,10 @@ import { usePageMeta } from "@/hooks/usePageMeta";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, AlertTriangle, MapPin, Info } from "lucide-react";
+import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, AlertTriangle, MapPin, Info, CalendarDays } from "lucide-react";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return { label: "Спокійно", color: "hsl(145, 80%, 45%)" };
@@ -24,6 +25,28 @@ const CityKyiv = () => {
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
   const { data: forecast, isLoading: forecastLoading } = useKpForecast();
+
+  const { data: forecast27 = [], isLoading: forecast27Loading } = useQuery<{ date: string; kp: number }[]>({
+    queryKey: ["forecast-27day"],
+    queryFn: async () => {
+      const res = await fetch("https://services.swpc.noaa.gov/text/27-day-outlook.txt");
+      const text = await res.text();
+      const lines = text.split("\n");
+      const result: { date: string; kp: number }[] = [];
+      for (const line of lines) {
+        const match = line.match(/^(\d{4})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+\d+\s+\d+\s+([\d.]+)/);
+        if (match) {
+          const [, year, mon, day, kp] = match;
+          const monthMap: Record<string, string> = { Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06", Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12" };
+          result.push({ date: `${year}-${monthMap[mon]}-${day.padStart(2, "0")}`, kp: parseFloat(kp) });
+        }
+      }
+      const today = new Date().toISOString().slice(0, 10);
+      return result.filter((d) => d.date >= today);
+    },
+    refetchInterval: 600000,
+    staleTime: 300000,
+  });
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
   const kpStatus = getKpStatus(latestKp);
@@ -302,6 +325,46 @@ const CityKyiv = () => {
           )}
           <p className="text-[11px] text-muted-foreground/60 border-t border-border/30 pt-3">
             Прогноз Kp індексу для Києва (50.45°N) від NOAA Space Weather Prediction Center. Час — київський (UTC+2).
+          </p>
+        </section>
+
+        {/* 27-day Kp forecast */}
+        <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label="Прогноз Kp на 27 днів">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary" />
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Прогноз Kp на 27 днів для Києва
+            </h2>
+          </div>
+          {forecast27Loading ? (
+            <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
+          ) : forecast27.length > 0 ? (
+            <div className="grid grid-cols-7 gap-1.5">
+              {forecast27.map((day) => {
+                const d = new Date(day.date);
+                const isToday = day.date === new Date().toISOString().slice(0, 10);
+                const kpColor = day.kp >= 7 ? "bg-red-500/20 text-red-400 border-red-500/30"
+                  : day.kp >= 5 ? "bg-orange-500/20 text-orange-400 border-orange-500/30"
+                  : day.kp >= 4 ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                  : "bg-green-500/20 text-green-400 border-green-500/30";
+                return (
+                  <div
+                    key={day.date}
+                    className={cn("rounded-md border p-1.5 text-center text-[10px] font-mono transition-colors", kpColor, isToday && "ring-1 ring-primary")}
+                    title={`${day.date}: Kp ${day.kp}`}
+                  >
+                    <div className="text-muted-foreground/70">{d.toLocaleDateString("uk-UA", { weekday: "narrow" })}</div>
+                    <div className="text-xs font-bold">{d.getDate()}</div>
+                    <div className="text-[9px] opacity-80">Kp {day.kp}</div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Дані прогнозу недоступні.</p>
+          )}
+          <p className="text-[11px] text-muted-foreground/60 border-t border-border/30 pt-3">
+            27-денний прогноз Kp-індексу для Києва (50.45°N) від NOAA SWPC. Точність знижується з кожним днем — використовуйте для загального планування.
           </p>
         </section>
 
