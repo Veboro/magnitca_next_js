@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { ArrowLeft, ArrowRight, User, Lock, Loader2, Activity } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, Activity, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
@@ -387,110 +387,84 @@ const MeteoTest = () => {
         {/* ─── Result ─── */}
         {step === "result" && (
           <div className="animate-fade-in space-y-6">
-            <div className="rounded-lg border border-border/50 bg-card p-8 relative overflow-hidden">
-              <h2 className="font-display text-xl font-bold text-foreground mb-6 relative z-10">
+            <div className="rounded-lg border border-border/50 bg-card p-8">
+              <h2 className="font-display text-xl font-bold text-foreground mb-6">
                 Ваш результат
               </h2>
 
-              {!user ? (
-                <>
-                  {/* Blurred result */}
-                  <div className="select-none pointer-events-none blur-[8px] opacity-50">
-                    <div className="flex flex-col items-center gap-4 py-6 text-center">
-                      <div className="relative">
-                        <svg className="h-32 w-32 -rotate-90" viewBox="0 0 100 100">
-                          <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--secondary))" strokeWidth="8" strokeOpacity="0.3" />
-                          <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--primary))" strokeWidth="8" strokeLinecap="round" strokeDasharray={`${2 * Math.PI * 42}`} strokeDashoffset={`${2 * Math.PI * 42 * (1 - score / 100)}`} />
-                        </svg>
-                        <span className="absolute inset-0 flex items-center justify-center font-mono text-3xl font-bold text-primary">
-                          {score}%
-                        </span>
-                      </div>
-                      <p className={cn("font-display text-xl font-bold", result.color)}>{result.label}</p>
-                      <p className="text-sm text-muted-foreground max-w-md">{result.description}</p>
-                    </div>
-                  </div>
+              <div className="flex flex-col items-center gap-4 py-6 text-center animate-scale-in">
+                <div className="relative">
+                  <svg className="h-32 w-32 -rotate-90" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--secondary))" strokeWidth="8" strokeOpacity="0.3" />
+                    <circle
+                      cx="50" cy="50" r="42"
+                      fill="none"
+                      stroke="hsl(var(--primary))"
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                      strokeDasharray={`${2 * Math.PI * 42}`}
+                      strokeDashoffset={`${2 * Math.PI * 42 * (1 - score / 100)}`}
+                      className="transition-all duration-1000"
+                    />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center font-mono text-3xl font-bold text-primary">
+                    {score}%
+                  </span>
+                </div>
+                <p className={cn("font-display text-xl font-bold", result.color)}>{result.label}</p>
+                <p className="text-sm text-muted-foreground max-w-md">{result.description}</p>
 
-                  {/* Auth CTA overlay */}
-                  <div className="absolute inset-x-0 top-14 bottom-0 flex flex-col items-center justify-center gap-3 bg-card/70 backdrop-blur-[2px]">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
-                      <Lock className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="space-y-1.5 text-center">
-                      <p className="text-sm font-medium text-foreground">
-                        Зареєструйтесь, щоб побачити результат
-                      </p>
-                      <p className="text-xs text-muted-foreground max-w-sm">
-                        Ваші відповіді збережено. Після реєстрації результат буде доступний у вашому кабінеті.
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        // Save pending test to localStorage
-                        const pending: PendingTest = { score, personalInfo, answers };
-                        localStorage.setItem(PENDING_TEST_KEY, JSON.stringify(pending));
-                        navigate("/auth?redirect=/test");
-                      }}
-                      className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-2.5 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-                    >
-                      <User className="h-4 w-4" />
-                      Зареєструватися
-                    </button>
+                {saving && (
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Зберігаємо результат...
                   </div>
-                </>
-              ) : (
-                <div className="flex flex-col items-center gap-4 py-6 text-center animate-scale-in">
-                  <div className="relative">
-                    <svg className="h-32 w-32 -rotate-90" viewBox="0 0 100 100">
-                      <circle cx="50" cy="50" r="42" fill="none" stroke="hsl(var(--secondary))" strokeWidth="8" strokeOpacity="0.3" />
-                      <circle
-                        cx="50" cy="50" r="42"
-                        fill="none"
-                        stroke="hsl(var(--primary))"
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                        strokeDasharray={`${2 * Math.PI * 42}`}
-                        strokeDashoffset={`${2 * Math.PI * 42 * (1 - score / 100)}`}
-                        className="transition-all duration-1000"
-                      />
-                    </svg>
-                    <span className="absolute inset-0 flex items-center justify-center font-mono text-3xl font-bold text-primary">
-                      {score}%
-                    </span>
-                  </div>
-                  <p className={cn("font-display text-xl font-bold", result.color)}>{result.label}</p>
-                  <p className="text-sm text-muted-foreground max-w-md">{result.description}</p>
+                )}
 
-                  {saving && (
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                      Зберігаємо результат...
-                    </div>
-                  )}
-
-                  <div className="flex gap-3 mt-4">
-                    <button
-                      onClick={() => {
-                        setStep("info");
-                        setCurrentQ(0);
-                        setAnswers([]);
-                        setScore(0);
-                        setCalcProgress(0);
-                        setSaving(false);
-                      }}
-                      className="rounded-md border border-border/50 bg-secondary/30 px-5 py-2 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary/60"
-                    >
-                      Пройти ще раз
-                    </button>
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={() => {
+                      setStep("info");
+                      setCurrentQ(0);
+                      setAnswers([]);
+                      setScore(0);
+                      setCalcProgress(0);
+                      setSaving(false);
+                    }}
+                    className="rounded-md border border-border/50 bg-secondary/30 px-5 py-2 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary/60"
+                  >
+                    Пройти ще раз
+                  </button>
+                  {user && (
                     <a
                       href="/profile"
                       className="rounded-md bg-primary px-5 py-2 font-mono text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                     >
                       Мій кабінет
                     </a>
-                  </div>
+                  )}
                 </div>
-              )}
+              </div>
+            </div>
+
+            {/* Telegram CTA */}
+            <div className="rounded-lg border border-border/50 bg-card p-6 text-center space-y-3">
+              <Send className="h-6 w-6 text-primary mx-auto" />
+              <p className="text-sm font-medium text-foreground">
+                Не пропустіть магнітні бурі!
+              </p>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                Підпишіться на наш Telegram-канал і отримуйте щоденні прогнози магнітних бур прямо в месенджер.
+              </p>
+              <a
+                href="https://t.me/+7UKzAK5ur8UxZmMy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-md bg-[hsl(200,80%,45%)] px-6 py-2.5 font-mono text-sm font-medium text-white transition-colors hover:bg-[hsl(200,80%,40%)]"
+              >
+                <Send className="h-4 w-4" />
+                Підписатись в Telegram
+              </a>
             </div>
           </div>
         )}

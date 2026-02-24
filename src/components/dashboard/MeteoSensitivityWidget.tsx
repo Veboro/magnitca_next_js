@@ -95,21 +95,17 @@ export const MeteoSensitivityWidget = ({ className }: { className?: string }) =>
           </a>
         </>
       ) : (
-        <>
-          <CircleGauge value={64} blurred />
-          {/* CTA overlay on top of blurred gauge */}
-          <div className="absolute inset-x-0 top-10 bottom-0 flex flex-col items-center justify-center gap-2">
-            <p className="text-[11px] text-muted-foreground text-center max-w-[160px]">
-              Дізнайтесь свій рівень чутливості до магнітних бур
-            </p>
-            <a
-              href="/test"
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-1.5 font-mono text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-            >
-              Пройти тест
-            </a>
-          </div>
-        </>
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-[11px] text-muted-foreground text-center max-w-[160px]">
+            Дізнайтесь свій рівень чутливості до магнітних бур
+          </p>
+          <a
+            href="/test"
+            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-1.5 font-mono text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Пройти тест
+          </a>
+        </div>
       )}
     </div>
   );
