@@ -357,7 +357,7 @@ const CityPage = () => {
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-primary" />
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Прогноз Kp на 27 днів для {city.nameGenitive}
+              Прогноз Kp на 27 днів — {city.name}
             </h2>
           </div>
           {forecast27Loading ? (
