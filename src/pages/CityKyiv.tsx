@@ -16,11 +16,6 @@ const getKpStatus = (kp: number) => {
 };
 
 const CityKyiv = () => {
-  usePageMeta(
-    "Магнітні бурі в Києві сьогодні — погода, якість повітря",
-    "Магнітні бурі в Києві сьогодні: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані для Києва в реальному часі."
-  );
-
   const { data, isLoading } = useCityWeather();
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
@@ -47,9 +42,17 @@ const CityKyiv = () => {
     refetchInterval: 600000,
     staleTime: 300000,
   });
+
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
   const kpStatus = getKpStatus(latestKp);
+
+  const todayDate = new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric" });
+
+  usePageMeta(
+    "Магнітні бурі в Києві сьогодні — погода, якість повітря",
+    `Магнітні бурі в Києві ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
+  );
 
   const today = new Date().toLocaleDateString("uk-UA", {
     weekday: "long",
