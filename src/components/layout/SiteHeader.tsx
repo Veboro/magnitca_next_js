@@ -163,7 +163,7 @@ export const SiteHeader = () => {
               <a
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 font-mono text-xs transition-all ${
+                className={`flex items-center gap-1.5 whitespace-nowrap rounded-md px-3 py-1.5 font-mono text-[18px] transition-all ${
                   isActive
                     ? "bg-primary/15 text-primary border border-primary/30 shadow-sm"
                     : "text-muted-foreground hover:text-foreground hover:bg-card"
