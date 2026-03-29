@@ -1,7 +1,6 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, Bell, BellOff, Loader2, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { useAuth } from "@/hooks/useAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +17,6 @@ const navItems = [
 
 export const SiteHeader = () => {
   const { user, signOut, loading: authLoading } = useAuth();
-  const { isSupported: pushSupported, isSubscribed: pushSubscribed, isLoading: pushLoading, toggle: togglePush } = usePushNotifications();
   const { unreadCount } = useNotifications(user);
   const location = useLocation();
   const [isDark, setIsDark] = useState(() => {
@@ -74,23 +72,6 @@ export const SiteHeader = () => {
         </a>
 
         <div className="flex items-center gap-3 sm:gap-4">
-          {pushSupported && (
-            <button
-              onClick={togglePush}
-              disabled={pushLoading}
-              className="flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-              aria-label={pushSubscribed ? "Вимкнути сповіщення" : "Увімкнути сповіщення"}
-              title={pushSubscribed ? "Сповіщення увімкнено" : "Увімкнути пуш-сповіщення"}
-            >
-              {pushLoading ? (
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-              ) : pushSubscribed ? (
-                <Bell className="h-3.5 w-3.5 text-primary" />
-              ) : (
-                <BellOff className="h-3.5 w-3.5" />
-              )}
-            </button>
-          )}
 
           <button
             onClick={toggleTheme}
