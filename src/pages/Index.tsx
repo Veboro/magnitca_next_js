@@ -78,10 +78,9 @@ const Index = () => {
           </span>
         </div>
         <section aria-label="Статус геомагнітної активності">
-          <div className="grid gap-6 lg:grid-cols-[1fr_1fr_auto]">
+          <div className="grid gap-6 lg:grid-cols-2">
             <StormStatusBanner />
             <HumanImpact />
-            <MeteoSensitivityWidget className="lg:w-52" />
           </div>
         </section>
 
