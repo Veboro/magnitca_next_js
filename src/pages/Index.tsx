@@ -10,7 +10,7 @@ import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
-import { MeteoSensitivityWidget } from "@/components/dashboard/MeteoSensitivityWidget";
+// MeteoSensitivityWidget merged into HumanImpact
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 
 const getKpStatus = (kp: number) => {
