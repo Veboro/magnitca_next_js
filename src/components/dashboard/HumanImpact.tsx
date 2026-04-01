@@ -64,6 +64,24 @@ const getImpactLevel = (kp: number): number => {
 export const HumanImpact = ({ className }: { className?: string }) => {
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
+  const { user } = useAuth();
+
+  const { data: latestResult } = useQuery({
+    queryKey: ["latest-test-result", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("test_results")
+        .select("score, created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const hasTestResult = !!user && !!latestResult;
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
