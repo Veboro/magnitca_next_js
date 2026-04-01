@@ -157,26 +157,26 @@ export const StormStatusBanner = () => {
               </div>
             )}
           </div>
-          {/* Vertical compact hourly bars for today */}
+          {/* Horizontal hourly bars for today */}
           {todayEntries.length > 0 && (
-            <div className="flex flex-col gap-1 mt-1">
+            <div className="flex items-end gap-1 mt-1 h-16">
               {todayEntries.map((entry, i) => {
                 const hour = new Date(entry.time_tag).toLocaleString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
                 const entryColor = levelColors[getEffectiveLevel(0, entry.kp)] || levelColors[0];
-                const barWidth = Math.max(8, (entry.kp / 9) * 100);
+                const barHeight = Math.max(10, (entry.kp / 9) * 100);
                 const isPast = new Date(entry.time_tag) < now;
                 return (
-                  <div key={i} className={`flex items-center gap-2 ${isPast ? "opacity-50" : ""}`}>
-                    <span className="text-[10px] font-mono text-muted-foreground w-10 shrink-0">{hour}</span>
-                    <div className="flex-1 h-3 rounded-sm bg-muted/30 overflow-hidden">
-                      <div
-                        className="h-full rounded-sm transition-all duration-300"
-                        style={{ width: `${barWidth}%`, backgroundColor: entryColor }}
-                      />
-                    </div>
-                    <span className="text-[10px] font-mono font-medium w-6 text-right" style={{ color: entryColor }}>
+                  <div key={i} className={`flex flex-col items-center flex-1 gap-0.5 ${isPast ? "opacity-50" : ""}`}>
+                    <span className="text-[9px] font-mono font-medium" style={{ color: entryColor }}>
                       {entry.kp.toFixed(1)}
                     </span>
+                    <div className="w-full rounded-sm bg-muted/30 overflow-hidden" style={{ height: "40px" }}>
+                      <div
+                        className="w-full rounded-sm transition-all duration-300"
+                        style={{ height: `${barHeight}%`, backgroundColor: entryColor, marginTop: "auto" }}
+                      />
+                    </div>
+                    <span className="text-[8px] font-mono text-muted-foreground">{hour}</span>
                   </div>
                 );
               })}
