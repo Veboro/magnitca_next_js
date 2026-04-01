@@ -65,7 +65,7 @@ export const SiteHeader = () => {
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         <a href="/" className="flex items-center">
-          <img src={logo} alt="Магнітка" className="h-8 w-auto max-w-[200px]" />
+          <img src={logo} alt="Магнітка" className="h-10 w-auto max-w-[250px]" />
         </a>
 
         <div className="flex items-center gap-3 sm:gap-4">
