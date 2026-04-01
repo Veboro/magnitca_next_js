@@ -286,6 +286,51 @@ export const HumanImpact = ({ className }: { className?: string }) => {
           </div>
         </div>
       </div>
+
+      {/* Meteo sensitivity test CTA */}
+      <div className="mt-3 border-t border-border/30 pt-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            Рівень метеозалежності
+          </span>
+        </div>
+        {hasTestResult ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "font-mono text-sm font-bold",
+                latestResult.score <= 30 ? "text-green-400" :
+                latestResult.score <= 60 ? "text-yellow-400" :
+                latestResult.score <= 80 ? "text-orange-400" : "text-red-400"
+              )}>
+                {latestResult.score}%
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                {latestResult.score <= 30 ? "Низька" : latestResult.score <= 60 ? "Помірна" : latestResult.score <= 80 ? "Висока" : "Дуже висока"}
+              </span>
+            </div>
+            <a
+              href="/test"
+              className="text-[10px] text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+            >
+              Пройти ще раз
+            </a>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] text-muted-foreground">
+              Дізнайтесь свій рівень чутливості
+            </p>
+            <a
+              href="/test"
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1 font-mono text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Пройти тест
+            </a>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
