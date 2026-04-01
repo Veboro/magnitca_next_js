@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
-import { Heart, Brain, BatteryLow, Frown, Smile, Meh } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Heart, Brain, BatteryLow, Frown, Smile, Meh, Activity } from "lucide-react";
 
 const levels = [
   {
