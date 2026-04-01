@@ -43,12 +43,19 @@ interface NewsForm {
   source: string;
 }
 
+const getKyivNow = () => {
+  const now = new Date();
+  const kyiv = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Kyiv" }));
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${kyiv.getFullYear()}-${pad(kyiv.getMonth() + 1)}-${pad(kyiv.getDate())}T${pad(kyiv.getHours())}:${pad(kyiv.getMinutes())}`;
+};
+
 const emptyForm: NewsForm = {
   title: "",
   slug: "",
   content: "",
   image_url: "",
-  published_at: new Date().toISOString().slice(0, 16),
+  published_at: getKyivNow(),
   telegram_sent: false,
   meta_title: "",
   meta_description: "",
