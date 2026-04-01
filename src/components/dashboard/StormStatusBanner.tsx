@@ -64,13 +64,18 @@ export const StormStatusBanner = () => {
   const color = levelColors[effectiveLevel] || levelColors[0];
   const kpEffect = getKpEffect(latestKp);
 
-  // Next 24h max Kp from forecast
+  // Max Kp for today (Kyiv timezone) + next 24h
   const now = new Date();
-  const next24h = forecast.filter((e) => {
+  const kyivDate = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Kyiv" }));
+  const todayStr = `${kyivDate.getFullYear()}-${String(kyivDate.getMonth() + 1).padStart(2, "0")}-${String(kyivDate.getDate()).padStart(2, "0")}`;
+  
+  const todayAndNext = forecast.filter((e) => {
+    const tag = e.time_tag.slice(0, 10);
     const t = new Date(e.time_tag);
-    return t >= now && t <= new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    // Include all of today + future entries within 24h
+    return tag === todayStr || (t >= now && t <= new Date(now.getTime() + 24 * 60 * 60 * 1000));
   });
-  const maxKp24h = next24h.length > 0 ? Math.max(...next24h.map((e) => e.kp)) : null;
+  const maxKp24h = todayAndNext.length > 0 ? Math.max(...todayAndNext.map((e) => e.kp)) : null;
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-glow-cyan">
@@ -142,7 +147,7 @@ export const StormStatusBanner = () => {
             <div className="flex items-center gap-2 ml-auto">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Макс. 24г</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Макс. сьогодні</p>
                 <p className="font-mono text-sm font-bold" style={{ color: levelColors[getEffectiveLevel(0, maxKp24h)] }}>
                   Kp {maxKp24h.toFixed(1)}
                 </p>
