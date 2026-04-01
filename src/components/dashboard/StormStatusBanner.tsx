@@ -147,7 +147,7 @@ export const StormStatusBanner = () => {
             <div className="flex items-center gap-2 ml-auto">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <div>
-                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Макс. 24г</p>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Макс. сьогодні</p>
                 <p className="font-mono text-sm font-bold" style={{ color: levelColors[getEffectiveLevel(0, maxKp24h)] }}>
                   Kp {maxKp24h.toFixed(1)}
                 </p>
