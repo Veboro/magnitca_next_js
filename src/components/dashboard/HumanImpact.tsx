@@ -1,6 +1,9 @@
 import { cn } from "@/lib/utils";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
-import { Heart, Brain, BatteryLow, Frown, Smile, Meh } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { Heart, Brain, BatteryLow, Frown, Smile, Meh, Activity } from "lucide-react";
 
 const levels = [
   {
@@ -61,6 +64,24 @@ const getImpactLevel = (kp: number): number => {
 export const HumanImpact = ({ className }: { className?: string }) => {
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
+  const { user } = useAuth();
+
+  const { data: latestResult } = useQuery({
+    queryKey: ["latest-test-result", user?.id],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("test_results")
+        .select("score, created_at")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      return data;
+    },
+    enabled: !!user,
+  });
+
+  const hasTestResult = !!user && !!latestResult;
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
@@ -264,6 +285,51 @@ export const HumanImpact = ({ className }: { className?: string }) => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Meteo sensitivity test CTA */}
+      <div className="mt-3 border-t border-border/30 pt-3">
+        <div className="flex items-center gap-2 mb-2">
+          <Activity className="h-3.5 w-3.5 text-primary" />
+          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            Рівень метеозалежності
+          </span>
+        </div>
+        {hasTestResult ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "font-mono text-sm font-bold",
+                latestResult.score <= 30 ? "text-green-400" :
+                latestResult.score <= 60 ? "text-yellow-400" :
+                latestResult.score <= 80 ? "text-orange-400" : "text-red-400"
+              )}>
+                {latestResult.score}%
+              </span>
+              <span className="text-[11px] text-muted-foreground">
+                {latestResult.score <= 30 ? "Низька" : latestResult.score <= 60 ? "Помірна" : latestResult.score <= 80 ? "Висока" : "Дуже висока"}
+              </span>
+            </div>
+            <a
+              href="/test"
+              className="text-[10px] text-primary hover:text-primary/80 transition-colors underline underline-offset-2"
+            >
+              Пройти ще раз
+            </a>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <p className="text-[11px] text-muted-foreground">
+              Дізнайтесь свій рівень чутливості
+            </p>
+            <a
+              href="/test"
+              className="inline-flex items-center gap-1 rounded-md bg-primary px-3 py-1 font-mono text-[11px] font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              Пройти тест
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );
