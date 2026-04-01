@@ -64,11 +64,8 @@ export const SiteHeader = () => {
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
-        <a href="/" className="flex items-center gap-2.5">
-          <img src={logo} alt="Магнітка" className="h-7 w-7" />
-          <span className="font-display text-lg font-bold text-foreground">
-            Магніт<span className="text-primary">ка</span>
-          </span>
+        <a href="/" className="flex items-center">
+          <img src={logo} alt="Магнітка" className="h-8 w-auto max-w-[200px]" />
         </a>
 
         <div className="flex items-center gap-3 sm:gap-4">
