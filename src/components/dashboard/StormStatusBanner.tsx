@@ -126,6 +126,7 @@ export const StormStatusBanner = () => {
 
         {/* Today's hourly Kp forecast */}
         <div className="rounded-md border border-border/40 bg-background/40 p-3 space-y-2">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Прогноз на сьогодні:</p>
           {/* Horizontal hourly bars for today */}
           {todayEntries.length > 0 && (
             <div className="flex items-end gap-1 mt-1 h-16">
