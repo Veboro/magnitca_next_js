@@ -76,6 +76,7 @@ export const StormStatusBanner = () => {
     return tag === todayStr || (t >= now && t <= new Date(now.getTime() + 24 * 60 * 60 * 1000));
   });
   const maxKp24h = todayAndNext.length > 0 ? Math.max(...todayAndNext.map((e) => e.kp)) : null;
+  const todayEntries = forecast.filter((e) => e.time_tag.slice(0, 10) === todayStr);
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-glow-cyan">
