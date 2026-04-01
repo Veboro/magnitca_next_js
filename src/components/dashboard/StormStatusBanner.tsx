@@ -1,9 +1,16 @@
-import { AlertTriangle, Zap } from "lucide-react";
-import { useNoaaScales } from "@/hooks/useSpaceWeather";
+import { AlertTriangle, Zap, TrendingUp } from "lucide-react";
+import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
+import { useKpForecast } from "@/hooks/useKpForecast";
 import heroBg from "@/assets/hero-bg.jpg";
 import ukraineOutline from "@/assets/ukraine-outline.png";
 
-const gLabels: Record<number, string> = {
+const getEffectiveLevel = (gLevel: number, kp: number): number => {
+  // Use the higher of G-scale or Kp-derived level
+  const kpLevel = kp < 4 ? 0 : kp < 5 ? 1 : kp < 6 ? 2 : kp < 7 ? 3 : kp < 8 ? 4 : 5;
+  return Math.max(gLevel, kpLevel);
+};
+
+const levelLabels: Record<number, string> = {
   0: "Спокійно",
   1: "G1 — Слабка буря",
   2: "G2 — Помірна буря",
@@ -12,7 +19,7 @@ const gLabels: Record<number, string> = {
   5: "G5 — Екстремальна буря",
 };
 
-const gColors: Record<number, string> = {
+const levelColors: Record<number, string> = {
   0: "hsl(145, 80%, 45%)",
   1: "hsl(55, 90%, 50%)",
   2: "hsl(35, 100%, 55%)",
@@ -21,7 +28,7 @@ const gColors: Record<number, string> = {
   5: "hsl(0, 80%, 55%)",
 };
 
-const gDescriptions: Record<number, string> = {
+const levelDescriptions: Record<number, string> = {
   0: "Геомагнітна активність у нормі. Значних збурень не очікується.",
   1: "Можливі слабкі коливання в енергомережах. Полярне сяйво на широтах 60°+.",
   2: "Можливі збої в енергомережах високих широт. Полярне сяйво на широтах 55°+.",
@@ -30,9 +37,40 @@ const gDescriptions: Record<number, string> = {
   5: "Катастрофічні збої електромереж. Повне порушення радіозв'язку.",
 };
 
+const kpEffects = [
+  { min: 0, max: 1, label: "Мінімальний", effects: "Жодного впливу на техніку та самопочуття." },
+  { min: 1, max: 2, label: "Слабкий", effects: "Можливе незначне погіршення GPS-точності (±3-5 м)." },
+  { min: 2, max: 3, label: "Незначний", effects: "Метеочутливі люди можуть відчувати легке нездужання." },
+  { min: 3, max: 4, label: "Нестабільний", effects: "Головний біль, втома у чутливих людей. GPS ±5-10 м." },
+  { min: 4, max: 5, label: "Активний", effects: "Можливі порушення сну, дратівливість. Збої КХ-радіозв'язку." },
+  { min: 5, max: 6, label: "Буря G1", effects: "Збої GPS-навігації, деградація радіозв'язку. Підвищений тиск, тахікардія." },
+  { min: 6, max: 7, label: "Буря G2", effects: "Серйозні збої GPS та супутникового ТБ. Ризик перебоїв електромережі." },
+  { min: 7, max: 8, label: "Сильна буря", effects: "Масштабні збої навігації та зв'язку. Загроза для трансформаторів." },
+  { min: 8, max: 10, label: "Екстремальна", effects: "Повна втрата GPS та КХ-радіо. Можливі блекаути." },
+];
+
+const getKpEffect = (kp: number) => {
+  return kpEffects.find((e) => kp >= e.min && kp < e.max) || kpEffects[kpEffects.length - 1];
+};
+
 export const StormStatusBanner = () => {
   const { data: scales } = useNoaaScales();
+  const { data: kpData } = useKpIndex();
+  const { data: forecast = [] } = useKpForecast();
+
   const gLevel = scales?.g?.Scale ?? 0;
+  const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
+  const effectiveLevel = getEffectiveLevel(gLevel, latestKp);
+  const color = levelColors[effectiveLevel] || levelColors[0];
+  const kpEffect = getKpEffect(latestKp);
+
+  // Next 24h max Kp from forecast
+  const now = new Date();
+  const next24h = forecast.filter((e) => {
+    const t = new Date(e.time_tag);
+    return t >= now && t <= new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  });
+  const maxKp24h = next24h.length > 0 ? Math.max(...next24h.map((e) => e.kp)) : null;
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-glow-cyan">
@@ -45,39 +83,75 @@ export const StormStatusBanner = () => {
         style={{ backgroundImage: `url(${ukraineOutline})` }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent" />
-      <div className="relative p-6 space-y-3">
+      <div className="relative p-6 space-y-4">
+        {/* Top row: status + indicator */}
         <div className="flex items-center justify-between">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-primary animate-pulse-glow" />
               <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                {gLevel > 0 ? "Геомагнітна буря" : "Моніторинг космічної погоди"}
+                {effectiveLevel > 0 ? "Геомагнітна буря" : "Моніторинг космічної погоди"}
               </span>
             </div>
             <h1 className="font-display text-3xl font-bold text-foreground">
-              {gLabels[gLevel] || "Спокійно"}
+              {levelLabels[effectiveLevel] || "Спокійно"}
             </h1>
             <p className="max-w-md text-sm text-muted-foreground">
-              {gDescriptions[gLevel] || gDescriptions[0]}
+              {levelDescriptions[effectiveLevel] || levelDescriptions[0]}
             </p>
           </div>
           <div
             className="hidden md:flex flex-col items-center justify-center rounded-full border border-primary/20 w-24 h-24 ml-6 flex-shrink-0 transition-colors duration-700"
             style={{
-              backgroundColor: `${gColors[gLevel] || gColors[0]}15`,
-              borderColor: `${gColors[gLevel] || gColors[0]}40`,
-              boxShadow: `0 0 20px ${gColors[gLevel] || gColors[0]}20`,
+              backgroundColor: `${color}15`,
+              borderColor: `${color}40`,
+              boxShadow: `0 0 20px ${color}20`,
             }}
           >
-            <AlertTriangle className="h-6 w-6 transition-colors duration-700" style={{ color: gColors[gLevel] || gColors[0] }} />
+            <AlertTriangle className="h-6 w-6 transition-colors duration-700" style={{ color }} />
             <p className="font-mono text-xs font-bold text-foreground mt-1">
-              {gLevel > 0 ? "АКТИВНА" : "НОРМА"}
+              {effectiveLevel > 0 ? "АКТИВНА" : "НОРМА"}
             </p>
             <p className="text-[10px] text-muted-foreground">
               R{scales?.r?.Scale ?? 0} S{scales?.s?.Scale ?? 0} G{gLevel}
             </p>
           </div>
         </div>
+
+        {/* Kp impact detail row */}
+        <div className="flex flex-wrap items-start gap-4 rounded-md border border-border/40 bg-background/40 p-3">
+          <div className="flex items-center gap-3">
+            <div
+              className="flex items-center justify-center rounded-md w-12 h-12 font-mono text-lg font-bold transition-colors duration-500"
+              style={{
+                backgroundColor: `${color}15`,
+                color,
+                border: `1px solid ${color}30`,
+              }}
+            >
+              {latestKp.toFixed(1)}
+            </div>
+            <div>
+              <p className="text-xs font-medium text-foreground">
+                Kp-індекс зараз: <span style={{ color }}>{kpEffect.label}</span>
+              </p>
+              <p className="text-[11px] text-muted-foreground max-w-sm">{kpEffect.effects}</p>
+            </div>
+          </div>
+          {maxKp24h !== null && (
+            <div className="flex items-center gap-2 ml-auto">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <div>
+                <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Макс. 24г</p>
+                <p className="font-mono text-sm font-bold" style={{ color: levelColors[getEffectiveLevel(0, maxKp24h)] }}>
+                  Kp {maxKp24h.toFixed(1)}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Telegram CTA */}
         <a
           href="https://t.me/+7UKzAK5ur8UxZmMy"
           target="_blank"
