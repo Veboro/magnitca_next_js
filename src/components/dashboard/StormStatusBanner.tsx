@@ -126,37 +126,6 @@ export const StormStatusBanner = () => {
 
         {/* Today's hourly Kp forecast */}
         <div className="rounded-md border border-border/40 bg-background/40 p-3 space-y-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div
-                className="flex items-center justify-center rounded-md w-12 h-12 font-mono text-lg font-bold transition-colors duration-500"
-                style={{
-                  backgroundColor: `${color}15`,
-                  color,
-                  border: `1px solid ${color}30`,
-                }}
-              >
-                {latestKp.toFixed(1)}
-              </div>
-              <div>
-                <p className="text-xs font-medium text-foreground">
-                  Kp-індекс зараз: <span style={{ color }}>{kpEffect.label}</span>
-                </p>
-                <p className="text-[11px] text-muted-foreground max-w-sm">{kpEffect.effects}</p>
-              </div>
-            </div>
-            {maxKp24h !== null && (
-              <div className="hidden sm:flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Макс. сьогодні</p>
-                  <p className="font-mono text-sm font-bold" style={{ color: levelColors[getEffectiveLevel(0, maxKp24h)] }}>
-                    Kp {maxKp24h.toFixed(1)}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
           {/* Horizontal hourly bars for today */}
           {todayEntries.length > 0 && (
             <div className="flex items-end gap-1 mt-1 h-16">
