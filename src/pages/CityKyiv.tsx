@@ -384,6 +384,28 @@ const CityKyiv = () => {
           </p>
         </section>
 
+        {/* Radiation map */}
+        <section className="rounded-2xl border border-border/50 bg-card/50 p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-primary" />
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Радіаційний фон — Київ
+            </h2>
+          </div>
+          <div className="rounded-xl overflow-hidden border border-border/30">
+            <iframe
+              src="https://www.saveecobot.com/radiation-maps#checks,!s,!c,!q,!r,50.45,30.52,11"
+              title="Карта радіаційного фону Києва — SaveEcoBot"
+              className="w-full h-[400px] md:h-[500px] border-0"
+              loading="lazy"
+              allowFullScreen
+            />
+          </div>
+          <p className="text-[11px] text-muted-foreground/60">
+            Дані радіаційного моніторингу надані <a href="https://www.saveecobot.com/radiation/misto-kyiv" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">SaveEcoBot</a>. Значення вимірюються автоматичними станціями та ручними постами спостереження.
+          </p>
+        </section>
+
         {/* SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label="Про сторінку">
           <h2 className="text-lg font-display font-semibold text-foreground/90">
