@@ -68,7 +68,7 @@ const CityKyiv = () => {
         <h1 className="sr-only">Магнітні бурі в Києві — погода та якість повітря</h1>
 
         {/* Three-column hero */}
-        <section className="grid grid-cols-1 lg:grid-cols-3 gap-4" aria-label="Статус Києва">
+        <section className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-4" aria-label="Статус Києва">
           {/* 1. Storm info */}
           <div className="rounded-lg border border-glow-cyan bg-card p-5 space-y-3 flex flex-col">
             <div className="flex items-center justify-between gap-2">
@@ -126,6 +126,8 @@ const CityKyiv = () => {
             </div>
           </div>
 
+          {/* Right half: two cards stacked */}
+          <div className="grid grid-rows-2 gap-4">
           {/* 2. Radiation */}
           <div className="rounded-lg border border-border/50 bg-card p-5 space-y-3 flex flex-col">
             <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
@@ -206,6 +208,7 @@ const CityKyiv = () => {
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </section>
 
