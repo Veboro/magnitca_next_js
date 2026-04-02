@@ -126,6 +126,8 @@ const CityKyiv = () => {
             </div>
           </div>
 
+          {/* Right half: two cards stacked */}
+          <div className="grid grid-rows-2 gap-4">
           {/* 2. Radiation */}
           <div className="rounded-lg border border-border/50 bg-card p-5 space-y-3 flex flex-col">
             <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
