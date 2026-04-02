@@ -1,4 +1,4 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin, Gauge, Wind } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,6 +9,8 @@ import logo from "@/assets/magnitca-logo.jpg";
 
 const navItems = [
   { href: "/", label: "Головна", icon: Activity },
+  { href: "/kp-index", label: "Kp-індекс", icon: Gauge },
+  { href: "/solar-wind", label: "Сонячний вітер", icon: Wind },
   { href: "/news", label: "Новини", icon: Newspaper },
   { href: "/calendar", label: "Календар", icon: CalendarDays },
   { href: "/test", label: "Тест", icon: ClipboardCheck },
