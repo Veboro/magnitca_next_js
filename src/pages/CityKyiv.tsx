@@ -134,88 +134,89 @@ const CityKyiv = () => {
             </div>
           </div>
 
-          {/* Right: three cards in a row */}
-          <div className="flex flex-col gap-4 lg:w-64">
-            {/* Sun */}
-            {data?.current && (
-              <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
-                <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-                  <Sun className="h-4 w-4 text-primary" />
-                  Схід і захід сонця
-                </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Sunrise className="h-4 w-4 text-amber-400" />
-                      <span>Схід</span>
-                    </div>
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {new Date(data.current.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Sunset className="h-4 w-4 text-orange-400" />
-                      <span>Захід</span>
-                    </div>
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {new Date(data.current.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-border/30 pt-2">
-                    <span className="text-xs text-muted-foreground">Тривалість дня</span>
-                    <span className="font-mono text-xs font-medium text-foreground">{data.current.dayLength}</span>
-                  </div>
-                </div>
-              </div>
-            )}
+        </section>
 
-            {/* Coordinates */}
+        {/* Three info cards in a row */}
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-4" aria-label="Додаткова інформація">
+          {/* Sun */}
+          {data?.current && (
             <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
               <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-                <MapPin className="h-4 w-4 text-primary" />
-                Координати
+                <Sun className="h-4 w-4 text-primary" />
+                Схід і захід сонця
               </h3>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Широта</span>
-                  <span className="font-mono text-xs text-foreground">50.4501° Пн</span>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Sunrise className="h-4 w-4 text-amber-400" />
+                    <span>Схід</span>
+                  </div>
+                  <span className="font-mono text-sm font-medium text-foreground">
+                    {new Date(data.current.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Довгота</span>
-                  <span className="font-mono text-xs text-foreground">30.5234° Сх</span>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Sunset className="h-4 w-4 text-orange-400" />
+                    <span>Захід</span>
+                  </div>
+                  <span className="font-mono text-sm font-medium text-foreground">
+                    {new Date(data.current.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" })}
+                  </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Часовий пояс</span>
-                  <span className="font-mono text-xs text-foreground">UTC+2 (EET)</span>
+                <div className="flex items-center justify-between border-t border-border/30 pt-2">
+                  <span className="text-xs text-muted-foreground">Тривалість дня</span>
+                  <span className="font-mono text-xs font-medium text-foreground">{data.current.dayLength}</span>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Radiation */}
-            <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
-              <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-                <Activity className="h-4 w-4 text-primary" />
-                Радіаційний фон
-              </h3>
-              <div className="flex items-center gap-3">
-                <div>
-                  <span className="font-mono text-2xl font-bold text-foreground">0.08–0.14</span>
-                  <span className="ml-1 text-xs text-muted-foreground">мкЗв/год</span>
-                </div>
+          {/* Coordinates */}
+          <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
+            <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
+              <MapPin className="h-4 w-4 text-primary" />
+              Координати
+            </h3>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Широта</span>
+                <span className="font-mono text-xs text-foreground">50.4501° Пн</span>
               </div>
-              <span className="inline-flex items-center rounded-full bg-green-500/15 border border-green-500/30 px-2 py-0.5 text-[10px] font-medium text-green-400">
-                В межах норми
-              </span>
-              <a
-                href="https://www.saveecobot.com/radiation/misto-kyiv"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block text-[11px] text-primary hover:underline"
-              >
-                Деталі на SaveEcoBot →
-              </a>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Довгота</span>
+                <span className="font-mono text-xs text-foreground">30.5234° Сх</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Часовий пояс</span>
+                <span className="font-mono text-xs text-foreground">UTC+2 (EET)</span>
+              </div>
             </div>
+          </div>
+
+          {/* Radiation */}
+          <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
+            <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
+              <Activity className="h-4 w-4 text-primary" />
+              Радіаційний фон
+            </h3>
+            <div className="flex items-center gap-3">
+              <div>
+                <span className="font-mono text-2xl font-bold text-foreground">0.08–0.14</span>
+                <span className="ml-1 text-xs text-muted-foreground">мкЗв/год</span>
+              </div>
+            </div>
+            <span className="inline-flex items-center rounded-full bg-green-500/15 border border-green-500/30 px-2 py-0.5 text-[10px] font-medium text-green-400">
+              В межах норми
+            </span>
+            <a
+              href="https://www.saveecobot.com/radiation/misto-kyiv"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-[11px] text-primary hover:underline"
+            >
+              Деталі на SaveEcoBot →
+            </a>
           </div>
         </section>
 
