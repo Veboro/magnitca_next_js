@@ -134,10 +134,11 @@ const CityKyiv = () => {
             </div>
           </div>
 
-          {/* Right: Sun & coordinates */}
-          <div className="rounded-lg border border-border/50 bg-card p-6 lg:w-64 space-y-5">
+          {/* Right: three cards in a row */}
+          <div className="flex flex-col gap-4 lg:w-64">
+            {/* Sun */}
             {data?.current && (
-              <div className="space-y-3">
+              <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
                 <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
                   <Sun className="h-4 w-4 text-primary" />
                   Схід і захід сонця
@@ -169,7 +170,8 @@ const CityKyiv = () => {
               </div>
             )}
 
-            <div className="space-y-3 border-t border-border/30 pt-4">
+            {/* Coordinates */}
+            <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
               <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
                 <MapPin className="h-4 w-4 text-primary" />
                 Координати
@@ -188,6 +190,31 @@ const CityKyiv = () => {
                   <span className="font-mono text-xs text-foreground">UTC+2 (EET)</span>
                 </div>
               </div>
+            </div>
+
+            {/* Radiation */}
+            <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3">
+              <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
+                <Activity className="h-4 w-4 text-primary" />
+                Радіаційний фон
+              </h3>
+              <div className="flex items-center gap-3">
+                <div>
+                  <span className="font-mono text-2xl font-bold text-foreground">0.08–0.14</span>
+                  <span className="ml-1 text-xs text-muted-foreground">мкЗв/год</span>
+                </div>
+              </div>
+              <span className="inline-flex items-center rounded-full bg-green-500/15 border border-green-500/30 px-2 py-0.5 text-[10px] font-medium text-green-400">
+                В межах норми
+              </span>
+              <a
+                href="https://www.saveecobot.com/radiation/misto-kyiv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-[11px] text-primary hover:underline"
+              >
+                Деталі на SaveEcoBot →
+              </a>
             </div>
           </div>
         </section>
