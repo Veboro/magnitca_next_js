@@ -27,6 +27,7 @@ import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
 import KpIndex from "./pages/KpIndex";
 import CityKyiv from "./pages/CityKyiv";
 import CityPage from "./pages/CityPage";
+import SolarWind from "./pages/SolarWind";
 
 const queryClient = new QueryClient();
 
