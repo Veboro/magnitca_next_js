@@ -202,6 +202,11 @@ export default function StormCalendar() {
         </div>
       )}
 
+      {/* 27-day forecast */}
+      <div className="mt-8">
+        <Forecast27Day />
+      </div>
+
       {/* SEO text */}
       <section className="mt-10 border-t border-border/30 pt-8">
         <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
