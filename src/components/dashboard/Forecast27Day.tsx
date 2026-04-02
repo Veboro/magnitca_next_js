@@ -1,18 +1,30 @@
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays } from "lucide-react";
+import { useMemo } from "react";
 
 const kpColor = (kp: number) => {
-  if (kp >= 7) return "bg-red-500/20 text-red-400 border-red-500/30";
-  if (kp >= 5) return "bg-orange-500/20 text-orange-400 border-orange-500/30";
-  if (kp >= 4) return "bg-yellow-500/20 text-yellow-400 border-yellow-500/30";
-  return "bg-green-500/20 text-green-400 border-green-500/30";
+  if (kp >= 7) return "bg-storm-severe/15 text-storm-severe border-storm-severe/30";
+  if (kp >= 5) return "bg-storm-strong/15 text-storm-strong border-storm-strong/30";
+  if (kp >= 4) return "bg-storm-moderate/15 text-storm-moderate border-storm-moderate/30";
+  if (kp >= 2) return "bg-storm-minor/15 text-storm-minor border-storm-minor/30";
+  return "bg-storm-quiet/10 text-storm-quiet border-storm-quiet/20";
+};
+
+const kpDot = (kp: number) => {
+  if (kp >= 7) return "bg-storm-severe";
+  if (kp >= 5) return "bg-storm-strong";
+  if (kp >= 4) return "bg-storm-moderate";
+  if (kp >= 2) return "bg-storm-minor";
+  return "bg-storm-quiet";
 };
 
 interface ForecastDay {
   date: string;
   kp: number;
 }
+
+const WEEKDAYS_UA = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
 
 export const Forecast27Day = ({ className }: { className?: string }) => {
   const { data: days = [], isLoading } = useQuery<ForecastDay[]>({
@@ -50,6 +62,33 @@ export const Forecast27Day = ({ className }: { className?: string }) => {
     staleTime: 300000,
   });
 
+  // Group days into weeks (Mon-Sun rows) with leading empty cells
+  const weeks = useMemo(() => {
+    if (!days.length) return [];
+    const rows: (ForecastDay | null)[][] = [];
+    let currentWeek: (ForecastDay | null)[] = [];
+
+    // First day — add leading empty cells to align to weekday
+    const firstDate = new Date(days[0].date + "T00:00:00");
+    const firstDow = (firstDate.getDay() + 6) % 7; // Mon=0
+    for (let i = 0; i < firstDow; i++) currentWeek.push(null);
+
+    for (const day of days) {
+      currentWeek.push(day);
+      if (currentWeek.length === 7) {
+        rows.push(currentWeek);
+        currentWeek = [];
+      }
+    }
+    if (currentWeek.length) {
+      while (currentWeek.length < 7) currentWeek.push(null);
+      rows.push(currentWeek);
+    }
+    return rows;
+  }, [days]);
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+
   return (
     <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
       <div className="flex items-center gap-2 mb-4">
@@ -64,29 +103,51 @@ export const Forecast27Day = ({ className }: { className?: string }) => {
           <span className="font-mono text-sm text-muted-foreground animate-pulse">Завантаження...</span>
         </div>
       ) : (
-        <div className="grid grid-cols-7 gap-1.5">
-          {days.map((day) => {
-            const d = new Date(day.date);
-            const dayNum = d.getDate();
-            const isToday = day.date === new Date().toISOString().slice(0, 10);
-            return (
-              <div
-                key={day.date}
-                className={cn(
-                  "rounded-md border p-1.5 text-center text-[10px] font-mono transition-colors",
-                  kpColor(day.kp),
-                  isToday && "ring-1 ring-primary"
-                )}
-                title={`${day.date}: Kp ${day.kp}`}
-              >
-                <div className="text-muted-foreground/70">
-                  {d.toLocaleDateString("uk-UA", { weekday: "narrow" })}
-                </div>
-                <div className="text-xs font-bold">{dayNum}</div>
-                <div className="text-[9px] opacity-80">Kp {day.kp}</div>
-              </div>
-            );
-          })}
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse">
+            <thead>
+              <tr>
+                {WEEKDAYS_UA.map((wd) => (
+                  <th key={wd} className="pb-2 text-center font-mono text-xs text-muted-foreground font-medium w-[14.28%]">
+                    {wd}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {weeks.map((week, wi) => (
+                <tr key={wi}>
+                  {week.map((day, di) => (
+                    <td key={di} className="p-0.5">
+                      {day ? (
+                        <div
+                          className={cn(
+                            "rounded-lg border p-2 text-center font-mono transition-colors",
+                            kpColor(day.kp),
+                            day.date === todayStr && "ring-2 ring-primary ring-offset-1 ring-offset-background"
+                          )}
+                          title={`${new Date(day.date + "T00:00:00").toLocaleDateString("uk-UA", { day: "numeric", month: "short" })}: Kp ${day.kp}`}
+                        >
+                          <div className="text-[10px] text-muted-foreground/60 leading-none mb-0.5">
+                            {new Date(day.date + "T00:00:00").toLocaleDateString("uk-UA", { month: "short" }).replace(".", "")}
+                          </div>
+                          <div className="text-base font-bold leading-none">
+                            {new Date(day.date + "T00:00:00").getDate()}
+                          </div>
+                          <div className="mt-1 flex items-center justify-center gap-1">
+                            <span className={cn("h-1.5 w-1.5 rounded-full", kpDot(day.kp))} />
+                            <span className="text-[10px] font-semibold">{day.kp}</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-2" />
+                      )}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
