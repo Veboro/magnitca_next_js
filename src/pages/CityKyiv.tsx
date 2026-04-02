@@ -411,41 +411,6 @@ const CityKyiv = () => {
           </p>
         </section>
 
-        {/* Radiation background */}
-        <section className="rounded-2xl border border-border/50 bg-card/50 p-5 space-y-4">
-          <div className="flex items-center gap-2">
-            <Activity className="h-4 w-4 text-primary" />
-            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Радіаційний фон — Київ
-            </h2>
-          </div>
-          <div className="rounded-xl border border-border/30 bg-muted/20 p-4 md:p-6 flex flex-col md:flex-row items-center gap-4 md:gap-6">
-            <div className="flex flex-col items-center gap-1 min-w-[120px]">
-              <span className="text-3xl font-bold text-foreground">≈0.08–0.14</span>
-              <span className="text-xs text-muted-foreground">мкЗв/год</span>
-              <span className="mt-1 inline-flex items-center rounded-full bg-green-500/15 border border-green-500/30 px-2 py-0.5 text-[10px] font-medium text-green-400">
-                В межах норми
-              </span>
-            </div>
-            <div className="flex-1 space-y-2 text-sm text-muted-foreground">
-              <p>
-                Радіаційний фон у Києві знаходиться в межах звичайних значень. Дані збираються з автоматичних онлайн-станцій та стаціонарних постів спостереження.
-              </p>
-              <a
-                href="https://www.saveecobot.com/radiation/misto-kyiv"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:underline transition-colors"
-              >
-                <MapPin className="h-3.5 w-3.5" />
-                Переглянути карту та деталі на SaveEcoBot →
-              </a>
-            </div>
-          </div>
-          <p className="text-[11px] text-muted-foreground/60">
-            Дані радіаційного моніторингу надані SaveEcoBot. Значення оновлюються автоматично протягом дня.
-          </p>
-        </section>
 
         {/* SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label="Про сторінку">
