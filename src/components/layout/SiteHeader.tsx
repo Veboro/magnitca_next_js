@@ -1,4 +1,4 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin, Gauge, Wind } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
