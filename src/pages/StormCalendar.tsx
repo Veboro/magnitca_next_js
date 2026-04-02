@@ -4,6 +4,7 @@ import { useStormCalendar, StormDay, StormLevel } from "@/hooks/useStormCalendar
 import { CalendarDays, Info } from "lucide-react";
 import { uk } from "date-fns/locale";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 
 const levelColors: Record<StormLevel, string> = {
   none: "",
