@@ -208,7 +208,6 @@ const CityKyiv = () => {
               </div>
             </div>
           </div>
-          </div>
         </section>
 
         {/* Metric cards grid */}
