@@ -27,6 +27,7 @@ import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
 import KpIndex from "./pages/KpIndex";
 import CityKyiv from "./pages/CityKyiv";
 import CityPage from "./pages/CityPage";
+import SolarWind from "./pages/SolarWind";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/kp-index" element={<KpIndex />} />
+            <Route path="/solar-wind" element={<SolarWind />} />
             <Route path="/city/kyiv" element={<CityKyiv />} />
             <Route path="/city/:slug" element={<CityPage />} />
             <Route path="/faq" element={<FAQ />} />
