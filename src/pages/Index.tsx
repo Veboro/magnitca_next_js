@@ -116,9 +116,6 @@ const Index = () => {
           </div>
       </section>
 
-        <section aria-label="Легенда шкали магнітних бур">
-          <StormLegend />
-        </section>
       </main>
 
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Магнітні бурі по містах України">
