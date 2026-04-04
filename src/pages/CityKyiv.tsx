@@ -229,6 +229,11 @@ const CityKyiv = () => {
           </section>
         ) : null}
 
+        {/* Kp Index Chart */}
+        <section aria-label="Графік Kp індексу">
+          <KpIndexGauge />
+        </section>
+
         {/* Air Quality */}
         {data?.airQuality && (
           <section aria-label="Якість повітря">
