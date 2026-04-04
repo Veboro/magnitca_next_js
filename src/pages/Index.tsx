@@ -12,8 +12,8 @@ import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
-import { cities } from "@/data/cities";
-import { citiesRu } from "@/data/cities-ru";
+import { CITIES } from "@/data/cities";
+import { CITIES_RU } from "@/data/cities-ru";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return "quiet" as const;
