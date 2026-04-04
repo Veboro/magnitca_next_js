@@ -140,84 +140,6 @@ const CityKyiv = () => {
           </div>
         </section>
 
-        {/* Metric cards grid */}
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
-          </div>
-        ) : data?.current ? (
-          <section aria-label="Поточні показники">
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-              <MiniCard icon={Wind} label="Вітер" value={`${Math.round(data.current.windSpeed)} км/г`} sub={getWindDirection(data.current.windDirection)} />
-              <MiniCard icon={Droplets} label="Вологість" value={`${data.current.humidity}%`} sub={data.current.humidity > 80 ? "Висока" : data.current.humidity > 50 ? "Помірна" : "Низька"} />
-              <MiniCard icon={Gauge} label="Тиск" value={`${Math.round(data.current.pressure)}`} sub="гПа" />
-              <MiniCard icon={Cloud} label="Хмарність" value={`${data.current.cloudCover}%`} sub={data.current.cloudCover > 80 ? "Суцільна" : data.current.cloudCover > 40 ? "Мінлива" : "Малохмарно"} />
-              <MiniCard icon={Sun} label="UV індекс" value={`${Math.round(data.current.uvIndex)}`} sub={data.current.uvIndex > 8 ? "Дуже високий" : data.current.uvIndex > 5 ? "Високий" : data.current.uvIndex > 2 ? "Помірний" : "Низький"} />
-              <MiniCard icon={Activity} label="Kp індекс" value={`${Math.round(latestKp)}`} sub={kpStatus.label} color={kpStatus.color} />
-            </div>
-          </section>
-        ) : null}
-
-        {/* Kyiv-specific info */}
-        <section className="rounded-lg border border-border/50 bg-card p-5" aria-label="Про магнітні бурі в Києві">
-          <h2 className="font-display text-lg font-bold text-foreground mb-3">Магнітні бурі в Києві</h2>
-          <div className="space-y-2 text-sm text-muted-foreground leading-relaxed">
-            <p>
-              Київ розташований на широті 50.45°, що робить його помірно чутливим до геомагнітних збурень.
-              Під час сильних бур (G3+) у столиці можливі збої GPS-навігації, перебої мобільного зв'язку
-              та вплив на самопочуття метеозалежних людей — головний біль, порушення сну, перепади тиску.
-            </p>
-            <p>
-              Моніторинг магнітних бур у Києві оновлюється щохвилини на основі даних NOAA Space Weather
-              Prediction Center. Прогноз Kp-індексу та G-шкали допоможе вам підготуватися до можливих
-              геомагнітних подій заздалегідь.
-            </p>
-          </div>
-        </section>
-
-        {/* Air Quality */}
-        {data?.airQuality && (
-          <section aria-label="Якість повітря">
-            <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
-              <div className="flex items-center gap-3">
-                <Eye className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-lg font-bold text-foreground">Якість повітря</h2>
-                <span
-                  className="ml-auto rounded-full px-3 py-1 text-xs font-bold"
-                  style={{
-                    backgroundColor: `${getAqiLabel(data.airQuality.aqi).color}15`,
-                    color: getAqiLabel(data.airQuality.aqi).color,
-                  }}
-                >
-                  {getAqiLabel(data.airQuality.aqi).label} • AQI {data.airQuality.aqi}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit="мкг/м³" warn={data.airQuality.pm25 > 25} />
-                <AqiItem label="PM10" value={data.airQuality.pm10} unit="мкг/м³" warn={data.airQuality.pm10 > 50} />
-                <AqiItem label="NO₂" value={data.airQuality.no2} unit="мкг/м³" warn={data.airQuality.no2 > 40} />
-                <AqiItem label="O₃" value={data.airQuality.o3} unit="мкг/м³" warn={data.airQuality.o3 > 100} />
-              </div>
-              {/* AQI bar */}
-              <div className="space-y-1">
-                <div className="flex h-2 rounded-full overflow-hidden">
-                  <div className="flex-1 bg-[hsl(145,80%,45%)]" />
-                  <div className="flex-1 bg-[hsl(100,70%,45%)]" />
-                  <div className="flex-1 bg-[hsl(55,90%,50%)]" />
-                  <div className="flex-1 bg-[hsl(35,100%,55%)]" />
-                  <div className="flex-1 bg-[hsl(0,80%,55%)]" />
-                </div>
-                <div className="relative h-0">
-                  <div
-                    className="absolute -top-3 w-0.5 h-4 bg-foreground rounded-full transition-all"
-                    style={{ left: `${Math.min(data.airQuality.aqi, 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
         {/* 3-day Kp forecast */}
         <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label="Прогноз Kp індексу на 3 дні">
           <div className="flex items-center gap-2">
@@ -349,6 +271,23 @@ const CityKyiv = () => {
           </p>
         </section>
 
+        {/* Metric cards grid */}
+        {isLoading ? (
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
+          </div>
+        ) : data?.current ? (
+          <section aria-label="Поточні показники">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+              <MiniCard icon={Wind} label="Вітер" value={`${Math.round(data.current.windSpeed)} км/г`} sub={getWindDirection(data.current.windDirection)} />
+              <MiniCard icon={Droplets} label="Вологість" value={`${data.current.humidity}%`} sub={data.current.humidity > 80 ? "Висока" : data.current.humidity > 50 ? "Помірна" : "Низька"} />
+              <MiniCard icon={Gauge} label="Тиск" value={`${Math.round(data.current.pressure)}`} sub="гПа" />
+              <MiniCard icon={Cloud} label="Хмарність" value={`${data.current.cloudCover}%`} sub={data.current.cloudCover > 80 ? "Суцільна" : data.current.cloudCover > 40 ? "Мінлива" : "Малохмарно"} />
+              <MiniCard icon={Sun} label="UV індекс" value={`${Math.round(data.current.uvIndex)}`} sub={data.current.uvIndex > 8 ? "Дуже високий" : data.current.uvIndex > 5 ? "Високий" : data.current.uvIndex > 2 ? "Помірний" : "Низький"} />
+              <MiniCard icon={Activity} label="Kp індекс" value={`${Math.round(latestKp)}`} sub={kpStatus.label} color={kpStatus.color} />
+            </div>
+          </section>
+        ) : null}
 
         {/* SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label="Про сторінку">
