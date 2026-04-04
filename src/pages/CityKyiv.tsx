@@ -229,9 +229,9 @@ const CityKyiv = () => {
           </section>
         ) : null}
 
-        {/* Kp Index Chart */}
-        <section aria-label="Графік Kp індексу">
-          <KpIndexGauge />
+        {/* Storm Status Banner with today's forecast */}
+        <section aria-label="Статус геомагнітної активності">
+          <StormStatusBanner />
         </section>
 
         {/* Air Quality */}
