@@ -19,8 +19,6 @@ import Contacts from "./pages/Contacts";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
-import ResetPassword from "./pages/ResetPassword";
-import Profile from "./pages/Profile";
 import MeteoTest from "./pages/MeteoTest";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
@@ -54,8 +52,6 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/test" element={<MeteoTest />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/news/new" element={<AdminNewsEditor />} />
