@@ -1,8 +1,7 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogIn, LogOut, ClipboardCheck, User, ChevronDown, Mail, Shield, MapPin, Gauge, Wind } from "lucide-react";
+import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogOut, ClipboardCheck, ChevronDown, Shield, Gauge, Wind } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { useNotifications } from "@/hooks/useNotifications";
 import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/magnitca-logo.jpg";
 
