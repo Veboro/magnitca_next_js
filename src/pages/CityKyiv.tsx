@@ -153,10 +153,13 @@ const CityKyiv = () => {
           ) : forecast && forecast.length > 0 ? (() => {
             const todayDate = new Date();
             const todayKey = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}-${String(todayDate.getDate()).padStart(2, "0")}`;
+            const tomorrowDate = new Date(todayDate);
+            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+            const tomorrowKey = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, "0")}-${String(tomorrowDate.getDate()).padStart(2, "0")}`;
             const filtered = forecast.filter((row) => {
               const d = new Date(row.time_tag + "Z");
               const kyivStr = d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
-              return kyivStr >= todayKey;
+              return kyivStr >= tomorrowKey;
             });
             const grouped = new Map<string, typeof forecast>();
             filtered.forEach((row) => {
