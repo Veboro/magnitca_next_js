@@ -6,8 +6,9 @@ import { useKpForecast } from "@/hooks/useKpForecast";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, AlertTriangle, MapPin, Info, CalendarDays } from "lucide-react";
+import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays } from "lucide-react";
 import { getCityBySlug } from "@/data/cities";
+import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return { label: "Спокійно", color: "hsl(145, 80%, 45%)" };
@@ -53,7 +54,6 @@ const CityPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const city = slug ? getCityBySlug(slug) : undefined;
 
-  // Hooks must be called unconditionally
   const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone);
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
@@ -106,196 +106,96 @@ const CityPage = () => {
       <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
         <h1 className="sr-only">Магнітні бурі в {city.nameGenitive} — погода та якість повітря</h1>
 
-        {/* Hero */}
-        <section className="grid gap-4 lg:grid-cols-[1fr_auto]" aria-label={`Статус ${city.name}`}>
-          <div className="rounded-lg border border-glow-cyan bg-card p-6 space-y-3">
-            <div className="flex items-start justify-between gap-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-primary animate-pulse-glow" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    {gLevel > 0 ? `Геомагнітна буря • ${city.name}` : `Моніторинг магнітних бур • ${city.name}`}
-                  </span>
-                </div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-                  Kp {Math.round(latestKp)} — {kpStatus.label}
-                </h2>
-                <p className="max-w-md text-sm text-muted-foreground">
-                  {gLevel >= 3
-                    ? `Можливі перебої з GPS та радіозв'язком у ${city.nameGenitive}. Метеозалежні люди можуть відчувати нездужання.`
-                    : gLevel > 0
-                    ? "Слабка геомагнітна активність. Метеочутливі люди можуть відчувати незначний вплив."
-                    : `Геомагнітна обстановка в ${city.nameGenitive} спокійна. Значних збурень не очікується.`}
-                </p>
-                <div className="flex flex-wrap items-center gap-3">
-                  {data?.current && (
-                    <div className="inline-flex items-center gap-3 rounded-md border border-border/50 bg-muted/30 px-3 py-1.5 text-xs text-muted-foreground">
-                      <span>{getWeatherEmoji(data.current.weatherCode)} {Math.round(data.current.temperature)}° • {getWeatherLabel(data.current.weatherCode)}</span>
-                      <span className="border-l border-border/50 pl-3">{today}</span>
-                    </div>
-                  )}
-                  <a
-                    href="https://t.me/+7UKzAK5ur8UxZmMy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
-                  >
-                    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-                      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                    </svg>
-                    Підключити сповіщення в Telegram
-                  </a>
-                </div>
-              </div>
-              <div
-                className="hidden md:flex flex-col items-center justify-center rounded-full border w-24 h-24 ml-6 shrink-0 transition-colors duration-700"
-                style={{
-                  backgroundColor: `${kpStatus.color}15`,
-                  borderColor: `${kpStatus.color}40`,
-                  boxShadow: `0 0 20px ${kpStatus.color}20`,
-                }}
-              >
-                <AlertTriangle className="h-6 w-6 transition-colors duration-700" style={{ color: kpStatus.color }} />
-                <p className="font-mono text-xs font-bold text-foreground mt-1">{gLevel > 0 ? "БУРЯ" : "НОРМА"}</p>
-                <p className="text-[10px] text-muted-foreground">Kp {Math.round(latestKp)} • G{gLevel}</p>
-              </div>
+        {/* Storm Banner + Sidebar */}
+        <section className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4 items-stretch" aria-label={`Статус геомагнітної активності в ${city.nameGenitive}`}>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-medium text-muted-foreground">
+                Геомагнітна ситуація в {city.nameGenitive} — {today}
+              </h2>
+            </div>
+            <div className="flex-1 [&>div]:rounded-t-none">
+              <StormStatusBanner />
             </div>
           </div>
 
-          {/* Sun & coordinates */}
-          <div className="rounded-lg border border-border/50 bg-card p-6 lg:w-64 space-y-5">
+          {/* Sun + Coordinates + Radiation */}
+          <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3 flex flex-col text-sm">
             {data?.current && (
-              <div className="space-y-3">
-                <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-                  <Sun className="h-4 w-4 text-primary" />
-                  Схід і захід сонця
+              <div className="space-y-1.5">
+                <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                  <Sun className="h-3.5 w-3.5 text-primary" />
+                  Схід / Захід сонця
                 </h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Sunrise className="h-4 w-4 text-amber-400" />
-                      <span>Схід</span>
-                    </div>
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {new Date(data.current.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: city.timezone })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Sunset className="h-4 w-4 text-orange-400" />
-                      <span>Захід</span>
-                    </div>
-                    <span className="font-mono text-sm font-medium text-foreground">
-                      {new Date(data.current.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: city.timezone })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between border-t border-border/30 pt-2">
-                    <span className="text-xs text-muted-foreground">Тривалість дня</span>
-                    <span className="font-mono text-xs font-medium text-foreground">{data.current.dayLength}</span>
-                  </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5 text-muted-foreground"><Sunrise className="h-3.5 w-3.5 text-amber-400" />Схід</span>
+                  <span className="font-mono font-medium text-foreground">{new Date(data.current.sunrise).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: city.timezone })}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5 text-muted-foreground"><Sunset className="h-3.5 w-3.5 text-orange-400" />Захід</span>
+                  <span className="font-mono font-medium text-foreground">{new Date(data.current.sunset).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: city.timezone })}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs border-t border-border/30 pt-1.5">
+                  <span className="text-muted-foreground">Тривалість дня</span>
+                  <span className="font-mono font-medium text-foreground">{data.current.dayLength}</span>
                 </div>
               </div>
             )}
-            <div className="space-y-3 border-t border-border/30 pt-4">
-              <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-                <MapPin className="h-4 w-4 text-primary" />
+            <div className="space-y-1.5 border-t border-border/30 pt-2">
+              <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                <MapPin className="h-3.5 w-3.5 text-primary" />
                 Координати
               </h3>
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Широта</span>
-                  <span className="font-mono text-xs text-foreground">{city.latLabel}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Довгота</span>
-                  <span className="font-mono text-xs text-foreground">{city.lonLabel}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Часовий пояс</span>
-                  <span className="font-mono text-xs text-foreground">{city.utcOffset}</span>
-                </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Широта</span>
+                <span className="font-mono text-foreground">{city.latLabel}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Довгота</span>
+                <span className="font-mono text-foreground">{city.lonLabel}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">Часовий пояс</span>
+                <span className="font-mono text-foreground">{city.utcOffset}</span>
+              </div>
+            </div>
+            <div className="space-y-1.5 border-t border-border/30 pt-2">
+              <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                <Activity className="h-3.5 w-3.5 text-primary" />
+                Радіаційний фон
+              </h3>
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-lg font-bold text-foreground">0.08–0.14</span>
+                <span className="text-[10px] text-muted-foreground">мкЗв/год</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[9px] font-medium text-storm-quiet">В межах норми</span>
+                <a href="https://www.saveecobot.com/radiation" target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline">SaveEcoBot →</a>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Metric cards */}
-        {isLoading ? (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
-            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
-          </div>
-        ) : data?.current ? (
-          <section aria-label="Поточні показники">
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-              <MiniCard icon={Wind} label="Вітер" value={`${Math.round(data.current.windSpeed)} км/г`} sub={getWindDirection(data.current.windDirection)} />
-              <MiniCard icon={Droplets} label="Вологість" value={`${data.current.humidity}%`} sub={data.current.humidity > 80 ? "Висока" : data.current.humidity > 50 ? "Помірна" : "Низька"} />
-              <MiniCard icon={Gauge} label="Тиск" value={`${Math.round(data.current.pressure)}`} sub="гПа" />
-              <MiniCard icon={Cloud} label="Хмарність" value={`${data.current.cloudCover}%`} sub={data.current.cloudCover > 80 ? "Суцільна" : data.current.cloudCover > 40 ? "Мінлива" : "Малохмарно"} />
-              <MiniCard icon={Sun} label="UV індекс" value={`${Math.round(data.current.uvIndex)}`} sub={data.current.uvIndex > 8 ? "Дуже високий" : data.current.uvIndex > 5 ? "Високий" : data.current.uvIndex > 2 ? "Помірний" : "Низький"} />
-              <MiniCard icon={Activity} label="Kp індекс" value={`${Math.round(latestKp)}`} sub={kpStatus.label} color={kpStatus.color} />
-            </div>
-          </section>
-        ) : null}
-
-        {/* Air Quality */}
-        {data?.airQuality && (
-          <section aria-label="Якість повітря">
-            <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
-              <div className="flex items-center gap-3">
-                <Eye className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-lg font-bold text-foreground">Якість повітря</h2>
-                <span
-                  className="ml-auto rounded-full px-3 py-1 text-xs font-bold"
-                  style={{
-                    backgroundColor: `${getAqiLabel(data.airQuality.aqi).color}15`,
-                    color: getAqiLabel(data.airQuality.aqi).color,
-                  }}
-                >
-                  {getAqiLabel(data.airQuality.aqi).label} • AQI {data.airQuality.aqi}
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit="мкг/м³" warn={data.airQuality.pm25 > 25} />
-                <AqiItem label="PM10" value={data.airQuality.pm10} unit="мкг/м³" warn={data.airQuality.pm10 > 50} />
-                <AqiItem label="NO₂" value={data.airQuality.no2} unit="мкг/м³" warn={data.airQuality.no2 > 40} />
-                <AqiItem label="O₃" value={data.airQuality.o3} unit="мкг/м³" warn={data.airQuality.o3 > 100} />
-              </div>
-              <div className="space-y-1">
-                <div className="flex h-2 rounded-full overflow-hidden">
-                  <div className="flex-1 bg-[hsl(145,80%,45%)]" />
-                  <div className="flex-1 bg-[hsl(100,70%,45%)]" />
-                  <div className="flex-1 bg-[hsl(55,90%,50%)]" />
-                  <div className="flex-1 bg-[hsl(35,100%,55%)]" />
-                  <div className="flex-1 bg-[hsl(0,80%,55%)]" />
-                </div>
-                <div className="relative h-0">
-                  <div
-                    className="absolute -top-3 w-0.5 h-4 bg-foreground rounded-full transition-all"
-                    style={{ left: `${Math.min(data.airQuality.aqi, 100)}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* 3-day Kp forecast */}
+        {/* 3-day Kp forecast (starting from tomorrow) */}
         <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label="Прогноз Kp індексу на 3 дні">
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-primary" />
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Прогноз Kp індексу на 3 дні (по 3-годинних інтервалах)
+              Прогноз Kp індексу для {city.nameGenitive} на 3 дні (по 3-годинних інтервалах)
             </h2>
           </div>
           {forecastLoading ? (
             <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
           ) : forecast && forecast.length > 0 ? (() => {
-            const todayDate = new Date();
-            const todayKey = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}-${String(todayDate.getDate()).padStart(2, "0")}`;
+            const nowDate = new Date();
+            const tomorrowDate = new Date(nowDate);
+            tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+            const tomorrowKey = `${tomorrowDate.getFullYear()}-${String(tomorrowDate.getMonth() + 1).padStart(2, "0")}-${String(tomorrowDate.getDate()).padStart(2, "0")}`;
             const filtered = forecast.filter((row) => {
               const d = new Date(row.time_tag + "Z");
-              const kyivStr = d.toLocaleDateString("sv-SE", { timeZone: city.timezone });
-              return kyivStr >= todayKey;
+              const dateStr = d.toLocaleDateString("sv-SE", { timeZone: city.timezone });
+              return dateStr >= tomorrowKey;
             });
             const grouped = new Map<string, typeof forecast>();
             filtered.forEach((row) => {
@@ -410,14 +310,96 @@ const CityPage = () => {
           </p>
         </section>
 
-        {/* SEO text */}
+        {/* Air Quality */}
+        {data?.airQuality && (
+          <section aria-label="Якість повітря">
+            <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <Eye className="h-5 w-5 text-primary" />
+                <h2 className="font-display text-lg font-bold text-foreground">Якість повітря</h2>
+                <span
+                  className="ml-auto rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    backgroundColor: `${getAqiLabel(data.airQuality.aqi).color}15`,
+                    color: getAqiLabel(data.airQuality.aqi).color,
+                  }}
+                >
+                  {getAqiLabel(data.airQuality.aqi).label} • AQI {data.airQuality.aqi}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit="мкг/м³" warn={data.airQuality.pm25 > 25} />
+                <AqiItem label="PM10" value={data.airQuality.pm10} unit="мкг/м³" warn={data.airQuality.pm10 > 50} />
+                <AqiItem label="NO₂" value={data.airQuality.no2} unit="мкг/м³" warn={data.airQuality.no2 > 40} />
+                <AqiItem label="O₃" value={data.airQuality.o3} unit="мкг/м³" warn={data.airQuality.o3 > 100} />
+              </div>
+              <div className="space-y-1">
+                <div className="flex h-2 rounded-full overflow-hidden">
+                  <div className="flex-1 bg-[hsl(145,80%,45%)]" />
+                  <div className="flex-1 bg-[hsl(100,70%,45%)]" />
+                  <div className="flex-1 bg-[hsl(55,90%,50%)]" />
+                  <div className="flex-1 bg-[hsl(35,100%,55%)]" />
+                  <div className="flex-1 bg-[hsl(0,80%,55%)]" />
+                </div>
+                <div className="relative h-0">
+                  <div
+                    className="absolute -top-3 w-0.5 h-4 bg-foreground rounded-full transition-all"
+                    style={{ left: `${Math.min(data.airQuality.aqi, 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Metric cards */}
+        {isLoading ? (
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
+            {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-24 rounded-lg" />)}
+          </div>
+        ) : data?.current ? (
+          <section aria-label="Поточні показники">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
+              <MiniCard icon={Wind} label="Вітер" value={`${Math.round(data.current.windSpeed)} км/г`} sub={getWindDirection(data.current.windDirection)} />
+              <MiniCard icon={Droplets} label="Вологість" value={`${data.current.humidity}%`} sub={data.current.humidity > 80 ? "Висока" : data.current.humidity > 50 ? "Помірна" : "Низька"} />
+              <MiniCard icon={Gauge} label="Тиск" value={`${Math.round(data.current.pressure)}`} sub="гПа" />
+              <MiniCard icon={Cloud} label="Хмарність" value={`${data.current.cloudCover}%`} sub={data.current.cloudCover > 80 ? "Суцільна" : data.current.cloudCover > 40 ? "Мінлива" : "Малохмарно"} />
+              <MiniCard icon={Sun} label="UV індекс" value={`${Math.round(data.current.uvIndex)}`} sub={data.current.uvIndex > 8 ? "Дуже високий" : data.current.uvIndex > 5 ? "Високий" : data.current.uvIndex > 2 ? "Помірний" : "Низький"} />
+              <MiniCard icon={Activity} label="Kp індекс" value={`${Math.round(latestKp)}`} sub={kpStatus.label} color={kpStatus.color} />
+            </div>
+          </section>
+        ) : null}
+
+        {/* Dynamic SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label="Про сторінку">
           <h2 className="text-lg font-display font-semibold text-foreground/90">
             Магнітні бурі в {city.nameGenitive} сьогодні, {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric", timeZone: city.timezone })}
           </h2>
-          <p>
-            Актуальна інформація про магнітні бурі в {city.nameGenitive}, поточну погоду, якість повітря та час сходу й заходу сонця. Дані оновлюються кожні 5 хвилин на основі Open-Meteo API та NOAA Space Weather Prediction Center.
-          </p>
+          {(() => {
+            const todayForecast = forecast?.filter((e) => {
+              const d = new Date(e.time_tag + "Z");
+              const dateStr = d.toLocaleDateString("sv-SE", { timeZone: city.timezone });
+              const nowStr = new Date().toLocaleDateString("sv-SE", { timeZone: city.timezone });
+              return dateStr === nowStr;
+            }) || [];
+            const kpValues = todayForecast.map((e) => e.kp);
+            const minKp = kpValues.length ? Math.min(...kpValues) : 0;
+            const maxKp = kpValues.length ? Math.max(...kpValues) : 0;
+            const rScale = scales?.r?.Scale ?? 0;
+            const sScale = scales?.s?.Scale ?? 0;
+            const dateStr = new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric", timeZone: city.timezone });
+
+            return (
+              <p>
+                {city.name}, {dateStr}. Поточний Kp-індекс — {latestKp.toFixed(1)}, рівень геомагнітної бурі — G{gLevel}.
+                {kpValues.length > 0 && ` Прогнозований діапазон Kp за добу: ${minKp.toFixed(1)}–${maxKp.toFixed(1)}.`}
+                {" "}Шкала радіозатемнень — R{rScale}, шкала радіаційних бур — S{sScale}.
+                {data?.current && ` Температура повітря — ${Math.round(data.current.temperature)}°C, тиск — ${Math.round(data.current.pressure)} гПа, вологість — ${data.current.humidity}%, вітер — ${Math.round(data.current.windSpeed)} км/год (${getWindDirection(data.current.windDirection)}).`}
+                {data?.airQuality && ` Індекс якості повітря AQI — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} мкг/м³.`}
+                {" "}Дані: NOAA SWPC, Open-Meteo.
+              </p>
+            );
+          })()}
         </section>
       </main>
     </div>
