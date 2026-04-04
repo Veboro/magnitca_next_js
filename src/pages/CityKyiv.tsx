@@ -353,7 +353,7 @@ const CityKyiv = () => {
             return (
               <p>
                 Київ, {dateStr}. Поточний Kp-індекс — {latestKp.toFixed(1)}, рівень геомагнітної бурі — G{gLevel}.
-                {kpValues.length > 0 && ` Прогнозований діапазон Kp за добу: {minKp.toFixed(1)}–${maxKp.toFixed(1)}.`}
+                {kpValues.length > 0 && ` Прогнозований діапазон Kp за добу: ${minKp.toFixed(1)}–${maxKp.toFixed(1)}.`}
                 {" "}Шкала радіозатемнень — R{rScale}, шкала радіаційних бур — S{sScale}.
                 {data?.current && ` Температура повітря — ${Math.round(data.current.temperature)}°C, тиск — ${Math.round(data.current.pressure)} гПа, вологість — ${data.current.humidity}%, вітер — ${Math.round(data.current.windSpeed)} км/год (${getWindDirection(data.current.windDirection)}).`}
                 {data?.airQuality && ` Індекс якості повітря AQI — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} мкг/м³.`}
