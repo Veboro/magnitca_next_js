@@ -76,75 +76,36 @@ export const SiteHeader = () => {
             {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
 
-          {!authLoading && (
-            user ? (
-              <>
-                <a
-                  href="/profile"
-                  className="relative flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
-                  aria-label="Сповіщення"
-                  title="Сповіщення"
-                >
-                  <Mail className="h-3.5 w-3.5" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-1.5 -right-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[9px] font-bold text-destructive-foreground">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </a>
-                <div className="relative" ref={menuRef}>
-                  <button
-                    onClick={() => setMenuOpen((v) => !v)}
-                    className="flex items-center gap-1.5 h-7 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors px-2"
-                    aria-label="Кабінет"
-                  >
-                    <User className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline text-xs font-medium max-w-[100px] truncate">
-                    {displayName || user.email?.split("@")[0] || "Кабінет"}
-                  </span>
-                  <ChevronDown className="h-3 w-3" />
-                </button>
-                {menuOpen && (
-                  <div className="absolute right-0 top-full mt-1.5 w-44 rounded-lg border border-border bg-popover shadow-lg z-50 py-1">
-                    <a
-                      href="/profile"
-                      className="flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-accent transition-colors"
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <User className="h-3.5 w-3.5" />
-                      Мій кабінет
-                    </a>
-                    {isAdmin && (
-                      <a
-                        href="/admin/news"
-                        className="flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-accent transition-colors"
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <Shield className="h-3.5 w-3.5" />
-                        Адмін-панель
-                      </a>
-                    )}
-                    <button
-                      onClick={() => { signOut(); setMenuOpen(false); }}
-                      className="flex items-center gap-2 w-full px-3 py-2 text-xs text-destructive hover:bg-accent transition-colors"
-                    >
-                      <LogOut className="h-3.5 w-3.5" />
-                      Вийти
-                    </button>
-                  </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <a
-                href="/auth"
-                className="flex items-center justify-center h-7 w-7 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                aria-label="Увійти"
-                title="Увійти / Зареєструватися"
+          {!authLoading && user && isAdmin && (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="flex items-center gap-1.5 h-7 rounded-md border border-primary/30 bg-primary/10 text-primary hover:bg-primary/20 transition-colors px-2"
+                aria-label="Адмін"
               >
-                <User className="h-3.5 w-3.5" />
-              </a>
-            )
+                <Shield className="h-3.5 w-3.5" />
+                <ChevronDown className="h-3 w-3" />
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-1.5 w-44 rounded-lg border border-border bg-popover shadow-lg z-50 py-1">
+                  <a
+                    href="/admin/news"
+                    className="flex items-center gap-2 px-3 py-2 text-xs text-foreground hover:bg-accent transition-colors"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    <Shield className="h-3.5 w-3.5" />
+                    Адмін-панель
+                  </a>
+                  <button
+                    onClick={() => { signOut(); setMenuOpen(false); }}
+                    className="flex items-center gap-2 w-full px-3 py-2 text-xs text-destructive hover:bg-accent transition-colors"
+                  >
+                    <LogOut className="h-3.5 w-3.5" />
+                    Вийти
+                  </button>
+                </div>
+              )}
+            </div>
           )}
 
         </div>
