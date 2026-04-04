@@ -32,19 +32,19 @@ const queryClient = new QueryClient();
 
 const AppRoutes = () => (
   <>
-    <Route path="/" element={<Index />} />
-    <Route path="/kp-index" element={<KpIndex />} />
-    <Route path="/solar-wind" element={<SolarWind />} />
-    <Route path="/city/kyiv" element={<CityKyiv />} />
-    <Route path="/city/:slug" element={<CityPage />} />
-    <Route path="/faq" element={<FAQ />} />
-    <Route path="/calendar" element={<StormCalendar />} />
-    <Route path="/news" element={<News />} />
-    <Route path="/news/:slug" element={<NewsArticle />} />
-    <Route path="/contacts" element={<Contacts />} />
-    <Route path="/about" element={<About />} />
-    <Route path="/privacy" element={<Privacy />} />
-    <Route path="/test" element={<MeteoTest />} />
+    <Route index element={<Index />} />
+    <Route path="kp-index" element={<KpIndex />} />
+    <Route path="solar-wind" element={<SolarWind />} />
+    <Route path="city/kyiv" element={<CityKyiv />} />
+    <Route path="city/:slug" element={<CityPage />} />
+    <Route path="faq" element={<FAQ />} />
+    <Route path="calendar" element={<StormCalendar />} />
+    <Route path="news" element={<News />} />
+    <Route path="news/:slug" element={<NewsArticle />} />
+    <Route path="contacts" element={<Contacts />} />
+    <Route path="about" element={<About />} />
+    <Route path="privacy" element={<Privacy />} />
+    <Route path="test" element={<MeteoTest />} />
   </>
 );
 
