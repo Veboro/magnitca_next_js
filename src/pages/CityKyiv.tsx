@@ -70,15 +70,17 @@ const CityKyiv = () => {
 
         {/* Three-column hero */}
         {/* Storm + Sun/Coords row */}
-        <section className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4" aria-label="Статус геомагнітної активності в Києві">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
+        <section className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4 items-stretch" aria-label="Статус геомагнітної активності в Києві">
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
               <MapPin className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-medium text-muted-foreground">
                 Геомагнітна ситуація в Києві — {today}
               </h2>
             </div>
-            <StormStatusBanner />
+            <div className="flex-1 [&>div]:rounded-t-none">
+              <StormStatusBanner />
+            </div>
           </div>
 
           {/* Sun + Coordinates */}
