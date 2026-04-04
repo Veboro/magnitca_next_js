@@ -50,8 +50,8 @@ const Index = () => {
   const gLevel = scales?.g?.Scale ?? 0;
 
   const cityList = i18n.language === "ru"
-    ? cities.map((c) => ({ name: citiesRu[c.slug]?.name || c.name, slug: c.slug }))
-    : cities.map((c) => ({ name: c.name, slug: c.slug }));
+    ? CITIES.map((c) => ({ name: CITIES_RU[c.slug]?.name || c.name, slug: c.slug }))
+    : CITIES.map((c) => ({ name: c.name, slug: c.slug }));
 
   const todayFormatted = new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" });
 
