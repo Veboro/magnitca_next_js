@@ -18,7 +18,6 @@ const navItems = [
 
 export const SiteHeader = () => {
   const { user, signOut, loading: authLoading } = useAuth();
-  const { unreadCount } = useNotifications(user);
   const location = useLocation();
   const [isDark, setIsDark] = useState(() => {
     if (typeof window !== "undefined") {
