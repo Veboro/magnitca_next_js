@@ -346,25 +346,19 @@ const CityKyiv = () => {
             const kpValues = todayForecast.map((e) => e.kp);
             const minKp = kpValues.length ? Math.min(...kpValues) : 0;
             const maxKp = kpValues.length ? Math.max(...kpValues) : 0;
-            const gText = gLevel > 0 ? `Зафіксовано геомагнітну бурю рівня G${gLevel}.` : "Геомагнітних бур не зафіксовано.";
-            const impactText = latestKp >= 5
-              ? "Метеозалежні люди можуть відчувати головний біль, підвищену втомлюваність та порушення сну."
-              : latestKp >= 3
-              ? "Метеочутливі люди можуть відчувати незначний вплив на самопочуття."
-              : "Геомагнітна обстановка сприятлива, значного впливу на самопочуття не очікується.";
+            const rScale = scales?.r?.Scale ?? 0;
+            const sScale = scales?.s?.Scale ?? 0;
+            const dateStr = new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" });
 
             return (
-              <>
-                <p>
-                  Геомагнітна активність у Києві станом на {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", timeZone: "Europe/Kyiv" })} — поточний Kp-індекс становить {latestKp.toFixed(1)}.
-                  {kpValues.length > 0 && ` Протягом доби Kp коливається в межах від ${minKp.toFixed(1)} до ${maxKp.toFixed(1)}.`}
-                  {" "}{gText} {impactText}
-                </p>
-                <p>
-                  {data?.current && `Погода в Києві: ${getWeatherLabel(data.current.weatherCode)}, температура ${Math.round(data.current.temperature)}°C, вологість ${data.current.humidity}%, атмосферний тиск ${Math.round(data.current.pressure)} гПа. `}
-                  Дані оновлюються щохвилини на основі NOAA Space Weather Prediction Center та Open-Meteo API.
-                </p>
-              </>
+              <p>
+                Київ, {dateStr}. Поточний Kp-індекс — {latestKp.toFixed(1)}, рівень геомагнітної бурі — G{gLevel}.
+                {kpValues.length > 0 && ` Прогнозований діапазон Kp за добу: {minKp.toFixed(1)}–${maxKp.toFixed(1)}.`}
+                {" "}Шкала радіозатемнень — R{rScale}, шкала радіаційних бур — S{sScale}.
+                {data?.current && ` Температура повітря — ${Math.round(data.current.temperature)}°C, тиск — ${Math.round(data.current.pressure)} гПа, вологість — ${data.current.humidity}%, вітер — ${Math.round(data.current.windSpeed)} км/год (${getWindDirection(data.current.windDirection)}).`}
+                {data?.airQuality && ` Індекс якості повітря AQI — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} мкг/м³.`}
+                {" "}Дані: NOAA SWPC, Open-Meteo.
+              </p>
             );
           })()}
         </section>
