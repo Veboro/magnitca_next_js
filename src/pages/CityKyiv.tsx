@@ -145,7 +145,7 @@ const CityKyiv = () => {
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-primary" />
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Прогноз Kp індексу на 3 дні (по 3-годинних інтервалах)
+              Прогноз Kp індексу для Києва на 3 дні (по 3-годинних інтервалах)
             </h2>
           </div>
           {forecastLoading ? (
