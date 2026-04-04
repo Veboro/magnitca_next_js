@@ -1,9 +1,10 @@
 import { cn } from "@/lib/utils";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
+import { useKpForecast } from "@/hooks/useKpForecast";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Heart, Brain, BatteryLow, Frown, Smile, Meh, Activity } from "lucide-react";
+import { Heart, Brain, Frown, Smile, Meh, Activity } from "lucide-react";
 
 const levels = [
   {
