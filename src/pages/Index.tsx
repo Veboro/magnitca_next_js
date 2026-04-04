@@ -1,5 +1,6 @@
 import { Wind, Gauge, Radio, Sun, Activity, Thermometer, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MetricCard } from "@/components/dashboard/MetricCard";
@@ -10,9 +11,9 @@ import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
-// MeteoSensitivityWidget merged into HumanImpact
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
-
+import { cities } from "@/data/cities";
+import { citiesRu } from "@/data/cities-ru";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return "quiet" as const;
@@ -23,13 +24,13 @@ const getKpStatus = (kp: number) => {
 };
 
 const Index = () => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "ru" ? "ru-RU" : "uk-UA";
   const REFRESH_INTERVAL = 60;
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
+  const langPrefix = i18n.language === "ru" ? "/ru" : "";
 
-  usePageMeta(
-    "Магнітка — магнітні бурі сьогодні, прогноз Kp індексу",
-    "Магнітка — моніторинг магнітних бур в реальному часі. Kp індекс, сонячний вітер, прогноз геомагнітної активності та вплив на здоров'я. Дані NOAA щохвилини."
-  );
+  usePageMeta(t("index.title"), t("index.description"));
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,137 +49,92 @@ const Index = () => {
   const latestMag = magData?.length ? magData[magData.length - 1] : null;
   const gLevel = scales?.g?.Scale ?? 0;
 
+  const cityList = i18n.language === "ru"
+    ? cities.map((c) => ({ name: citiesRu[c.slug]?.name || c.name, slug: c.slug }))
+    : cities.map((c) => ({ name: c.name, slug: c.slug }));
+
+  const todayFormatted = new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" });
+
   return (
     <div className="min-h-screen bg-background grid-bg">
       <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
-        <h1 className="sr-only">Магнітка — моніторинг магнітних бур в реальному часі</h1>
+        <h1 className="sr-only">{t("index.srTitle")}</h1>
 
         <div className="flex items-center gap-3">
-          <h2 className="font-display text-xl font-bold text-foreground">Поточна ситуація</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">{t("index.currentSituation")}</h2>
           <span className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-storm-quiet animate-pulse-glow" />
-            <span className="font-mono text-xs text-muted-foreground">НАЖИВО</span>
+            <span className="font-mono text-xs text-muted-foreground">{t("index.live")}</span>
           </span>
           <span className="font-mono text-sm text-muted-foreground">
-            {new Date().toLocaleDateString("uk-UA", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
+            {new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
           </span>
           <span className="flex items-center gap-1.5 ml-auto">
-            <RefreshCw
-              className="h-3 w-3 text-muted-foreground/60 transition-transform"
-              style={{
-                animation: countdown <= 3 ? "spin 1s linear infinite" : "none",
-              }}
-            />
-            <span className="font-mono text-[10px] text-muted-foreground/60">
-              {countdown}с
-            </span>
-            <span
-              className="h-[3px] rounded-full bg-primary/40 transition-all duration-1000 ease-linear"
-              style={{ width: `${(countdown / REFRESH_INTERVAL) * 40}px` }}
-            />
+            <RefreshCw className="h-3 w-3 text-muted-foreground/60 transition-transform" style={{ animation: countdown <= 3 ? "spin 1s linear infinite" : "none" }} />
+            <span className="font-mono text-[10px] text-muted-foreground/60">{countdown}{t("common.seconds")}</span>
+            <span className="h-[3px] rounded-full bg-primary/40 transition-all duration-1000 ease-linear" style={{ width: `${(countdown / REFRESH_INTERVAL) * 40}px` }} />
           </span>
         </div>
-        <section aria-label="Статус геомагнітної активності">
+
+        <section aria-label={t("index.stormStatus")}>
           <div className="grid gap-6 lg:grid-cols-2">
             <StormStatusBanner />
             <HumanImpact />
           </div>
         </section>
 
-        <section aria-label="Ключові показники космічної погоди">
+        <section aria-label={t("index.keyMetrics")}>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-            <MetricCard icon={Gauge} title="Kp Індекс" value={Math.round(latestKp)} status={getKpStatus(latestKp)} trendValue={latestKp > 4 ? "Зростає" : "Стабільно"} trend="stable" tooltip="Планетарний індекс магнітної активності (0–9). Значення ≥5 означає геомагнітну бурю." />
-            <MetricCard icon={Wind} title="Сон. вітер" value={Math.round(latestWind?.speed || 0)} unit="км/с" status={latestWind && latestWind.speed > 500 ? "strong" : "quiet"} trendValue={latestWind && latestWind.speed > 500 ? "Висока шв." : "Нормальна"} trend="stable" tooltip="Швидкість потоку заряджених частинок від Сонця. Норма ~400 км/с, >500 км/с — підвищена активність." />
-            <MetricCard icon={Radio} title="Bz (IMF)" value={latestMag?.bz?.toFixed(1) || "—"} unit="нТ" status={latestMag && latestMag.bz < -10 ? "moderate" : "quiet"} trendValue={latestMag && latestMag.bz < 0 ? "Південний" : "Північний"} trend="stable" tooltip="Вертикальна складова міжпланетного магнітного поля. Від'ємні значення (південний напрямок) посилюють геомагнітні бурі." />
-            <MetricCard icon={Sun} title="R-шкала" value={`R${scales?.r?.Scale ?? 0}`} status={scales && scales.r.Scale > 2 ? "strong" : "quiet"} trendValue="Радіо" trend="stable" tooltip="Шкала NOAA для радіозатемнень (R1–R5). Впливає на HF-радіозв'язок та GPS-навігацію." />
-            <MetricCard icon={Thermometer} title="Bt (IMF)" value={latestMag?.bt?.toFixed(1) || "—"} unit="нТ" status={latestMag && latestMag.bt > 15 ? "moderate" : "quiet"} trendValue={latestMag && latestMag.bt > 15 ? "Підвищений" : "Нормальний"} trend="stable" tooltip="Загальна напруженість міжпланетного магнітного поля. Значення >15 нТ вказує на потужний сонячний вітер." />
-            <MetricCard icon={Activity} title="G-шкала" value={`G${gLevel}`} status={gLevel > 2 ? "strong" : gLevel > 0 ? "moderate" : "quiet"} trendValue={gLevel > 0 ? "Буря" : "Спокійно"} trend="stable" tooltip="Шкала NOAA для геомагнітних бур (G1–G5). Впливає на енергомережі, супутники та полярне сяйво." />
+            <MetricCard icon={Gauge} title={t("metrics.kpIndex")} value={Math.round(latestKp)} status={getKpStatus(latestKp)} trendValue={latestKp > 4 ? t("metrics.rising") : t("metrics.stable")} trend="stable" tooltip={t("metrics.kpTooltip")} />
+            <MetricCard icon={Wind} title={t("metrics.solarWind")} value={Math.round(latestWind?.speed || 0)} unit={t("common.kmPerSec")} status={latestWind && latestWind.speed > 500 ? "strong" : "quiet"} trendValue={latestWind && latestWind.speed > 500 ? t("metrics.highSpeed") : t("metrics.normal")} trend="stable" tooltip={t("metrics.windTooltip")} />
+            <MetricCard icon={Radio} title={t("metrics.bz")} value={latestMag?.bz?.toFixed(1) || "—"} unit={t("common.nT")} status={latestMag && latestMag.bz < -10 ? "moderate" : "quiet"} trendValue={latestMag && latestMag.bz < 0 ? t("metrics.south") : t("metrics.north")} trend="stable" tooltip={t("metrics.bzTooltip")} />
+            <MetricCard icon={Sun} title={t("metrics.rScale")} value={`R${scales?.r?.Scale ?? 0}`} status={scales && scales.r.Scale > 2 ? "strong" : "quiet"} trendValue={t("metrics.radio")} trend="stable" tooltip={t("metrics.rTooltip")} />
+            <MetricCard icon={Thermometer} title={t("metrics.bt")} value={latestMag?.bt?.toFixed(1) || "—"} unit={t("common.nT")} status={latestMag && latestMag.bt > 15 ? "moderate" : "quiet"} trendValue={latestMag && latestMag.bt > 15 ? t("metrics.elevated") : t("metrics.normalAdj")} trend="stable" tooltip={t("metrics.btTooltip")} />
+            <MetricCard icon={Activity} title={t("metrics.gScale")} value={`G${gLevel}`} status={gLevel > 2 ? "strong" : gLevel > 0 ? "moderate" : "quiet"} trendValue={gLevel > 0 ? t("metrics.storm") : t("metrics.calm")} trend="stable" tooltip={t("metrics.gTooltip")} />
           </div>
         </section>
 
-        <section aria-label="Прогноз Kp індексу на 3 дні">
+        <section aria-label={t("index.forecast3day")}>
           <KpForecast3Day />
         </section>
 
-        <section aria-label="Розширений прогноз на 27 днів">
+        <section aria-label={t("index.forecast27day")}>
           <Forecast27Day />
         </section>
 
-        <section aria-label="Графіки та прогноз">
+        <section aria-label={t("index.chartsSection")}>
           <div className="grid gap-6 lg:grid-cols-3">
             <KpIndexGauge className="lg:col-span-1" />
             <SolarWindChart className="lg:col-span-2" />
           </div>
-
           <div className="mt-6 grid gap-6 lg:grid-cols-3">
             <BzChart className="lg:col-span-2" />
             <NewsWidget className="lg:col-span-1" />
           </div>
-      </section>
-
+        </section>
       </main>
 
-      <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Магнітні бурі по містах України">
-        <h2 className="text-lg font-display font-semibold text-foreground/90 mb-5">
-          Магнітні бурі по містах України
-        </h2>
+      <section className="mx-auto max-w-7xl px-6 py-10" aria-label={t("index.citiesTitle")}>
+        <h2 className="text-lg font-display font-semibold text-foreground/90 mb-5">{t("index.citiesTitle")}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-3 text-sm">
-          {[
-            { name: "Вінниця", slug: "vinnytsia" },
-            { name: "Дніпро", slug: "dnipro" },
-            { name: "Донецьк", slug: "donetsk" },
-            { name: "Житомир", slug: "zhytomyr" },
-            { name: "Запоріжжя", slug: "zaporizhzhia" },
-            { name: "Івано-Франківськ", slug: "ivano-frankivsk" },
-            { name: "Київ", slug: "kyiv" },
-            { name: "Кропивницький", slug: "kropyvnytskyi" },
-            { name: "Луганськ", slug: "luhansk" },
-            { name: "Луцьк", slug: "lutsk" },
-            { name: "Львів", slug: "lviv" },
-            { name: "Миколаїв", slug: "mykolaiv" },
-            { name: "Одеса", slug: "odesa" },
-            { name: "Полтава", slug: "poltava" },
-            { name: "Рівне", slug: "rivne" },
-            { name: "Севастополь", slug: "sevastopol" },
-            { name: "Сімферополь", slug: "simferopol" },
-            { name: "Суми", slug: "sumy" },
-            { name: "Тернопіль", slug: "ternopil" },
-            { name: "Ужгород", slug: "uzhhorod" },
-            { name: "Харків", slug: "kharkiv" },
-            { name: "Херсон", slug: "kherson" },
-            { name: "Хмельницький", slug: "khmelnytskyi" },
-            { name: "Черкаси", slug: "cherkasy" },
-            { name: "Чернівці", slug: "chernivtsi" },
-            { name: "Чернігів", slug: "chernihiv" },
-          ].map((city) => (
-            <a
-              key={city.slug}
-              href={`/city/${city.slug}`}
-              className="text-primary hover:underline whitespace-nowrap"
-            >
-              магнітні бурі <span className="font-semibold">{city.name}</span>
+          {cityList.map((city) => (
+            <a key={city.slug} href={`${langPrefix}/city/${city.slug}`} className="text-primary hover:underline whitespace-nowrap">
+              {t("index.citiesLink")} <span className="font-semibold">{city.name}</span>
             </a>
           ))}
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-10" aria-label="Про сервіс Магнітка">
+      <section className="mx-auto max-w-7xl px-6 py-10" aria-label={t("index.aboutService")}>
         <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
           <h2 className="text-lg font-display font-semibold text-foreground/90">
-            Магнітні бурі сьогодні, {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })} — прогноз геомагнітної активності
+            {t("index.seoTitle", { date: todayFormatted })}
           </h2>
-          <p>
-            <strong>Магнітка</strong> — це безкоштовний український сервіс моніторингу магнітних бур у реальному часі. Ми показуємо актуальний <strong>Kp індекс</strong>, швидкість сонячного вітру, стан міжпланетного магнітного поля та прогноз геомагнітної активності на сьогодні й найближчі три дні. Усі дані оновлюються щохвилини з офіційних джерел <strong>NOAA Space Weather Prediction Center</strong>.
-          </p>
-          <p>
-            Геомагнітні бурі виникають через потужні викиди сонячної плазми, що взаємодіють із магнітним полем Землі. Вони можуть впливати на самопочуття людей — спричиняти головний біль, підвищену втомлюваність, перепади тиску та порушення сну. Завдяки Магнітці ви завжди знатимете, чи очікується магнітна буря сьогодні, і зможете підготуватися заздалегідь.
-          </p>
-          <p>
-            Сервіс відображає ключові показники космічної погоди: <strong>Kp індекс</strong> (планетарний індекс магнітної активності від 0 до 9), <strong>G-шкалу NOAA</strong> (рівень геомагнітної бурі від G1 до G5), а також графіки сонячного вітру та компоненти Bz магнітного поля. Додатково доступний <strong>календар магнітних бур</strong> з архівом за останні дні та прогнозом на наступні.
-          </p>
+          <p dangerouslySetInnerHTML={{ __html: t("index.seoText1") }} />
+          <p dangerouslySetInnerHTML={{ __html: t("index.seoText2") }} />
+          <p dangerouslySetInnerHTML={{ __html: t("index.seoText3") }} />
         </div>
       </section>
-
     </div>
   );
 };

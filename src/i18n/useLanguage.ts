@@ -1,32 +1,26 @@
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect } from "react";
 import { SUPPORTED_LANGS, Lang } from "./config";
 
 export function useLanguage() {
-  const { lang } = useParams<{ lang?: string }>();
   const { i18n } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const currentLang: Lang = lang === "ru" ? "ru" : "uk";
+  const currentLang: Lang = i18n.language === "ru" ? "ru" : "uk";
 
   useEffect(() => {
-    if (i18n.language !== currentLang) {
-      i18n.changeLanguage(currentLang);
-    }
     document.documentElement.lang = currentLang;
-  }, [currentLang, i18n]);
+  }, [currentLang]);
 
   const switchLanguage = (newLang: Lang) => {
     const path = location.pathname;
     let newPath: string;
 
     if (newLang === "uk") {
-      // Remove /ru prefix
       newPath = path.replace(/^\/ru/, "") || "/";
     } else {
-      // Add /ru prefix
       if (path.startsWith("/ru")) {
         newPath = path;
       } else {
