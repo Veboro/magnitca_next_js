@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
 import { useKpIndex } from "@/hooks/useSpaceWeather";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
+const kpLabels = ["Спокійно", "Спокійно", "Низько", "Нестабільно", "Активно", "Мала буря", "Помірна", "Сильна", "Екстремальна", "Екстремальна"];
 const kpColors = [
   "bg-storm-quiet", "bg-storm-quiet", "bg-storm-quiet",
   "bg-storm-minor", "bg-storm-minor",
@@ -13,20 +13,26 @@ const kpColors = [
 ];
 
 export const KpIndexGauge = ({ className }: { className?: string }) => {
-  const { t, i18n } = useTranslation();
-  const langPrefix = i18n.language === "ru" ? "/ru" : "";
   const { data: kpData } = useKpIndex();
   const latestKp = kpData && kpData.length > 0 ? kpData[kpData.length - 1].kp : 0;
   const value = Math.min(9, Math.max(0, Math.round(latestKp)));
-  const kpLabel = t(`gauge.label${value}`);
 
   return (
-    <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)} role="img" aria-label={`${t("gauge.title")}. Kp ${value}, ${kpLabel}`}>
-      <h3 className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("gauge.title")}</h3>
+    <div className={cn("rounded-lg border border-glow-cyan bg-card p-6", className)} role="img" aria-label={`Графік планетарного Kp індексу. Поточне значення: Kp ${value}, стан: ${kpLabels[value]}`}>
+      <h3 className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        Планетарний Kp Індекс
+      </h3>
       <div className="mt-4 flex items-end gap-1.5">
         {Array.from({ length: 10 }, (_, i) => (
           <div key={i} className="flex flex-1 flex-col items-center gap-1">
-            <div className={cn("w-full rounded-sm transition-all duration-500", i <= value ? kpColors[i] : "bg-secondary", i <= value ? "opacity-100" : "opacity-30")} style={{ height: `${12 + i * 6}px` }} />
+            <div
+              className={cn(
+                "w-full rounded-sm transition-all duration-500",
+                i <= value ? kpColors[i] : "bg-secondary",
+                i <= value ? "opacity-100" : "opacity-30"
+              )}
+              style={{ height: `${12 + i * 6}px` }}
+            />
             <span className="font-mono text-[10px] text-muted-foreground">{i}</span>
           </div>
         ))}
@@ -34,14 +40,22 @@ export const KpIndexGauge = ({ className }: { className?: string }) => {
       <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className={cn("h-3 w-3 rounded-full animate-pulse-glow", kpColors[value])} />
-          <span className="font-mono text-2xl font-bold text-foreground text-glow-cyan">Kp {value}</span>
+          <span className="font-mono text-2xl font-bold text-foreground text-glow-cyan">
+            Kp {value}
+          </span>
         </div>
-        <span className="text-sm font-medium text-muted-foreground">{kpLabel}</span>
+        <span className="text-sm font-medium text-muted-foreground">{kpLabels[value]}</span>
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border/30 pt-3">
-        <p className="text-[11px] leading-relaxed text-muted-foreground/60">{t("gauge.note")}</p>
-        <Link to={`${langPrefix}/kp-index`} className="inline-flex items-center gap-1 shrink-0 ml-3 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors">
-          {t("gauge.details")} <ArrowRight className="h-3 w-3" />
+        <p className="text-[11px] leading-relaxed text-muted-foreground/60">
+          Рівень геомагнітної активності за шкалою 0–9. Оновлюється щохвилини.
+        </p>
+        <Link
+          to="/kp-index"
+          className="inline-flex items-center gap-1 shrink-0 ml-3 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors"
+        >
+          Детальніше
+          <ArrowRight className="h-3 w-3" />
         </Link>
       </div>
     </div>

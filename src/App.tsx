@@ -26,27 +26,8 @@ import KpIndex from "./pages/KpIndex";
 import CityKyiv from "./pages/CityKyiv";
 import CityPage from "./pages/CityPage";
 import SolarWind from "./pages/SolarWind";
-import { LanguageWrapper } from "@/components/LanguageWrapper";
 
 const queryClient = new QueryClient();
-
-const AppRoutes = () => (
-  <>
-    <Route index element={<Index />} />
-    <Route path="kp-index" element={<KpIndex />} />
-    <Route path="solar-wind" element={<SolarWind />} />
-    <Route path="city/kyiv" element={<CityKyiv />} />
-    <Route path="city/:slug" element={<CityPage />} />
-    <Route path="faq" element={<FAQ />} />
-    <Route path="calendar" element={<StormCalendar />} />
-    <Route path="news" element={<News />} />
-    <Route path="news/:slug" element={<NewsArticle />} />
-    <Route path="contacts" element={<Contacts />} />
-    <Route path="about" element={<About />} />
-    <Route path="privacy" element={<Privacy />} />
-    <Route path="test" element={<MeteoTest />} />
-  </>
-);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -58,18 +39,20 @@ const App = () => (
           <ScrollToTop />
           <SiteHeader />
           <Routes>
-            {/* Ukrainian (default) routes */}
-            <Route element={<LanguageWrapper />}>
-              {AppRoutes()}
-            </Route>
-
-            {/* Russian routes with /ru prefix */}
-            <Route path="/ru" element={<LanguageWrapper />}>
-              {AppRoutes()}
-            </Route>
-
-            {/* Auth & Admin — no language prefix needed */}
+            <Route path="/" element={<Index />} />
+            <Route path="/kp-index" element={<KpIndex />} />
+            <Route path="/solar-wind" element={<SolarWind />} />
+            <Route path="/city/kyiv" element={<CityKyiv />} />
+            <Route path="/city/:slug" element={<CityPage />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/calendar" element={<StormCalendar />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/news/:slug" element={<NewsArticle />} />
+            <Route path="/contacts" element={<Contacts />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/test" element={<MeteoTest />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/news/new" element={<AdminNewsEditor />} />
             <Route path="/admin/news/:id/edit" element={<AdminNewsEditor />} />

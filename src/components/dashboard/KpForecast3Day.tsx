@@ -1,5 +1,4 @@
 import { useKpForecast, KpForecastEntry } from "@/hooks/useKpForecast";
-import { useTranslation } from "react-i18next";
 import { Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,11 +26,21 @@ const kpBadgeBg = (kp: number) => {
   return "bg-red-500/15 text-red-400 border-red-500/30";
 };
 
-const groupByDay = (entries: KpForecastEntry[], locale: string) => {
+const formatHour = (timeTag: string) => {
+  const d = new Date(timeTag);
+  return d.toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+};
+
+const formatDayHeader = (timeTag: string) => {
+  const d = new Date(timeTag);
+  return d.toLocaleDateString("uk-UA", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv" });
+};
+
+const groupByDay = (entries: KpForecastEntry[]) => {
   const groups: Record<string, KpForecastEntry[]> = {};
   entries.forEach((e) => {
     const d = new Date(e.time_tag);
-    const key = d.toLocaleDateString(locale, { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Europe/Kyiv" });
+    const key = d.toLocaleDateString("uk-UA", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "Europe/Kyiv" });
     if (!groups[key]) groups[key] = [];
     groups[key].push(e);
   });
@@ -39,33 +48,23 @@ const groupByDay = (entries: KpForecastEntry[], locale: string) => {
 };
 
 export const KpForecast3Day = ({ className }: { className?: string }) => {
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : "uk-UA";
   const { data: entries = [], isLoading } = useKpForecast();
-  const allDays = groupByDay(entries, locale);
+  const allDays = groupByDay(entries);
   const days = allDays.slice(-3);
   const MAX_KP = 9;
-
-  const formatHour = (timeTag: string) => {
-    const d = new Date(timeTag);
-    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
-  };
-
-  const formatDayHeader = (timeTag: string) => {
-    const d = new Date(timeTag);
-    return d.toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv" });
-  };
 
   return (
     <div className={cn("rounded-lg border border-border/50 bg-card p-6", className)}>
       <div className="flex items-center gap-2 mb-5">
         <Info className="h-4 w-4 text-primary" />
-        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("forecast3day.title")}</h3>
+        <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+          Прогноз Kp індексу на 3 дні (по 3-годинних інтервалах)
+        </h3>
       </div>
 
       {isLoading ? (
         <div className="flex h-24 items-center justify-center">
-          <span className="font-mono text-sm text-muted-foreground animate-pulse">{t("common.loading")}</span>
+          <span className="font-mono text-sm text-muted-foreground animate-pulse">Завантаження...</span>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -73,20 +72,30 @@ export const KpForecast3Day = ({ className }: { className?: string }) => {
             const maxKp = Math.max(...dayEntries.map((e) => e.kp));
             return (
               <div key={dayIdx} className="rounded-lg border border-border/40 bg-background/50 p-4">
+                {/* Day header */}
                 <div className="flex items-center justify-between mb-3">
-                  <span className="font-mono text-xs font-medium text-foreground">{formatDayHeader(dayEntries[0].time_tag)}</span>
+                  <span className="font-mono text-xs font-medium text-foreground">
+                    {formatDayHeader(dayEntries[0].time_tag)}
+                  </span>
                   <span className={cn("text-[10px] font-bold font-mono px-2 py-0.5 rounded border", kpBadgeBg(maxKp))}>
-                    {t("common.max")} Kp {maxKp.toFixed(1)}
+                    макс. Kp {maxKp.toFixed(1)}
                   </span>
                 </div>
+
+                {/* Hourly rows */}
                 <div className="space-y-1.5">
                   {dayEntries.map((entry, i) => {
                     const barWidth = Math.max((entry.kp / MAX_KP) * 100, 3);
                     return (
                       <div key={i} className="flex items-center gap-2">
-                        <span className="font-mono text-[11px] text-muted-foreground/70 w-10 shrink-0">{formatHour(entry.time_tag)}</span>
+                        <span className="font-mono text-[11px] text-muted-foreground/70 w-10 shrink-0">
+                          {formatHour(entry.time_tag)}
+                        </span>
                         <div className="flex-1 h-3 bg-muted/20 rounded-sm overflow-hidden">
-                          <div className={cn("h-full rounded-sm transition-all", kpBarColor(entry.kp))} style={{ width: `${barWidth}%` }} />
+                          <div
+                            className={cn("h-full rounded-sm transition-all", kpBarColor(entry.kp))}
+                            style={{ width: `${barWidth}%` }}
+                          />
                         </div>
                         <span className={cn("font-mono text-xs font-bold w-7 text-right shrink-0", kpTextColor(entry.kp))}>
                           {entry.kp.toFixed(entry.kp % 1 ? 1 : 0)}
@@ -101,7 +110,9 @@ export const KpForecast3Day = ({ className }: { className?: string }) => {
         </div>
       )}
 
-      <p className="mt-4 border-t border-border/30 pt-3 text-[11px] text-muted-foreground/60">{t("forecast3day.note")}</p>
+      <p className="mt-4 border-t border-border/30 pt-3 text-[11px] text-muted-foreground/60">
+        3-годинний прогноз Kp-індексу від NOAA SWPC. Дані оновлюються що 5 хвилин.
+      </p>
     </div>
   );
 };
