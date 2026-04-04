@@ -69,43 +69,16 @@ const CityKyiv = () => {
         <h1 className="sr-only">Магнітні бурі в Києві — погода та якість повітря</h1>
 
         {/* Three-column hero */}
-        {/* Storm Status Banner */}
-        <section aria-label="Статус геомагнітної активності в Києві">
-          <div className="flex items-center gap-2 mb-2">
-            <MapPin className="h-4 w-4 text-primary" />
-            <h2 className="text-sm font-medium text-muted-foreground">
-              Геомагнітна ситуація в Києві — {today}
-            </h2>
-          </div>
-          <StormStatusBanner />
-        </section>
-
-        {/* Info row: Radiation + Sun/Coords */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4" aria-label="Додаткова інформація">
-          {/* Radiation */}
-          <div className="rounded-lg border border-border/50 bg-card p-5 space-y-3 flex flex-col">
-            <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
-              <Activity className="h-4 w-4 text-primary" />
-              Радіаційний фон у Києві
-            </h3>
-            <div>
-              <span className="font-mono text-3xl font-bold text-foreground">0.08–0.14</span>
-              <span className="ml-1 text-xs text-muted-foreground">мкЗв/год</span>
+        {/* Storm + Sun/Coords row */}
+        <section className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4" aria-label="Статус геомагнітної активності в Києві">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-medium text-muted-foreground">
+                Геомагнітна ситуація в Києві — {today}
+              </h2>
             </div>
-            <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[10px] font-medium text-storm-quiet">
-              В межах норми
-            </span>
-            <p className="text-xs text-muted-foreground flex-1">
-              Дані збираються з автоматичних онлайн-станцій та постів спостереження у Києві.
-            </p>
-            <a
-              href="https://www.saveecobot.com/radiation/misto-kyiv"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[11px] text-primary hover:underline"
-            >
-              Деталі на SaveEcoBot →
-            </a>
+            <StormStatusBanner />
           </div>
 
           {/* Sun + Coordinates */}
