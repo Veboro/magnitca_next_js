@@ -114,6 +114,10 @@ const Index = () => {
             <BzChart className="lg:col-span-2" />
             <NewsWidget className="lg:col-span-1" />
           </div>
+      </section>
+
+        <section aria-label="Легенда шкали магнітних бур">
+          <StormLegend />
         </section>
       </main>
 
