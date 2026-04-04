@@ -65,6 +65,7 @@ const getImpactLevel = (kp: number): number => {
 export const HumanImpact = ({ className }: { className?: string }) => {
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
+  const { data: forecast } = useKpForecast();
   const { user } = useAuth();
 
   const { data: latestResult } = useQuery({
@@ -86,7 +87,29 @@ export const HumanImpact = ({ className }: { className?: string }) => {
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
-  const impactIdx = getImpactLevel(latestKp);
+
+  // Calculate today's max Kp from forecast data (Kyiv timezone)
+  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+  const todayMaxKp = forecast?.length
+    ? Math.max(
+        ...forecast
+          .filter((e) => {
+            const d = new Date(e.time_tag.includes("Z") ? e.time_tag : e.time_tag + "Z");
+            return d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" }) === todayKey;
+          })
+          .map((e) => e.kp),
+        0
+      )
+    : 0;
+
+  // Effective Kp = max of current instant Kp and today's peak
+  const effectiveKp = Math.max(latestKp, todayMaxKp);
+
+  // Also factor in G-level: G1=5, G2=6, G3=7, G4=8, G5=9
+  const gBasedKp = gLevel > 0 ? gLevel + 4 : 0;
+  const finalKp = Math.max(effectiveKp, gBasedKp);
+
+  const impactIdx = getImpactLevel(finalKp);
   const impact = levels[impactIdx];
   const MoodIcon = impact.mood;
 
