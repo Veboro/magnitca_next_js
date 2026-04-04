@@ -25,7 +25,6 @@ export const SiteHeader = () => {
     }
     return true;
   });
-  const [displayName, setDisplayName] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
