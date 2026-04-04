@@ -349,6 +349,136 @@ const CityKyiv = () => {
           </p>
         </section>
 
+        {/* 3-day Kp forecast */}
+        <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label="Прогноз Kp індексу на 3 дні">
+          <div className="flex items-center gap-2">
+            <Info className="h-4 w-4 text-primary" />
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Прогноз Kp індексу на 3 дні (по 3-годинних інтервалах)
+            </h2>
+          </div>
+          {forecastLoading ? (
+            <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
+          ) : forecast && forecast.length > 0 ? (() => {
+            const todayDate = new Date();
+            const todayKey = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}-${String(todayDate.getDate()).padStart(2, "0")}`;
+            const filtered = forecast.filter((row) => {
+              const d = new Date(row.time_tag + "Z");
+              const kyivStr = d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+              return kyivStr >= todayKey;
+            });
+            const grouped = new Map<string, typeof forecast>();
+            filtered.forEach((row) => {
+              const dateKey = new Date(row.time_tag + "Z").toLocaleDateString("uk-UA", {
+                weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv",
+              });
+              if (!grouped.has(dateKey)) grouped.set(dateKey, []);
+              grouped.get(dateKey)!.push(row);
+            });
+            const days = Array.from(grouped.entries()).slice(0, 3);
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {days.map(([dateLabel, rows]) => {
+                  const maxKp = Math.max(...rows.map((r) => r.kp));
+                  const maxKpRound = Math.min(9, Math.max(0, Math.round(maxKp)));
+                  return (
+                    <div key={dateLabel} className="rounded-md border border-border/30 bg-muted/10 p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-mono text-xs font-medium text-foreground">{dateLabel}</span>
+                        <span className={cn(
+                          "text-[10px] font-mono px-1.5 py-0.5 rounded",
+                          maxKpRound >= 5 ? "bg-storm-severe/20 text-storm-severe" :
+                          maxKpRound >= 4 ? "bg-storm-moderate/20 text-storm-moderate" :
+                          "bg-storm-quiet/20 text-storm-quiet"
+                        )}>
+                          макс. Kp {maxKp.toFixed(1)}
+                        </span>
+                      </div>
+                      <div className="space-y-1">
+                        {rows.map((row, j) => {
+                          const kpVal = Math.min(9, Math.max(0, Math.round(row.kp)));
+                          return (
+                            <div key={j} className="flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground font-mono">
+                                {new Date(row.time_tag + "Z").toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Kyiv" })}
+                              </span>
+                              <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                                <div
+                                  className={cn(
+                                    "h-full rounded-full transition-all",
+                                    kpVal >= 5 ? "bg-storm-severe" :
+                                    kpVal >= 4 ? "bg-storm-moderate" :
+                                    kpVal >= 2 ? "bg-storm-minor" :
+                                    "bg-storm-quiet"
+                                  )}
+                                  style={{ width: `${(row.kp / 9) * 100}%` }}
+                                />
+                              </div>
+                              <span className={cn(
+                                "font-mono font-bold w-8 text-right",
+                                kpVal >= 5 ? "text-storm-severe" :
+                                kpVal >= 4 ? "text-storm-moderate" :
+                                "text-muted-foreground"
+                              )}>
+                                {row.kp.toFixed(1)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })() : (
+            <p className="text-sm text-muted-foreground">Дані прогнозу недоступні.</p>
+          )}
+          <p className="text-[11px] text-muted-foreground/60 border-t border-border/30 pt-3">
+            Прогноз Kp індексу для Києва (50.45°N) від NOAA Space Weather Prediction Center. Час — київський (UTC+2).
+          </p>
+        </section>
+
+        {/* 27-day Kp forecast */}
+        <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label="Прогноз Kp на 27 днів">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary" />
+            <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Прогноз Kp на 27 днів для Києва
+            </h2>
+          </div>
+          {forecast27Loading ? (
+            <p className="text-sm text-muted-foreground animate-pulse">Завантаження прогнозу...</p>
+          ) : forecast27.length > 0 ? (
+            <div className="grid grid-cols-7 gap-1.5">
+              {forecast27.map((day) => {
+                const d = new Date(day.date);
+                const isToday = day.date === new Date().toISOString().slice(0, 10);
+                const kpColor = day.kp >= 7 ? "bg-red-500/20 text-red-400 border-red-500/30"
+                  : day.kp >= 5 ? "bg-orange-500/20 text-orange-400 border-orange-500/30"
+                  : day.kp >= 4 ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                  : "bg-green-500/20 text-green-400 border-green-500/30";
+                return (
+                  <div
+                    key={day.date}
+                    className={cn("rounded-md border p-1.5 text-center text-[10px] font-mono transition-colors", kpColor, isToday && "ring-1 ring-primary")}
+                    title={`${day.date}: Kp ${day.kp}`}
+                  >
+                    <div className="text-muted-foreground/70">{d.toLocaleDateString("uk-UA", { weekday: "narrow" })}</div>
+                    <div className="text-xs font-bold">{d.getDate()}</div>
+                    <div className="text-[9px] opacity-80">Kp {day.kp}</div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">Дані прогнозу недоступні.</p>
+          )}
+          <p className="text-[11px] text-muted-foreground/60 border-t border-border/30 pt-3">
+            27-денний прогноз Kp-індексу для Києва (50.45°N) від NOAA SWPC. Точність знижується з кожним днем — використовуйте для загального планування.
+          </p>
+        </section>
 
         {/* SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label="Про сторінку">
