@@ -271,6 +271,48 @@ const CityKyiv = () => {
           </p>
         </section>
 
+        {/* Air Quality */}
+        {data?.airQuality && (
+          <section aria-label="Якість повітря">
+            <div className="rounded-lg border border-border/50 bg-card p-5 space-y-4">
+              <div className="flex items-center gap-3">
+                <Eye className="h-5 w-5 text-primary" />
+                <h2 className="font-display text-lg font-bold text-foreground">Якість повітря</h2>
+                <span
+                  className="ml-auto rounded-full px-3 py-1 text-xs font-bold"
+                  style={{
+                    backgroundColor: `${getAqiLabel(data.airQuality.aqi).color}15`,
+                    color: getAqiLabel(data.airQuality.aqi).color,
+                  }}
+                >
+                  {getAqiLabel(data.airQuality.aqi).label} • AQI {data.airQuality.aqi}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit="мкг/м³" warn={data.airQuality.pm25 > 25} />
+                <AqiItem label="PM10" value={data.airQuality.pm10} unit="мкг/м³" warn={data.airQuality.pm10 > 50} />
+                <AqiItem label="NO₂" value={data.airQuality.no2} unit="мкг/м³" warn={data.airQuality.no2 > 40} />
+                <AqiItem label="O₃" value={data.airQuality.o3} unit="мкг/м³" warn={data.airQuality.o3 > 100} />
+              </div>
+              <div className="space-y-1">
+                <div className="flex h-2 rounded-full overflow-hidden">
+                  <div className="flex-1 bg-[hsl(145,80%,45%)]" />
+                  <div className="flex-1 bg-[hsl(100,70%,45%)]" />
+                  <div className="flex-1 bg-[hsl(55,90%,50%)]" />
+                  <div className="flex-1 bg-[hsl(35,100%,55%)]" />
+                  <div className="flex-1 bg-[hsl(0,80%,55%)]" />
+                </div>
+                <div className="relative h-0">
+                  <div
+                    className="absolute -top-3 w-0.5 h-4 bg-foreground rounded-full transition-all"
+                    style={{ left: `${Math.min(data.airQuality.aqi, 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Metric cards grid */}
         {isLoading ? (
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-6">
