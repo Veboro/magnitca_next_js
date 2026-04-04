@@ -12,6 +12,7 @@ import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
 // MeteoSensitivityWidget merged into HumanImpact
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
+import { StormLegend } from "@/components/dashboard/StormLegend";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return "quiet" as const;
