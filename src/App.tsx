@@ -19,6 +19,7 @@ import Contacts from "./pages/Contacts";
 import About from "./pages/About";
 import Privacy from "./pages/Privacy";
 import Auth from "./pages/Auth";
+import MeteoTest from "./pages/MeteoTest";
 import AdminNews from "./pages/admin/AdminNews";
 import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
 import KpIndex from "./pages/KpIndex";
