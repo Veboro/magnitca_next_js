@@ -336,9 +336,37 @@ const CityKyiv = () => {
           <h2 className="text-lg font-display font-semibold text-foreground/90">
             Магнітні бурі в Києві сьогодні, {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
           </h2>
-          <p>
-            Актуальна інформація про магнітні бурі в Києві, поточну погоду, якість повітря та час сходу й заходу сонця. Дані оновлюються кожні 5 хвилин на основі Open-Meteo API та NOAA Space Weather Prediction Center.
-          </p>
+          {(() => {
+            const todayForecast = forecast?.filter((e) => {
+              const d = new Date(e.time_tag + "Z");
+              const kyivStr = d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+              const nowStr = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+              return kyivStr === nowStr;
+            }) || [];
+            const kpValues = todayForecast.map((e) => e.kp);
+            const minKp = kpValues.length ? Math.min(...kpValues) : 0;
+            const maxKp = kpValues.length ? Math.max(...kpValues) : 0;
+            const gText = gLevel > 0 ? `Зафіксовано геомагнітну бурю рівня G${gLevel}.` : "Геомагнітних бур не зафіксовано.";
+            const impactText = latestKp >= 5
+              ? "Метеозалежні люди можуть відчувати головний біль, підвищену втомлюваність та порушення сну."
+              : latestKp >= 3
+              ? "Метеочутливі люди можуть відчувати незначний вплив на самопочуття."
+              : "Геомагнітна обстановка сприятлива, значного впливу на самопочуття не очікується.";
+
+            return (
+              <>
+                <p>
+                  Геомагнітна активність у Києві станом на {new Date().toLocaleDateString("uk-UA", { day: "numeric", month: "long", timeZone: "Europe/Kyiv" })} — поточний Kp-індекс становить {latestKp.toFixed(1)}.
+                  {kpValues.length > 0 && ` Протягом доби Kp коливається в межах від ${minKp.toFixed(1)} до ${maxKp.toFixed(1)}.`}
+                  {" "}{gText} {impactText}
+                </p>
+                <p>
+                  {data?.current && `Погода в Києві: ${getWeatherLabel(data.current.weatherCode)}, температура ${Math.round(data.current.temperature)}°C, вологість ${data.current.humidity}%, атмосферний тиск ${Math.round(data.current.pressure)} гПа. `}
+                  Дані оновлюються щохвилини на основі NOAA Space Weather Prediction Center та Open-Meteo API.
+                </p>
+              </>
+            );
+          })()}
         </section>
       </main>
     </div>
