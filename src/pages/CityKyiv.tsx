@@ -70,7 +70,13 @@ const CityKyiv = () => {
 
         {/* Three-column hero */}
         {/* Storm Status Banner */}
-        <section aria-label="Статус геомагнітної активності">
+        <section aria-label="Статус геомагнітної активності в Києві">
+          <div className="flex items-center gap-2 mb-2">
+            <MapPin className="h-4 w-4 text-primary" />
+            <h2 className="text-sm font-medium text-muted-foreground">
+              Геомагнітна ситуація в Києві — {today}
+            </h2>
+          </div>
           <StormStatusBanner />
         </section>
 
