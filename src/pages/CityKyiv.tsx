@@ -137,6 +137,28 @@ const CityKyiv = () => {
                 </div>
               </div>
             </div>
+            {/* Radiation */}
+            <div className="space-y-3 border-t border-border/30 pt-3">
+              <h3 className="flex items-center gap-2 font-display text-sm font-bold text-foreground">
+                <Activity className="h-4 w-4 text-primary" />
+                Радіаційний фон
+              </h3>
+              <div>
+                <span className="font-mono text-2xl font-bold text-foreground">0.08–0.14</span>
+                <span className="ml-1 text-xs text-muted-foreground">мкЗв/год</span>
+              </div>
+              <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[10px] font-medium text-storm-quiet">
+                В межах норми
+              </span>
+              <a
+                href="https://www.saveecobot.com/radiation/misto-kyiv"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-[11px] text-primary hover:underline"
+              >
+                Деталі на SaveEcoBot →
+              </a>
+            </div>
           </div>
         </section>
 
