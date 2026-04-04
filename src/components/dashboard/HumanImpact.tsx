@@ -301,7 +301,9 @@ export const HumanImpact = ({ className }: { className?: string }) => {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1">
               <Heart className="h-3 w-3 text-muted-foreground" />
-              <span className="font-mono text-[10px] text-muted-foreground">Kp {latestKp.toFixed(1)}</span>
+              <span className="font-mono text-[10px] text-muted-foreground">
+                Kp {latestKp.toFixed(1)}{todayMaxKp > latestKp ? ` / макс ${todayMaxKp.toFixed(1)}` : ""}
+              </span>
             </div>
             <div className="flex items-center gap-1">
               <Brain className="h-3 w-3 text-muted-foreground" />
