@@ -1,3 +1,5 @@
+"use client";
+
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -65,6 +67,7 @@ export const RichTextEditor = ({ content, onChange, placeholder }: RichTextEdito
       }),
     ],
     content,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class:
@@ -80,7 +83,7 @@ export const RichTextEditor = ({ content, onChange, placeholder }: RichTextEdito
     if (editor && content !== editor.getHTML()) {
       editor.commands.setContent(content);
     }
-  }, [content]);
+  }, [content, editor]);
 
   if (!editor) return null;
 

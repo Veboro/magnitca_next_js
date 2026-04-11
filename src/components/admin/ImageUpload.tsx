@@ -1,5 +1,6 @@
+"use client";
+
 import { useState, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,23 +28,24 @@ export const ImageUpload = ({ value, onChange }: ImageUploadProps) => {
 
     setUploading(true);
     try {
-      const ext = file.name.split(".").pop() || "webp";
-      const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const formData = new FormData();
+      formData.append("file", file);
 
-      const { error } = await supabase.storage
-        .from("news-images")
-        .upload(fileName, file, { contentType: file.type });
+      const response = await fetch("/api/admin/upload-image", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (error) throw error;
+      const payload = await response.json().catch(() => null);
 
-      const { data: urlData } = supabase.storage
-        .from("news-images")
-        .getPublicUrl(fileName);
+      if (!response.ok) {
+        throw new Error(payload?.error || "Не вдалося завантажити зображення.");
+      }
 
-      onChange(urlData.publicUrl);
+      onChange(payload.url);
       toast.success("Зображення завантажено");
-    } catch (e: any) {
-      toast.error(`Помилка: ${e.message}`);
+    } catch (error) {
+      toast.error(`Помилка: ${error instanceof Error ? error.message : "Upload failed"}`);
     } finally {
       setUploading(false);
     }

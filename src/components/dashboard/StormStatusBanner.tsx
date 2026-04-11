@@ -1,8 +1,6 @@
 import { AlertTriangle, Zap, TrendingUp } from "lucide-react";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
-import heroBg from "@/assets/hero-bg.jpg";
-import ukraineOutline from "@/assets/ukraine-outline.png";
 
 const getEffectiveLevel = (gLevel: number, kp: number): number => {
   // Use the higher of G-scale or Kp-derived level
@@ -77,6 +75,8 @@ export const StormStatusBanner = () => {
   });
   const maxKp24h = todayAndNext.length > 0 ? Math.max(...todayAndNext.map((e) => e.kp)) : null;
   const todayEntries = forecast.filter((e) => e.time_tag.slice(0, 10) === todayStr);
+  const heroBg = "/hero-bg.jpg";
+  const ukraineOutline = "/ukraine-outline.png";
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-glow-cyan">

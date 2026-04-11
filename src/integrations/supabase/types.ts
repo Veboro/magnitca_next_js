@@ -17,43 +17,76 @@ export type Database = {
       news: {
         Row: {
           content: string
+          content_ru: string | null
+          content_uk: string | null
           created_at: string
           id: string
           image_url: string | null
           meta_description: string | null
+          meta_description_ru: string | null
+          meta_description_uk: string | null
           meta_title: string | null
+          meta_title_ru: string | null
+          meta_title_uk: string | null
           published_at: string
+          status: string
           slug: string | null
+          slug_ru: string | null
+          slug_uk: string | null
           source: string | null
           telegram_sent: boolean | null
+          title_ru: string | null
+          title_uk: string | null
           title: string
           updated_at: string
         }
         Insert: {
           content: string
+          content_ru?: string | null
+          content_uk?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
           meta_description?: string | null
+          meta_description_ru?: string | null
+          meta_description_uk?: string | null
           meta_title?: string | null
+          meta_title_ru?: string | null
+          meta_title_uk?: string | null
           published_at?: string
+          status?: string
           slug?: string | null
+          slug_ru?: string | null
+          slug_uk?: string | null
           source?: string | null
           telegram_sent?: boolean | null
+          title_ru?: string | null
+          title_uk?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           content?: string
+          content_ru?: string | null
+          content_uk?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
           meta_description?: string | null
+          meta_description_ru?: string | null
+          meta_description_uk?: string | null
           meta_title?: string | null
+          meta_title_ru?: string | null
+          meta_title_uk?: string | null
           published_at?: string
+          status?: string
           slug?: string | null
+          slug_ru?: string | null
+          slug_uk?: string | null
           source?: string | null
           telegram_sent?: boolean | null
+          title_ru?: string | null
+          title_uk?: string | null
           title?: string
           updated_at?: string
         }

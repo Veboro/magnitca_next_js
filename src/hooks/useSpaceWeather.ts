@@ -9,20 +9,22 @@ export interface KpEntry {
   kp: number;
 }
 
-export function useKpIndex() {
+export async function fetchKpIndex(): Promise<KpEntry[]> {
+  const res = await fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`);
+  const data = await res.json();
+  return data.map((d: any) => ({
+    time_tag: d.time_tag,
+    kp: parseFloat(d.estimated_kp ?? d.kp_index ?? d.kp ?? 0),
+  }));
+}
+
+export function useKpIndex(initialData?: KpEntry[]) {
   return useQuery<KpEntry[]>({
     queryKey: ["kp-index"],
-    queryFn: async () => {
-      const res = await fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`);
-      const data = await res.json();
-      // Each entry: { time_tag, kp_index, estimated_kp, ... }
-      return data.map((d: any) => ({
-        time_tag: d.time_tag,
-        kp: parseFloat(d.estimated_kp ?? d.kp_index ?? d.kp ?? 0),
-      }));
-    },
+    queryFn: fetchKpIndex,
     refetchInterval: 60000,
     staleTime: 30000,
+    initialData,
   });
 }
 
@@ -85,20 +87,23 @@ export interface NoaaScales {
   g: { Scale: number; Text: string };
 }
 
-export function useNoaaScales() {
+export async function fetchNoaaScales(): Promise<NoaaScales> {
+  const res = await fetch(`${SWPC_BASE}/products/noaa-scales.json`);
+  const data = await res.json();
+  return {
+    r: data["-1"]?.R ?? { Scale: 0, Text: "none" },
+    s: data["-1"]?.S ?? { Scale: 0, Text: "none" },
+    g: data["-1"]?.G ?? { Scale: 0, Text: "none" },
+  };
+}
+
+export function useNoaaScales(initialData?: NoaaScales) {
   return useQuery<NoaaScales>({
     queryKey: ["noaa-scales"],
-    queryFn: async () => {
-      const res = await fetch(`${SWPC_BASE}/products/noaa-scales.json`);
-      const data = await res.json();
-      return {
-        r: data["-1"]?.R ?? { Scale: 0, Text: "none" },
-        s: data["-1"]?.S ?? { Scale: 0, Text: "none" },
-        g: data["-1"]?.G ?? { Scale: 0, Text: "none" },
-      };
-    },
+    queryFn: fetchNoaaScales,
     refetchInterval: 60000,
     staleTime: 30000,
+    initialData,
   });
 }
 

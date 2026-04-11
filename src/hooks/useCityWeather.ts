@@ -108,7 +108,7 @@ function calcDayLength(sunrise: string, sunset: string): string {
   return `${h}год ${m}хв`;
 }
 
-async function fetchWeather(lat: number, lon: number, tz: string): Promise<CityWeatherResult> {
+export async function fetchCityWeather(lat: number, lon: number, tz: string): Promise<CityWeatherResult> {
   const [weatherRes, aqRes] = await Promise.all([
     fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,wind_speed_10m,wind_direction_10m,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,precipitation_sum,uv_index_max&timezone=${encodeURIComponent(tz)}&forecast_days=7`
@@ -170,11 +170,17 @@ async function fetchWeather(lat: number, lon: number, tz: string): Promise<CityW
   return { current, airQuality, hourly, daily };
 }
 
-export function useCityWeather(lat = 50.4501, lon = 30.5234, tz = "Europe/Kyiv") {
+export function useCityWeather(
+  lat = 50.4501,
+  lon = 30.5234,
+  tz = "Europe/Kyiv",
+  initialData?: CityWeatherResult
+) {
   return useQuery({
     queryKey: ["city-weather", lat, lon],
-    queryFn: () => fetchWeather(lat, lon, tz),
+    queryFn: () => fetchCityWeather(lat, lon, tz),
     refetchInterval: 5 * 60 * 1000,
     staleTime: 3 * 60 * 1000,
+    initialData,
   });
 }

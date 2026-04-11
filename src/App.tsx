@@ -9,25 +9,44 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 
 import { PwaInstallBanner } from "@/components/PwaInstallBanner";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import FAQ from "./pages/FAQ";
-import StormCalendar from "./pages/StormCalendar";
-import News from "./pages/News";
-import NewsArticle from "./pages/NewsArticle";
-import Contacts from "./pages/Contacts";
-import About from "./pages/About";
-import Privacy from "./pages/Privacy";
-import Auth from "./pages/Auth";
-import MeteoTest from "./pages/MeteoTest";
-import AdminNews from "./pages/admin/AdminNews";
-import AdminNewsEditor from "./pages/admin/AdminNewsEditor";
-import KpIndex from "./pages/KpIndex";
-import CityKyiv from "./pages/CityKyiv";
-import CityPage from "./pages/CityPage";
-import SolarWind from "./pages/SolarWind";
+import Index from "./legacy-pages/Index";
+import NotFound from "./legacy-pages/NotFound";
+import FAQ from "./legacy-pages/FAQ";
+import StormCalendar from "./legacy-pages/StormCalendar";
+import News from "./legacy-pages/News";
+import NewsArticle from "./legacy-pages/NewsArticle";
+import Contacts from "./legacy-pages/Contacts";
+import About from "./legacy-pages/About";
+import Privacy from "./legacy-pages/Privacy";
+import Auth from "./legacy-pages/Auth";
+import MeteoTest from "./legacy-pages/MeteoTest";
+import AdminNews from "./legacy-pages/admin/AdminNews";
+import AdminNewsEditor from "./legacy-pages/admin/AdminNewsEditor";
+import KpIndex from "./legacy-pages/KpIndex";
+import CityKyiv from "./legacy-pages/CityKyiv";
+import CityPage from "./legacy-pages/CityPage";
+import SolarWind from "./legacy-pages/SolarWind";
+import { LanguageWrapper } from "@/components/LanguageWrapper";
 
 const queryClient = new QueryClient();
+
+const AppRoutes = () => (
+  <>
+    <Route index element={<Index />} />
+    <Route path="kp-index" element={<KpIndex />} />
+    <Route path="solar-wind" element={<SolarWind />} />
+    <Route path="city/kyiv" element={<CityKyiv />} />
+    <Route path="city/:slug" element={<CityPage />} />
+    <Route path="faq" element={<FAQ />} />
+    <Route path="calendar" element={<StormCalendar />} />
+    <Route path="news" element={<News />} />
+    <Route path="news/:slug" element={<NewsArticle />} />
+    <Route path="contacts" element={<Contacts />} />
+    <Route path="about" element={<About />} />
+    <Route path="privacy" element={<Privacy />} />
+    <Route path="test" element={<MeteoTest />} />
+  </>
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -39,20 +58,18 @@ const App = () => (
           <ScrollToTop />
           <SiteHeader />
           <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/kp-index" element={<KpIndex />} />
-            <Route path="/solar-wind" element={<SolarWind />} />
-            <Route path="/city/kyiv" element={<CityKyiv />} />
-            <Route path="/city/:slug" element={<CityPage />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/calendar" element={<StormCalendar />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/news/:slug" element={<NewsArticle />} />
-            <Route path="/contacts" element={<Contacts />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/privacy" element={<Privacy />} />
+            {/* Ukrainian (default) routes */}
+            <Route element={<LanguageWrapper />}>
+              {AppRoutes()}
+            </Route>
+
+            {/* Russian routes with /ru prefix */}
+            <Route path="/ru" element={<LanguageWrapper />}>
+              {AppRoutes()}
+            </Route>
+
+            {/* Auth & Admin — no language prefix needed */}
             <Route path="/auth" element={<Auth />} />
-            <Route path="/test" element={<MeteoTest />} />
             <Route path="/admin/news" element={<AdminNews />} />
             <Route path="/admin/news/new" element={<AdminNewsEditor />} />
             <Route path="/admin/news/:id/edit" element={<AdminNewsEditor />} />
