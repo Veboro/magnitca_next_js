@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { listNewsAdmin } from "@/lib/admin-content";
+import { DeleteNewsButton } from "@/components/admin/delete-news-button";
 
 export default async function AdminNewsPage() {
   const news = await listNewsAdmin();
@@ -60,9 +61,12 @@ export default async function AdminNewsPage() {
                   </div>
                 </td>
                 <td className="px-4 py-3">
-                  <Link href={`/admin/news/${item.id}`} className="text-primary hover:underline">
-                    Редагувати
-                  </Link>
+                  <div className="flex items-center gap-4">
+                    <Link href={`/admin/news/${item.id}`} className="text-primary hover:underline">
+                      Редагувати
+                    </Link>
+                    <DeleteNewsButton id={item.id} title={item.title_uk || item.title_ru || item.id} />
+                  </div>
                 </td>
               </tr>
             ))}
