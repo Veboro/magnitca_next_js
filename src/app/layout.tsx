@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "../index.css";
 import { PublicFooter } from "@/components/next/public-footer";
 import { GoogleAnalytics } from "@/components/next/google-analytics";
@@ -47,7 +48,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="uk" className="dark">
       <body>
-        <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         <Providers>
           <div className="min-h-screen bg-background text-foreground">
             <PublicHeader />
