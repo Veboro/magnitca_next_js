@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../index.css";
 import { PublicFooter } from "@/components/next/public-footer";
+import { GoogleAnalytics } from "@/components/next/google-analytics";
 import { PublicHeader } from "@/components/next/public-header";
 import { Providers } from "@/components/next/providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="uk" className="dark">
       <body>
+        <GoogleAnalytics />
         <Providers>
           <div className="min-h-screen bg-background text-foreground">
             <PublicHeader />
