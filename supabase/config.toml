@@ -1,4 +1,10 @@
-project_id = "vipkucckidwsurcgxedw"
+project_id = "xdysdmtwhhnkvdbaaflm"
 
 [functions.contact-form]
+verify_jwt = false
+
+[functions.generate-news]
+verify_jwt = false
+
+[functions.telegram-forecast]
 verify_jwt = false

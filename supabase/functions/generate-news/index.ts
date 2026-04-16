@@ -1,14 +1,24 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const UA_TRANSLIT: Record<string, string> = {
-  а:"a",б:"b",в:"v",г:"h",ґ:"g",д:"d",е:"e",є:"ye",ж:"zh",з:"z",и:"y",і:"i",
-  ї:"yi",й:"y",к:"k",л:"l",м:"m",н:"n",о:"o",п:"p",р:"r",с:"s",т:"t",у:"u",
-  ф:"f",х:"kh",ц:"ts",ч:"ch",ш:"sh",щ:"shch",ь:"",ю:"yu",я:"ya","'":"",ʼ:"",
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
-function slugify(text: string): string {
+const OPENAI_API_BASE = "https://api.openai.com/v1";
+const SWPC_BASE = "https://services.swpc.noaa.gov";
+
+const UA_TRANSLIT: Record<string, string> = {
+  а: "a", б: "b", в: "v", г: "h", ґ: "g", д: "d", е: "e", є: "ye", ж: "zh", з: "z", и: "y", і: "i",
+  ї: "yi", й: "y", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u",
+  ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch", ь: "", ю: "yu", я: "ya", "'": "", "ʼ": "",
+};
+
+function slugify(text: string) {
   const lower = text.toLowerCase();
   let result = "";
+
   for (const ch of lower) {
     if (UA_TRANSLIT[ch] !== undefined) {
       result += UA_TRANSLIT[ch];
@@ -18,34 +28,217 @@ function slugify(text: string): string {
       result += " ";
     }
   }
-  return result.trim().replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 80);
+
+  return result.trim().replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 90);
 }
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+function formatDate(date: Date, locale: "uk-UA" | "ru-RU") {
+  return new Intl.DateTimeFormat(locale, {
+    timeZone: "Europe/Kyiv",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function dateKeyKyiv(date: Date) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Kyiv",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+function kyivHour(date: Date) {
+  return Number(new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Europe/Kyiv",
+    hour: "2-digit",
+    hour12: false,
+  }).format(date));
+}
+
+function parseLatestKp(kpData: any[]) {
+  if (!kpData.length) return 0;
+  const latest = kpData[kpData.length - 1];
+  return parseFloat(latest.estimated_kp ?? latest.kp_index ?? latest.kp ?? 0) || 0;
+}
+
+type ForecastRow = {
+  time_tag: string;
+  kp: number | string;
+  observed?: string | null;
+  noaa_scale?: string | null;
 };
 
-const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
-const SWPC_BASE = "https://services.swpc.noaa.gov";
+function buildUpcomingDays(kpForecastRaw: ForecastRow[], todayKey: string) {
+  const map = new Map<string, number[]>();
+
+  for (const row of kpForecastRaw) {
+    const timeTag = row.time_tag;
+    const day = timeTag?.slice(0, 10);
+    const kp = parseFloat(String(row.kp));
+    const observed = row.observed;
+
+    if (!day || observed === "observed" || Number.isNaN(kp) || day < todayKey) continue;
+    if (!map.has(day)) map.set(day, []);
+    map.get(day)!.push(kp);
+  }
+
+  return Array.from(map.entries()).slice(0, 3).map(([date, values]) => {
+    const maxKp = Math.max(...values);
+    return {
+      date,
+      maxKp,
+      avgKp: values.reduce((sum, value) => sum + value, 0) / values.length,
+      gScale: maxKp >= 5 ? Math.min(Math.floor(maxKp - 4), 5) : 0,
+    };
+  });
+}
+
+function forecastSummary(days: Array<{ date: string; maxKp: number; avgKp: number; gScale: number }>) {
+  return days
+    .map((day) => `${day.date}: max Kp ${day.maxKp.toFixed(1)}, avg Kp ${day.avgKp.toFixed(1)}, G${day.gScale}`)
+    .join("; ");
+}
+
+async function askAi(openAiApiKey: string, prompt: string, model: string, maxTokens: number) {
+  const response = await fetch(`${OPENAI_API_BASE}/chat/completions`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${openAiApiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model,
+      messages: [{ role: "user", content: prompt }],
+      max_completion_tokens: maxTokens,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`AI error [${response.status}]: ${await response.text()}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content?.trim();
+
+  if (!content) {
+    throw new Error("AI returned empty content");
+  }
+
+  return content;
+}
+
+function escapeXml(text: string) {
+  return text
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
+function wrapSvgText(text: string, maxLineLength = 28) {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+
+  for (const word of words) {
+    const next = current ? `${current} ${word}` : word;
+    if (next.length > maxLineLength && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = next;
+    }
+  }
+
+  if (current) lines.push(current);
+  return lines.slice(0, 3);
+}
+
+function generateFallbackImage(_titleUk: string, _dateUk: string, currentG: number) {
+  const color = currentG >= 4 ? "#ef4444" : currentG >= 3 ? "#f97316" : currentG >= 1 ? "#eab308" : "#22c55e";
+
+  const svg = `
+  <svg width="1536" height="1024" viewBox="0 0 1536 1024" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#071019"/>
+        <stop offset="55%" stop-color="#0b1d2b"/>
+        <stop offset="100%" stop-color="#030712"/>
+      </linearGradient>
+      <radialGradient id="aurora" cx="0.15" cy="0.12" r="0.95">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.45"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="beam" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="0.05"/>
+        <stop offset="50%" stop-color="${color}" stop-opacity="0.32"/>
+        <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.06"/>
+      </linearGradient>
+    </defs>
+    <rect width="1536" height="1024" fill="url(#bg)"/>
+    <rect width="1536" height="1024" fill="url(#aurora)"/>
+    <circle cx="1230" cy="170" r="200" fill="${color}" fill-opacity="0.14"/>
+    <circle cx="250" cy="790" r="260" fill="#38bdf8" fill-opacity="0.08"/>
+    <path d="M-40 760 C220 590, 430 860, 720 710 S1260 450, 1576 700 L1576 1024 L-40 1024 Z" fill="${color}" fill-opacity="0.10"/>
+    <path d="M-20 680 C220 520, 420 740, 690 610 S1180 380, 1560 620" stroke="url(#beam)" stroke-width="120" stroke-linecap="round" fill="none"/>
+    <path d="M40 310 C260 210, 510 440, 800 310 S1230 120, 1480 250" stroke="${color}" stroke-opacity="0.18" stroke-width="36" stroke-linecap="round" fill="none"/>
+    <rect x="72" y="120" width="1392" height="784" rx="36" fill="rgba(6, 12, 20, 0.18)" stroke="rgba(125, 211, 252, 0.12)"/>
+  </svg>`;
+
+  return svg.trim();
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: protected by Supabase's built-in JWT verification
-
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    if (!OPENAI_API_KEY) throw new Error("OPENAI_API_KEY not configured");
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) throw new Error("Supabase env is not configured");
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
+    const force = body?.force === true;
 
-    // 1. Fetch NOAA data
+    const now = new Date();
+    const todayKey = dateKeyKyiv(now);
+    const hour = kyivHour(now);
+    const dateUk = formatDate(now, "uk-UA");
+    const dateRu = formatDate(now, "ru-RU");
+    const slugUk = `mahnitni-buri-sogodni-${todayKey}`;
+    const slugRu = `magnitnye-buri-segodnya-${todayKey}`;
+
+    if (!force && hour !== 7) {
+      return new Response(
+        JSON.stringify({ success: true, skipped: true, reason: "Outside 07:00 Europe/Kyiv publishing window" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const { data: existingNews, error: existingError } = await supabase
+      .from("news")
+      .select("id, slug_uk")
+      .eq("slug_uk", slugUk)
+      .maybeSingle();
+
+    if (existingError) throw new Error(existingError.message);
+    if (existingNews && !force) {
+      return new Response(
+        JSON.stringify({ success: true, skipped: true, reason: "Site news already generated today", news_id: existingNews.id }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const [scalesRes, kpRes, solarWindRes, kpForecastRes] = await Promise.all([
       fetch(`${SWPC_BASE}/products/noaa-scales.json`),
       fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
@@ -53,183 +246,218 @@ Deno.serve(async (req) => {
       fetch(`${SWPC_BASE}/products/noaa-planetary-k-index-forecast.json`),
     ]);
 
-    const scales = await scalesRes.json();
-    const kpData = await kpRes.json();
-    const solarWindRaw: string[][] = await solarWindRes.json();
-    const kpForecastRaw: string[][] = await kpForecastRes.json();
+    if (!scalesRes.ok || !kpRes.ok || !solarWindRes.ok || !kpForecastRes.ok) {
+      throw new Error("Failed to fetch NOAA data");
+    }
 
-    const latestKp = kpData.length > 0
-      ? parseFloat(kpData[kpData.length - 1].estimated_kp ?? kpData[kpData.length - 1].kp_index ?? "0")
-      : 0;
+    const [scales, kpData, solarWindRaw, kpForecastRaw] = await Promise.all([
+      scalesRes.json(),
+      kpRes.json(),
+      solarWindRes.json(),
+      kpForecastRes.json(),
+    ]);
 
+    const latestKp = parseLatestKp(kpData);
+    const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0") || 0;
     const lastWind = solarWindRaw.length > 1 ? solarWindRaw[solarWindRaw.length - 1] : null;
     const windSpeed = lastWind ? parseFloat(lastWind[2]) || 0 : 0;
     const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
+    const upcoming = buildUpcomingDays(kpForecastRaw, todayKey);
+    const forecastText = forecastSummary(upcoming);
 
-    // Build per-day Kp forecast from the actual forecast endpoint
-    const todayStr = new Date().toISOString().slice(0, 10);
-    const dayKpMap: Record<string, number[]> = {};
-    for (const row of kpForecastRaw.slice(1)) {
-      const [timeTag, kpVal, observed] = row;
-      if (observed === "observed") continue;
-      const day = timeTag.slice(0, 10);
-      const kp = parseFloat(kpVal);
-      if (!isNaN(kp)) {
-        if (!dayKpMap[day]) dayKpMap[day] = [];
-        dayKpMap[day].push(kp);
-      }
-    }
+    const titleUkPrompt = `Ти — редактор українського новинного сайту про космічну погоду.
 
-    const forecast = Object.entries(dayKpMap).slice(0, 3).map(([date, kps]) => ({
-      date,
-      maxKp: Math.max(...kps).toFixed(1),
-      avgKp: (kps.reduce((a, b) => a + b, 0) / kps.length).toFixed(1),
-      gScale: Math.max(...kps) >= 5 ? Math.min(Math.floor(Math.max(...kps) - 4), 5) : 0,
-    }));
+Напиши ОДИН заголовок українською для новини про магнітні бурі на сьогодні на основі реальних даних NOAA.
 
-    const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0");
+Вхідні дані:
+- Дата: ${dateUk}
+- Поточний Kp-індекс: ${latestKp.toFixed(1)}
+- Поточний рівень G: G${currentG}
+- Максимальний прогноз Kp на сьогодні: ${Math.max(latestKp, upcoming[0]?.maxKp ?? latestKp).toFixed(1)}
+- Прогноз на найближчі дні: ${forecastText}
 
-    const today = new Date();
-    const dateStr = today.toLocaleDateString("uk-UA", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    });
+Завдання:
+Створи заголовок у стилі українських новинних медіа. Він має звучати як реальний редакторський хедлайн, який можна побачити на головній сторінці новинного сайту, а не як SEO-шаблон або технічний опис.
 
-    // 2. Generate article with AI — two separate calls for reliability
-    const contentPrompt = `Ти — журналіст українського новинного порталу про космічну погоду. Напиши новину українською мовою на основі реальних даних NOAA.
+Вимоги:
+- тільки українська мова
+- один заголовок
+- довжина 55-95 символів
+- без лапок
+- без markdown
+- без емодзі
+- природний новинний стиль
+- більш медійне, живе формулювання
+- можна використовувати дату, слова "прогноз", "очікуються", "якою буде активність", "що відомо"
+- якщо активність слабка, не перебільшуй
+- якщо прогноз передбачає посилення найближчими днями, це можна відобразити
+- не вигадуй нових фактів
+- не використовуй канцеляризми
+- не використовуй штучні SEO-фрази
 
-Дані на ${dateStr}:
-- Поточний Kp-індекс: ${latestKp.toFixed(1)}, G-шкала: G${currentG}
-- Сонячний вітер: швидкість ${windSpeed.toFixed(0)} км/с, густина ${windDensity.toFixed(1)} p/cm³
-- Прогноз Kp-індексу на найближчі дні:
-${forecast.map(f => `  ${f.date}: макс Kp=${f.maxKp}, середній Kp=${f.avgKp}, G-шкала: G${f.gScale}${f.gScale >= 1 ? " (магнітна буря)" : " (без бурі)"}`).join("\n")}
+Уникай таких шаблонів:
+- "Сьогодні магнітні бурі:"
+- "Магнітні бурі сьогодні: прогноз та вплив на здоров'я..."
+- "Актуальні прогнози..."
+- "Що треба знати..."
+- "Рівні KP..."
+- "Вплив на здоров'я" без реальної потреби
+- занадто загальних або рекламних формулювань
+- сухих формулювань на кшталт "активність залишається на низькому рівні", якщо можна сказати живіше
 
-Стиль і структура — як у реальних українських новинних порталах:
+Орієнтуйся на такі патерни:
+- Магнітні бурі 15 квітня: якою буде сонячна активність сьогодні
+- Прогноз магнітних бур на 15 квітня: що очікується сьогодні
+- Сонячна активність 15 квітня: чи прогнозують магнітні бурі
+- Магнітні бурі 15 квітня: що показує прогноз NOAA
+- Магнітні бурі 15 квітня: чи буде відчутною сонячна активність
+- Прогноз магнітних бур на сьогодні: чого чекати 15 квітня
 
-1. Перший абзац: головна новина дня — який K-індекс, який рівень (зелений/жовтий/помаранчевий/червоний), чи очікується магнітна буря. 2-3 речення.
+Поверни тільки один готовий заголовок.`;
 
-2. Другий абзац: деталі — швидкість сонячного вітру, густина плазми, що відбувалося на Сонці за останню добу. Якщо G0 — зазнач що суттєвих спалахів не зафіксовано. 2-3 речення.
+    const contentUkPrompt = `Ти — редактор українського новинного сайту про космічну погоду. Напиши повну новину українською на основі реальних даних NOAA.
 
-3. Третій абзац: прогноз на найближчі 1-2 дні з конкретними значеннями K-індексу з даних прогнозу. Можна згадати "за даними NOAA". 2-3 речення.
+Дані:
+- Дата: ${dateUk}
+- Поточний Kp-індекс: ${latestKp.toFixed(1)}
+- Поточна G-шкала: G${currentG}
+- Сонячний вітер: ${windSpeed.toFixed(0)} км/с
+- Густина плазми: ${windDensity.toFixed(1)} p/cm³
+- Прогноз на найближчі дні: ${forecastText}
 
-4. Четвертий абзац: короткий дисклеймер що прогнози можуть змінюватися, бо дані оновлюються що три години, і найточніші прогнози — на один день наперед. Якщо K-індекс ≥ 4, додай пораду для метеозалежних. 1-2 речення.
+Вимоги:
+- Тільки українська
+- Стиль: новинний, людяний, природний, але точний
+- Без markdown і списків
+- 4-6 абзаців
+- Довжина: 1400-2200 символів
+- Не дублюй телеграм-формат, це повна новина для сайту
+- Не вигадуй цифри поза даними
+- Згадуй NOAA як джерело прогнозу
+- Зроби помітний, але не клікбейтний акцент на тому, як геомагнітна активність може позначитися на самопочутті метеочутливих людей
+- Якщо активність слабка, поясни це спокійно і без перебільшення
+- Якщо є ризик погіршення самопочуття, опиши його простою людською мовою: головний біль, втома, дратівливість, порушення сну, коливання тиску
+- Один із центральних абзаців має бути саме про можливий вплив на самопочуття, але без медичних страшилок
+- Наприкінці коротко вкажи, що ситуація може оновлюватися протягом дня
 
-Критичні вимоги:
-- Поверни ТІЛЬКИ текст новини, без заголовка, без JSON, без markdown
-- Абзаци розділені подвійним переносом рядка
-- Загальна довжина: 800-1200 символів
-- Стиль: стриманий, інформативний, журналістський
-- НЕ використовуй емодзі, markdown, списки
-- НЕ вигадуй дані — використовуй ТІЛЬКИ надані числа
-- НЕ згадуй сайт magnitca.com
-- НЕ посилайся на інші джерела крім NOAA — ми самі є джерелом`;
+Поверни тільки текст новини.`;
 
-    const titlePrompt = `Придумай стислий заголовок для новини про магнітні бурі на ${dateStr}. Kp=${latestKp.toFixed(1)}, G${currentG}.
-Приклади: "Магнітні бурі 20 лютого: прогноз геомагнітної активності", "Сонячна активність 20 лютого: чого очікувати".
-Поверни ТІЛЬКИ заголовок, 50-80 символів, без лапок, без markdown.`;
-
-    // Fire both requests in parallel
-    const [contentRes, titleRes] = await Promise.all([
-      fetch(AI_GATEWAY, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "google/gemini-2.5-flash", messages: [{ role: "user", content: contentPrompt }], max_tokens: 2000 }),
-      }),
-      fetch(AI_GATEWAY, {
-        method: "POST",
-        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ model: "google/gemini-2.5-flash-lite", messages: [{ role: "user", content: titlePrompt }], max_tokens: 200 }),
-      }),
+    const [titleUk, contentUk] = await Promise.all([
+      askAi(OPENAI_API_KEY, titleUkPrompt, "gpt-4o-mini", 200),
+      askAi(OPENAI_API_KEY, contentUkPrompt, "gpt-4o-mini", 2600),
     ]);
 
-    if (!contentRes.ok) throw new Error(`AI content error [${contentRes.status}]: ${await contentRes.text()}`);
-    if (!titleRes.ok) throw new Error(`AI title error [${titleRes.status}]: ${await titleRes.text()}`);
+    const cleanTitleUk = titleUk.replace(/^["«]|["»]$/g, "").trim();
+    const translateTitleRuPrompt = `Переведи этот украинский SEO-заголовок на русский язык максимально близко по смыслу и тону.
 
-    const [contentData, titleData] = await Promise.all([contentRes.json(), titleRes.json()]);
-    
-    const articleContent = contentData.choices?.[0]?.message?.content?.trim();
-    const articleTitle = titleData.choices?.[0]?.message?.content?.trim()?.replace(/^["«]|["»]$/g, "") || `Прогноз магнітних бур — ${dateStr}`;
-    
-    if (!articleContent || articleContent.length < 200) {
-      throw new Error(`AI returned insufficient content (${articleContent?.length || 0} chars)`);
-    }
+Украинский заголовок:
+${cleanTitleUk}
 
-    const article = { title: articleTitle, content: articleContent };
+Требования:
+- Только русский язык
+- Сохрани смысл, тон и SEO-характер заголовка
+- Без кавычек и markdown
+- Не добавляй новых фактов
 
-    // 3. Generate cover image
-    let imageUrl: string | null = null;
-    try {
-      const imagePrompt = `Generate an image: a wide social media card (1200x600, landscape 2:1 aspect ratio). Background: smooth dark gradient with subtle aurora/northern lights and cosmic effects. Large bold white centered text: "${article.title}". Bottom right corner small text: "magnitca.com". Minimalist, space-themed, no faces, no photos of people. The text must be in Ukrainian language exactly as provided.`;
+Верни только готовый заголовок.`;
 
-      const imgRes = await fetch(AI_GATEWAY, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-pro-image-preview",
-          messages: [{ role: "user", content: imagePrompt }],
-          modalities: ["image", "text"],
-        }),
-      });
+    const translateContentRuPrompt = `Переведи эту украинскую новость на русский язык максимально близко к оригиналу.
 
-      if (imgRes.ok) {
-        const imgData = await imgRes.json();
-        const base64Image = imgData.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-        if (base64Image) {
-          const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, "");
-          const binaryData = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
-          // Convert to WebP for smaller file size
-          const fileName = `${slugify(article.title)}-${Date.now()}.webp`;
+Украинский текст:
+${contentUk}
 
-          const { error: uploadErr } = await supabase.storage
-            .from("news-images")
-            .upload(fileName, binaryData, { contentType: "image/webp", upsert: true });
+Требования:
+- Только русский язык
+- Сохрани структуру, смысл, факты, числа и тон оригинала
+- Не сокращай и не расширяй материал заметно
+- Не добавляй новых фактов от себя
+- Используй естественный грамотный русский язык без украинских слов, англицизмов и технических артефактов
+- Не используй markdown
 
-          if (!uploadErr) {
-            const { data: urlData } = supabase.storage.from("news-images").getPublicUrl(fileName);
-            imageUrl = urlData.publicUrl;
-          } else {
-            console.error("Upload error:", uploadErr);
-          }
-        }
-      }
-    } catch (imgErr) {
-      console.error("Image generation error:", imgErr);
-    }
+Верни только готовый перевод.`;
 
-    // 4. Save to DB
-    const baseSlug = slugify(article.title);
-    const { count } = await supabase.from("news").select("id", { count: "exact", head: true }).like("slug", `${baseSlug}%`);
-    const slug = count && count > 0 ? `${baseSlug}-${count + 1}` : baseSlug;
+    const [titleRu, contentRu] = await Promise.all([
+      askAi(OPENAI_API_KEY, translateTitleRuPrompt, "gpt-4o-mini", 220),
+      askAi(OPENAI_API_KEY, translateContentRuPrompt, "gpt-4o-mini", 3000),
+    ]);
 
-    const { data: inserted, error: dbError } = await supabase.from("news").insert({
-      title: article.title,
-      content: article.content,
-      slug,
+    const cleanTitleRu = titleRu.replace(/^["«]|["»]$/g, "").trim();
+
+    const svgMarkup = generateFallbackImage(cleanTitleUk, dateUk, currentG);
+    const binaryData = new TextEncoder().encode(svgMarkup);
+    const fileName = `${slugify(cleanTitleUk)}-${Date.now()}.svg`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("news-images")
+      .upload(fileName, binaryData, { contentType: "image/svg+xml", upsert: true });
+
+    if (uploadError) throw new Error(`Image upload error: ${uploadError.message}`);
+
+    const { data: publicImage } = supabase.storage.from("news-images").getPublicUrl(fileName);
+    const imageUrl = publicImage.publicUrl;
+
+    const payload = {
+      title: cleanTitleUk,
+      slug: slugUk,
+      content: contentUk,
+      source: "daily_ai",
       image_url: imageUrl,
-      source: "ai",
+      meta_title: cleanTitleUk,
+      meta_description: contentUk.replace(/\s+/g, " ").slice(0, 160),
+      status: "published",
       telegram_sent: false,
-    }).select().single();
+      title_uk: cleanTitleUk,
+      slug_uk: slugUk,
+      content_uk: contentUk,
+      meta_title_uk: cleanTitleUk,
+      meta_description_uk: contentUk.replace(/\s+/g, " ").slice(0, 160),
+      title_ru: cleanTitleRu,
+      slug_ru: slugRu,
+      content_ru: contentRu,
+      meta_title_ru: cleanTitleRu,
+      meta_description_ru: contentRu.replace(/\s+/g, " ").slice(0, 160),
+      published_at: now.toISOString(),
+    };
 
-    if (dbError) {
-      console.error("DB insert error:", dbError);
-      throw new Error(`DB error: ${dbError.message}`);
+    let newsId = existingNews?.id ?? null;
+
+    if (existingNews?.id) {
+      const { data: updated, error: updateError } = await supabase
+        .from("news")
+        .update(payload)
+        .eq("id", existingNews.id)
+        .select("id")
+        .single();
+
+      if (updateError) throw new Error(updateError.message);
+      newsId = updated.id;
+    } else {
+      const { data: inserted, error: insertError } = await supabase
+        .from("news")
+        .insert(payload)
+        .select("id")
+        .single();
+
+      if (insertError) throw new Error(insertError.message);
+      newsId = inserted.id;
     }
 
     return new Response(
-      JSON.stringify({ success: true, article: inserted }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({
+        success: true,
+        news_id: newsId,
+        slug_uk: slugUk,
+        slug_ru: slugRu,
+        image_url: imageUrl,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {
-    console.error("Error:", error);
-    const msg = error instanceof Error ? error.message : "Unknown error";
-    return new Response(JSON.stringify({ success: false, error: msg }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.error("generate-news error:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
+    return new Response(
+      JSON.stringify({ success: false, error: message }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 });

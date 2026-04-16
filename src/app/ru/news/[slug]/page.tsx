@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getNewsArticleBySlug } from "@/lib/server-news";
 import { absoluteUrl } from "@/lib/site";
 
@@ -61,7 +61,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function RussianNewsArticlePage({ params }: Params) {
   const { slug } = await params;
-  const article = await getNewsArticleBySlug(slug, "ru").catch(() => null);
+  let article = await getNewsArticleBySlug(slug, "ru").catch(() => null);
+
+  if (!article) {
+    const ukrainianArticle = await getNewsArticleBySlug(slug, "uk").catch(() => null);
+    if (ukrainianArticle?.alternateSlug) {
+      redirect(`/ru/news/${ukrainianArticle.alternateSlug}`);
+    }
+  }
 
   if (!article) {
     notFound();
