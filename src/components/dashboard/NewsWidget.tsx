@@ -22,6 +22,7 @@ export const NewsWidget = ({ className }: { className?: string }) => {
         .from("news")
         .select("id, title_uk, slug_uk, title_ru, slug_ru, published_at")
         .eq("status", "published")
+        .neq("source", "telegram_ai")
         .order("published_at", { ascending: false })
         .limit(4);
       if (error) throw error;

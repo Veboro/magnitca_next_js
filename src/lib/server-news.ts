@@ -49,6 +49,7 @@ export async function getLatestNews(limit = 30, locale: SiteLocale = "uk"): Prom
       "id, published_at, image_url, status, title_uk, slug_uk, meta_description_uk, title_ru, slug_ru, meta_description_ru"
     )
     .eq("status", "published")
+    .neq("source", "telegram_ai")
     .order("published_at", { ascending: false })
     .limit(limit);
 
@@ -88,6 +89,7 @@ export async function getNewsArticleBySlug(
     .select("*")
     .eq(slugColumn, slug)
     .eq("status", "published")
+    .neq("source", "telegram_ai")
     .maybeSingle();
 
   if (!data) {
@@ -96,6 +98,7 @@ export async function getNewsArticleBySlug(
       .select("*")
       .eq("id", slug)
       .eq("status", "published")
+      .neq("source", "telegram_ai")
       .maybeSingle());
   }
 
