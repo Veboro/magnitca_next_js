@@ -9,13 +9,14 @@ interface NewsItem { id: string; title: string; slug: string | null; published_a
 
 export const NewsWidget = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : "uk-UA";
-  const langPrefix = i18n.language === "ru" ? "/ru" : "";
+  const isRussian = i18n.language === "ru";
+  const locale = isRussian ? "ru-RU" : "uk-UA";
+  const langPrefix = isRussian ? "/ru" : "";
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(locale, { day: "numeric", month: "short" });
 
   const { data: news = [], isLoading } = useQuery<NewsItem[]>({
-    queryKey: ["news-widget"],
+    queryKey: ["news-widget", i18n.language],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("news")
@@ -27,8 +28,8 @@ export const NewsWidget = ({ className }: { className?: string }) => {
       return (data ?? [])
         .map((item) => ({
           id: item.id,
-          title: i18n.language === "ru" ? item.title_ru : item.title_uk,
-          slug: i18n.language === "ru" ? item.slug_ru : item.slug_uk,
+          title: isRussian ? item.title_ru : item.title_uk,
+          slug: isRussian ? item.slug_ru : item.slug_uk,
           published_at: item.published_at,
         }))
         .filter((item) => item.title && item.slug) as NewsItem[];

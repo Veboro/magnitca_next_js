@@ -75,11 +75,15 @@ function gScaleToLabel(g: number) {
   return "спокійна геомагнітна обстановка";
 }
 
-function gScaleToEmoji(g: number) {
-  if (g >= 4) return "🔴";
-  if (g >= 3) return "🟠";
-  if (g >= 1) return "🟡";
+function kpToEmoji(kp: number) {
+  if (kp >= 7) return "🔴";
+  if (kp >= 5) return "🟠";
+  if (kp >= 4) return "🟡";
   return "🟢";
+}
+
+function kpLegendLine() {
+  return "🟢🟡🟠🔴";
 }
 
 function escapeXml(text: string) {
@@ -201,6 +205,84 @@ function buildUpcomingDays(kpForecastRaw: ForecastRow[], todayKey: string) {
   });
 }
 
+function formatKyivShortDate(isoDate: string) {
+  const date = new Date(`${isoDate}T00:00:00Z`);
+  return new Intl.DateTimeFormat("uk-UA", {
+    timeZone: "Europe/Kyiv",
+    day: "numeric",
+    month: "long",
+  }).format(date);
+}
+
+function buildForecastEmojiLines(
+  todayLabel: string,
+  todayMaxKp: number,
+  upcoming: Array<{ date: string; maxKp: number; avgKp: number; gScale: number }>,
+) {
+  const lines = [`${todayLabel}: ${kpToEmoji(todayMaxKp)} Kp ${todayMaxKp.toFixed(1)}`];
+  for (const item of upcoming.slice(0, 2)) {
+    lines.push(`${formatKyivShortDate(item.date)}: ${kpToEmoji(item.maxKp)} Kp ${item.maxKp.toFixed(1)}`);
+  }
+  return lines.join("; ");
+}
+
+function summarizeTodayWindows(todayForecast: Array<{ timeTag: string; kp: number; observed: boolean }>) {
+  if (!todayForecast.length) {
+    return {
+      strongestStart: null as string | null,
+      strongestEnd: null as string | null,
+      strongestMaxKp: 0,
+      strongestG: 0,
+      windowsText: "прогноз на добу поки обмежений",
+    };
+  }
+
+  const windows = [
+    { key: "night", label: "вночі", hours: [0, 3, 6] },
+    { key: "morning", label: "вранці", hours: [6, 9, 12] },
+    { key: "day", label: "вдень", hours: [12, 15, 18] },
+    { key: "evening", label: "увечері", hours: [18, 21, 24] },
+  ];
+
+  const dataByHour = new Map<number, number>();
+  for (const item of todayForecast) {
+    const kyivHour = Number(
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Europe/Kyiv",
+        hour: "2-digit",
+        hour12: false,
+      }).format(new Date(item.timeTag)),
+    );
+    dataByHour.set(kyivHour, item.kp);
+  }
+
+  const summarized = windows.map((window) => {
+    const values = window.hours
+      .map((hour) => dataByHour.get(hour))
+      .filter((value): value is number => typeof value === "number");
+    const maxKp = values.length ? Math.max(...values) : 0;
+    return {
+      ...window,
+      maxKp,
+      gScale: maxKp >= 5 ? Math.min(Math.floor(maxKp - 4), 5) : 0,
+    };
+  });
+
+  const strongest = summarized.reduce((best, item) => (item.maxKp > best.maxKp ? item : best), summarized[0]);
+  const windowsText = summarized
+    .filter((item) => item.maxKp > 0)
+    .map((item) => `${item.label} — до Kp ${item.maxKp.toFixed(1)} (G${item.gScale})`)
+    .join("; ");
+
+  return {
+    strongestStart: strongest?.hours?.[0] !== undefined ? `${String(strongest.hours[0]).padStart(2, "0")}:00` : null,
+    strongestEnd: strongest?.hours?.[1] !== undefined ? `${String(strongest.hours[1]).padStart(2, "0")}:00` : null,
+    strongestMaxKp: strongest?.maxKp ?? 0,
+    strongestG: strongest?.gScale ?? 0,
+    windowsText,
+  };
+}
+
 async function generateAiText({
   openAiApiKey,
   dateLabel,
@@ -211,6 +293,11 @@ async function generateAiText({
   windSpeed,
   windDensity,
   upcoming,
+  todayWindowsText,
+  strongestStart,
+  strongestEnd,
+  strongestMaxKp,
+  strongestG,
 }: {
   openAiApiKey: string;
   dateLabel: string;
@@ -221,38 +308,88 @@ async function generateAiText({
   windSpeed: number;
   windDensity: number;
   upcoming: Array<{ date: string; maxKp: number; avgKp: number; gScale: number }>;
+  todayWindowsText: string;
+  strongestStart: string | null;
+  strongestEnd: string | null;
+  strongestMaxKp: number;
+  strongestG: number;
 }) {
-  const titlePrompt = `Ти пишеш заголовок для Telegram-поста і новини українською.
-Тема: магнітні бурі сьогодні, дата ${dateLabel}, поточний Kp ${latestKp.toFixed(1)}, прогнозний максимум сьогодні ${todayMaxKp.toFixed(1)}, G${currentG}.
-Поверни ТІЛЬКИ один природний журналістський заголовок українською, 55-90 символів, без лапок і без markdown.`;
+  const forecastEmojiLines = buildForecastEmojiLines(dateLabel, todayMaxKp, upcoming);
+  const likelyBodyImpact =
+    todayMaxKp >= 5
+      ? "можливий відчутніший вплив на самопочуття, особливо в чутливих людей"
+      : todayMaxKp >= 4
+        ? "у чутливих людей можливі втома, головний біль або коливання тиску"
+        : "помітного впливу на самопочуття для більшості людей не очікується";
 
-  const textPrompt = `Ти — редактор Telegram-каналу про магнітні бурі. Напиши живий, людяний, але точний пост українською на основі реальних даних NOAA.
+  const titlePrompt = `Ти пишеш заголовок для Telegram-поста українською в стилі інформаційного каналу про магнітні бурі.
 
-Дані на сьогодні (${dateLabel}, ключ дати ${dateKey}):
+Дані:
+- Дата: ${dateLabel}
+- Поточний Kp: ${latestKp.toFixed(1)}
+- Максимум на сьогодні: ${todayMaxKp.toFixed(1)}
+- Найпомітніший відрізок доби: ${strongestStart && strongestEnd ? `${strongestStart}–${strongestEnd}, до Kp ${strongestMaxKp.toFixed(1)}` : "даних недостатньо"}
+- Коротко по добі: ${todayWindowsText}
+
+Вимоги:
+- один заголовок
+- українська мова
+- 55-95 символів
+- стиль: телеграм-канал / новинний канал, але без клікбейту
+- має відображати не лише ранок, а загальну картину дня
+- якщо суттєве посилення очікується пізніше, це можна винести в заголовок
+- без лапок, без markdown, без емодзі
+
+Поверни тільки готовий заголовок.`;
+
+  const textPrompt = `Ти — редактор українського Telegram-каналу про магнітні бурі. Напиши інформативний пост у стилі живого каналу: коротко, чітко, по-людськи, без канцеляриту, з акцентом на об'єктивний прогноз на весь день.
+
+Дані NOAA на сьогодні (${dateLabel}, ключ дати ${dateKey}):
 - Поточний Kp-індекс: ${latestKp.toFixed(1)}
-- Поточна G-шкала: G${currentG}
 - Максимальний прогноз Kp на сьогодні: ${todayMaxKp.toFixed(1)}
 - Сонячний вітер: ${windSpeed.toFixed(0)} км/с
 - Густина сонячного вітру: ${windDensity.toFixed(1)} p/cm³
-- Наступні дні: ${upcoming.map((item) => `${item.date}: max Kp ${item.maxKp.toFixed(1)}, avg Kp ${item.avgKp.toFixed(1)}, G${item.gScale}`).join("; ")}
+- Картина по відрізках доби: ${todayWindowsText}
+- Найпомітніший відрізок: ${strongestStart && strongestEnd ? `${strongestStart}–${strongestEnd}, до Kp ${strongestMaxKp.toFixed(1)}` : "даних недостатньо"}
+- Наступні дні: ${upcoming.map((item) => `${formatKyivShortDate(item.date)}: max Kp ${item.maxKp.toFixed(1)}, avg Kp ${item.avgKp.toFixed(1)}`).join("; ")}
+- Ймовірний висновок по самопочуттю: ${likelyBodyImpact}
+- Формат блоку прогнозу по днях: ${forecastEmojiLines}
 
 Вимоги:
-- Формат для Telegram, без markdown
-- Додай 2-4 доречні емодзі, щоб текст був живішим, але без перевантаження
-- Тон: як жива людина, не канцелярит, не суха зведенка
-- Не вигадуй нічого поза цими даними
-- Якщо бурі фактично не очікуються, скажи це спокійно і прямо
-- Якщо активність підвищена, коротко поясни, як це може позначитися на самопочутті
-- Додай короткий блок з цифрами
-- В кінці дай природний заклик стежити за оновленнями на magnitca.com
-- Довжина: 650-950 символів
+- тільки українська мова
+- без markdown
+- 2-5 доречних емодзі, але стримано
+- текст має бути об'єктивним і враховувати весь день
+- не вигадуй фактів поза цими даними
+- якщо день загалом спокійний, але ввечері можливе посилення, скажи це прямо
+- окремо коротко поясни, чи можливий вплив на самопочуття і в які години це ймовірніше
+- не перебільшуй загрозу, якщо дані цього не підтверджують
+- довжина: 700-1100 символів
+- не використовуй сухі фрази типу "ми спостерігаємо", "ситуація характеризується", "відбуватиметься"
+- не пиши як пресреліз або машинний звіт
+- стиль має бути близьким до телеграм-поста з прикладу
+- не допускай логічних суперечностей у часових формулюваннях
+- якщо найсильніший відрізок припадає на ніч, не пиши, що "день розпочнеться" з цього піку
+- тон: живий, але стриманий; ніби канал пояснює ситуацію своїм читачам
+- речення мають бути короткими або середніми, без перевантажених конструкцій
+- якщо день загалом неважкий, прямо скажи про це: без драматизації, але й без сухості
+- блок про самопочуття пиши м'яко і практично: що можуть відчути метеочутливі люди і що краще зробити
+- завершення коротке, природне, без рекламного пафосу
 
 Структура:
-1. Короткий емоційно-інформативний вступ про ситуацію сьогодні
-2. Абзац з поясненням, що означають ці показники
-3. Блок з цифрами
-4. 1-2 речення про найближчі дні
-5. Коротке завершення
+1. Короткий лід з оцінкою ситуації на день
+2. Абзац про те, як розподіляється активність упродовж доби
+3. Блок "📊 Показники:" з короткими цифрами на окремих рядках
+4. Блок "📅 Прогноз (${kpLegendLine()}):" на 2-3 найближчі дні, де кожен день на новому рядку у форматі "17 квітня: 🟠 Kp 5.7"
+5. Короткий висновок про самопочуття і завершення зі згадкою magnitca.com
+
+Орієнтир по тону:
+- близько до формату "сьогодні так, вдень так, увечері так, ось показники, ось прогноз"
+- текст має читатися як пост каналу, а не як машинна довідка
+- припустимі конструкції: "сьогодні магнітних бур не очікується", "увечері можливе посилення", "найнапруженіший відрізок доби", "можна трохи видихнути"
+- добрий орієнтир стилю: "день загалом не виглядає важким, але повністю тихим його теж не назвеш"
+- ще один орієнтир: "для більшості людей це буде цілком нормальний день"
+- не використовуй надто офіційні слова на кшталт "суттєвих відхилень", якщо є простіший варіант
 
 Поверни тільки готовий текст поста.`;
 
@@ -433,7 +570,7 @@ Deno.serve(async (req) => {
 
     const { data: existingPost, error: existingError } = await supabase
       .from("news")
-      .select("id, slug_uk, telegram_sent")
+      .select("id, slug_uk, slug_ru, telegram_sent, source, title_ru, content_ru, image_url")
       .eq("slug_uk", slugUk)
       .maybeSingle();
 
@@ -472,6 +609,7 @@ Deno.serve(async (req) => {
     const todayForecast = buildTodayForecast(kpForecastRaw, kyivDateKey);
     const todayMaxKp = todayForecast.length ? Math.max(...todayForecast.map((item) => item.kp)) : latestKp;
     const upcoming = buildUpcomingDays(kpForecastRaw, kyivDateKey);
+    const todayWindows = summarizeTodayWindows(todayForecast);
 
     const { title, text } = await generateAiText({
       openAiApiKey: OPENAI_API_KEY,
@@ -483,6 +621,11 @@ Deno.serve(async (req) => {
       windSpeed,
       windDensity,
       upcoming,
+      todayWindowsText: todayWindows.windowsText,
+      strongestStart: todayWindows.strongestStart,
+      strongestEnd: todayWindows.strongestEnd,
+      strongestMaxKp: todayWindows.strongestMaxKp,
+      strongestG: todayWindows.strongestG,
     });
     const telegramCaption = clampTelegramCaption(text);
 
@@ -498,30 +641,36 @@ Deno.serve(async (req) => {
     const { data: imagePublic } = supabase.storage.from("news-images").getPublicUrl(fileName);
     const imageUrl = imagePublic.publicUrl;
 
-    const payload = {
-      title,
-      slug: slugUk,
-      content: text,
-      source: "telegram_ai",
-      image_url: imageUrl,
-      meta_title: title,
-      meta_description: telegramCaption.replace(/\s+/g, " ").slice(0, 160),
-      status: "published",
-      telegram_sent: true,
-      title_uk: title,
-      slug_uk: slugUk,
-      content_uk: text,
-      meta_title_uk: title,
-      meta_description_uk: telegramCaption.replace(/\s+/g, " ").slice(0, 160),
-      published_at: now.toISOString(),
-    };
-
     let newsId = existingPost?.id ?? null;
 
     if (existingPost?.id) {
+      const hasLocalizedSiteContent = Boolean(existingPost.slug_ru && existingPost.title_ru && existingPost.content_ru);
+      const updatePayload = hasLocalizedSiteContent
+        ? {
+            telegram_sent: true,
+            image_url: existingPost.image_url || imageUrl,
+          }
+        : {
+            title,
+            slug: slugUk,
+            content: text,
+            source: "telegram_ai",
+            image_url: imageUrl,
+            meta_title: title,
+            meta_description: telegramCaption.replace(/\s+/g, " ").slice(0, 160),
+            status: "published",
+            telegram_sent: true,
+            title_uk: title,
+            slug_uk: slugUk,
+            content_uk: text,
+            meta_title_uk: title,
+            meta_description_uk: telegramCaption.replace(/\s+/g, " ").slice(0, 160),
+            published_at: now.toISOString(),
+          };
+
       const { data: updatedNews, error: updateError } = await supabase
         .from("news")
-        .update(payload)
+        .update(updatePayload)
         .eq("id", existingPost.id)
         .select("id")
         .single();
@@ -529,6 +678,24 @@ Deno.serve(async (req) => {
       if (updateError) throw new Error(updateError.message);
       newsId = updatedNews.id;
     } else {
+      const payload = {
+        title,
+        slug: slugUk,
+        content: text,
+        source: "telegram_ai",
+        image_url: imageUrl,
+        meta_title: title,
+        meta_description: telegramCaption.replace(/\s+/g, " ").slice(0, 160),
+        status: "published",
+        telegram_sent: true,
+        title_uk: title,
+        slug_uk: slugUk,
+        content_uk: text,
+        meta_title_uk: title,
+        meta_description_uk: telegramCaption.replace(/\s+/g, " ").slice(0, 160),
+        published_at: now.toISOString(),
+      };
+
       const { data: insertedNews, error: insertError } = await supabase
         .from("news")
         .insert(payload)

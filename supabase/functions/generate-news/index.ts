@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
 
     const { data: existingNews, error: existingError } = await supabase
       .from("news")
-      .select("id, slug_uk")
+      .select("id, slug_uk, telegram_sent")
       .eq("slug_uk", slugUk)
       .maybeSingle();
 
@@ -417,6 +417,7 @@ ${contentUk}
       meta_title_ru: cleanTitleRu,
       meta_description_ru: contentRu.replace(/\s+/g, " ").slice(0, 160),
       published_at: now.toISOString(),
+      telegram_sent: existingNews?.telegram_sent ?? false,
     };
 
     let newsId = existingNews?.id ?? null;
