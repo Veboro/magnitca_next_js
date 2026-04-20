@@ -12,15 +12,8 @@ export function useKpForecast() {
   return useQuery<KpForecastEntry[]>({
     queryKey: ["kp-forecast-3day"],
     queryFn: async () => {
-      const res = await fetch(
-        "https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json"
-      );
-      const data = await res.json();
-      // API returns array of objects: {time_tag, kp, observed, noaa_scale}
-      return (data as any[]).map((d) => ({
-        time_tag: d.time_tag,
-        kp: parseFloat(d.kp) || 0,
-      }));
+      const res = await fetch("/api/space-weather/kp-forecast-3day");
+      return await res.json();
     },
     refetchInterval: 300000, // every 5 min
     staleTime: 120000,

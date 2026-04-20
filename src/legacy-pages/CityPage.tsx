@@ -1,9 +1,12 @@
 "use client";
 
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel, formatApiLocalTime } from "@/hooks/useCityWeather";
+import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
+import { useCitySunTimes } from "@/hooks/useCitySunTimes";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
+import { useKpForecast27Day } from "@/hooks/useKpForecast27Day";
+import { formatApiLocalTime } from "@/lib/city-sun-times";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -272,31 +275,22 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: LegacyLocal
   const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
 
   const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, undefined, locale);
+  const { data: sunTimes } = useCitySunTimes({
+    lat: city?.lat ?? 50.4501,
+    lon: city?.lon ?? 30.5234,
+    timezone: city?.timezone ?? "Europe/Kyiv",
+    locale,
+    fallback: data?.current
+      ? {
+          sunrise: data.current.sunrise,
+          sunset: data.current.sunset,
+        }
+      : null,
+  });
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
   const { data: forecast, isLoading: forecastLoading } = useKpForecast();
-
-  const { data: forecast27 = [], isLoading: forecast27Loading } = useQuery<{ date: string; kp: number }[]>({
-    queryKey: ["forecast-27day"],
-    queryFn: async () => {
-      const res = await fetch("https://services.swpc.noaa.gov/text/27-day-outlook.txt");
-      const text = await res.text();
-      const lines = text.split("\n");
-      const result: { date: string; kp: number }[] = [];
-      for (const line of lines) {
-        const match = line.match(/^(\d{4})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+\d+\s+\d+\s+([\d.]+)/);
-        if (match) {
-          const [, year, mon, day, kp] = match;
-          const monthMap: Record<string, string> = { Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06", Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12" };
-          result.push({ date: `${year}-${monthMap[mon]}-${day.padStart(2, "0")}`, kp: parseFloat(kp) });
-        }
-      }
-      const today = new Date().toISOString().slice(0, 10);
-      return result.filter((d) => d.date >= today);
-    },
-    refetchInterval: 600000,
-    staleTime: 300000,
-  });
+  const { data: forecast27 = [], isLoading: forecast27Loading } = useKpForecast27Day();
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
@@ -356,15 +350,15 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: LegacyLocal
                 </h3>
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5 text-muted-foreground"><Sunrise className="h-3.5 w-3.5 text-amber-400" />{t.sunrise}</span>
-                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(data.current.sunrise)}</span>
+                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(sunTimes?.sunrise ?? data.current.sunrise)}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5 text-muted-foreground"><Sunset className="h-3.5 w-3.5 text-orange-400" />{t.sunset}</span>
-                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(data.current.sunset)}</span>
+                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(sunTimes?.sunset ?? data.current.sunset)}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs border-t border-border/30 pt-1.5">
                   <span className="text-muted-foreground">{t.dayLength}</span>
-                  <span className="font-mono font-medium text-foreground">{data.current.dayLength}</span>
+                  <span className="font-mono font-medium text-foreground">{sunTimes?.dayLength ?? data.current.dayLength}</span>
                 </div>
               </div>
             )}

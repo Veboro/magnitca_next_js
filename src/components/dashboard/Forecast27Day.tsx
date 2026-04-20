@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { useQuery } from "@tanstack/react-query";
 import { CalendarDays } from "lucide-react";
 import { useMemo } from "react";
+import { useKpForecast27Day } from "@/hooks/useKpForecast27Day";
+
+type ForecastDay = { date: string; kp: number };
 
 const kpColor = (kp: number) => {
   if (kp >= 7) return "bg-storm-severe/15 text-storm-severe border-storm-severe/30";
@@ -20,34 +22,11 @@ const kpDot = (kp: number) => {
   return "bg-storm-quiet";
 };
 
-interface ForecastDay { date: string; kp: number; }
-
 export const Forecast27Day = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
   const weekdays = [t("forecast27.mon"), t("forecast27.tue"), t("forecast27.wed"), t("forecast27.thu"), t("forecast27.fri"), t("forecast27.sat"), t("forecast27.sun")];
-
-  const { data: days = [], isLoading } = useQuery<ForecastDay[]>({
-    queryKey: ["forecast-27day"],
-    queryFn: async () => {
-      const res = await fetch("https://services.swpc.noaa.gov/text/27-day-outlook.txt");
-      const text = await res.text();
-      const lines = text.split("\n");
-      const result: ForecastDay[] = [];
-      for (const line of lines) {
-        const match = line.match(/^(\d{4})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+(\d{1,2})\s+\d+\s+\d+\s+([\d.]+)/);
-        if (match) {
-          const [, year, mon, day, kp] = match;
-          const monthMap: Record<string, string> = { Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06", Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12" };
-          result.push({ date: `${year}-${monthMap[mon]}-${day.padStart(2, "0")}`, kp: parseFloat(kp) });
-        }
-      }
-      const today = new Date().toISOString().slice(0, 10);
-      return result.filter((d) => d.date >= today);
-    },
-    refetchInterval: 600000,
-    staleTime: 300000,
-  });
+  const { data: days = [], isLoading } = useKpForecast27Day();
 
   const weeks = useMemo(() => {
     if (!days.length) return [];
