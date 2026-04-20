@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { CITIES } from "@/data/cities";
+import { ALL_UK_CITIES } from "@/data/cities";
+import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
 import { getLatestNews } from "@/lib/server-news";
 import { SITE_URL } from "@/lib/site";
@@ -15,6 +16,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/faq",
     "/about",
     "/contacts",
+    "/cities",
     "/privacy",
     "/cookies",
     "/terms",
@@ -33,6 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/ru/faq",
     "/ru/about",
     "/ru/contacts",
+    "/ru/cities",
     "/ru/privacy",
     "/ru/cookies",
     "/ru/terms",
@@ -42,16 +45,40 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "/ru" ? 0.9 : 0.6,
   }));
 
-  const cityPages: MetadataRoute.Sitemap = CITIES.map((city) => ({
+  const plStaticPages: MetadataRoute.Sitemap = [
+    "/pl",
+    "/pl/test",
+    "/pl/calendar",
+    "/pl/kp-index",
+    "/pl/solar-wind",
+    "/pl/faq",
+    "/pl/about",
+    "/pl/contacts",
+    "/pl/privacy",
+    "/pl/cookies",
+    "/pl/terms",
+  ].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    changeFrequency: path === "/pl" ? "hourly" : "daily",
+    priority: path === "/pl" ? 0.85 : 0.6,
+  }));
+
+  const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/city/${city.slug}`,
     changeFrequency: "hourly",
     priority: 0.8,
   }));
 
-  const ruCityPages: MetadataRoute.Sitemap = CITIES.map((city) => ({
+  const ruCityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/ru/city/${getRuCitySlug(city)}`,
     changeFrequency: "hourly",
     priority: 0.7,
+  }));
+
+  const plCityPages: MetadataRoute.Sitemap = CITIES_PL.map((city) => ({
+    url: `${SITE_URL}/pl/city/${city.slug}`,
+    changeFrequency: "hourly",
+    priority: 0.75,
   }));
 
   const newsPages = await getLatestNews(1000, "uk")
@@ -76,5 +103,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
     .catch(() => []);
 
-  return [...staticPages, ...ruStaticPages, ...cityPages, ...ruCityPages, ...newsPages, ...ruNewsPages];
+  return [...staticPages, ...ruStaticPages, ...plStaticPages, ...cityPages, ...ruCityPages, ...plCityPages, ...newsPages, ...ruNewsPages];
 }

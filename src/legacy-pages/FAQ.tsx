@@ -10,6 +10,8 @@ import { HelpCircle, Zap, Heart, Wifi, Sun, Shield, Globe, Activity } from "luci
 import { usePageMeta } from "@/hooks/usePageMeta";
 import type { SiteLocale } from "@/lib/locale";
 
+type LegacyLocale = SiteLocale;
+
 type FAQSection = {
   title: string;
   icon: typeof Zap;
@@ -17,7 +19,7 @@ type FAQSection = {
 };
 
 const copy: Record<
-  SiteLocale,
+  LegacyLocale,
   {
     metaTitle: string;
     metaDescription: string;
@@ -322,6 +324,102 @@ const copy: Record<
       },
     ],
   },
+  pl: {
+    metaTitle: "FAQ — Magnitca | Najczęstsze pytania o burze magnetyczne",
+    metaDescription:
+      "Odpowiedzi na najczęstsze pytania o burze magnetyczne, indeks Kp, wpływ na samopoczucie i technologię. Wszystko prostym językiem.",
+    heading: "Najczęstsze pytania",
+    intro:
+      "Najważniejsze informacje o burzach magnetycznych, aktywności słonecznej oraz ich wpływie na samopoczucie i technologię — w prostym, praktycznym formacie.",
+    sections: [
+      {
+        title: "Podstawy burz magnetycznych",
+        icon: Zap,
+        items: [
+          {
+            q: "Czym jest burza magnetyczna?",
+            a: "Burza magnetyczna to czasowe zaburzenie pola magnetycznego Ziemi wywołane strumieniem naładowanych cząstek ze Słońca. Najczęściej dochodzi do niej po koronalnym wyrzucie masy lub przy napływie szybkiego wiatru słonecznego.",
+          },
+          {
+            q: "Co oznacza indeks Kp?",
+            a: "Indeks Kp to globalny wskaźnik aktywności geomagnetycznej w skali od 0 do 9. Wartości 0-3 oznaczają spokojną sytuację, 4 wskazuje na niestabilne tło, a 5 i więcej oznacza już burzę magnetyczną.",
+          },
+          {
+            q: "Czy burze magnetyczne są takie same w każdym kraju?",
+            a: "Tak, sama aktywność geomagnetyczna ma charakter globalny. Różnice regionalne dotyczą głównie widoczności zorzy polarnej i lokalnych warunków pogodowych, ale nie samej skali burzy.",
+          },
+        ],
+      },
+      {
+        title: "Aktywność słoneczna",
+        icon: Sun,
+        items: [
+          {
+            q: "Czym jest wiatr słoneczny?",
+            a: "Wiatr słoneczny to stały strumień naładowanych cząstek wypływających z korony słonecznej. Jego prędkość i gęstość mają duże znaczenie dla tego, jak silnie zareaguje magnetosfera Ziemi.",
+          },
+          {
+            q: "Co oznacza składowa Bz?",
+            a: "Bz to pionowa składowa międzyplanetarnego pola magnetycznego. Gdy staje się ujemna, cząstkom wiatru słonecznego łatwiej przenikać do magnetosfery, a ryzyko burzy rośnie.",
+          },
+          {
+            q: "Czym jest koronalny wyrzut masy (CME)?",
+            a: "CME to ogromna chmura plazmy i pola magnetycznego wyrzucana ze Słońca. Jeśli jest skierowana ku Ziemi, może wywołać silniejszą burzę magnetyczną po 1-3 dniach.",
+          },
+        ],
+      },
+      {
+        title: "Wpływ na samopoczucie",
+        icon: Heart,
+        items: [
+          {
+            q: "Czy burze magnetyczne naprawdę wpływają na ludzi?",
+            a: "Dane naukowe nie są jednoznaczne, ale wiele osób wrażliwych na pogodę zauważa podczas wzrostu aktywności geomagnetycznej ból głowy, zmęczenie, rozdrażnienie lub problemy ze snem.",
+          },
+          {
+            q: "Kto najczęściej odczuwa taki wpływ?",
+            a: "Najczęściej są to osoby meteowrażliwe, osoby z chorobami układu krążenia, problemami neurologicznymi oraz ci, którzy silnie reagują na wahania pogody i ciśnienia.",
+          },
+          {
+            q: "Jak zachować się w dzień podwyższonej aktywności?",
+            a: "Najlepiej ograniczyć przeciążenia, zadbać o sen, nawodnienie i spokojniejszy rytm dnia. Jeśli masz przewlekłe dolegliwości, warto obserwować samopoczucie uważniej niż zwykle.",
+          },
+        ],
+      },
+      {
+        title: "Wpływ na technologię",
+        icon: Wifi,
+        items: [
+          {
+            q: "Czy burze magnetyczne mogą zakłócać GPS i łączność?",
+            a: "Tak, szczególnie silniejsze burze mogą pogarszać dokładność GPS, łączność radiową i stabilność niektórych systemów satelitarnych.",
+          },
+          {
+            q: "Czy smartfon lub komputer mogą się zepsuć od burzy magnetycznej?",
+            a: "Nie bezpośrednio. Domowa elektronika zwykle jest bezpieczna. Największe ryzyko dotyczy infrastruktury energetycznej, satelitów i systemów opartych na sygnałach radiowych.",
+          },
+        ],
+      },
+      {
+        title: "O serwisie",
+        icon: Activity,
+        items: [
+          {
+            q: "Skąd pochodzą dane na stronie?",
+            a: "Magnitca korzysta z otwartych źródeł danych NOAA Space Weather Prediction Center oraz Open-Meteo. Dane są prezentowane w prostszej, bardziej czytelnej formie.",
+          },
+          {
+            q: "Jak często dane są aktualizowane?",
+            a: "Wiatr słoneczny jest aktualizowany bardzo często, indeks Kp pojawia się w oficjalnych interwałach, a prognozy są odświeżane w ciągu dnia zgodnie z publikacjami źródeł.",
+          },
+          {
+            q: "Czy korzystanie z serwisu jest bezpłatne?",
+            a: "Tak. Publiczna część serwisu jest dostępna bezpłatnie i nie wymaga rejestracji do podstawowego przeglądania danych.",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 function buildFaqJsonLd(sections: FAQSection[]) {
@@ -341,7 +439,7 @@ function buildFaqJsonLd(sections: FAQSection[]) {
   };
 }
 
-const FAQ = ({ locale = "uk" }: { locale?: SiteLocale }) => {
+const FAQ = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const t = copy[locale];
   const faqJsonLd = buildFaqJsonLd(t.sections);
 

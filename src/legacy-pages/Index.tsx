@@ -2,7 +2,6 @@
 
 import { Wind, Gauge, Radio, Sun, Activity, Thermometer, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MetricCard } from "@/components/dashboard/MetricCard";
@@ -15,7 +14,9 @@ import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 import { CITIES } from "@/data/cities";
+import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
+import type { SiteLocale } from "@/lib/locale";
 
 const getKpStatus = (kp: number) => {
   if (kp <= 2) return "quiet" as const;
@@ -25,12 +26,31 @@ const getKpStatus = (kp: number) => {
   return "severe" as const;
 };
 
-const Index = () => {
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : "uk-UA";
+function getByPath(source: Record<string, any>, path: string): string {
+  return path.split(".").reduce<any>((acc, segment) => acc?.[segment], source) ?? path;
+}
+
+const Index = ({ locale, messages }: { locale: SiteLocale; messages: Record<string, any> }) => {
+  const t = (path: string, vars?: Record<string, string>) => {
+    let value = getByPath(messages, path);
+
+    if (typeof value !== "string") {
+      return path;
+    }
+
+    if (vars) {
+      for (const [key, replacement] of Object.entries(vars)) {
+        value = value.replaceAll(`{{${key}}}`, replacement);
+      }
+    }
+
+    return value;
+  };
+
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const REFRESH_INTERVAL = 60;
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
-  const langPrefix = i18n.language === "ru" ? "/ru" : "";
+  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : "";
 
   usePageMeta(t("index.title"), t("index.description"));
 
@@ -51,11 +71,13 @@ const Index = () => {
   const latestMag = magData?.length ? magData[magData.length - 1] : null;
   const gLevel = scales?.g?.Scale ?? 0;
 
-  const cityList = i18n.language === "ru"
+  const cityList = locale === "ru"
     ? CITIES.map((c) => ({ name: CITIES_RU[c.slug]?.name || c.name, slug: getRuCitySlug(c) }))
-    : CITIES.map((c) => ({ name: c.name, slug: c.slug }));
+    : locale === "pl"
+      ? CITIES_PL.map((c) => ({ name: c.name, slug: c.slug }))
+      : CITIES.map((c) => ({ name: c.name, slug: c.slug }));
 
-  const todayFormatted = new Date().toLocaleDateString(locale, { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" });
+  const todayFormatted = new Date().toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" });
 
   return (
     <div className="min-h-screen bg-background grid-bg">
@@ -69,7 +91,7 @@ const Index = () => {
             <span className="font-mono text-xs text-muted-foreground">{t("index.live")}</span>
           </span>
           <span className="font-mono text-sm text-muted-foreground">
-            {new Date().toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
+            {new Date().toLocaleDateString(localeTag, { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" })}
           </span>
           <span className="flex items-center gap-1.5 ml-auto">
             <RefreshCw className="h-3 w-3 text-muted-foreground/60 transition-transform" style={{ animation: countdown <= 3 ? "spin 1s linear infinite" : "none" }} />
@@ -125,6 +147,16 @@ const Index = () => {
             </a>
           ))}
         </div>
+        {locale !== "pl" ? (
+          <div className="mt-6">
+            <a
+              href={`${langPrefix}/cities`}
+              className="inline-flex items-center rounded-full border border-border/60 bg-card/60 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card"
+            >
+              {t("index.citiesMore")}
+            </a>
+          </div>
+        ) : null}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label={t("index.aboutService")}>

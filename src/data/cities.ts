@@ -1,3 +1,5 @@
+import { EXTRA_UK_CITIES } from "./ukraine-city-catalog";
+
 export interface CityConfig {
   slug: string;
   name: string;
@@ -353,6 +355,8 @@ export const CITIES: CityConfig[] = [
   },
 ];
 
+export const ALL_UK_CITIES: CityConfig[] = [...CITIES, ...EXTRA_UK_CITIES];
+
 export function getCityBySlug(slug: string): CityConfig | undefined {
-  return CITIES.find((c) => c.slug === slug);
+  return ALL_UK_CITIES.find((c) => c.slug === slug);
 }

@@ -9,6 +9,8 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { Gauge, TrendingUp, Info, HelpCircle } from "lucide-react";
 import type { SiteLocale } from "@/lib/locale";
 
+type LegacyLocale = SiteLocale;
+
 const copy = {
   uk: {
     pageTitle: "Kp індекс онлайн в режимі реального часу — прогноз магнітних бур",
@@ -106,6 +108,54 @@ const copy = {
       { q: "Где можно посмотреть прогноз Kp индекса?", a: "На этой странице вы найдете 3-дневный прогноз Kp индекса по 3-часовым интервалам от NOAA Space Weather Prediction Center, а также текущее значение и историю за 24 часа." },
     ],
   },
+  pl: {
+    pageTitle: "Indeks Kp online w czasie rzeczywistym — prognoza burz magnetycznych",
+    pageDescription:
+      "Aktualny indeks Kp w czasie rzeczywistym. Bieżąca wartość, wykres z ostatnich 24 godzin i 3-dniowa prognoza aktywności geomagnetycznej na podstawie danych NOAA.",
+    heroTitle: "Indeks Kp dzisiaj",
+    heroText:
+      "Planetarny indeks aktywności geomagnetycznej w czasie rzeczywistym. Aktualna wartość, wykres z ostatnich 24 godzin i 3-dniowa prognoza NOAA SWPC.",
+    currentKpLabel: "Aktualny indeks Kp",
+    currentState: "Bieżąca sytuacja",
+    chartAria: "Wykres indeksu Kp z ostatnich 24 godzin",
+    chartTitle: "Indeks Kp z ostatnich",
+    hours: "godz.",
+    forecastAria: "3-dniowa prognoza indeksu Kp",
+    forecastTitle: "Prognoza indeksu Kp na 3 dni (co 3 godziny)",
+    loading: "Ładowanie prognozy...",
+    unavailable: "Dane prognozy są chwilowo niedostępne.",
+    maxKp: "maks. Kp",
+    scaleAria: "Skala indeksu Kp",
+    scaleTitle: "Skala indeksu Kp (0–9)",
+    seoAria: "O indeksie Kp",
+    seoHeading: "Czym jest indeks Kp i dlaczego ma znaczenie?",
+    seoText1:
+      "<strong>Indeks Kp</strong> to globalny wskaźnik aktywności geomagnetycznej Ziemi w skali od 0 do 9. Powstaje na podstawie pomiarów z sieci magnetometrów rozmieszczonych na świecie i jest wykorzystywany do oceny siły zaburzeń pola magnetycznego.",
+    seoText2:
+      "Im wyższy indeks Kp, tym większe prawdopodobieństwo zakłóceń w łączności, nawigacji satelitarnej i gorszego samopoczucia u osób wrażliwych na pogodę. Na tej stronie znajdziesz aktualną wartość indeksu Kp, wykres jego zmian oraz 3-dniową prognozę NOAA.",
+    faqAria: "Najczęstsze pytania o indeks Kp",
+    faqTitle: "Najczęstsze pytania",
+    gScale: "Skala G",
+    rScale: "Skala R",
+    sScale: "Skala S",
+    kpLevels: [
+      { kp: "0–1", status: "Spokojnie", color: "bg-storm-quiet", description: "Minimalna aktywność geomagnetyczna, bez zauważalnego wpływu na technologie i samopoczucie." },
+      { kp: "2–3", status: "Niska aktywność", color: "bg-storm-quiet", description: "Niewielkie wahania pola magnetycznego. Zwykle bez odczuwalnych skutków dla większości osób." },
+      { kp: "4", status: "Niestabilnie", color: "bg-storm-minor", description: "Podwyższona aktywność geomagnetyczna. Osoby meteowrażliwe mogą odczuwać lekki dyskomfort." },
+      { kp: "5 (G1)", status: "Słaba burza", color: "bg-storm-moderate", description: "Słaba burza magnetyczna. Możliwe drobne zakłócenia GPS i gorsze samopoczucie u części osób." },
+      { kp: "6 (G2)", status: "Umiarkowana burza", color: "bg-storm-moderate", description: "Umiarkowana burza. Ryzyko zakłóceń radiowych i większego wpływu na osoby wrażliwe." },
+      { kp: "7 (G3)", status: "Silna burza", color: "bg-storm-strong", description: "Silna burza. Możliwe wyraźniejsze problemy z nawigacją, łącznością i energią." },
+      { kp: "8 (G4)", status: "Bardzo silna", color: "bg-storm-severe", description: "Bardzo silna burza z podwyższonym ryzykiem zakłóceń technologicznych." },
+      { kp: "9 (G5)", status: "Ekstremalna", color: "bg-storm-severe", description: "Ekstremalna burza geomagnetyczna o największym potencjalnym wpływie na infrastrukturę." },
+    ],
+    faqItems: [
+      { q: "Czym jest indeks Kp?", a: "Indeks Kp to planetarny wskaźnik aktywności geomagnetycznej od 0 do 9. Im wyższa wartość, tym silniejsze zaburzenie pola magnetycznego Ziemi." },
+      { q: "Jak często aktualizuje się indeks Kp?", a: "Oficjalny indeks Kp publikowany jest co 3 godziny, ale na stronie mogą pojawiać się również wartości szacunkowe aktualizowane częściej." },
+      { q: "Jak indeks Kp wpływa na samopoczucie?", a: "Przy podwyższonym Kp część osób może odczuwać ból głowy, zmęczenie, rozdrażnienie czy problemy ze snem. Nie dotyczy to wszystkich, ale zależność bywa zauważalna." },
+      { q: "Co oznacza skala G?", a: "Skala G NOAA opisuje siłę burzy geomagnetycznej od G1 do G5. Każdy poziom odpowiada określonemu przedziałowi wartości Kp." },
+      { q: "Gdzie sprawdzić prognozę indeksu Kp?", a: "Na tej stronie znajdziesz 3-dniową prognozę Kp od NOAA, a także bieżącą wartość i wykres zmian z ostatnich godzin." },
+    ],
+  },
 } as const;
 
 const todayStr = (localeTag: string) =>
@@ -116,9 +166,9 @@ const todayStr = (localeTag: string) =>
     timeZone: "Europe/Kyiv",
   });
 
-const KpIndex = ({ locale = "uk" }: { locale?: SiteLocale }) => {
+const KpIndex = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const today = todayStr(localeTag);
 
   usePageMeta(
@@ -137,7 +187,7 @@ const KpIndex = ({ locale = "uk" }: { locale?: SiteLocale }) => {
   // Sample every 10th point for smoother chart
   const sampled = kpData?.filter((_, i) => i % 10 === 0) ?? [];
   const chartData = sampled.map((d) => ({
-    time: new Date(d.time_tag).toLocaleTimeString("uk-UA", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" }),
+    time: new Date(d.time_tag).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone: locale === "pl" ? "Europe/Warsaw" : "Europe/Kyiv" }),
     kp: d.kp,
   }));
 

@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import type { SiteLocale } from "@/lib/locale";
 
+type LegacyLocale = SiteLocale;
+
 interface PersonalInfo {
   name: string;
   age: string;
@@ -18,7 +20,7 @@ interface PersonalInfo {
 type Step = "info" | "questions" | "calculating" | "result";
 
 const copy: Record<
-  SiteLocale,
+  LegacyLocale,
   {
     title: string;
     description: string;
@@ -187,6 +189,70 @@ const copy: Record<
       resistantDesc: "Отлично! Геомагнитная активность практически не влияет на ваш организм.",
     },
   },
+  pl: {
+    title: "Test na meteowrażliwość — Magnitca",
+    description:
+      "Bezpłatny test na meteowrażliwość. Sprawdź, jak silnie Twój organizm reaguje na burze magnetyczne i aktywność geomagnetyczną.",
+    backHome: "Na stronę główną",
+    heading: "Test na meteowrażliwość",
+    subtitle:
+      "Sprawdź, jak bardzo Twój organizm reaguje na burze magnetyczne. Test zajmie 2-3 minuty.",
+    yourName: "Twoje imię",
+    enterName: "Wpisz imię",
+    age: "Wiek",
+    gender: "Płeć",
+    physicalActivity: "Poziom aktywności fizycznej",
+    hasChronic: "Mam choroby przewlekłe (sercowo-naczyniowe, neurologiczne itp.)",
+    startTest: "Rozpocznij test",
+    questionProgress: "Pytanie",
+    analyzing: "Analizujemy Twoje odpowiedzi...",
+    processingPersonal: "Przetwarzanie danych osobowych...",
+    comparingMeteo: "Porównanie z bazą danych pogodowych...",
+    calculatingIndex: "Obliczanie wskaźnika wrażliwości...",
+    formingResult: "Przygotowanie wyniku...",
+    yourResult: "Twój wynik",
+    tryAgain: "Zrób test ponownie",
+    telegramTitle: "Nie przegap burz magnetycznych!",
+    telegramText:
+      "Dołącz do naszego kanału w Telegramie i otrzymuj codzienne prognozy burz magnetycznych bezpośrednio w komunikatorze.",
+    telegramButton: "Dołącz do Telegrama",
+    answerOptions: [
+      { label: "Nigdy", value: 0 },
+      { label: "Rzadko", value: 1 },
+      { label: "Czasami", value: 2 },
+      { label: "Często", value: 3 },
+      { label: "Zawsze", value: 4 },
+    ],
+    genderOptions: ["Mężczyzna", "Kobieta", "Inna"],
+    activityOptions: ["Niska", "Umiarkowana", "Wysoka"],
+    questions: [
+      "Czy odczuwasz ból głowy podczas burz magnetycznych?",
+      "Czy w dniach z zaburzeniami geomagnetycznymi szybciej się męczysz?",
+      "Czy masz problemy ze snem przed lub w trakcie burz magnetycznych?",
+      "Czy zauważasz nagłe zmiany nastroju związane z aktywnością słoneczną?",
+      "Czy odczuwasz wahania ciśnienia podczas burz?",
+      "Czy podczas aktywności geomagnetycznej pojawiają się zawroty głowy?",
+      "Czy podczas burz magnetycznych odczuwasz ból stawów lub mięśni?",
+      "Czy w czasie burz pojawia się niepokój lub napięcie?",
+      "Czy masz trudności z koncentracją przy zaburzeniach geomagnetycznych?",
+      "Czy zauważasz zaburzenia rytmu serca podczas burz?",
+      "Czy wyczuwasz zmianę pogody jeszcze przed jej nadejściem?",
+      "Czy podczas burz magnetycznych nasilają się choroby przewlekłe?",
+    ],
+    labels: {
+      high: "Wysoka meteowrażliwość",
+      highDesc:
+        "Twój organizm wyraźnie reaguje na aktywność geomagnetyczną. Warto uważnie śledzić prognozy burz magnetycznych i dostosowywać rytm dnia.",
+      moderate: "Umiarkowana meteowrażliwość",
+      moderateDesc:
+        "Jesteś umiarkowanie wrażliwy na zmiany pogody kosmicznej. Warto zwracać uwagę na dni z podwyższoną aktywnością.",
+      low: "Niska meteowrażliwość",
+      lowDesc:
+        "Burze magnetyczne raczej nie wpływają silnie na Twoje samopoczucie, choć sporadycznie możesz odczuwać niewielki dyskomfort.",
+      resistant: "Odporność na pogodę kosmiczną",
+      resistantDesc: "Świetnie! Aktywność geomagnetyczna praktycznie nie wpływa na Twój organizm.",
+    },
+  },
 };
 
 function calculateScore(answers: number[], info: PersonalInfo, locale: SiteLocale): number {
@@ -200,8 +266,8 @@ function calculateScore(answers: number[], info: PersonalInfo, locale: SiteLocal
 
   if (info.hasChronic) raw += 4;
 
-  const lowActivity = locale === "ru" ? "Низкая" : "Низька";
-  const moderateActivity = locale === "ru" ? "Умеренная" : "Помірна";
+  const lowActivity = locale === "ru" ? "Низкая" : locale === "pl" ? "Niska" : "Низька";
+  const moderateActivity = locale === "ru" ? "Умеренная" : locale === "pl" ? "Umiarkowana" : "Помірна";
 
   if (info.physicalActivity === lowActivity) raw += 2;
   else if (info.physicalActivity === moderateActivity) raw += 1;
@@ -218,10 +284,10 @@ function getResultLabel(score: number, locale: SiteLocale) {
   return { label: t.resistant, color: "text-green-400", description: t.resistantDesc };
 }
 
-const MeteoTest = ({ locale = "uk" }: { locale?: SiteLocale }) => {
+const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const t = copy[locale];
 
-  usePageMeta(t.title, t.description, locale === "ru" ? "/ru/test" : "/test");
+  usePageMeta(t.title, t.description, locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : "/test");
 
   const [step, setStep] = useState<Step>("info");
   const [currentQ, setCurrentQ] = useState(0);

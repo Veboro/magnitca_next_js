@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
-import { CITIES, getCityBySlug } from "@/data/cities";
+import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getRuCitySlug } from "@/data/cities-ru";
 
 type Params = {
@@ -9,7 +9,7 @@ type Params = {
 };
 
 export function generateStaticParams() {
-  return CITIES.map((city) => ({ slug: city.slug }));
+  return ALL_UK_CITIES.map((city) => ({ slug: city.slug }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {

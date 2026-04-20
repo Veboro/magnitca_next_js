@@ -10,14 +10,18 @@ interface NewsItem { id: string; title: string; slug: string | null; published_a
 export const NewsWidget = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
   const isRussian = i18n.language === "ru";
-  const locale = isRussian ? "ru-RU" : "uk-UA";
-  const langPrefix = isRussian ? "/ru" : "";
+  const isPolish = i18n.language === "pl";
+  const locale = isRussian ? "ru-RU" : isPolish ? "pl-PL" : "uk-UA";
+  const langPrefix = isRussian ? "/ru" : isPolish ? "/pl" : "";
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(locale, { day: "numeric", month: "short" });
 
   const { data: news = [], isLoading } = useQuery<NewsItem[]>({
     queryKey: ["news-widget", i18n.language],
     queryFn: async () => {
+      if (isPolish) {
+        return [];
+      }
       const { data, error } = await supabase
         .from("news")
         .select("id, title_uk, slug_uk, title_ru, slug_ru, published_at")
@@ -45,7 +49,9 @@ export const NewsWidget = ({ className }: { className?: string }) => {
           <Newspaper className="h-4 w-4 text-primary" />
           <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("newsWidget.title")}</h3>
         </div>
-        <Link href={`${langPrefix}/news`} className="text-xs text-primary hover:text-primary/80 transition-colors">{t("newsWidget.allNews")}</Link>
+        {!isPolish && (
+          <Link href={`${langPrefix}/news`} className="text-xs text-primary hover:text-primary/80 transition-colors">{t("newsWidget.allNews")}</Link>
+        )}
       </div>
 
       {isLoading ? (

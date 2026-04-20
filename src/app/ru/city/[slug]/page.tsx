@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
-import { CITIES, getCityBySlug } from "@/data/cities";
+import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getCityByRuSlug, getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 
 type Params = {
@@ -9,12 +9,12 @@ type Params = {
 };
 
 export function generateStaticParams() {
-  return CITIES.map((city) => ({ slug: getRuCitySlug(city) }));
+  return ALL_UK_CITIES.map((city) => ({ slug: getRuCitySlug(city) }));
 }
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const city = getCityByRuSlug(slug, CITIES);
+  const city = getCityByRuSlug(slug, ALL_UK_CITIES);
 
   if (!city) {
     return {
@@ -42,7 +42,7 @@ export const revalidate = 3600;
 
 export default async function RussianCityPage({ params }: Params) {
   const { slug } = await params;
-  const city = getCityByRuSlug(slug, CITIES);
+  const city = getCityByRuSlug(slug, ALL_UK_CITIES);
 
   if (!city) {
     const fallbackCity = getCityBySlug(slug);

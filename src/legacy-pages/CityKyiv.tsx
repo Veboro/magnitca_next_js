@@ -11,6 +11,8 @@ import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, Aler
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import type { SiteLocale } from "@/lib/locale";
 
+type LegacyLocale = Extract<SiteLocale, "uk" | "ru">;
+
 const copy = {
   uk: {
     title: "Магнітні бурі в Києві сьогодні — погода, якість повітря",
@@ -123,7 +125,7 @@ const getKpStatus = (kp: number, locale: SiteLocale) => {
   return { label: t.extreme, color: "hsl(0, 80%, 55%)" };
 };
 
-const CityKyiv = ({ locale = "uk" }: { locale?: SiteLocale }) => {
+const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const t = copy[locale];
   const localeTag = locale === "ru" ? "ru-RU" : "uk-UA";
   const { data, isLoading } = useCityWeather();
@@ -245,7 +247,6 @@ const CityKyiv = ({ locale = "uk" }: { locale?: SiteLocale }) => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[9px] font-medium text-storm-quiet">{t.normal}</span>
-                <a href="https://www.saveecobot.com/radiation/misto-kyiv" target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline">SaveEcoBot →</a>
               </div>
             </div>
           </div>

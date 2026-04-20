@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { Suspense } from "react";
 import "../index.css";
-import { PublicFooter } from "@/components/next/public-footer";
 import { GoogleAnalytics } from "@/components/next/google-analytics";
-import { PublicHeader } from "@/components/next/public-header";
 import { Providers } from "@/components/next/providers";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
@@ -44,20 +43,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headerStore = await headers();
+  const locale = headerStore.get("x-site-locale") === "ru"
+    ? "ru"
+    : headerStore.get("x-site-locale") === "pl"
+      ? "pl"
+      : "uk";
+
   return (
-    <html lang="uk" className="dark">
+    <html lang={locale} className="dark">
       <body>
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
-        <Providers>
-          <div className="min-h-screen bg-background text-foreground">
-            <PublicHeader />
-            {children}
-            <PublicFooter />
-          </div>
-        </Providers>
+        <Providers initialLocale={locale}>{children}</Providers>
       </body>
     </html>
   );

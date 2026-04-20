@@ -10,6 +10,7 @@ export const metadata: Metadata = {
     languages: {
       uk: "/test",
       ru: "/ru/test",
+      pl: "/pl/test",
       "x-default": "/test",
     },
   },

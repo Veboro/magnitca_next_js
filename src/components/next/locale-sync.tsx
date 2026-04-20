@@ -1,21 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { usePathname } from "next/navigation";
 import i18n from "@/i18n/config";
-import { isRuPath } from "@/lib/locale";
+import { isPlPath, isRuPath } from "@/lib/locale";
 
 export function LocaleSync() {
   const pathname = usePathname();
 
-  useEffect(() => {
-    const locale = pathname && isRuPath(pathname) ? "ru" : "uk";
+  useLayoutEffect(() => {
+    const docLocale = pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+    const i18nLocale = docLocale;
 
-    if (i18n.language !== locale) {
-      i18n.changeLanguage(locale);
+    if (i18n.language !== i18nLocale) {
+      i18n.changeLanguage(i18nLocale);
     }
 
-    document.documentElement.lang = locale;
+    document.documentElement.lang = docLocale;
   }, [pathname]);
 
   return null;

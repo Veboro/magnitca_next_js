@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { CheckCircle, Loader2, Send } from "lucide-react";
 
-type ContactFormLocale = "uk" | "ru";
+type ContactFormLocale = "uk" | "ru" | "pl";
 
 const copy: Record<
   ContactFormLocale,
@@ -45,6 +45,19 @@ const copy: Record<
     message: "Сообщение",
     sending: "Отправка...",
     send: "Отправить сообщение",
+  },
+  pl: {
+    sendError: "Nie udalo sie wyslac wiadomosci.",
+    unknownError: "Wystapil blad podczas wysylania.",
+    successTitle: "Dziekujemy za wiadomosc",
+    successText:
+      "Wiadomosc zostala wyslana. Jesli sprawa jest pilna, napisz tez na",
+    sendAnother: "Wyslij kolejna wiadomosc",
+    name: "Imie i nazwisko",
+    email: "Email",
+    message: "Wiadomosc",
+    sending: "Wysylanie...",
+    send: "Wyslij wiadomosc",
   },
 };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { usePageMeta } from "@/hooks/usePageMeta";
-import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
+import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel, formatApiLocalTime } from "@/hooks/useCityWeather";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
 import { useQuery } from "@tanstack/react-query";
@@ -10,8 +10,11 @@ import { cn } from "@/lib/utils";
 import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays } from "lucide-react";
 import { getCityBySlug } from "@/data/cities";
 import { getLocalizedCity } from "@/data/cities-ru";
+import { getCityByPlSlug } from "@/data/cities-pl";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import type { SiteLocale } from "@/lib/locale";
+
+type LegacyLocale = SiteLocale;
 
 const copy = {
   uk: {
@@ -142,6 +145,70 @@ const copy = {
     airIndex: "Индекс качества воздуха AQI",
     dataSource: "Данные",
   },
+  pl: {
+    calm: "Spokojnie",
+    low: "Niska aktywność",
+    moderate: "Umiarkowana burza",
+    strong: "Silna burza",
+    extreme: "Ekstremalna burza",
+    geoSituation: "Sytuacja geomagnetyczna w",
+    sunriseSunset: "Wschód / Zachód słońca",
+    sunrise: "Wschód",
+    sunset: "Zachód",
+    dayLength: "Długość dnia",
+    coordinates: "Współrzędne",
+    latitude: "Szerokość",
+    longitude: "Długość",
+    timezone: "Strefa czasowa",
+    radiation: "Tło promieniowania",
+    normal: "W normie",
+    forecast3: "Prognoza indeksu Kp dla",
+    forecast3suffix: "na 3 dni (co 3 godziny)",
+    loading: "Ładowanie prognozy...",
+    unavailable: "Dane prognozy są chwilowo niedostępne.",
+    max: "maks. Kp",
+    forecast3Foot1: "Prognoza indeksu Kp dla miasta",
+    forecast3Foot2: "od NOAA Space Weather Prediction Center. Czas lokalny",
+    forecast27: "Prognoza Kp na 27 dni —",
+    forecast27Foot1: "27-dniowa prognoza indeksu Kp dla miasta",
+    forecast27Foot2: "od NOAA SWPC. Dokładność maleje z każdym dniem — traktuj ją jako orientacyjną.",
+    airQuality: "Jakość powietrza",
+    currentMetrics: "Aktualne wskaźniki",
+    wind: "Wiatr",
+    humidity: "Wilgotność",
+    pressure: "Ciśnienie",
+    cloudiness: "Zachmurzenie",
+    uv: "Indeks UV",
+    kpIndex: "Indeks Kp",
+    high: "Wysoka",
+    medium: "Umiarkowana",
+    lowHumidity: "Niska",
+    overcast: "Duże",
+    variable: "Zmienne",
+    clear: "Małe",
+    uvVeryHigh: "Bardzo wysoki",
+    uvHigh: "Wysoki",
+    uvMedium: "Umiarkowany",
+    uvLow: "Niski",
+    aboutPage: "O stronie",
+    cityNotFound: "Nie znaleziono miasta",
+    srOnlyHeading: "Burze magnetyczne w",
+    srOnlySuffix: "pogoda i jakość powietrza",
+    geoActivityStatus: "Status aktywności geomagnetycznej w",
+    forecast3Aria: "Prognoza indeksu Kp na 3 dni",
+    forecast27Aria: "Prognoza Kp na 27 dni",
+    seoHeading: "Burze magnetyczne w",
+    today: "dzisiaj",
+    currentKp: "Aktualny indeks Kp",
+    stormLevel: "poziom burzy geomagnetycznej",
+    forecastRange: "Prognozowany zakres Kp w ciągu doby",
+    radioBlackout: "Skala zakłóceń radiowych",
+    radiationStorm: "skala burz radiacyjnych",
+    temperature: "Temperatura powietrza",
+    windSpeed: "wiatr",
+    airIndex: "Indeks jakości powietrza AQI",
+    dataSource: "Dane",
+  },
 } as const;
 
 const getKpStatus = (kp: number, locale: SiteLocale) => {
@@ -156,7 +223,9 @@ const getKpStatus = (kp: number, locale: SiteLocale) => {
 function getWindDirection(deg: number, locale: SiteLocale): string {
   const dirs = locale === "ru"
     ? ["С", "СВ", "В", "ЮВ", "Ю", "ЮЗ", "З", "СЗ"]
-    : ["Пн", "ПнСх", "Сх", "ПдСх", "Пд", "ПдЗх", "Зх", "ПнЗх"];
+    : locale === "pl"
+      ? ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+      : ["Пн", "ПнСх", "Сх", "ПдСх", "Пд", "ПдЗх", "Зх", "ПнЗх"];
   return dirs[Math.round(deg / 45) % 8];
 }
 
@@ -187,18 +256,22 @@ function AqiItem({ label, value, unit, warn }: { label: string; value: number; u
   );
 }
 
-const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale }) => {
+const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: LegacyLocale }) => {
   const resolvedSlug =
     slug ??
     (typeof window !== "undefined"
       ? window.location.pathname.split("/").filter(Boolean).at(-1)
       : undefined);
-  const cityBase = resolvedSlug ? getCityBySlug(resolvedSlug) : undefined;
-  const city = cityBase ? getLocalizedCity(cityBase, locale) : undefined;
+  const cityBase = resolvedSlug
+    ? locale === "pl"
+      ? getCityByPlSlug(resolvedSlug)
+      : getCityBySlug(resolvedSlug)
+    : undefined;
+  const city = cityBase ? (locale === "ru" ? getLocalizedCity(cityBase, "ru") : cityBase) : undefined;
   const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
 
-  const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone);
+  const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, undefined, locale);
   const { data: kpData } = useKpIndex();
   const { data: scales } = useNoaaScales();
   const { data: forecast, isLoading: forecastLoading } = useKpForecast();
@@ -233,6 +306,8 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale 
   const dynamicDescription = city
     ? locale === "ru"
       ? `Магнитные бури в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, качество воздуха в реальном времени.`
+      : locale === "pl"
+        ? `Burze magnetyczne w ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoza, pogoda i jakość powietrza w czasie rzeczywistym.`
       : `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
     : "";
 
@@ -281,11 +356,11 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale 
                 </h3>
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5 text-muted-foreground"><Sunrise className="h-3.5 w-3.5 text-amber-400" />{t.sunrise}</span>
-                  <span className="font-mono font-medium text-foreground">{new Date(data.current.sunrise).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone: city.timezone })}</span>
+                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(data.current.sunrise)}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs">
                   <span className="flex items-center gap-1.5 text-muted-foreground"><Sunset className="h-3.5 w-3.5 text-orange-400" />{t.sunset}</span>
-                  <span className="font-mono font-medium text-foreground">{new Date(data.current.sunset).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone: city.timezone })}</span>
+                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(data.current.sunset)}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs border-t border-border/30 pt-1.5">
                   <span className="text-muted-foreground">{t.dayLength}</span>
@@ -318,11 +393,10 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale 
               </h3>
               <div className="flex items-center justify-between">
                 <span className="font-mono text-lg font-bold text-foreground">0.08–0.14</span>
-                <span className="text-[10px] text-muted-foreground">мкЗв/год</span>
+                <span className="text-[10px] text-muted-foreground">{locale === "pl" ? "µSv/h" : locale === "ru" ? "мкЗв/ч" : "мкЗв/год"}</span>
               </div>
               <div className="flex items-center justify-between">
                 <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[9px] font-medium text-storm-quiet">{t.normal}</span>
-                <a href="https://www.saveecobot.com/radiation" target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:underline">SaveEcoBot →</a>
               </div>
             </div>
           </div>
@@ -471,18 +545,18 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale 
                 <span
                   className="ml-auto rounded-full px-3 py-1 text-xs font-bold"
                   style={{
-                    backgroundColor: `${getAqiLabel(data.airQuality.aqi).color}15`,
-                    color: getAqiLabel(data.airQuality.aqi).color,
+                    backgroundColor: `${getAqiLabel(data.airQuality.aqi, locale).color}15`,
+                    color: getAqiLabel(data.airQuality.aqi, locale).color,
                   }}
                 >
-                  {getAqiLabel(data.airQuality.aqi).label} • AQI {data.airQuality.aqi}
+                  {getAqiLabel(data.airQuality.aqi, locale).label} • AQI {data.airQuality.aqi}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit="мкг/м³" warn={data.airQuality.pm25 > 25} />
-                <AqiItem label="PM10" value={data.airQuality.pm10} unit="мкг/м³" warn={data.airQuality.pm10 > 50} />
-                <AqiItem label="NO₂" value={data.airQuality.no2} unit="мкг/м³" warn={data.airQuality.no2 > 40} />
-                <AqiItem label="O₃" value={data.airQuality.o3} unit="мкг/м³" warn={data.airQuality.o3 > 100} />
+                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.pm25 > 25} />
+                <AqiItem label="PM10" value={data.airQuality.pm10} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.pm10 > 50} />
+                <AqiItem label="NO₂" value={data.airQuality.no2} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.no2 > 40} />
+                <AqiItem label="O₃" value={data.airQuality.o3} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.o3 > 100} />
               </div>
               <div className="space-y-1">
                 <div className="flex h-2 rounded-full overflow-hidden">
@@ -511,9 +585,9 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale 
         ) : data?.current ? (
           <section aria-label={t.currentMetrics}>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-              <MiniCard icon={Wind} label={t.wind} value={`${Math.round(data.current.windSpeed)} км/г`} sub={getWindDirection(data.current.windDirection, locale)} />
+              <MiniCard icon={Wind} label={t.wind} value={`${Math.round(data.current.windSpeed)} ${locale === "pl" ? "km/h" : "км/г"}`} sub={getWindDirection(data.current.windDirection, locale)} />
               <MiniCard icon={Droplets} label={t.humidity} value={`${data.current.humidity}%`} sub={data.current.humidity > 80 ? t.high : data.current.humidity > 50 ? t.medium : t.lowHumidity} />
-              <MiniCard icon={Gauge} label={t.pressure} value={`${Math.round(data.current.pressure)}`} sub="гПа" />
+              <MiniCard icon={Gauge} label={t.pressure} value={`${Math.round(data.current.pressure)}`} sub={locale === "pl" ? "hPa" : "гПа"} />
               <MiniCard icon={Cloud} label={t.cloudiness} value={`${data.current.cloudCover}%`} sub={data.current.cloudCover > 80 ? t.overcast : data.current.cloudCover > 40 ? t.variable : t.clear} />
               <MiniCard icon={Sun} label={t.uv} value={`${Math.round(data.current.uvIndex)}`} sub={data.current.uvIndex > 8 ? t.uvVeryHigh : data.current.uvIndex > 5 ? t.uvHigh : data.current.uvIndex > 2 ? t.uvMedium : t.uvLow} />
               <MiniCard icon={Activity} label={t.kpIndex} value={`${Math.round(latestKp)}`} sub={kpStatus.label} color={kpStatus.color} />
@@ -545,8 +619,8 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: SiteLocale 
                 {city.name}, {dateStr}. {t.currentKp} — {latestKp.toFixed(1)}, {t.stormLevel} — G{gLevel}.
                 {kpValues.length > 0 && ` ${t.forecastRange}: ${minKp.toFixed(1)}–${maxKp.toFixed(1)}.`}
                 {" "}{t.radioBlackout} — R{rScale}, {t.radiationStorm} — S{sScale}.
-                {data?.current && ` ${t.temperature} — ${Math.round(data.current.temperature)}°C, ${t.pressure.toLowerCase()} — ${Math.round(data.current.pressure)} гПа, ${t.humidity.toLowerCase()} — ${data.current.humidity}%, ${t.windSpeed} — ${Math.round(data.current.windSpeed)} км/год (${getWindDirection(data.current.windDirection, locale)}).`}
-                {data?.airQuality && ` ${t.airIndex} — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} мкг/м³.`}
+                {data?.current && ` ${t.temperature} — ${Math.round(data.current.temperature)}°C, ${t.pressure.toLowerCase()} — ${Math.round(data.current.pressure)} ${locale === "pl" ? "hPa" : "гПа"}, ${t.humidity.toLowerCase()} — ${data.current.humidity}%, ${t.windSpeed} — ${Math.round(data.current.windSpeed)} ${locale === "pl" ? "km/h" : "км/год"} (${getWindDirection(data.current.windDirection, locale)}).`}
+                {data?.airQuality && ` ${t.airIndex} — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} ${locale === "pl" ? "µg/m³" : "мкг/м³"}.`}
                 {" "}{t.dataSource}: NOAA SWPC, Open-Meteo.
               </p>
             );

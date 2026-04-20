@@ -7,6 +7,8 @@ import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
 import { Wind, TrendingUp, Info, HelpCircle, Gauge, Zap } from "lucide-react";
 import type { SiteLocale } from "@/lib/locale";
 
+type LegacyLocale = SiteLocale;
+
 const copy = {
   uk: {
     pageTitle: "Сонячний вітер онлайн в режимі реального часу — швидкість та густина",
@@ -112,6 +114,58 @@ const copy = {
       { q: "Что такое компонента Bz?", a: "Bz — это вертикальная компонента межпланетного магнитного поля (IMF). Отрицательное значение Bz (южное) облегчает проникновение солнечного ветра в магнитосферу, что увеличивает вероятность геомагнитной бури." },
     ],
   },
+  pl: {
+    pageTitle: "Wiatr słoneczny online w czasie rzeczywistym — prędkość i gęstość",
+    pageDescription:
+      "Aktualny wiatr słoneczny w czasie rzeczywistym. Prędkość, gęstość i wykres z ostatnich 2 godzin na podstawie danych NOAA DSCOVR.",
+    heroTitle: "Wiatr słoneczny dzisiaj",
+    heroText:
+      "Prędkość i gęstość wiatru słonecznego w czasie rzeczywistym. Wykres z ostatnich 2 godzin oraz międzyplanetarne pole magnetyczne IMF Bz.",
+    currentAria: "Aktualne wartości wiatru słonecznego",
+    speed: "Prędkość",
+    density: "Gęstość",
+    normal: "Normalna",
+    elevated: "Podwyższona",
+    stronglySouth: "Silnie południowe",
+    south: "Południowe",
+    weaklySouth: "Lekko południowe",
+    north: "Północne",
+    speedChartAria: "Wykres prędkości i gęstości wiatru słonecznego",
+    speedChartTitle: "Prędkość i gęstość — ostatnie 2 godziny",
+    bzChartAria: "Wykres IMF Bz",
+    bzChartTitle: "Międzyplanetarne pole magnetyczne (Bz) — ostatnie 2 godziny",
+    loading: "Ładowanie...",
+    bzNote:
+      "Ujemna wartość Bz ułatwia przenikanie wiatru słonecznego do magnetosfery Ziemi. Gdy Bz spada poniżej -5 nT, ryzyko burzy geomagnetycznej wyraźnie rośnie.",
+    scaleAria: "Skala prędkości wiatru słonecznego",
+    scaleTitle: "Skala prędkości wiatru słonecznego (km/s)",
+    seoAria: "O wietrze słonecznym",
+    seoHeading: "Czym jest wiatr słoneczny i dlaczego ma znaczenie?",
+    seoText1:
+      "Wiatr słoneczny to stały strumień naładowanych cząstek wypływających z korony słonecznej. Jego prędkość zwykle mieści się w zakresie od 300 do ponad 800 km/s, a gęstość może szybko się zmieniać.",
+    seoText2:
+      "Gdy prędkość i gęstość wiatru słonecznego rosną, zwiększa się nacisk na magnetosferę Ziemi. Szczególne znaczenie ma składowa Bz, ponieważ ujemne wartości zwiększają prawdopodobieństwo zaburzeń geomagnetycznych.",
+    faqAria: "Najczęstsze pytania o wiatr słoneczny",
+    faqTitle: "Najczęstsze pytania",
+    tooltipKyiv: "czas lokalny",
+    areaSpeed: "Prędkość",
+    areaDensity: "Gęstość",
+    speedLevels: [
+      { range: "< 300", status: "Powolny", color: "bg-storm-quiet", description: "Powolny wiatr słoneczny, zwykle bez istotnego wpływu na magnetosferę." },
+      { range: "300–400", status: "Normalny", color: "bg-storm-quiet", description: "Typowa prędkość wiatru słonecznego i spokojne warunki geomagnetyczne." },
+      { range: "400–500", status: "Podwyższony", color: "bg-storm-minor", description: "Podwyższona prędkość może sprzyjać lekkim zaburzeniom geomagnetycznym." },
+      { range: "500–600", status: "Wysoki", color: "bg-storm-moderate", description: "Szybszy strumień zwiększa ryzyko bardziej odczuwalnych zaburzeń." },
+      { range: "600–800", status: "Bardzo wysoki", color: "bg-storm-strong", description: "Bardzo szybki wiatr słoneczny może prowadzić do silniejszych burz magnetycznych." },
+      { range: "> 800", status: "Ekstremalny", color: "bg-storm-severe", description: "Ekstremalnie szybki strumień o dużym potencjale zaburzeń geomagnetycznych." },
+    ],
+    faqItems: [
+      { q: "Czym jest wiatr słoneczny?", a: "To strumień naładowanych cząstek emitowanych przez Słońce. Gdy dociera do Ziemi z większą prędkością i gęstością, może nasilać aktywność geomagnetyczną." },
+      { q: "Jak prędkość wiatru słonecznego wpływa na Ziemię?", a: "Wyższa prędkość oznacza silniejsze oddziaływanie na magnetosferę. W połączeniu z niekorzystnym polem magnetycznym może prowadzić do burz geomagnetycznych." },
+      { q: "Czym jest gęstość wiatru słonecznego?", a: "Gęstość pokazuje, ile cząstek znajduje się w jednostce objętości. Wysoka gęstość wraz z dużą prędkością zwykle zwiększa wpływ na magnetosferę." },
+      { q: "Jak często aktualizowane są dane?", a: "Dane pochodzą z pomiarów satelity DSCOVR i są regularnie odświeżane, dzięki czemu można śledzić zmiany niemal w czasie rzeczywistym." },
+      { q: "Co oznacza składowa Bz?", a: "Bz to część międzyplanetarnego pola magnetycznego. Ujemny Bz zwiększa szansę, że wiatr słoneczny skuteczniej zaburzy pole magnetyczne Ziemi." },
+    ],
+  },
 } as const;
 
 const todayStr = (localeTag: string) =>
@@ -160,9 +214,9 @@ const CustomTooltip = ({ active, payload, label, locale = "uk" }: any) => {
   );
 };
 
-const SolarWind = ({ locale = "uk" }: { locale?: SiteLocale }) => {
+const SolarWind = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const today = todayStr(localeTag);
 
   usePageMeta(

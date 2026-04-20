@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getPathForLocale, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, isPlPath, isRuPath, type SiteLocale } from "@/lib/locale";
 
 const copy: Record<
   SiteLocale,
@@ -34,12 +34,20 @@ const copy: Record<
     rss: "RSS",
     copyright: "Магнитка. Данные NOAA SWPC и Open-Meteo.",
   },
+  pl: {
+    contacts: "Kontakt",
+    about: "O projekcie",
+    privacy: "Polityka prywatności",
+    cookies: "Polityka cookie",
+    terms: "Warunki korzystania",
+    rss: "RSS",
+    copyright: "Magnitca. Dane NOAA SWPC i Open-Meteo.",
+  },
 };
 
 export function PublicFooter() {
   const pathname = usePathname();
-  const locale: SiteLocale = pathname && isRuPath(pathname) ? "ru" : "uk";
-
+  const locale: SiteLocale = pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   return (
     <footer className="border-t border-border/30">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-muted-foreground">

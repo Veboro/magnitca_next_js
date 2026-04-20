@@ -27,12 +27,14 @@ import CityKyiv from "./legacy-pages/CityKyiv";
 import CityPage from "./legacy-pages/CityPage";
 import SolarWind from "./legacy-pages/SolarWind";
 import { LanguageWrapper } from "@/components/LanguageWrapper";
+import uk from "@/i18n/locales/uk";
+import ru from "@/i18n/locales/ru";
 
 const queryClient = new QueryClient();
 
-const AppRoutes = () => (
+const AppRoutes = (locale: "uk" | "ru", messages: Record<string, any>) => (
   <>
-    <Route index element={<Index />} />
+    <Route index element={<Index locale={locale} messages={messages} />} />
     <Route path="kp-index" element={<KpIndex />} />
     <Route path="solar-wind" element={<SolarWind />} />
     <Route path="city/kyiv" element={<CityKyiv />} />
@@ -60,12 +62,12 @@ const App = () => (
           <Routes>
             {/* Ukrainian (default) routes */}
             <Route element={<LanguageWrapper />}>
-              {AppRoutes()}
+              {AppRoutes("uk", uk)}
             </Route>
 
             {/* Russian routes with /ru prefix */}
             <Route path="/ru" element={<LanguageWrapper />}>
-              {AppRoutes()}
+              {AppRoutes("ru", ru)}
             </Route>
 
             {/* Auth & Admin — no language prefix needed */}

@@ -60,7 +60,7 @@ const groupFutureDays = (entries: KpForecastEntry[], locale: string) => {
 
 export const KpForecast3Day = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : "uk-UA";
+  const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
   const { data: entries = [], isLoading } = useKpForecast();
   const days = groupFutureDays(entries, locale);
   const MAX_KP = 9;

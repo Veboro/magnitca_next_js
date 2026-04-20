@@ -18,6 +18,11 @@ const RU_PAGE_META: Record<string, { title: string; description: string }> = {
     title: "Контакты",
     description: "Связь с командой Магнитки: вопросы, обратная связь и сообщения об ошибках.",
   },
+  cities: {
+    title: "Магнитные бури по городам Украины",
+    description:
+      "Каталог страниц о магнитных бурях по городам Украины с распределением по областям, областным центрам и крупным населённым пунктам.",
+  },
   privacy: {
     title: "Политика конфиденциальности",
     description:
@@ -55,9 +60,54 @@ const RU_PAGE_META: Record<string, { title: string; description: string }> = {
   },
 };
 
+const PL_PAGE_META: Record<string, { title: string; description: string }> = {
+  home: {
+    title: "Magnitca — burze magnetyczne dzisiaj i prognoza indeksu Kp",
+    description:
+      "Magnitca monitoruje burze magnetyczne, indeks Kp, wiatr słoneczny i pogodę kosmiczną w czasie rzeczywistym dla użytkowników w Polsce.",
+  },
+  about: {
+    title: "O Magnitca",
+    description: "Informacje o serwisie Magnitca, zrodlach danych NOAA i podejsciu redakcyjnym.",
+  },
+  contacts: {
+    title: "Kontakt",
+    description: "Kontakt z zespolem Magnitca: pytania, wspolpraca i zgloszenia bledow.",
+  },
+  privacy: {
+    title: "Polityka prywatnosci",
+    description: "Informacje o prywatnosci, analityce i przetwarzaniu danych w serwisie Magnitca.",
+  },
+  cookies: {
+    title: "Polityka cookie",
+    description: "Informacje o plikach cookie i analityce wykorzystywanych w serwisie Magnitca.",
+  },
+  terms: {
+    title: "Warunki korzystania",
+    description: "Zasady korzystania z serwisu Magnitca, odpowiedzialnosc i charakter informacyjny tresci.",
+  },
+  faq: {
+    title: "FAQ o burzach magnetycznych",
+    description: "Najczesciej zadawane pytania o burze magnetyczne, indeks Kp i wplyw na samopoczucie.",
+  },
+  kp_index: {
+    title: "Indeks Kp",
+    description: "Aktualny indeks Kp, wykres i prognoza aktywnosci geomagnetycznej dla polskiej wersji Magnitca.",
+  },
+  solar_wind: {
+    title: "Wiatr sloneczny",
+    description: "Predkosc wiatru slonecznego, gestosc i pole IMF Bz w czasie rzeczywistym.",
+  },
+  calendar: {
+    title: "Kalendarz burz magnetycznych",
+    description: "Kalendarz aktywnosci geomagnetycznej i prognoza na kolejne dni.",
+  },
+};
+
 const OG_LOCALE: Record<SiteLocale, string> = {
   uk: "uk_UA",
   ru: "ru_RU",
+  pl: "pl_PL",
 };
 
 export async function resolveLocalizedMetadata(
@@ -68,20 +118,31 @@ export async function resolveLocalizedMetadata(
   const canonical = getPathForLocale(path, locale);
   const ukUrl = getPathForLocale(path, "uk");
   const ruUrl = getPathForLocale(path, "ru");
-  const meta = locale === "uk" ? await getPageMeta(pageKey) : RU_PAGE_META[pageKey];
+  const plUrl = getPathForLocale(path, "pl");
+  const meta =
+    locale === "uk"
+      ? await getPageMeta(pageKey)
+      : locale === "ru"
+        ? RU_PAGE_META[pageKey]
+        : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
   const description = meta?.description ?? "";
+  const languages: Record<string, string> = {
+    uk: ukUrl,
+    ru: ruUrl,
+    "x-default": ukUrl,
+  };
+
+  if (pageKey !== "news" && pageKey !== "cities") {
+    languages.pl = plUrl;
+  }
 
   return {
     title,
     description,
     alternates: {
       canonical,
-      languages: {
-        uk: ukUrl,
-        ru: ruUrl,
-        "x-default": ukUrl,
-      },
+      languages,
     },
     openGraph: {
       type: "website",

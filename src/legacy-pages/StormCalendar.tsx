@@ -4,10 +4,12 @@ import { useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar, StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
-import { ru, uk } from "date-fns/locale";
+import { pl, ru, uk } from "date-fns/locale";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
+
+type LegacyLocale = SiteLocale;
 
 const levelColors: Record<StormLevel, string> = {
   none: "",
@@ -31,6 +33,13 @@ const levelLabels = {
     moderate: "Умеренная буря (Kp5)",
     strong: "Сильная буря (Kp6-7)",
     severe: "Экстремальная буря (Kp8-9)",
+  },
+  pl: {
+    none: "Spokojnie",
+    minor: "Słaba burza (Kp4)",
+    moderate: "Umiarkowana burza (Kp5)",
+    strong: "Silna burza (Kp6-7)",
+    severe: "Ekstremalna burza (Kp8-9)",
   },
 };
 
@@ -83,12 +92,32 @@ const copy = {
     seo3:
       "Календарь обновляется автоматически на основе официальных данных NOAA Space Weather Prediction Center. Используйте его для планирования своего дня и контроля самочувствия в период повышенной солнечной активности.",
   },
+  pl: {
+    badge: "KALENDARZ BURZ MAGNETYCZNYCH",
+    pageTitlePrefix: "Kalendarz burz magnetycznych na",
+    pageTitleSuffix: "— Magnitca",
+    pageDescriptionPrefix: "Kalendarz burz magnetycznych na",
+    pageDescriptionSuffix: "Dni z zaburzeniami geomagnetycznymi są oznaczone kolorem według skali intensywności.",
+    intro:
+      "Dni z burzami magnetycznymi są oznaczone kolorem w zależności od intensywności. Przerywana ramka oznacza prognozę na najbliższe dni.",
+    forecast: "Prognoza",
+    disturbanceDays: "Dni z zaburzeniami geomagnetycznymi",
+    forecastBadge: "prognoza",
+    seo1Prefix: "Na tej stronie znajduje się",
+    seo1StrongPrefix: "kalendarz burz magnetycznych na",
+    seo1Rest:
+      "z danymi o aktywności geomagnetycznej dla każdego dnia. Dni z podwyższoną aktywnością są oznaczone kolorem według poziomu intensywności burzy: od słabych (Kp4) po ekstremalne (Kp8–9). Dni prognozowane są wyróżnione przerywaną ramką.",
+    seo2:
+      "Burze geomagnetyczne mierzy się za pomocą planetarnego indeksu Kp i skali G NOAA. Gdy indeks Kp osiąga 4 lub więcej, odnotowuje się burzę magnetyczną. Im wyższy poziom, tym większy wpływ na samopoczucie osób wrażliwych na pogodę, łączność satelitarną, nawigację GPS i sieci energetyczne.",
+    seo3:
+      "Kalendarz jest aktualizowany automatycznie na podstawie oficjalnych danych NOAA Space Weather Prediction Center. Można go wykorzystywać do planowania dnia i obserwowania samopoczucia w okresach zwiększonej aktywności słonecznej.",
+  },
 } as const;
 
-export default function StormCalendar({ locale = "uk" }: { locale?: SiteLocale }) {
+export default function StormCalendar({ locale = "uk" }: { locale?: LegacyLocale }) {
   const t = copy[locale];
-  const dateLocale = locale === "ru" ? ru : uk;
-  const localeTag = locale === "ru" ? "ru-RU" : "uk-UA";
+  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : uk;
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 

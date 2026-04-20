@@ -14,7 +14,7 @@ const kpColors = [
 
 export const KpIndexGauge = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
-  const langPrefix = i18n.language === "ru" ? "/ru" : "";
+  const langPrefix = i18n.language === "ru" ? "/ru" : i18n.language === "pl" ? "/pl" : "";
   const { data: kpData } = useKpIndex();
   const latestKp = kpData && kpData.length > 0 ? kpData[kpData.length - 1].kp : 0;
   const value = Math.min(9, Math.max(0, Math.round(latestKp)));
