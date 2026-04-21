@@ -1,9 +1,11 @@
 "use client";
 
-import { usePageMeta } from "@/hooks/usePageMeta";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
+import type { CityWeatherResult } from "@/hooks/useCityWeather";
 import { useCitySunTimes } from "@/hooks/useCitySunTimes";
+import type { CitySunTimesPayload } from "@/lib/city-sun-times";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
+import type { KpEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
 import { useKpForecast27Day } from "@/hooks/useKpForecast27Day";
 import { formatApiLocalTime } from "@/lib/city-sun-times";
@@ -259,7 +261,16 @@ function AqiItem({ label, value, unit, warn }: { label: string; value: number; u
   );
 }
 
-const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: LegacyLocale }) => {
+interface CityPageProps {
+  slug?: string;
+  locale?: LegacyLocale;
+  initialWeather?: CityWeatherResult | null;
+  initialSunTimes?: CitySunTimesPayload | null;
+  initialKp?: KpEntry[] | null;
+  initialScales?: NoaaScales | null;
+}
+
+const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initialKp, initialScales }: CityPageProps) => {
   const resolvedSlug =
     slug ??
     (typeof window !== "undefined"
@@ -274,21 +285,20 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: LegacyLocal
   const t = copy[locale];
   const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
 
-  const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, undefined, locale);
+  const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, initialWeather ?? undefined, locale);
   const { data: sunTimes } = useCitySunTimes({
     lat: city?.lat ?? 50.4501,
     lon: city?.lon ?? 30.5234,
     timezone: city?.timezone ?? "Europe/Kyiv",
     locale,
-    fallback: data?.current
-      ? {
-          sunrise: data.current.sunrise,
-          sunset: data.current.sunset,
-        }
-      : null,
+    fallback: initialSunTimes
+      ? { sunrise: initialSunTimes.sunrise, sunset: initialSunTimes.sunset }
+      : data?.current
+        ? { sunrise: data.current.sunrise, sunset: data.current.sunset }
+        : null,
   });
-  const { data: kpData } = useKpIndex();
-  const { data: scales } = useNoaaScales();
+  const { data: kpData } = useKpIndex(initialKp ?? undefined);
+  const { data: scales } = useNoaaScales(initialScales ?? undefined);
   const { data: forecast, isLoading: forecastLoading } = useKpForecast();
   const { data: forecast27 = [], isLoading: forecast27Loading } = useKpForecast27Day();
 
@@ -304,11 +314,6 @@ const CityPage = ({ slug, locale = "uk" }: { slug?: string; locale?: LegacyLocal
         ? `Burze magnetyczne w ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoza, pogoda i jakość powietrza w czasie rzeczywistym.`
       : `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
     : "";
-
-  usePageMeta(
-    city?.seoTitle ?? `${t.srOnlyHeading} — ${t.cityNotFound}`,
-    dynamicDescription || city?.seoDescription || ""
-  );
 
   if (!city) return null;
 

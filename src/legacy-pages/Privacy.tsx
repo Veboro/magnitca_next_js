@@ -1,13 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { usePageMeta } from "@/hooks/usePageMeta";
-
 const Privacy = () => {
-  usePageMeta(
-    "Політика конфіденційності — Магнітка",
-    "Політика конфіденційності сервісу Магнітка. Інформація про збір даних, файли cookie та захист персональних даних."
-  );
-
   return (
   <main className="min-h-screen bg-background pt-20 pb-12">
     <div className="mx-auto max-w-3xl px-4 sm:px-6">

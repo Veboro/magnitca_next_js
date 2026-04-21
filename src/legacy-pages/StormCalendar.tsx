@@ -2,10 +2,10 @@
 
 import { useMemo } from "react";
 import { Calendar } from "@/components/ui/calendar";
-import { useStormCalendar, StormDay, StormLevel } from "@/hooks/useStormCalendar";
+import { useStormCalendar } from "@/hooks/useStormCalendar";
+import type { StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
 import { pl, ru, uk } from "date-fns/locale";
-import { usePageMeta } from "@/hooks/usePageMeta";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
 
@@ -114,19 +114,14 @@ const copy = {
   },
 } as const;
 
-export default function StormCalendar({ locale = "uk" }: { locale?: LegacyLocale }) {
+export default function StormCalendar({ locale = "uk", initialData }: { locale?: LegacyLocale; initialData?: StormDay[] | null }) {
   const t = copy[locale];
   const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : uk;
   const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 
-  usePageMeta(
-    `${t.pageTitlePrefix} ${monthName} ${t.pageTitleSuffix}`,
-    `${t.pageDescriptionPrefix} ${monthName}. ${t.pageDescriptionSuffix}`
-  );
-
-  const { data: stormDays, isLoading } = useStormCalendar();
+  const { data: stormDays, isLoading } = useStormCalendar(initialData);
 
   const stormMap = useMemo(() => {
     const map = new Map<string, StormDay>();

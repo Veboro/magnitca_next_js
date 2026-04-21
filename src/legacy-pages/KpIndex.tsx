@@ -1,7 +1,7 @@
 "use client";
 
-import { usePageMeta } from "@/hooks/usePageMeta";
 import { useKpIndex, useNoaaScales } from "@/hooks/useSpaceWeather";
+import type { KpEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
 import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { cn } from "@/lib/utils";
@@ -166,19 +166,19 @@ const todayStr = (localeTag: string) =>
     timeZone: "Europe/Kyiv",
   });
 
-const KpIndex = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
+interface KpIndexProps {
+  locale?: LegacyLocale;
+  initialKp?: KpEntry[] | null;
+  initialScales?: NoaaScales | null;
+}
+
+const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   const t = copy[locale];
   const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const today = todayStr(localeTag);
 
-  usePageMeta(
-    t.pageTitle,
-    t.pageDescription,
-    "/kp-index"
-  );
-
-  const { data: kpData } = useKpIndex();
-  const { data: scales } = useNoaaScales();
+  const { data: kpData } = useKpIndex(initialKp ?? undefined);
+  const { data: scales } = useNoaaScales(initialScales ?? undefined);
   const { data: forecast, isLoading: forecastLoading } = useKpForecast();
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;

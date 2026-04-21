@@ -33,7 +33,7 @@ export interface SolarWindEntry {
   temperature: number;
 }
 
-export function useSolarWind() {
+export function useSolarWind(initialData?: SolarWindEntry[]) {
   return useQuery<SolarWindEntry[]>({
     queryKey: ["solar-wind"],
     queryFn: async () => {
@@ -42,6 +42,7 @@ export function useSolarWind() {
     },
     refetchInterval: 60000,
     staleTime: 30000,
+    initialData,
   });
 }
 
@@ -52,7 +53,7 @@ export interface MagEntry {
   bt: number;
 }
 
-export function useMagData() {
+export function useMagData(initialData?: MagEntry[]) {
   return useQuery<MagEntry[]>({
     queryKey: ["mag-data"],
     queryFn: async () => {
@@ -61,6 +62,7 @@ export function useMagData() {
     },
     refetchInterval: 60000,
     staleTime: 30000,
+    initialData,
   });
 }
 

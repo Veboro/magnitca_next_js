@@ -3,8 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, ArrowLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { usePageMeta } from "@/hooks/usePageMeta";
-
 interface NewsItem {
   id: string;
   title: string;
@@ -22,11 +20,6 @@ const formatDate = (dateStr: string) => {
 };
 
 const News = () => {
-  usePageMeta(
-    "Новини магнітних бур — Магнітка",
-    "Щоденні прогнози та новини магнітних бур. Аналітика геомагнітної активності, сонячного вітру та Kp індексу."
-  );
-
   const { data: news = [], isLoading } = useQuery<NewsItem[]>({
     queryKey: ["news"],
     queryFn: async () => {

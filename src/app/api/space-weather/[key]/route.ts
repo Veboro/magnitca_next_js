@@ -82,6 +82,50 @@ async function fetchFallback(key: SpaceWeatherCacheKey) {
       const today = new Date().toISOString().slice(0, 10);
       return result.filter((d) => d.date >= today);
     }
+    case "storm-calendar": {
+      const [kpRes, scalesRes] = await Promise.all([
+        fetch(`${SWPC_BASE}/products/noaa-planetary-k-index.json`, { cache: "no-store" }),
+        fetch(`${SWPC_BASE}/products/noaa-scales.json`, { cache: "no-store" }),
+      ]);
+      const kpRaw: Array<{ time_tag: string; Kp: number }> = await kpRes.json();
+      const scales = await scalesRes.json();
+
+      function kpToLevel(kp: number) {
+        if (kp >= 8) return "severe";
+        if (kp >= 6) return "strong";
+        if (kp >= 5) return "moderate";
+        if (kp >= 4) return "minor";
+        return "none";
+      }
+
+      const dailyMax: Record<string, number> = {};
+      for (const row of kpRaw) {
+        const date = row.time_tag?.substring(0, 10);
+        if (!date) continue;
+        const kp = row.Kp || 0;
+        if (!dailyMax[date] || kp > dailyMax[date]) dailyMax[date] = kp;
+      }
+
+      const days = Object.entries(dailyMax).map(([date, maxKp]) => ({
+        date,
+        maxKp: Math.round(maxKp * 10) / 10,
+        level: kpToLevel(maxKp),
+        isForecast: false,
+      }));
+
+      for (const key of ["1", "2", "3"]) {
+        const entry = scales[key];
+        if (!entry) continue;
+        const gScale = parseInt(entry.G?.Scale ?? "0", 10);
+        const approxKp = gScale > 0 ? gScale + 4 : 0;
+        const date = entry.DateStamp;
+        if (date && !dailyMax[date]) {
+          days.push({ date, maxKp: approxKp, level: kpToLevel(approxKp), isForecast: true });
+        }
+      }
+
+      return days.sort((a: any, b: any) => a.date.localeCompare(b.date));
+    }
   }
 }
 

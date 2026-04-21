@@ -63,6 +63,46 @@ function mapKpForecast(data: any[]) {
   }));
 }
 
+function mapStormCalendar(kpHistorical: Array<{ time_tag: string; Kp: number }>, scales: any) {
+  type StormLevel = "none" | "minor" | "moderate" | "strong" | "severe";
+
+  function kpToLevel(kp: number): StormLevel {
+    if (kp >= 8) return "severe";
+    if (kp >= 6) return "strong";
+    if (kp >= 5) return "moderate";
+    if (kp >= 4) return "minor";
+    return "none";
+  }
+
+  const dailyMax: Record<string, number> = {};
+  for (const row of kpHistorical) {
+    const date = row.time_tag?.substring(0, 10);
+    if (!date) continue;
+    const kp = row.Kp || 0;
+    if (!dailyMax[date] || kp > dailyMax[date]) dailyMax[date] = kp;
+  }
+
+  const days = Object.entries(dailyMax).map(([date, maxKp]) => ({
+    date,
+    maxKp: Math.round(maxKp * 10) / 10,
+    level: kpToLevel(maxKp),
+    isForecast: false,
+  }));
+
+  for (const key of ["1", "2", "3"]) {
+    const entry = scales[key];
+    if (!entry) continue;
+    const gScale = parseInt(entry.G?.Scale ?? "0", 10);
+    const approxKp = gScale > 0 ? gScale + 4 : 0;
+    const date = entry.DateStamp;
+    if (date && !dailyMax[date]) {
+      days.push({ date, maxKp: approxKp, level: kpToLevel(approxKp), isForecast: true });
+    }
+  }
+
+  return days.sort((a, b) => a.date.localeCompare(b.date));
+}
+
 function mapKpForecast27Day(text: string) {
   const lines = text.split("\n");
   const result: Array<{ date: string; kp: number }> = [];
@@ -103,7 +143,7 @@ Deno.serve(async (req) => {
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, serviceRoleKey);
 
-    const [kpIndexRaw, solarWindRaw, magRaw, scalesRaw, forecastRaw, forecast27Raw] = await Promise.all([
+    const [kpIndexRaw, solarWindRaw, magRaw, scalesRaw, forecastRaw, forecast27Raw, kpHistoricalRaw] = await Promise.all([
       fetchJson<any[]>(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
       fetchJson<string[][]>(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
       fetchJson<string[][]>(`${SWPC_BASE}/products/solar-wind/mag-2-hour.json`),
@@ -113,6 +153,7 @@ Deno.serve(async (req) => {
         if (!res.ok) throw new Error(`Fetch failed [${res.status}] ${SWPC_BASE}/text/27-day-outlook.txt`);
         return res.text();
       }),
+      fetchJson<Array<{ time_tag: string; Kp: number }>>(`${SWPC_BASE}/products/noaa-planetary-k-index.json`),
     ]);
 
     const fetchedAt = new Date().toISOString();
@@ -150,6 +191,12 @@ Deno.serve(async (req) => {
       {
         cache_key: "kp-forecast-27day",
         payload: mapKpForecast27Day(forecast27Raw),
+        source: "noaa",
+        fetched_at: fetchedAt,
+      },
+      {
+        cache_key: "storm-calendar",
+        payload: mapStormCalendar(kpHistoricalRaw, scalesRaw),
         source: "noaa",
         fetched_at: fetchedAt,
       },

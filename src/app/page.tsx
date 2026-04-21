@@ -2,11 +2,22 @@ import type { Metadata } from "next";
 import { resolveLocalizedMetadata } from "@/lib/seo";
 import IndexPage from "@/legacy-pages/Index";
 import uk from "@/i18n/locales/uk";
+import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 
 export async function generateMetadata(): Promise<Metadata> {
   return resolveLocalizedMetadata("home", "/", "uk");
 }
 
-export default function HomePage() {
-  return <IndexPage locale="uk" messages={uk} />;
+export default async function HomePage() {
+  const { kpData, windData, magData, scales } = await getHomePageWeatherData();
+  return (
+    <IndexPage
+      locale="uk"
+      messages={uk}
+      initialKp={kpData}
+      initialWind={windData}
+      initialMag={magData}
+      initialScales={scales}
+    />
+  );
 }

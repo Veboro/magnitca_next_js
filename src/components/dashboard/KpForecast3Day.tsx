@@ -91,7 +91,7 @@ export const KpForecast3Day = ({ className }: { className?: string }) => {
           {days.map((dayEntries, dayIdx) => {
             const maxKp = Math.max(...dayEntries.map((e) => e.kp));
             return (
-              <div key={dayIdx} className="rounded-lg border border-border/40 bg-background/50 p-4">
+              <div key={dayIdx} className="rounded-lg border border-border/50 bg-card p-4">
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono text-xs font-medium text-foreground">{formatDayHeader(dayEntries[0].time_tag)}</span>
                   <span className={cn("text-[10px] font-bold font-mono px-2 py-0.5 rounded border", kpBadgeBg(maxKp))}>
@@ -103,7 +103,7 @@ export const KpForecast3Day = ({ className }: { className?: string }) => {
                     const barWidth = Math.max((entry.kp / MAX_KP) * 100, 3);
                     return (
                       <div key={i} className="flex items-center gap-2">
-                        <span className="font-mono text-[11px] text-muted-foreground/70 w-10 shrink-0">{formatHour(entry.time_tag)}</span>
+                        <span className="font-mono text-[11px] text-muted-foreground w-10 shrink-0">{formatHour(entry.time_tag)}</span>
                         <div className="flex-1 h-3 bg-muted/20 rounded-sm overflow-hidden">
                           <div className={cn("h-full rounded-sm transition-all", kpBarColor(entry.kp))} style={{ width: `${barWidth}%` }} />
                         </div>

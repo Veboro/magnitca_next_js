@@ -3,6 +3,11 @@ import { notFound, redirect } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
 import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getCityByRuSlug, getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
+import { getCityWeatherCache } from "@/lib/city-weather-cache";
+import { getCitySunTimesCache } from "@/lib/city-sun-times-cache";
+import { buildCityWeatherCacheKey } from "@/lib/city-weather";
+import { buildCitySunTimesCacheKey, getDateInTimeZone } from "@/lib/city-sun-times";
+import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 
 type Params = {
   params: Promise<{ slug: string }>;
@@ -58,5 +63,21 @@ export default async function RussianCityPage({ params }: Params) {
     notFound();
   }
 
-  return <CityPageClient slug={city.slug} locale="ru" />;
+  const date = getDateInTimeZone(city.timezone);
+  const [weatherCache, sunTimesCache, { kpData, scales }] = await Promise.all([
+    getCityWeatherCache(buildCityWeatherCacheKey(city.lat, city.lon, city.timezone)),
+    getCitySunTimesCache(buildCitySunTimesCacheKey(city.lat, city.lon, city.timezone, date)),
+    getHomePageWeatherData(),
+  ]);
+
+  return (
+    <CityPageClient
+      slug={city.slug}
+      locale="ru"
+      initialWeather={weatherCache?.payload ?? null}
+      initialSunTimes={sunTimesCache}
+      initialKp={kpData}
+      initialScales={scales}
+    />
+  );
 }

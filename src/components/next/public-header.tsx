@@ -253,7 +253,7 @@ export function PublicHeader() {
               type="button"
               onClick={() => setMobileLocaleOpen((value) => !value)}
               className="inline-flex h-10 min-w-[76px] items-center justify-between rounded-full border border-border/50 bg-card/50 px-3 text-xs font-semibold text-foreground transition-colors hover:border-primary/50"
-              aria-label="Language switcher"
+              aria-label={`${locale.toUpperCase()} — Language switcher`}
               aria-expanded={mobileLocaleOpen}
             >
               <span>{locale.toUpperCase()}</span>

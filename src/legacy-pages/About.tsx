@@ -1,14 +1,7 @@
 // rebuild trigger
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
-import { usePageMeta } from "@/hooks/usePageMeta";
-
 const About = () => {
-  usePageMeta(
-    "Про нас — Магнітка | Моніторинг магнітних бур",
-    "Магнітка — безкоштовний український сервіс моніторингу магнітних бур у реальному часі. Дані NOAA, Kp-індекс, вплив на здоров'я."
-  );
-
   return (
   <main className="min-h-screen bg-background pt-20 pb-12">
     <div className="mx-auto max-w-3xl px-4 sm:px-6">

@@ -61,7 +61,7 @@ export const StormStatusBanner = () => {
                 {effectiveLevel > 0 ? t("storm.geoStorm") : t("storm.monitoring")}
               </span>
             </div>
-            <h1 className="font-display text-3xl font-bold text-foreground">{levelLabel}</h1>
+            <h2 className="font-display text-3xl font-bold text-foreground">{levelLabel}</h2>
             <p className="max-w-md text-sm text-muted-foreground">{levelDesc}</p>
           </div>
           <div

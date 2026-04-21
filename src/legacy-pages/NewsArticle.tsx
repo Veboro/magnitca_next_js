@@ -3,9 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { CalendarDays, Clock, ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
-import { usePageMeta } from "@/hooks/usePageMeta";
-
-
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return d.toLocaleDateString("uk-UA", {
@@ -54,12 +51,6 @@ const NewsArticle = () => {
   const articleTitle = (article as any)?.meta_title || article?.title || "Новина";
   const articleDescRaw = (article as any)?.meta_description || article?.content?.slice(0, 150)?.replace(/<[^>]*>/g, "")?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
   const articleSlugOrId = article?.slug || article?.id || slug;
-
-  usePageMeta(
-    `${articleTitle} — Магнітка`,
-    articleDescRaw,
-    `/news/${articleSlugOrId}`
-  );
 
   // Update OG image if article has one
   useEffect(() => {

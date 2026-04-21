@@ -2,17 +2,19 @@
 
 import { Wind, Gauge, Radio, Sun, Activity, Thermometer, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
-import { usePageMeta } from "@/hooks/usePageMeta";
+import dynamic from "next/dynamic";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MetricCard } from "@/components/dashboard/MetricCard";
 import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
-import { SolarWindChart } from "@/components/dashboard/SolarWindChart";
-import { BzChart } from "@/components/dashboard/BzChart";
 import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
-import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
-import { NewsWidget } from "@/components/dashboard/NewsWidget";
+
+const SolarWindChart = dynamic(() => import("@/components/dashboard/SolarWindChart").then(m => ({ default: m.SolarWindChart })), { ssr: false });
+const BzChart = dynamic(() => import("@/components/dashboard/BzChart").then(m => ({ default: m.BzChart })), { ssr: false });
+const Forecast27Day = dynamic(() => import("@/components/dashboard/Forecast27Day").then(m => ({ default: m.Forecast27Day })), { ssr: false });
+const NewsWidget = dynamic(() => import("@/components/dashboard/NewsWidget").then(m => ({ default: m.NewsWidget })), { ssr: false });
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
+import type { KpEntry, SolarWindEntry, MagEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import { CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
@@ -30,7 +32,16 @@ function getByPath(source: Record<string, any>, path: string): string {
   return path.split(".").reduce<any>((acc, segment) => acc?.[segment], source) ?? path;
 }
 
-const Index = ({ locale, messages }: { locale: SiteLocale; messages: Record<string, any> }) => {
+interface IndexProps {
+  locale: SiteLocale;
+  messages: Record<string, any>;
+  initialKp?: KpEntry[] | null;
+  initialWind?: SolarWindEntry[] | null;
+  initialMag?: MagEntry[] | null;
+  initialScales?: NoaaScales | null;
+}
+
+const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialScales }: IndexProps) => {
   const t = (path: string, vars?: Record<string, string>) => {
     let value = getByPath(messages, path);
 
@@ -52,8 +63,6 @@ const Index = ({ locale, messages }: { locale: SiteLocale; messages: Record<stri
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
   const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : "";
 
-  usePageMeta(t("index.title"), t("index.description"));
-
   useEffect(() => {
     const timer = setInterval(() => {
       setCountdown((prev) => (prev <= 1 ? REFRESH_INTERVAL : prev - 1));
@@ -61,10 +70,10 @@ const Index = ({ locale, messages }: { locale: SiteLocale; messages: Record<stri
     return () => clearInterval(timer);
   }, []);
 
-  const { data: kpData } = useKpIndex();
-  const { data: windData } = useSolarWind();
-  const { data: magData } = useMagData();
-  const { data: scales } = useNoaaScales();
+  const { data: kpData } = useKpIndex(initialKp ?? undefined);
+  const { data: windData } = useSolarWind(initialWind ?? undefined);
+  const { data: magData } = useMagData(initialMag ?? undefined);
+  const { data: scales } = useNoaaScales(initialScales ?? undefined);
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const latestWind = windData?.length ? windData[windData.length - 1] : null;

@@ -1,6 +1,5 @@
 "use client";
 
-import { usePageMeta } from "@/hooks/usePageMeta";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
 import { useCitySunTimes } from "@/hooks/useCitySunTimes";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
@@ -153,13 +152,6 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const kpStatus = getKpStatus(latestKp, locale);
 
   const todayDate = new Date().toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric" });
-
-  usePageMeta(
-    t.title,
-    locale === "ru"
-      ? `Магнитные бури в Киеве ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, качество воздуха в реальном времени.`
-      : `Магнітні бурі в Києві ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
-  );
 
   const today = new Date().toLocaleDateString(localeTag, {
     weekday: "long",

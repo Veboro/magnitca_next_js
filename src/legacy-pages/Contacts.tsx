@@ -1,16 +1,10 @@
 import { useState } from "react";
 import { ArrowLeft, Send, Loader2, CheckCircle } from "lucide-react";
 import { Link } from "react-router-dom";
-import { usePageMeta } from "@/hooks/usePageMeta";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
 const Contacts = () => {
-  usePageMeta(
-    "Контакти — Магнітка",
-    "Зв'яжіться з командою Магнітки. Питання, пропозиції та повідомлення про помилки."
-  );
-
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");

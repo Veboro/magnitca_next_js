@@ -7,7 +7,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { HelpCircle, Zap, Heart, Wifi, Sun, Shield, Globe, Activity } from "lucide-react";
-import { usePageMeta } from "@/hooks/usePageMeta";
 import type { SiteLocale } from "@/lib/locale";
 
 type LegacyLocale = SiteLocale;
@@ -442,8 +441,6 @@ function buildFaqJsonLd(sections: FAQSection[]) {
 const FAQ = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const t = copy[locale];
   const faqJsonLd = buildFaqJsonLd(t.sections);
-
-  usePageMeta(t.metaTitle, t.metaDescription);
 
   return (
     <main className="min-h-screen bg-background">

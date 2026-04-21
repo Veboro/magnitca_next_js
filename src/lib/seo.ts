@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { getPageMeta } from "@/lib/admin-content";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
 import { getPathForLocale, type SiteLocale } from "@/lib/locale";
 
 const RU_PAGE_META: Record<string, { title: string; description: string }> = {
@@ -126,7 +126,7 @@ export async function resolveLocalizedMetadata(
         ? RU_PAGE_META[pageKey]
         : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
-  const description = meta?.description ?? "";
+  const description = meta?.description || SITE_DESCRIPTION;
   const languages: Record<string, string> = {
     uk: ukUrl,
     ru: ruUrl,

@@ -53,6 +53,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} className="dark">
+      <head>
+        <link rel="preconnect" href="https://xdysdmtwhhnkvdbaaflm.supabase.co" />
+        <link rel="preload" as="image" href="/hero-bg.jpg" fetchPriority="high" />
+      </head>
       <body>
         <Suspense fallback={null}>
           <GoogleAnalytics />

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import IndexPage from "@/legacy-pages/Index";
 import { absoluteUrl } from "@/lib/site";
 import pl from "@/i18n/locales/pl";
+import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 
 export async function generateMetadata(): Promise<Metadata> {
   const canonical = absoluteUrl("/pl");
@@ -45,6 +46,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default function PolishLandingPage() {
-  return <IndexPage locale="pl" messages={pl} />;
+export default async function PolishLandingPage() {
+  const { kpData, windData, magData, scales } = await getHomePageWeatherData();
+  return (
+    <IndexPage
+      locale="pl"
+      messages={pl}
+      initialKp={kpData}
+      initialWind={windData}
+      initialMag={magData}
+      initialScales={scales}
+    />
+  );
 }

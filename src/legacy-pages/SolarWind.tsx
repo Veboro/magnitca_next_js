@@ -1,7 +1,7 @@
 "use client";
 
-import { usePageMeta } from "@/hooks/usePageMeta";
 import { useSolarWind, useMagData } from "@/hooks/useSpaceWeather";
+import type { SolarWindEntry, MagEntry } from "@/hooks/useSpaceWeather";
 import { cn } from "@/lib/utils";
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { Wind, TrendingUp, Info, HelpCircle, Gauge, Zap } from "lucide-react";
@@ -214,19 +214,19 @@ const CustomTooltip = ({ active, payload, label, locale = "uk" }: any) => {
   );
 };
 
-const SolarWind = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
+interface SolarWindProps {
+  locale?: LegacyLocale;
+  initialWind?: SolarWindEntry[] | null;
+  initialMag?: MagEntry[] | null;
+}
+
+const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) => {
   const t = copy[locale];
   const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
   const today = todayStr(localeTag);
 
-  usePageMeta(
-    t.pageTitle,
-    t.pageDescription,
-    "/solar-wind"
-  );
-
-  const { data: windData, isLoading: windLoading } = useSolarWind();
-  const { data: magData, isLoading: magLoading } = useMagData();
+  const { data: windData, isLoading: windLoading } = useSolarWind(initialWind ?? undefined);
+  const { data: magData, isLoading: magLoading } = useMagData(initialMag ?? undefined);
 
   const latestWind = windData?.length ? windData[windData.length - 1] : null;
   const latestMag = magData?.length ? magData[magData.length - 1] : null;
