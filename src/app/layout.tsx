@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { Suspense } from "react";
 import "../index.css";
 import { GoogleAnalytics } from "@/components/next/google-analytics";
@@ -44,15 +43,8 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const headerStore = await headers();
-  const locale = headerStore.get("x-site-locale") === "ru"
-    ? "ru"
-    : headerStore.get("x-site-locale") === "pl"
-      ? "pl"
-      : "uk";
-
   return (
-    <html lang={locale} className="dark">
+    <html lang="uk" className="dark">
       <head>
         <link rel="preconnect" href="https://xdysdmtwhhnkvdbaaflm.supabase.co" />
         <link rel="preload" as="image" href="/hero-bg.jpg" fetchPriority="high" />
@@ -61,7 +53,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
-        <Providers initialLocale={locale}>{children}</Providers>
+        <Providers initialLocale="uk">{children}</Providers>
       </body>
     </html>
   );
