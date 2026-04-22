@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { getSupabaseAdminClient } from "@/lib/server-supabase";
 import type { KpEntry, SolarWindEntry, MagEntry, NoaaScales } from "@/hooks/useSpaceWeather";
+import type { KpForecastEntry } from "@/hooks/useKpForecast";
 import type { StormDay } from "@/hooks/useStormCalendar";
 
 export const SPACE_WEATHER_KEYS = [
@@ -39,17 +40,19 @@ export interface HomePageWeatherData {
   windData: SolarWindEntry[] | null;
   magData: MagEntry[] | null;
   scales: NoaaScales | null;
+  forecast3Day: KpForecastEntry[] | null;
 }
 
 export const getHomePageWeatherData = unstable_cache(
   async (): Promise<HomePageWeatherData> => {
-    const [kpData, windData, magData, scales] = await Promise.all([
+    const [kpData, windData, magData, scales, forecast3Day] = await Promise.all([
       getSpaceWeatherCache<KpEntry[]>("kp-index"),
       getSpaceWeatherCache<SolarWindEntry[]>("solar-wind"),
       getSpaceWeatherCache<MagEntry[]>("mag-data"),
       getSpaceWeatherCache<NoaaScales>("noaa-scales"),
+      getSpaceWeatherCache<KpForecastEntry[]>("kp-forecast-3day"),
     ]);
-    return { kpData, windData, magData, scales };
+    return { kpData, windData, magData, scales, forecast3Day };
   },
   ["home-weather"],
   { revalidate: 300 },

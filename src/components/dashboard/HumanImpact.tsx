@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
-import { useKpIndex } from "@/hooks/useSpaceWeather";
-import { useKpForecast } from "@/hooks/useKpForecast";
+import { useKpIndex, type KpEntry } from "@/hooks/useSpaceWeather";
+import { useKpForecast, type KpForecastEntry } from "@/hooks/useKpForecast";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -33,10 +33,18 @@ const getImpactLevel = (kp: number): number => {
   return 4;
 };
 
-export const HumanImpact = ({ className }: { className?: string }) => {
+export const HumanImpact = ({
+  className,
+  initialKp,
+  initialForecast,
+}: {
+  className?: string;
+  initialKp?: KpEntry[] | null;
+  initialForecast?: KpForecastEntry[] | null;
+}) => {
   const { t, i18n } = useTranslation();
-  const { data: kpData } = useKpIndex();
-  const { data: forecast } = useKpForecast();
+  const { data: kpData } = useKpIndex(initialKp ?? undefined);
+  const { data: forecast } = useKpForecast(initialForecast ?? undefined);
   const { user } = useAuth();
   const langPrefix = i18n.language === "ru" ? "/ru" : i18n.language === "pl" ? "/pl" : "";
 

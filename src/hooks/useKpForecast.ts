@@ -8,7 +8,7 @@ export interface KpForecastEntry {
 /**
  * 3-day Kp forecast from NOAA SWPC (3-hour intervals)
  */
-export function useKpForecast() {
+export function useKpForecast(initialData?: KpForecastEntry[]) {
   return useQuery<KpForecastEntry[]>({
     queryKey: ["kp-forecast-3day"],
     queryFn: async () => {
@@ -17,5 +17,6 @@ export function useKpForecast() {
     },
     refetchInterval: 300000, // every 5 min
     staleTime: 120000,
+    initialData,
   });
 }

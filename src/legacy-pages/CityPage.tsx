@@ -6,7 +6,7 @@ import { useCitySunTimes } from "@/hooks/useCitySunTimes";
 import type { CitySunTimesPayload } from "@/lib/city-sun-times";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import type { KpEntry, NoaaScales } from "@/hooks/useSpaceWeather";
-import { useKpForecast } from "@/hooks/useKpForecast";
+import { useKpForecast, type KpForecastEntry } from "@/hooks/useKpForecast";
 import { useKpForecast27Day } from "@/hooks/useKpForecast27Day";
 import { formatApiLocalTime } from "@/lib/city-sun-times";
 import { useQuery } from "@tanstack/react-query";
@@ -268,9 +268,10 @@ interface CityPageProps {
   initialSunTimes?: CitySunTimesPayload | null;
   initialKp?: KpEntry[] | null;
   initialScales?: NoaaScales | null;
+  initialForecast3?: KpForecastEntry[] | null;
 }
 
-const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initialKp, initialScales }: CityPageProps) => {
+const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initialKp, initialScales, initialForecast3 }: CityPageProps) => {
   const resolvedSlug =
     slug ??
     (typeof window !== "undefined"
@@ -299,7 +300,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
   });
   const { data: kpData } = useKpIndex(initialKp ?? undefined);
   const { data: scales } = useNoaaScales(initialScales ?? undefined);
-  const { data: forecast, isLoading: forecastLoading } = useKpForecast();
+  const { data: forecast, isLoading: forecastLoading } = useKpForecast(initialForecast3 ?? undefined);
   const { data: forecast27 = [], isLoading: forecast27Loading } = useKpForecast27Day();
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
@@ -341,7 +342,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
               </h2>
             </div>
             <div className="flex-1 [&>div]:rounded-t-none">
-              <StormStatusBanner />
+              <StormStatusBanner initialKp={initialKp} initialScales={initialScales} initialForecast={initialForecast3} />
             </div>
           </div>
 

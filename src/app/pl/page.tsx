@@ -47,7 +47,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PolishLandingPage() {
-  const { kpData, windData, magData, scales } = await getHomePageWeatherData();
+  const { kpData, windData, magData, scales, forecast3Day } = await getHomePageWeatherData();
   return (
     <IndexPage
       locale="pl"
@@ -56,6 +56,7 @@ export default async function PolishLandingPage() {
       initialWind={windData}
       initialMag={magData}
       initialScales={scales}
+      initialForecast3={forecast3Day}
     />
   );
 }

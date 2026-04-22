@@ -1,7 +1,7 @@
 import { AlertTriangle, Zap, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
-import { useKpForecast } from "@/hooks/useKpForecast";
+import { useNoaaScales, useKpIndex, type KpEntry, type NoaaScales } from "@/hooks/useSpaceWeather";
+import { useKpForecast, type KpForecastEntry } from "@/hooks/useKpForecast";
 
 const getEffectiveLevel = (gLevel: number, kp: number): number => {
   const kpLevel = kp < 4 ? 0 : kp < 5 ? 1 : kp < 6 ? 2 : kp < 7 ? 3 : kp < 8 ? 4 : 5;
@@ -17,12 +17,18 @@ const levelColors: Record<number, string> = {
   5: "hsl(0, 80%, 55%)",
 };
 
-export const StormStatusBanner = () => {
+interface StormStatusBannerProps {
+  initialKp?: KpEntry[] | null;
+  initialScales?: NoaaScales | null;
+  initialForecast?: KpForecastEntry[] | null;
+}
+
+export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }: StormStatusBannerProps) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
-  const { data: scales } = useNoaaScales();
-  const { data: kpData } = useKpIndex();
-  const { data: forecast = [] } = useKpForecast();
+  const { data: scales } = useNoaaScales(initialScales ?? undefined);
+  const { data: kpData } = useKpIndex(initialKp ?? undefined);
+  const { data: forecast = [] } = useKpForecast(initialForecast ?? undefined);
 
   const gLevel = scales?.g?.Scale ?? 0;
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;

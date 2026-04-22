@@ -52,7 +52,7 @@ export default async function CityPage({ params }: Params) {
   }
 
   const date = getDateInTimeZone(city.timezone);
-  const [weatherCache, sunTimesCache, { kpData, scales }] = await Promise.all([
+  const [weatherCache, sunTimesCache, { kpData, scales, forecast3Day }] = await Promise.all([
     getCityWeatherCache(buildCityWeatherCacheKey(city.lat, city.lon, city.timezone)),
     getCitySunTimesCache(buildCitySunTimesCacheKey(city.lat, city.lon, city.timezone, date)),
     getHomePageWeatherData(),
@@ -66,6 +66,7 @@ export default async function CityPage({ params }: Params) {
       initialSunTimes={sunTimesCache}
       initialKp={kpData}
       initialScales={scales}
+      initialForecast3={forecast3Day}
     />
   );
 }

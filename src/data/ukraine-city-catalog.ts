@@ -94,33 +94,105 @@ export const EXTRA_UK_CITIES: CityConfig[] = [
   makeCity("yalta", "Ялта", "Ялті", 44.4952, 34.1663),
   makeCity("kerch", "Керч", "Керчі", 45.3560, 36.4674),
   makeCity("yevpatoriia", "Євпаторія", "Євпаторії", 45.2009, 33.3666),
+  // Vinnytska
+  makeCity("haisyn", "Гайсин", "Гайсині", 48.8103, 29.3842),
+  makeCity("tulchyn", "Тульчин", "Тульчині", 48.6744, 28.8497),
+  makeCity("khmilnyk", "Хмільник", "Хмільнику", 49.5569, 27.9572),
+  // Volynska
+  makeCity("kamin-kashyrskyi", "Камінь-Каширський", "Камені-Каширському", 51.6242, 24.9606),
+  // Dnipropetrovska
+  makeCity("nikopol", "Нікополь", "Нікополі", 47.5670, 34.4000),
+  makeCity("synelnykove", "Синельникове", "Синельниковому", 48.3178, 35.5119),
+  makeCity("novomoskovsk", "Новомосковськ", "Новомосковську", 48.6333, 35.2167),
+  // Donetska
+  makeCity("bakhmut", "Бахмут", "Бахмуті", 48.5947, 38.0008),
+  makeCity("horlivka", "Горлівка", "Горлівці", 48.3000, 38.0500),
+  makeCity("pokrovsk", "Покровськ", "Покровську", 48.2828, 37.1828),
+  makeCity("volnovakha", "Волноваха", "Волновасі", 47.6022, 37.4919),
+  // Zhytomyrska
+  makeCity("zviahel", "Звягель", "Звягелі", 50.5833, 27.6333),
+  // Zakarpatska
+  makeCity("berehove", "Берегове", "Береговому", 48.2056, 22.6472),
+  makeCity("rakhiv", "Рахів", "Рахові", 48.0500, 24.2000),
+  makeCity("tiachiv", "Тячів", "Тячеві", 48.0114, 23.5722),
+  // Zaporizka
+  makeCity("polohy", "Пологи", "Пологах", 47.4833, 36.2500),
+  makeCity("vasylivka", "Василівка", "Василівці", 47.4431, 35.2819),
+  // Ivano-Frankivska
+  makeCity("nadvirna", "Надвірна", "Надвірній", 48.6330, 24.5830),
+  makeCity("kosiv", "Косів", "Косові", 48.3135, 25.0822),
+  makeCity("verkhovyna", "Верховина", "Верховині", 48.1517, 24.8136),
+  // Kyivska
+  makeCity("fastiv", "Фастів", "Фастові", 50.0767, 29.9177),
+  makeCity("obukhiv", "Обухів", "Обухові", 50.1101, 30.6265),
+  makeCity("vyshhorod", "Вишгород", "Вишгороді", 50.8170, 30.4000),
+  // Kirovohradska
+  makeCity("novoukrainka", "Новоукраїнка", "Новоукраїнці", 48.3231, 31.5242),
+  makeCity("holovanivsk", "Голованівськ", "Голованівську", 48.3800, 30.4472),
+  // Luhanska
+  makeCity("alchevsk", "Алчевськ", "Алчевську", 48.4778, 38.7978),
+  makeCity("starobilsk", "Старобільськ", "Старобільську", 49.2775, 38.9242),
+  makeCity("svatove", "Сватове", "Сватовому", 49.4150, 38.1550),
+  makeCity("dovzhansk", "Довжанськ", "Довжанську", 48.0778, 39.6472),
+  makeCity("rovenky", "Ровеньки", "Ровеньках", 48.0711, 39.3428),
+  // Lvivska
+  makeCity("sambir", "Самбір", "Самборі", 49.5167, 23.2028),
+  makeCity("zolochiv", "Золочів", "Золочеві", 49.8075, 24.9031),
+  // Mykolaivska
+  makeCity("voznesensk", "Вознесенськ", "Вознесенську", 47.5500, 31.3330),
+  makeCity("bashtanka", "Баштанка", "Баштанці", 47.4056, 32.4375),
+  // Odeska
+  makeCity("podilsk", "Подільськ", "Подільську", 47.7419, 29.5350),
+  makeCity("rozdilna", "Роздільна", "Роздільній", 46.8486, 30.0792),
+  makeCity("bolhrad", "Болград", "Болграді", 45.6672, 28.6128),
+  makeCity("berezivka", "Березівка", "Березівці", 47.2039, 30.9128),
+  // Rivnenska
+  makeCity("sarny", "Сарни", "Сарнах", 51.3372, 26.6058),
+  // Sumska
+  makeCity("romny", "Ромни", "Ромнах", 50.7500, 33.4670),
+  // Kharkivska
+  makeCity("chuhuiv", "Чугуїв", "Чугуєві", 49.8356, 36.6864),
+  makeCity("kupiansk", "Куп'янськ", "Куп'янську", 49.7170, 37.5830),
+  makeCity("bohodukhiv", "Богодухів", "Богодухові", 50.1822, 35.5161),
+  makeCity("krasnohrad", "Красноград", "Красноградi", 49.3686, 35.4500),
+  // Khersonska
+  makeCity("skadovsk", "Скадовськ", "Скадовську", 46.1170, 32.9170),
+  makeCity("beryslav", "Берислав", "Бериславі", 46.8330, 33.4170),
+  // Cherkaska
+  makeCity("zvenyhorodka", "Звенигородка", "Звенигородці", 49.0697, 30.9678),
+  // Chernivtska
+  makeCity("vyzhnytsia", "Вижниця", "Вижниці", 48.2500, 25.1917),
+  makeCity("kelmentsi", "Кельменці", "Кельменцях", 48.4633, 26.8292),
+  // Chernihivska
+  makeCity("novhorod-siverskyi", "Новгород-Сіверський", "Новгороді-Сіверському", 52.0043, 33.2780),
+  makeCity("koriukivka", "Корюківка", "Корюківці", 51.7833, 32.2500),
 ];
 
 export const UKRAINE_REGION_GROUPS: RegionGroup[] = [
   { key: "kyiv-city", titleUk: "м. Київ", titleRu: "г. Киев", slugs: ["kyiv"] },
-  { key: "vinnytsia", titleUk: "Вінницька область", titleRu: "Винницкая область", slugs: ["vinnytsia", "zhmerynka", "mohyliv-podilskyi"] },
-  { key: "volyn", titleUk: "Волинська область", titleRu: "Волынская область", slugs: ["lutsk", "kovel", "volodymyr"] },
-  { key: "dnipropetrovsk", titleUk: "Дніпропетровська область", titleRu: "Днепропетровская область", slugs: ["dnipro", "kryvyi-rih", "kamianske", "pavlohrad"] },
-  { key: "donetsk", titleUk: "Донецька область", titleRu: "Донецкая область", slugs: ["donetsk", "mariupol", "kramatorsk", "sloviansk"] },
-  { key: "zhytomyr", titleUk: "Житомирська область", titleRu: "Житомирская область", slugs: ["zhytomyr", "berdychiv", "korosten"] },
-  { key: "zakarpattia", titleUk: "Закарпатська область", titleRu: "Закарпатская область", slugs: ["uzhhorod", "mukachevo", "khust"] },
-  { key: "zaporizhzhia", titleUk: "Запорізька область", titleRu: "Запорожская область", slugs: ["zaporizhzhia", "melitopol", "berdiansk"] },
-  { key: "ivano-frankivsk", titleUk: "Івано-Франківська область", titleRu: "Ивано-Франковская область", slugs: ["ivano-frankivsk", "kalush", "kolomyia"] },
-  { key: "kyiv-oblast", titleUk: "Київська область", titleRu: "Киевская область", slugs: ["bila-tserkva", "brovary", "boryspil", "bucha", "irpin"] },
-  { key: "kirovohrad", titleUk: "Кіровоградська область", titleRu: "Кировоградская область", slugs: ["kropyvnytskyi", "oleksandriia", "svitlovodsk"] },
-  { key: "luhansk", titleUk: "Луганська область", titleRu: "Луганская область", slugs: ["luhansk", "sievierodonetsk", "lysychansk"] },
-  { key: "lviv", titleUk: "Львівська область", titleRu: "Львовская область", slugs: ["lviv", "drohobych", "chervonohrad", "stryi"] },
-  { key: "mykolaiv", titleUk: "Миколаївська область", titleRu: "Николаевская область", slugs: ["mykolaiv", "pervomaisk", "yuzhnoukrainsk"] },
-  { key: "odesa", titleUk: "Одеська область", titleRu: "Одесская область", slugs: ["odesa", "izmail", "bilhorod-dnistrovskyi", "chornomorsk"] },
+  { key: "vinnytsia", titleUk: "Вінницька область", titleRu: "Винницкая область", slugs: ["vinnytsia", "zhmerynka", "mohyliv-podilskyi", "haisyn", "tulchyn", "khmilnyk"] },
+  { key: "volyn", titleUk: "Волинська область", titleRu: "Волынская область", slugs: ["lutsk", "kovel", "volodymyr", "kamin-kashyrskyi"] },
+  { key: "dnipropetrovsk", titleUk: "Дніпропетровська область", titleRu: "Днепропетровская область", slugs: ["dnipro", "kryvyi-rih", "kamianske", "pavlohrad", "nikopol", "synelnykove", "novomoskovsk"] },
+  { key: "donetsk", titleUk: "Донецька область", titleRu: "Донецкая область", slugs: ["donetsk", "mariupol", "kramatorsk", "sloviansk", "bakhmut", "horlivka", "pokrovsk", "volnovakha"] },
+  { key: "zhytomyr", titleUk: "Житомирська область", titleRu: "Житомирская область", slugs: ["zhytomyr", "berdychiv", "korosten", "zviahel"] },
+  { key: "zakarpattia", titleUk: "Закарпатська область", titleRu: "Закарпатская область", slugs: ["uzhhorod", "mukachevo", "khust", "berehove", "rakhiv", "tiachiv"] },
+  { key: "zaporizhzhia", titleUk: "Запорізька область", titleRu: "Запорожская область", slugs: ["zaporizhzhia", "melitopol", "berdiansk", "polohy", "vasylivka"] },
+  { key: "ivano-frankivsk", titleUk: "Івано-Франківська область", titleRu: "Ивано-Франковская область", slugs: ["ivano-frankivsk", "kalush", "kolomyia", "nadvirna", "kosiv", "verkhovyna"] },
+  { key: "kyiv-oblast", titleUk: "Київська область", titleRu: "Киевская область", slugs: ["bila-tserkva", "brovary", "boryspil", "bucha", "irpin", "fastiv", "obukhiv", "vyshhorod"] },
+  { key: "kirovohrad", titleUk: "Кіровоградська область", titleRu: "Кировоградская область", slugs: ["kropyvnytskyi", "oleksandriia", "svitlovodsk", "novoukrainka", "holovanivsk"] },
+  { key: "luhansk", titleUk: "Луганська область", titleRu: "Луганская область", slugs: ["luhansk", "sievierodonetsk", "lysychansk", "alchevsk", "starobilsk", "svatove", "dovzhansk", "rovenky"] },
+  { key: "lviv", titleUk: "Львівська область", titleRu: "Львовская область", slugs: ["lviv", "drohobych", "chervonohrad", "stryi", "sambir", "zolochiv"] },
+  { key: "mykolaiv", titleUk: "Миколаївська область", titleRu: "Николаевская область", slugs: ["mykolaiv", "pervomaisk", "yuzhnoukrainsk", "voznesensk", "bashtanka"] },
+  { key: "odesa", titleUk: "Одеська область", titleRu: "Одесская область", slugs: ["odesa", "izmail", "bilhorod-dnistrovskyi", "chornomorsk", "podilsk", "rozdilna", "bolhrad", "berezivka"] },
   { key: "poltava", titleUk: "Полтавська область", titleRu: "Полтавская область", slugs: ["poltava", "kremenchuk", "myrhorod", "lubny"] },
-  { key: "rivne", titleUk: "Рівненська область", titleRu: "Ровенская область", slugs: ["rivne", "dubno", "varash"] },
-  { key: "sumy", titleUk: "Сумська область", titleRu: "Сумская область", slugs: ["sumy", "konotop", "shostka", "okhtyrka"] },
+  { key: "rivne", titleUk: "Рівненська область", titleRu: "Ровенская область", slugs: ["rivne", "dubno", "varash", "sarny"] },
+  { key: "sumy", titleUk: "Сумська область", titleRu: "Сумская область", slugs: ["sumy", "konotop", "shostka", "okhtyrka", "romny"] },
   { key: "ternopil", titleUk: "Тернопільська область", titleRu: "Тернопольская область", slugs: ["ternopil", "chortkiv", "kremenets"] },
-  { key: "kharkiv", titleUk: "Харківська область", titleRu: "Харьковская область", slugs: ["kharkiv", "lozova", "izium"] },
-  { key: "kherson", titleUk: "Херсонська область", titleRu: "Херсонская область", slugs: ["kherson", "nova-kakhovka", "henichesk"] },
+  { key: "kharkiv", titleUk: "Харківська область", titleRu: "Харьковская область", slugs: ["kharkiv", "lozova", "izium", "chuhuiv", "kupiansk", "bohodukhiv", "krasnohrad"] },
+  { key: "kherson", titleUk: "Херсонська область", titleRu: "Херсонская область", slugs: ["kherson", "nova-kakhovka", "henichesk", "skadovsk", "beryslav"] },
   { key: "khmelnytskyi", titleUk: "Хмельницька область", titleRu: "Хмельницкая область", slugs: ["khmelnytskyi", "kamianets-podilskyi", "shepetivka"] },
-  { key: "cherkasy", titleUk: "Черкаська область", titleRu: "Черкасская область", slugs: ["cherkasy", "uman", "smila", "zolotonosha"] },
-  { key: "chernivtsi", titleUk: "Чернівецька область", titleRu: "Черновицкая область", slugs: ["chernivtsi", "khotyn", "storozhynets"] },
-  { key: "chernihiv", titleUk: "Чернігівська область", titleRu: "Черниговская область", slugs: ["chernihiv", "nizhyn", "pryluky"] },
+  { key: "cherkasy", titleUk: "Черкаська область", titleRu: "Черкасская область", slugs: ["cherkasy", "uman", "smila", "zolotonosha", "zvenyhorodka"] },
+  { key: "chernivtsi", titleUk: "Чернівецька область", titleRu: "Черновицкая область", slugs: ["chernivtsi", "khotyn", "storozhynets", "vyzhnytsia", "kelmentsi"] },
+  { key: "chernihiv", titleUk: "Чернігівська область", titleRu: "Черниговская область", slugs: ["chernihiv", "nizhyn", "pryluky", "novhorod-siverskyi", "koriukivka"] },
   { key: "crimea", titleUk: "Автономна Республіка Крим", titleRu: "Автономная Республика Крым", slugs: ["simferopol", "sevastopol", "yalta", "kerch", "yevpatoriia"] },
 ];

@@ -9,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RussianHomePage() {
-  const { kpData, windData, magData, scales } = await getHomePageWeatherData();
+  const { kpData, windData, magData, scales, forecast3Day } = await getHomePageWeatherData();
   return (
     <IndexPage
       locale="ru"
@@ -18,6 +18,7 @@ export default async function RussianHomePage() {
       initialWind={windData}
       initialMag={magData}
       initialScales={scales}
+      initialForecast3={forecast3Day}
     />
   );
 }

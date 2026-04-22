@@ -8,13 +8,14 @@ import { MetricCard } from "@/components/dashboard/MetricCard";
 import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
 import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
+import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
+import { NewsWidget } from "@/components/dashboard/NewsWidget";
 
 const SolarWindChart = dynamic(() => import("@/components/dashboard/SolarWindChart").then(m => ({ default: m.SolarWindChart })), { ssr: false });
 const BzChart = dynamic(() => import("@/components/dashboard/BzChart").then(m => ({ default: m.BzChart })), { ssr: false });
-const Forecast27Day = dynamic(() => import("@/components/dashboard/Forecast27Day").then(m => ({ default: m.Forecast27Day })), { ssr: false });
-const NewsWidget = dynamic(() => import("@/components/dashboard/NewsWidget").then(m => ({ default: m.NewsWidget })), { ssr: false });
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 import type { KpEntry, SolarWindEntry, MagEntry, NoaaScales } from "@/hooks/useSpaceWeather";
+import type { KpForecastEntry } from "@/hooks/useKpForecast";
 import { CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
@@ -39,9 +40,10 @@ interface IndexProps {
   initialWind?: SolarWindEntry[] | null;
   initialMag?: MagEntry[] | null;
   initialScales?: NoaaScales | null;
+  initialForecast3?: KpForecastEntry[] | null;
 }
 
-const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialScales }: IndexProps) => {
+const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialScales, initialForecast3 }: IndexProps) => {
   const t = (path: string, vars?: Record<string, string>) => {
     let value = getByPath(messages, path);
 
@@ -111,8 +113,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
 
         <section aria-label={t("index.stormStatus")}>
           <div className="grid gap-6 lg:grid-cols-2">
-            <StormStatusBanner />
-            <HumanImpact />
+            <StormStatusBanner initialKp={initialKp} initialScales={initialScales} initialForecast={initialForecast3} />
+            <HumanImpact initialKp={initialKp} initialForecast={initialForecast3} />
           </div>
         </section>
 
@@ -128,7 +130,7 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         </section>
 
         <section aria-label={t("index.forecast3day")}>
-          <KpForecast3Day />
+          <KpForecast3Day initialData={initialForecast3} />
         </section>
 
         <section aria-label={t("index.forecast27day")}>
