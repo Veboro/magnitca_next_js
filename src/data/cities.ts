@@ -14,6 +14,10 @@ export interface CityConfig {
   seoDescription: string;
 }
 
+function buildUkSeoTitle(nameGenitive: string) {
+  return `Магнітні бурі в ${nameGenitive} сьогодні, kp-індекс та сонячний вітер`;
+}
+
 export const CITIES: CityConfig[] = [
   {
     slug: "kyiv",
@@ -353,7 +357,10 @@ export const CITIES: CityConfig[] = [
     seoTitle: "Магнітні бурі в Чернігові сьогодні — погода, якість повітря",
     seoDescription: "Магнітні бурі в Чернігові сьогодні: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані в реальному часі.",
   },
-];
+].map((city) => ({
+  ...city,
+  seoTitle: buildUkSeoTitle(city.nameGenitive),
+}));
 
 export const ALL_UK_CITIES: CityConfig[] = [...CITIES, ...EXTRA_UK_CITIES];
 

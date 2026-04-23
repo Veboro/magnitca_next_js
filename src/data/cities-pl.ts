@@ -1,5 +1,9 @@
 import type { CityConfig } from "./cities";
 
+function buildPlSeoTitle(nameGenitive: string) {
+  return `Burze magnetyczne w ${nameGenitive} dzisiaj, indeks Kp i wiatr słoneczny`;
+}
+
 export const CITIES_PL: CityConfig[] = [
   {
     slug: "warszawa",
@@ -323,7 +327,10 @@ export const CITIES_PL: CityConfig[] = [
     seoDescription:
       "Burze magnetyczne w Bielsku-Białej dzisiaj: indeks Kp, pogoda, wschód i zachód słońca oraz jakość powietrza. Aktualne dane dla Bielska-Białej w czasie rzeczywistym.",
   },
-];
+].map((city) => ({
+  ...city,
+  seoTitle: buildPlSeoTitle(city.nameGenitive),
+}));
 
 export function getCityByPlSlug(slug: string): CityConfig | undefined {
   return CITIES_PL.find((city) => city.slug === slug);

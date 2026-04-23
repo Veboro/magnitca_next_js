@@ -6,11 +6,13 @@ import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
 import { useKpForecast27Day } from "@/hooks/useKpForecast27Day";
 import { formatApiLocalTime } from "@/lib/city-sun-times";
+import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, AlertTriangle, MapPin, Info, CalendarDays } from "lucide-react";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import type { SiteLocale } from "@/lib/locale";
+import { CityImpactPanel } from "@/components/city/city-impact-panel";
 
 type LegacyLocale = Extract<SiteLocale, "uk" | "ru">;
 
@@ -64,6 +66,9 @@ const copy = {
     moderate: "Помірна буря",
     strong: "Сильна буря",
     extreme: "Екстремальна буря",
+    hydrometWarning: "Попередження від гідрометцентру",
+    hydrometSource: "Джерело: УкрГМЦ",
+    hydrometUnavailable: "Попередження тимчасово недоступні",
   },
   ru: {
     title: "Магнитные бури в Киеве сегодня — погода, качество воздуха",
@@ -114,6 +119,9 @@ const copy = {
     moderate: "Умеренная буря",
     strong: "Сильная буря",
     extreme: "Экстремальная буря",
+    hydrometWarning: "Предупреждение гидрометцентра",
+    hydrometSource: "Источник: УкрГМЦ",
+    hydrometUnavailable: "Предупреждение временно недоступно",
   },
 } as const;
 
@@ -146,10 +154,40 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const { data: scales } = useNoaaScales();
   const { data: forecast, isLoading: forecastLoading } = useKpForecast();
   const { data: forecast27 = [], isLoading: forecast27Loading } = useKpForecast27Day();
+  const { data: uhmcWarning } = useQuery({
+    queryKey: ["uhmc-warning", "kyiv-city", locale],
+    queryFn: async () => {
+      const response = await fetch(`/api/uhmc-warning?regionCode=1&locale=${locale}`);
+      if (!response.ok) {
+        throw new Error("Failed to load UHMC warning");
+      }
+      return response.json() as Promise<{
+        summary: string;
+        details: string[];
+        updatedAt: string | null;
+        sourceUrl: string;
+      }>;
+    },
+    staleTime: 15 * 60 * 1000,
+  });
 
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
   const kpStatus = getKpStatus(latestKp, locale);
+  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+  const todayMaxKp = forecast?.length
+    ? Math.max(
+        ...forecast
+          .filter((entry) => {
+            const date = new Date(entry.time_tag.includes("Z") ? entry.time_tag : `${entry.time_tag}Z`);
+            return date.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" }) === todayKey;
+          })
+          .map((entry) => entry.kp),
+        0
+      )
+    : 0;
+  const cityMagneticKp = Math.max(latestKp, todayMaxKp);
+  const cityHourlyPressures = data?.hourly?.map((entry) => entry.pressure).filter((value) => Number.isFinite(value)) ?? [];
 
   const todayDate = new Date().toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric" });
 
@@ -168,7 +206,7 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
 
         {/* Three-column hero */}
         {/* Storm + Sun/Coords row */}
-        <section className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4 items-stretch" aria-label={t.geoAria}>
+        <section className="grid grid-cols-1 xl:grid-cols-[5.5fr_2.6fr_3fr] gap-4 items-stretch" aria-label={t.geoAria}>
           <div className="flex flex-col">
             <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
               <MapPin className="h-4 w-4 text-primary" />
@@ -180,6 +218,15 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
               <StormStatusBanner />
             </div>
           </div>
+
+          {data?.current ? (
+            <CityImpactPanel
+              locale={locale}
+              magneticKp={cityMagneticKp}
+              currentPressure={data.current.pressure}
+              hourlyPressures={cityHourlyPressures}
+            />
+          ) : null}
 
           {/* Sun + Coordinates */}
           <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3 flex flex-col text-sm">
@@ -223,15 +270,29 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
             </div>
             <div className="space-y-1.5 border-t border-border/30 pt-2">
               <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
-                <Activity className="h-3.5 w-3.5 text-primary" />
-                {t.radiation}
+                <AlertTriangle className="h-3.5 w-3.5 text-primary" />
+                {t.hydrometWarning}
               </h3>
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-lg font-bold text-foreground">0.08–0.14</span>
-                <span className="text-[10px] text-muted-foreground">мкЗв/год</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[9px] font-medium text-storm-quiet">{t.normal}</span>
+              <div className="space-y-1 rounded-xl border border-primary/20 bg-primary/5 p-3 shadow-[0_0_0_1px_rgba(0,255,255,0.03)]">
+                <p className="font-mono text-sm font-bold text-foreground">
+                  {uhmcWarning?.summary ?? t.hydrometUnavailable}
+                </p>
+                {uhmcWarning?.details?.[0] ? (
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
+                    {uhmcWarning.details[0]}
+                  </p>
+                ) : null}
+                {uhmcWarning?.updatedAt ? (
+                  <p className="text-[10px] text-muted-foreground">{uhmcWarning.updatedAt}</p>
+                ) : null}
+                <a
+                  href={uhmcWarning?.sourceUrl ?? "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex text-[10px] font-medium text-primary hover:text-primary/80"
+                >
+                  {t.hydrometSource}
+                </a>
               </div>
             </div>
           </div>

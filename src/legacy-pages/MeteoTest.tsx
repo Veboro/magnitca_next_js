@@ -27,6 +27,14 @@ const copy: Record<
     backHome: string;
     heading: string;
     subtitle: string;
+    introTitle: string;
+    introText: string;
+    howItWorksTitle: string;
+    howItWorksItems: string[];
+    resultsInfoTitle: string;
+    resultsInfoText: string;
+    disclaimerTitle: string;
+    disclaimerText: string;
     yourName: string;
     enterName: string;
     age: string;
@@ -69,6 +77,21 @@ const copy: Record<
     heading: "Тест на метеозалежність",
     subtitle:
       "Дізнайтесь, наскільки ваш організм чутливий до магнітних бур. Тест займе 2-3 хвилини.",
+    introTitle: "Як працює тест",
+    introText:
+      "Цей тест допомагає приблизно оцінити, наскільки ви чутливі до змін геомагнітної активності, перепадів тиску та пов'язаних із ними симптомів.",
+    howItWorksTitle: "Що враховується",
+    howItWorksItems: [
+      "ваші типові реакції на магнітні бурі та зміни погоди",
+      "вік, рівень фізичної активності та наявність хронічних станів",
+      "частота симптомів: головний біль, втома, безсоння, коливання тиску, тривожність",
+    ],
+    resultsInfoTitle: "Що означає результат",
+    resultsInfoText:
+      "Після відповідей ви отримаєте відсоткову оцінку метеочутливості. Чим вищий відсоток, тим імовірніше, що періоди магнітних бур або різких погодних змін можуть впливати на ваше самопочуття.",
+    disclaimerTitle: "Важливо",
+    disclaimerText:
+      "Це не медичний діагноз і не замінює консультацію лікаря. Тест дає орієнтовну оцінку, яка допомагає краще зрозуміти власні реакції та стежити за прогнозами.",
     yourName: "Ваше ім'я",
     enterName: "Введіть ім'я",
     age: "Вік",
@@ -133,6 +156,21 @@ const copy: Record<
     heading: "Тест на метеозависимость",
     subtitle:
       "Узнайте, насколько ваш организм чувствителен к магнитным бурям. Тест займёт 2-3 минуты.",
+    introTitle: "Как работает тест",
+    introText:
+      "Этот тест помогает примерно оценить, насколько вы чувствительны к изменениям геомагнитной активности, перепадам давления и связанным с ними симптомам.",
+    howItWorksTitle: "Что учитывается",
+    howItWorksItems: [
+      "ваши типичные реакции на магнитные бури и изменения погоды",
+      "возраст, уровень физической активности и наличие хронических состояний",
+      "частота симптомов: головная боль, усталость, бессонница, колебания давления, тревожность",
+    ],
+    resultsInfoTitle: "Что означает результат",
+    resultsInfoText:
+      "После ответов вы получите процентную оценку метеочувствительности. Чем выше процент, тем вероятнее, что периоды магнитных бурь или резких погодных изменений влияют на ваше самочувствие.",
+    disclaimerTitle: "Важно",
+    disclaimerText:
+      "Это не медицинский диагноз и не замена консультации врача. Тест даёт ориентировочную оценку, которая помогает лучше понять собственные реакции и следить за прогнозами.",
     yourName: "Ваше имя",
     enterName: "Введите имя",
     age: "Возраст",
@@ -197,6 +235,21 @@ const copy: Record<
     heading: "Test na meteowrażliwość",
     subtitle:
       "Sprawdź, jak bardzo Twój organizm reaguje na burze magnetyczne. Test zajmie 2-3 minuty.",
+    introTitle: "Jak działa test",
+    introText:
+      "Ten test pomaga w przybliżeniu ocenić, jak silnie reagujesz na zmiany aktywności geomagnetycznej, wahania ciśnienia i związane z nimi objawy.",
+    howItWorksTitle: "Co bierzemy pod uwagę",
+    howItWorksItems: [
+      "Twoje typowe reakcje na burze magnetyczne i zmiany pogody",
+      "wiek, poziom aktywności fizycznej i obecność chorób przewlekłych",
+      "częstość objawów: ból głowy, zmęczenie, bezsenność, wahania ciśnienia, niepokój",
+    ],
+    resultsInfoTitle: "Co oznacza wynik",
+    resultsInfoText:
+      "Po odpowiedzi otrzymasz procentową ocenę meteowrażliwości. Im wyższy wynik, tym większe prawdopodobieństwo, że burze magnetyczne lub gwałtowne zmiany pogody wpływają na Twoje samopoczucie.",
+    disclaimerTitle: "Ważne",
+    disclaimerText:
+      "To nie jest diagnoza medyczna i nie zastępuje konsultacji z lekarzem. Test daje orientacyjną ocenę, która pomaga lepiej zrozumieć własne reakcje i śledzić prognozy.",
     yourName: "Twoje imię",
     enterName: "Wpisz imię",
     age: "Wiek",
@@ -466,6 +519,39 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
               {t.startTest}
               <ArrowRight className="h-4 w-4" />
             </button>
+          </div>
+        )}
+
+        {step === "info" && (
+          <div className="animate-fade-in space-y-4">
+            <section className="rounded-xl border border-border/50 bg-card p-5">
+              <h2 className="text-sm font-semibold text-foreground">{t.introTitle}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.introText}</p>
+
+              <h3 className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                {t.howItWorksTitle}
+              </h3>
+              <ul className="mt-3 space-y-2">
+                {t.howItWorksItems.map((item) => (
+                  <li key={item} className="flex gap-2 text-sm leading-6 text-foreground/90">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            <section className="rounded-xl border border-border/50 bg-card p-5">
+              <h2 className="text-sm font-semibold text-foreground">{t.resultsInfoTitle}</h2>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.resultsInfoText}</p>
+
+              <div className="mt-4 rounded-lg border border-primary/15 bg-primary/[0.05] p-4">
+                <h3 className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                  {t.disclaimerTitle}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-foreground/85">{t.disclaimerText}</p>
+              </div>
+            </section>
           </div>
         )}
 

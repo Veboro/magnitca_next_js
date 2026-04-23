@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Newspaper, Search, Wind } from "lucide-react";
+import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind } from "lucide-react";
 import { getPathForLocale, getSafeLocaleSwitchPath, isPlPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
@@ -67,6 +67,7 @@ export function PublicHeader() {
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileLocaleOpen, setMobileLocaleOpen] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [localeLinks, setLocaleLinks] = useState<Record<SiteLocale, string | null>>({
     uk: getSafeLocaleSwitchPath(pathnameValue, "uk"),
     ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
@@ -132,6 +133,13 @@ export function PublicHeader() {
   }, [citySearchItems, normalizedQuery]);
 
   useEffect(() => {
+    const savedTheme = window.localStorage.getItem("theme");
+    const prefersDark = savedTheme !== "light";
+    document.documentElement.classList.toggle("dark", prefersDark);
+    setIsDarkTheme(prefersDark);
+  }, []);
+
+  useEffect(() => {
     const nextLinks: Record<SiteLocale, string | null> = {
       uk: getSafeLocaleSwitchPath(pathnameValue, "uk"),
       ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
@@ -178,9 +186,16 @@ export function PublicHeader() {
     setMobileLocaleOpen(false);
   }, [pathnameValue]);
 
+  const toggleTheme = () => {
+    const nextThemeIsDark = !isDarkTheme;
+    setIsDarkTheme(nextThemeIsDark);
+    document.documentElement.classList.toggle("dark", nextThemeIsDark);
+    window.localStorage.setItem("theme", nextThemeIsDark ? "dark" : "light");
+  };
+
   return (
     <header className="sticky top-0 z-40 border-b border-border/40 bg-background/85 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+      <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
         <Link href={getPathForLocale("/", locale)} className="min-w-0 flex items-center gap-3">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-sm">
             <Activity className="h-5 w-5" />
@@ -241,17 +256,31 @@ export function PublicHeader() {
         <div className="shrink-0 flex items-center gap-2">
           <button
             type="button"
-            onClick={() => setSearchOpen((value) => !value)}
+            onClick={() => {
+              setMobileLocaleOpen(false);
+              setSearchOpen((value) => !value);
+            }}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/50 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
             aria-label={searchCopy[locale].placeholder}
             aria-expanded={searchOpen}
           >
             <Search className="h-4 w-4" />
           </button>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/50 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
+            aria-label={isDarkTheme ? "Увімкнути світлу тему" : "Увімкнути темну тему"}
+          >
+            {isDarkTheme ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           <div className="relative shrink-0 lg:hidden">
             <button
               type="button"
-              onClick={() => setMobileLocaleOpen((value) => !value)}
+              onClick={() => {
+                setSearchOpen(false);
+                setMobileLocaleOpen((value) => !value);
+              }}
               className="inline-flex h-10 min-w-[76px] items-center justify-between rounded-full border border-border/50 bg-card/50 px-3 text-xs font-semibold text-foreground transition-colors hover:border-primary/50"
               aria-label={`${locale.toUpperCase()} — Language switcher`}
               aria-expanded={mobileLocaleOpen}
@@ -284,6 +313,14 @@ export function PublicHeader() {
               </div>
             )}
           </div>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="hidden h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground lg:inline-flex"
+            aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}
+          >
+            {isDarkTheme ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
           <div className="hidden items-center rounded-full border border-border/50 bg-card/50 p-1 lg:inline-flex">
             <Link
               href={localeLinks.uk}
@@ -314,7 +351,7 @@ export function PublicHeader() {
           </div>
         </div>
         {searchOpen && (
-          <div className="basis-full w-full lg:hidden">
+          <div className="absolute left-4 right-4 top-[calc(100%-0.25rem)] z-50 lg:hidden sm:left-6 sm:right-6">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
@@ -331,7 +368,7 @@ export function PublicHeader() {
                 className="h-11 w-full rounded-xl border border-border/50 bg-card/60 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary/50 focus:bg-card"
               />
             </div>
-            <div className="mt-2 rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
+            <div className="mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
               <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                 {searchCopy[locale].section}
               </p>

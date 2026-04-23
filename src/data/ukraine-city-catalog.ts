@@ -1,4 +1,5 @@
 import type { CityConfig } from "./cities";
+import { SHEET_EXACT_EXTRA_UK_CITIES, SHEET_EXACT_REGION_GROUPS } from "./ukraine-sheet-exact";
 
 type RegionGroup = {
   key: string;
@@ -27,12 +28,12 @@ function makeCity(
     lonLabel: `${Math.abs(lon).toFixed(4)}° ${lonSuffix}`,
     timezone: "Europe/Kyiv",
     utcOffset: "UTC+2 (EET)",
-    seoTitle: `${name}: магнітні бурі сьогодні — погода, якість повітря`,
+    seoTitle: `Магнітні бурі в ${nameGenitive} сьогодні, kp-індекс та сонячний вітер`,
     seoDescription: `${name}: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані в реальному часі.`,
   };
 }
 
-export const EXTRA_UK_CITIES: CityConfig[] = [
+const MANUAL_EXTRA_UK_CITIES: CityConfig[] = [
   makeCity("zhmerynka", "Жмеринка", "Жмеринці", 49.0371, 28.1120),
   makeCity("mohyliv-podilskyi", "Могилів-Подільський", "Могилеві-Подільському", 48.4459, 27.7982),
   makeCity("kovel", "Ковель", "Ковелі", 51.2153, 24.7087),
@@ -89,6 +90,24 @@ export const EXTRA_UK_CITIES: CityConfig[] = [
   makeCity("zolotonosha", "Золотоноша", "Золотоноші", 49.6683, 32.0405),
   makeCity("khotyn", "Хотин", "Хотині", 48.5150, 26.4910),
   makeCity("storozhynets", "Сторожинець", "Сторожинці", 48.1643, 25.7189),
+  makeCity("novodnistrovsk", "Новодністровськ", "Новодністровську", 48.5849, 27.4311),
+  makeCity("sokyriany", "Сокиряни", "Сокирянах", 48.4460, 27.4112),
+  makeCity("hlyboka", "Глибока", "Глибоці", 48.0858, 25.9284),
+  makeCity("krasnoilsk", "Красноїльськ", "Красноїльську", 48.0182, 25.5999),
+  makeCity("zastavna", "Заставна", "Заставні", 48.5236, 25.8456),
+  makeCity("berehomet", "Берегомет", "Берегометі", 48.1631, 25.3099),
+  makeCity("novoselytsia", "Новоселиця", "Новоселиці", 48.2180, 26.2665),
+  makeCity("kitsman", "Кіцмань", "Кіцмані", 48.4411, 25.7668),
+  makeCity("klishkivtsi", "Клішківці", "Клішківцях", 48.4304, 26.2596),
+  makeCity("kamianka", "Кам'янка", "Кам'янці", 48.0288, 25.9195),
+  makeCity("velykyi-kuchuriv", "Великий Кучурів", "Великому Кучурові", 48.1993, 25.8943),
+  makeCity("vashkivtsi", "Вашківці", "Вашківцях", 48.3820, 25.5175),
+  makeCity("mamaivtsi", "Мамаївці", "Мамаївцях", 48.3527, 25.8222),
+  makeCity("marshyntsi", "Маршинці", "Маршинцях", 48.2142, 26.2921),
+  makeCity("tarasivtsi", "Тарасівці", "Тарасівцях", 48.2039, 26.3686),
+  makeCity("chudei", "Чудей", "Чудеї", 48.0510, 25.6221),
+  makeCity("kolinkivtsi", "Колінківці", "Колінківцях", 48.4105, 26.1397),
+  makeCity("romankivtsi", "Романківці", "Романківцях", 48.4847, 27.2138),
   makeCity("nizhyn", "Ніжин", "Ніжині", 51.0480, 31.8869),
   makeCity("pryluky", "Прилуки", "Прилуках", 50.5937, 32.3876),
   makeCity("yalta", "Ялта", "Ялті", 44.4952, 34.1663),
@@ -119,9 +138,38 @@ export const EXTRA_UK_CITIES: CityConfig[] = [
   makeCity("polohy", "Пологи", "Пологах", 47.4833, 36.2500),
   makeCity("vasylivka", "Василівка", "Василівці", 47.4431, 35.2819),
   // Ivano-Frankivska
+  makeCity("dolyna", "Долина", "Долині", 48.9782, 23.9790),
+  makeCity("burshtyn", "Бурштин", "Бурштині", 49.2622, 24.6160),
+  makeCity("perehinske", "Перегінське", "Перегінському", 48.8116, 24.1939),
+  makeCity("bolekhiv", "Болехів", "Болехові", 49.0663, 23.8599),
+  makeCity("sniatyn", "Снятин", "Снятині", 48.4523, 25.5518),
+  makeCity("tysmenytsia", "Тисмениця", "Тисмениці", 48.9018, 24.8485),
+  makeCity("horodenka", "Городенка", "Городенці", 48.6721, 25.4953),
+  makeCity("tlumach", "Тлумач", "Тлумачі", 48.8666, 25.0012),
+  makeCity("rohatyn", "Рогатин", "Рогатині", 49.4093, 24.6106),
+  makeCity("deliatyn", "Делятин", "Делятині", 48.5277, 24.6286),
+  makeCity("lanchyn", "Ланчин", "Ланчині", 48.5555, 24.7523),
+  makeCity("yaremche", "Яремче", "Яремчі", 48.4504, 24.5510),
+  makeCity("bohorodchany", "Богородчани", "Богородчанах", 48.8093, 24.5456),
+  makeCity("halych", "Галич", "Галичі", 49.1233, 24.7299),
   makeCity("nadvirna", "Надвірна", "Надвірній", 48.6330, 24.5830),
   makeCity("kosiv", "Косів", "Косові", 48.3135, 25.0822),
+  makeCity("kosmach", "Космач", "Космачі", 48.3307, 24.8144),
+  makeCity("broshniv-osada", "Брошнів-Осада", "Брошневі-Осаді", 48.9959, 24.1859),
+  makeCity("rozhniv", "Рожнів", "Рожневі", 48.3649, 25.2286),
   makeCity("verkhovyna", "Верховина", "Верховині", 48.1517, 24.8136),
+  makeCity("pechenizhyn", "Печеніжин", "Печеніжині", 48.5132, 24.8804),
+  makeCity("otyniia", "Отинія", "Отинії", 48.7345, 24.8638),
+  makeCity("stari-kuty", "Старі Кути", "Старих Кутах", 48.2873, 25.1738),
+  makeCity("holyn", "Голинь", "Голині", 49.0056, 24.2480),
+  makeCity("svarychiv", "Сваричів", "Сваричеві", 48.9592, 24.1865),
+  makeCity("mykulychyn", "Микуличин", "Микуличині", 48.3972, 24.5994),
+  makeCity("pasichna", "Пасічна", "Пасічній", 48.5745, 24.4451),
+  makeCity("pniv", "Пнів", "Пневі", 48.6160, 24.5311),
+  makeCity("bili-oslavy", "Білі Ослави", "Білих Ославах", 48.4954, 24.7010),
+  makeCity("bytkiv", "Битків", "Биткові", 48.6215, 24.4804),
+  makeCity("kuty", "Кути", "Кутах", 48.2627, 25.1819),
+  makeCity("zabolotiv", "Заболотів", "Заболотові", 48.4737, 25.2778),
   // Kyivska
   makeCity("fastiv", "Фастів", "Фастові", 50.0767, 29.9177),
   makeCity("obukhiv", "Обухів", "Обухові", 50.1101, 30.6265),
@@ -163,12 +211,29 @@ export const EXTRA_UK_CITIES: CityConfig[] = [
   // Chernivtska
   makeCity("vyzhnytsia", "Вижниця", "Вижниці", 48.2500, 25.1917),
   makeCity("kelmentsi", "Кельменці", "Кельменцях", 48.4633, 26.8292),
+  makeCity("luzhany", "Лужани", "Лужанах", 48.3581, 25.7690),
+  makeCity("ispas", "Іспас", "Іспасі", 48.2955, 25.2681),
+  makeCity("boiany", "Бояни", "Боянах", 48.2669, 26.1263),
+  makeCity("toporivtsi", "Топорівці", "Топорівцях", 48.3790, 26.0867),
+  makeCity("chahor", "Чагор", "Чагорі", 48.2415, 25.9883),
+  makeCity("ridkivtsi", "Рідківці", "Рідківцях", 48.3375, 26.0610),
+  makeCity("banyliv-pidhirnyi", "Банилів-Підгірний", "Банилові-Підгірному", 48.0932, 25.4937),
+  makeCity("banyliv", "Банилів", "Банилові", 48.3580, 25.3434),
+  makeCity("molodiia", "Молодія", "Молодії", 48.2242, 26.0253),
+  makeCity("verkhni-petrivtsi", "Верхні Петрівці", "Верхніх Петрівцях", 48.0586, 25.6937),
+  makeCity("verenchanka", "Веренчанка", "Веренчанці", 48.5445, 25.7444),
+  makeCity("myhove", "Мигове", "Миговому", 48.1445, 25.3633),
   // Chernihivska
   makeCity("novhorod-siverskyi", "Новгород-Сіверський", "Новгороді-Сіверському", 52.0043, 33.2780),
   makeCity("koriukivka", "Корюківка", "Корюківці", 51.7833, 32.2500),
 ];
 
-export const UKRAINE_REGION_GROUPS: RegionGroup[] = [
+export const EXTRA_UK_CITIES: CityConfig[] = [
+  ...MANUAL_EXTRA_UK_CITIES,
+  ...SHEET_EXACT_EXTRA_UK_CITIES,
+];
+
+const MANUAL_UKRAINE_REGION_GROUPS: RegionGroup[] = [
   { key: "kyiv-city", titleUk: "м. Київ", titleRu: "г. Киев", slugs: ["kyiv"] },
   { key: "vinnytsia", titleUk: "Вінницька область", titleRu: "Винницкая область", slugs: ["vinnytsia", "zhmerynka", "mohyliv-podilskyi", "haisyn", "tulchyn", "khmilnyk"] },
   { key: "volyn", titleUk: "Волинська область", titleRu: "Волынская область", slugs: ["lutsk", "kovel", "volodymyr", "kamin-kashyrskyi"] },
@@ -177,7 +242,48 @@ export const UKRAINE_REGION_GROUPS: RegionGroup[] = [
   { key: "zhytomyr", titleUk: "Житомирська область", titleRu: "Житомирская область", slugs: ["zhytomyr", "berdychiv", "korosten", "zviahel"] },
   { key: "zakarpattia", titleUk: "Закарпатська область", titleRu: "Закарпатская область", slugs: ["uzhhorod", "mukachevo", "khust", "berehove", "rakhiv", "tiachiv"] },
   { key: "zaporizhzhia", titleUk: "Запорізька область", titleRu: "Запорожская область", slugs: ["zaporizhzhia", "melitopol", "berdiansk", "polohy", "vasylivka"] },
-  { key: "ivano-frankivsk", titleUk: "Івано-Франківська область", titleRu: "Ивано-Франковская область", slugs: ["ivano-frankivsk", "kalush", "kolomyia", "nadvirna", "kosiv", "verkhovyna"] },
+  {
+    key: "ivano-frankivsk",
+    titleUk: "Івано-Франківська область",
+    titleRu: "Ивано-Франковская область",
+    slugs: [
+      "ivano-frankivsk",
+      "kalush",
+      "kolomyia",
+      "dolyna",
+      "nadvirna",
+      "burshtyn",
+      "perehinske",
+      "bolekhiv",
+      "sniatyn",
+      "tysmenytsia",
+      "horodenka",
+      "tlumach",
+      "rohatyn",
+      "deliatyn",
+      "kosiv",
+      "lanchyn",
+      "yaremche",
+      "bohorodchany",
+      "halych",
+      "kosmach",
+      "broshniv-osada",
+      "rozhniv",
+      "verkhovyna",
+      "pechenizhyn",
+      "otyniia",
+      "stari-kuty",
+      "holyn",
+      "svarychiv",
+      "mykulychyn",
+      "pasichna",
+      "pniv",
+      "bili-oslavy",
+      "bytkiv",
+      "kuty",
+      "zabolotiv",
+    ],
+  },
   { key: "kyiv-oblast", titleUk: "Київська область", titleRu: "Киевская область", slugs: ["bila-tserkva", "brovary", "boryspil", "bucha", "irpin", "fastiv", "obukhiv", "vyshhorod"] },
   { key: "kirovohrad", titleUk: "Кіровоградська область", titleRu: "Кировоградская область", slugs: ["kropyvnytskyi", "oleksandriia", "svitlovodsk", "novoukrainka", "holovanivsk"] },
   { key: "luhansk", titleUk: "Луганська область", titleRu: "Луганская область", slugs: ["luhansk", "sievierodonetsk", "lysychansk", "alchevsk", "starobilsk", "svatove", "dovzhansk", "rovenky"] },
@@ -192,7 +298,74 @@ export const UKRAINE_REGION_GROUPS: RegionGroup[] = [
   { key: "kherson", titleUk: "Херсонська область", titleRu: "Херсонская область", slugs: ["kherson", "nova-kakhovka", "henichesk", "skadovsk", "beryslav"] },
   { key: "khmelnytskyi", titleUk: "Хмельницька область", titleRu: "Хмельницкая область", slugs: ["khmelnytskyi", "kamianets-podilskyi", "shepetivka"] },
   { key: "cherkasy", titleUk: "Черкаська область", titleRu: "Черкасская область", slugs: ["cherkasy", "uman", "smila", "zolotonosha", "zvenyhorodka"] },
-  { key: "chernivtsi", titleUk: "Чернівецька область", titleRu: "Черновицкая область", slugs: ["chernivtsi", "khotyn", "storozhynets", "vyzhnytsia", "kelmentsi"] },
+  {
+    key: "chernivtsi",
+    titleUk: "Чернівецька область",
+    titleRu: "Черновицкая область",
+    slugs: [
+      "chernivtsi",
+      "storozhynets",
+      "khotyn",
+      "novodnistrovsk",
+      "sokyriany",
+      "hlyboka",
+      "krasnoilsk",
+      "zastavna",
+      "berehomet",
+      "novoselytsia",
+      "kelmentsi",
+      "kitsman",
+      "klishkivtsi",
+      "kamianka",
+      "velykyi-kuchuriv",
+      "vashkivtsi",
+      "mamaivtsi",
+      "marshyntsi",
+      "tarasivtsi",
+      "chudei",
+      "kolinkivtsi",
+      "romankivtsi",
+      "vyzhnytsia",
+      "luzhany",
+      "ispas",
+      "boiany",
+      "toporivtsi",
+      "chahor",
+      "ridkivtsi",
+      "banyliv-pidhirnyi",
+      "banyliv",
+      "molodiia",
+      "verkhni-petrivtsi",
+      "verenchanka",
+      "myhove",
+    ],
+  },
   { key: "chernihiv", titleUk: "Чернігівська область", titleRu: "Черниговская область", slugs: ["chernihiv", "nizhyn", "pryluky", "novhorod-siverskyi", "koriukivka"] },
   { key: "crimea", titleUk: "Автономна Республіка Крим", titleRu: "Автономная Республика Крым", slugs: ["simferopol", "sevastopol", "yalta", "kerch", "yevpatoriia"] },
 ];
+
+const MANUAL_REGION_OWNER_BY_SLUG = new Map<string, string>();
+
+for (const group of MANUAL_UKRAINE_REGION_GROUPS) {
+  for (const slug of group.slugs) {
+    MANUAL_REGION_OWNER_BY_SLUG.set(slug, group.key);
+  }
+}
+
+export const UKRAINE_REGION_GROUPS: RegionGroup[] = MANUAL_UKRAINE_REGION_GROUPS.map((group) => {
+  const sheetGroup = SHEET_EXACT_REGION_GROUPS.find((candidate) => candidate.key === group.key);
+
+  if (!sheetGroup) {
+    return group;
+  }
+
+  const safeSheetSlugs = sheetGroup.slugs.filter((slug) => {
+    const manualOwner = MANUAL_REGION_OWNER_BY_SLUG.get(slug);
+    return !manualOwner || manualOwner === group.key;
+  });
+
+  return {
+    ...group,
+    slugs: Array.from(new Set([...group.slugs, ...safeSheetSlugs])),
+  };
+});

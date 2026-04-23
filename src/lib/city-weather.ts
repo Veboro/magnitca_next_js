@@ -29,6 +29,7 @@ export interface HourlyForecast {
   temperature: number;
   weatherCode: number;
   precipitation: number;
+  pressure: number;
 }
 
 export interface DailyForecast {
@@ -61,7 +62,7 @@ export async function fetchCityWeatherFromSource(
 ): Promise<CityWeatherResult> {
   const [weatherRes, aqRes] = await Promise.all([
     fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,wind_speed_10m,wind_direction_10m,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,precipitation_sum,uv_index_max&timezone=${encodeURIComponent(tz)}&forecast_days=7`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,surface_pressure,cloud_cover,wind_speed_10m,wind_direction_10m,weather_code,uv_index&hourly=temperature_2m,weather_code,precipitation,surface_pressure&daily=temperature_2m_max,temperature_2m_min,weather_code,sunrise,sunset,precipitation_sum,uv_index_max&timezone=${encodeURIComponent(tz)}&forecast_days=7`,
       { cache: "no-store" }
     ),
     fetch(
@@ -106,6 +107,7 @@ export async function fetchCityWeatherFromSource(
     temperature: weather.hourly.temperature_2m[i],
     weatherCode: weather.hourly.weather_code[i],
     precipitation: weather.hourly.precipitation[i],
+    pressure: weather.hourly.surface_pressure[i],
   }));
 
   const daily: DailyForecast[] = d.time.map((t: string, i: number) => ({

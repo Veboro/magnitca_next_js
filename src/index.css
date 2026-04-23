@@ -9,66 +9,66 @@
 
 @layer base {
   :root {
-    --background: 340 40% 96%;
-    --foreground: 240 10% 10%;
+    --background: 120 10% 91%;
+    --foreground: 155 20% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 240 10% 10%;
+    --card-foreground: 155 20% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 10%;
+    --popover-foreground: 155 20% 10%;
 
-    --primary: 340 82% 55%;
+    --primary: 145 67% 28%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 340 20% 92%;
-    --secondary-foreground: 240 10% 20%;
+    --secondary: 120 9% 88%;
+    --secondary-foreground: 155 19% 18%;
 
-    --muted: 340 15% 92%;
-    --muted-foreground: 240 5% 45%;
+    --muted: 120 8% 89%;
+    --muted-foreground: 155 8% 34%;
 
-    --accent: 340 30% 95%;
-    --accent-foreground: 340 70% 45%;
+    --accent: 145 22% 90%;
+    --accent-foreground: 145 67% 26%;
 
     --destructive: 0 72% 50%;
     --destructive-foreground: 0 85% 97%;
 
-    --border: 340 15% 88%;
-    --input: 340 15% 88%;
-    --ring: 340 82% 55%;
+    --border: 140 10% 80%;
+    --input: 140 10% 82%;
+    --ring: 145 67% 28%;
 
     --radius: 0.75rem;
 
-    --glow-cyan: 0 0 15px hsla(340, 60%, 55%, 0.12);
-    --glow-amber: 0 0 15px hsla(35, 70%, 50%, 0.12);
-    --glow-red: 0 0 15px hsla(0, 70%, 50%, 0.12);
-    --glow-green: 0 0 15px hsla(145, 60%, 40%, 0.12);
+    --glow-cyan: 0 14px 32px hsla(145, 67%, 28%, 0.12);
+    --glow-amber: 0 10px 28px hsla(35, 75%, 48%, 0.10);
+    --glow-red: 0 10px 28px hsla(0, 70%, 50%, 0.10);
+    --glow-green: 0 10px 28px hsla(145, 45%, 35%, 0.12);
 
-    --chart-1: 340 82% 55%;
-    --chart-2: 210 80% 55%;
-    --chart-3: 340 20% 65%;
-    --chart-4: 210 16% 46%;
-    --chart-5: 340 30% 40%;
+    --chart-1: 145 67% 28%;
+    --chart-2: 151 44% 42%;
+    --chart-3: 91 66% 53%;
+    --chart-4: 42 84% 57%;
+    --chart-5: 6 79% 61%;
 
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 240 10% 10%;
-    --sidebar-primary: 340 82% 55%;
+    --sidebar-foreground: 155 20% 10%;
+    --sidebar-primary: 145 67% 28%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 340 20% 92%;
-    --sidebar-accent-foreground: 340 70% 45%;
-    --sidebar-border: 340 15% 88%;
-    --sidebar-ring: 340 82% 55%;
+    --sidebar-accent: 120 9% 88%;
+    --sidebar-accent-foreground: 145 67% 26%;
+    --sidebar-border: 140 10% 80%;
+    --sidebar-ring: 145 67% 28%;
     --sidebar: 0 0% 100%;
     --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: 'Lora', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.04);
-    --shadow-xs: 0 1px 3px 0px hsl(0 0% 0% / 0.04);
-    --shadow-sm: 0 1px 3px 0px hsl(0 0% 0% / 0.06), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
-    --shadow: 0 1px 3px 0px hsl(0 0% 0% / 0.06), 0 1px 2px -1px hsl(0 0% 0% / 0.06);
-    --shadow-md: 0 2px 6px 0px hsl(0 0% 0% / 0.06), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
-    --shadow-lg: 0 4px 12px 0px hsl(0 0% 0% / 0.06), 0 4px 6px -1px hsl(0 0% 0% / 0.06);
-    --shadow-xl: 0 8px 20px 0px hsl(0 0% 0% / 0.08), 0 8px 10px -1px hsl(0 0% 0% / 0.08);
+    --shadow-2xs: 0 1px 2px 0px hsl(160 10% 10% / 0.04);
+    --shadow-xs: 0 1px 3px 0px hsl(160 10% 10% / 0.05);
+    --shadow-sm: 0 3px 10px 0px hsl(160 10% 10% / 0.06), 0 1px 2px -1px hsl(160 10% 10% / 0.05);
+    --shadow: 0 6px 18px -8px hsl(160 10% 10% / 0.08), 0 2px 6px -3px hsl(160 10% 10% / 0.05);
+    --shadow-md: 0 14px 30px -14px hsl(160 10% 10% / 0.14), 0 6px 12px -6px hsl(160 10% 10% / 0.08);
+    --shadow-lg: 0 24px 48px -20px hsl(160 10% 10% / 0.18), 0 10px 20px -10px hsl(160 10% 10% / 0.10);
+    --shadow-xl: 0 38px 70px -26px hsl(160 10% 10% / 0.22), 0 16px 30px -16px hsl(160 10% 10% / 0.12);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.2);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
@@ -143,6 +143,11 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    background-image:
+      radial-gradient(circle at top left, hsl(147 37% 88% / 0.95), transparent 26%),
+      radial-gradient(circle at top right, hsl(47 90% 90% / 0.7), transparent 20%),
+      linear-gradient(180deg, hsl(var(--background)), hsl(120 7% 88%));
+    min-height: 100vh;
   }
 
   :root:not(.dark) body {
@@ -160,7 +165,7 @@
   }
 
   :root:not(.dark) .text-muted-foreground {
-    color: hsl(240 5% 35%);
+    color: hsl(155 8% 32%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -195,6 +200,16 @@
     border-color: hsl(180 100% 50% / 0.3);
     box-shadow: inset 0 0 15px hsla(180, 100%, 50%, 0.05), var(--glow-cyan);
   }
+  :root:not(.dark) .glow-cyan {
+    box-shadow: 0 18px 40px -24px hsla(145, 67%, 28%, 0.24);
+  }
+  :root:not(.dark) .text-glow-cyan {
+    text-shadow: 0 0 12px hsla(145, 67%, 28%, 0.12);
+  }
+  :root:not(.dark) .border-glow-cyan {
+    border-color: hsl(145 54% 30% / 0.26);
+    box-shadow: 0 18px 34px -26px hsla(145, 67%, 28%, 0.18), inset 0 1px 0 hsla(0, 0%, 100%, 0.7);
+  }
   .grid-bg {
     background-image: 
       linear-gradient(hsla(180, 100%, 50%, 0.03) 1px, transparent 1px),
@@ -202,10 +217,7 @@
     background-size: 40px 40px;
   }
   :root .grid-bg {
-    background-image: 
-      linear-gradient(hsla(340, 80%, 55%, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, hsla(340, 80%, 55%, 0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-image: none;
   }
 }
 

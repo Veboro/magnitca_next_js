@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
 import type { CityWeatherResult } from "@/hooks/useCityWeather";
 import { useCitySunTimes } from "@/hooks/useCitySunTimes";
@@ -12,12 +13,15 @@ import { formatApiLocalTime } from "@/lib/city-sun-times";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays } from "lucide-react";
-import { getCityBySlug } from "@/data/cities";
-import { getLocalizedCity } from "@/data/cities-ru";
+import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays, AlertTriangle } from "lucide-react";
+import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
+import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import { getCityByPlSlug } from "@/data/cities-pl";
+import { UKRAINE_REGION_GROUPS } from "@/data/ukraine-city-catalog";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import type { SiteLocale } from "@/lib/locale";
+import { getUhmcRegionCode } from "@/lib/uhmc-warning";
+import { CityImpactPanel } from "@/components/city/city-impact-panel";
 
 type LegacyLocale = SiteLocale;
 
@@ -85,6 +89,10 @@ const copy = {
     windSpeed: "вітер",
     airIndex: "Індекс якості повітря AQI",
     dataSource: "Дані",
+    popularInRegion: "Популярні міста",
+    hydrometWarning: "Попередження від гідрометцентру",
+    hydrometSource: "Джерело: УкрГМЦ",
+    hydrometUnavailable: "Попередження тимчасово недоступні",
   },
   ru: {
     calm: "Спокойно",
@@ -149,6 +157,10 @@ const copy = {
     windSpeed: "ветер",
     airIndex: "Индекс качества воздуха AQI",
     dataSource: "Данные",
+    popularInRegion: "Популярные города",
+    hydrometWarning: "Предупреждение гидрометцентра",
+    hydrometSource: "Источник: УкрГМЦ",
+    hydrometUnavailable: "Предупреждение временно недоступно",
   },
   pl: {
     calm: "Spokojnie",
@@ -213,6 +225,10 @@ const copy = {
     windSpeed: "wiatr",
     airIndex: "Indeks jakości powietrza AQI",
     dataSource: "Dane",
+    popularInRegion: "Popularne miasta",
+    hydrometWarning: "Ostrzeżenie hydrometcentrum",
+    hydrometSource: "Źródło: UHGMC",
+    hydrometUnavailable: "Ostrzeżenie chwilowo niedostępne",
   },
 } as const;
 
@@ -224,6 +240,36 @@ const getKpStatus = (kp: number, locale: SiteLocale) => {
   if (kp <= 7) return { label: t.strong, color: "hsl(15, 90%, 50%)" };
   return { label: t.extreme, color: "hsl(0, 80%, 55%)" };
 };
+
+function toUkRegionGenitive(title: string) {
+  const overrides: Record<string, string> = {
+    "м. Київ": "Києва",
+    "Автономна Республіка Крим": "Автономної Республіки Крим",
+  };
+
+  if (overrides[title]) return overrides[title];
+
+  return title
+    .replace("ька область", "ької області")
+    .replace("цька область", "цької області")
+    .replace("зька область", "зької області")
+    .replace("ська область", "ської області");
+}
+
+function toRuRegionGenitive(title: string) {
+  const overrides: Record<string, string> = {
+    "г. Киев": "Киева",
+    "Автономная Республика Крым": "Автономной Республики Крым",
+  };
+
+  if (overrides[title]) return overrides[title];
+
+  return title
+    .replace("ькая область", "ькой области")
+    .replace("цкая область", "цкой области")
+    .replace("зкая область", "зкой области")
+    .replace("ская область", "ской области");
+}
 
 function getWindDirection(deg: number, locale: SiteLocale): string {
   const dirs = locale === "ru"
@@ -306,8 +352,78 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const gLevel = scales?.g?.Scale ?? 0;
   const kpStatus = getKpStatus(latestKp, locale);
+  const regionGroup = cityBase
+    ? UKRAINE_REGION_GROUPS.find((group) => group.slugs.includes(cityBase.slug))
+    : undefined;
+  const regionTitle = regionGroup
+    ? locale === "ru"
+      ? regionGroup.titleRu
+      : regionGroup.titleUk
+    : "";
+  const regionTitleForHeading = regionTitle
+    ? locale === "ru"
+      ? toRuRegionGenitive(regionTitle)
+      : locale === "pl"
+        ? regionTitle
+        : toUkRegionGenitive(regionTitle)
+    : "";
+  const popularRegionTitle = regionTitleForHeading
+    ? locale === "ru"
+      ? `${t.popularInRegion} ${regionTitleForHeading}`
+      : locale === "pl"
+        ? `${t.popularInRegion} ${regionTitleForHeading}`
+        : `${t.popularInRegion} ${regionTitleForHeading}`
+    : t.popularInRegion;
+  const popularRegionCities =
+    locale === "pl" || !regionGroup || !cityBase
+      ? []
+      : regionGroup.slugs
+          .filter((candidateSlug) => candidateSlug !== cityBase.slug)
+          .map((candidateSlug) => ALL_UK_CITIES.find((candidate) => candidate.slug === candidateSlug))
+          .filter((candidate): candidate is NonNullable<typeof candidate> => Boolean(candidate))
+          .map((candidate) => {
+            const localized = locale === "ru" ? getLocalizedCity(candidate, "ru") : candidate;
+            const href = locale === "ru" ? `/ru/city/${getRuCitySlug(candidate)}` : `/city/${candidate.slug}`;
+            return { name: localized.name, href };
+          });
+  const uhmcRegionCode = locale === "pl" ? null : getUhmcRegionCode(regionGroup?.key);
+  const { data: uhmcWarning } = useQuery({
+    queryKey: ["uhmc-warning", uhmcRegionCode, locale],
+    queryFn: async () => {
+      const response = await fetch(`/api/uhmc-warning?regionCode=${uhmcRegionCode}&locale=${locale}`);
+      if (!response.ok) {
+        throw new Error("Failed to load UHMC warning");
+      }
+      return response.json() as Promise<{
+        status: "none" | "active";
+        updatedAt: string | null;
+        level: number | null;
+        types: string[];
+        periods: string[];
+        details: string[];
+        summary: string;
+        sourceUrl: string;
+      }>;
+    },
+    enabled: Boolean(uhmcRegionCode),
+    staleTime: 15 * 60 * 1000,
+  });
 
   const todayDate = new Date().toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric" });
+  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: city.timezone });
+  const todayMaxKp = forecast?.length
+    ? Math.max(
+        ...forecast
+          .filter((entry) => {
+            const date = new Date(entry.time_tag.includes("Z") ? entry.time_tag : `${entry.time_tag}Z`);
+            return date.toLocaleDateString("sv-SE", { timeZone: city.timezone }) === todayKey;
+          })
+          .map((entry) => entry.kp),
+        0
+      )
+    : 0;
+  const cityMagneticKp = Math.max(latestKp, todayMaxKp);
+  const cityHourlyPressures = data?.hourly?.map((entry) => entry.pressure).filter((value) => Number.isFinite(value)) ?? [];
   const dynamicDescription = city
     ? locale === "ru"
       ? `Магнитные бури в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, качество воздуха в реальном времени.`
@@ -331,7 +447,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
 
         {/* Storm Banner + Sidebar */}
         <section
-          className="grid grid-cols-1 lg:grid-cols-[7fr_3fr] gap-4 items-stretch"
+          className="grid grid-cols-1 xl:grid-cols-[5.5fr_2.6fr_3fr] gap-4 items-stretch"
           aria-label={`${t.geoActivityStatus} ${city.nameGenitive}`}
         >
           <div className="flex flex-col">
@@ -345,6 +461,15 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
               <StormStatusBanner initialKp={initialKp} initialScales={initialScales} initialForecast={initialForecast3} />
             </div>
           </div>
+
+          {data?.current ? (
+            <CityImpactPanel
+              locale={locale}
+              magneticKp={cityMagneticKp}
+              currentPressure={data.current.pressure}
+              hourlyPressures={cityHourlyPressures}
+            />
+          ) : null}
 
           {/* Sun + Coordinates + Radiation */}
           <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3 flex flex-col text-sm">
@@ -386,19 +511,51 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 <span className="font-mono text-foreground">{city.utcOffset}</span>
               </div>
             </div>
-            <div className="space-y-1.5 border-t border-border/30 pt-2">
-              <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
-                <Activity className="h-3.5 w-3.5 text-primary" />
-                {t.radiation}
-              </h3>
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-lg font-bold text-foreground">0.08–0.14</span>
-                <span className="text-[10px] text-muted-foreground">{locale === "pl" ? "µSv/h" : locale === "ru" ? "мкЗв/ч" : "мкЗв/год"}</span>
+            {locale === "pl" ? (
+              <div className="space-y-1.5 border-t border-border/30 pt-2">
+                <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                  <Activity className="h-3.5 w-3.5 text-primary" />
+                  {t.radiation}
+                </h3>
+                <div className="flex items-center justify-between">
+                  <span className="font-mono text-lg font-bold text-foreground">0.08–0.14</span>
+                  <span className="text-[10px] text-muted-foreground">µSv/h</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[9px] font-medium text-storm-quiet">{t.normal}</span>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="inline-flex items-center rounded-full bg-storm-quiet/15 border border-storm-quiet/30 px-2 py-0.5 text-[9px] font-medium text-storm-quiet">{t.normal}</span>
+            ) : (
+              <div className="space-y-1.5 border-t border-border/30 pt-2">
+                <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                  <AlertTriangle className="h-3.5 w-3.5 text-primary" />
+                  {t.hydrometWarning}
+                </h3>
+                <div className="space-y-1 rounded-xl border border-primary/20 bg-primary/5 p-3 shadow-[0_0_0_1px_rgba(0,255,255,0.03)]">
+                  <p className="font-mono text-sm font-bold text-foreground">
+                    {uhmcWarning?.summary ?? t.hydrometUnavailable}
+                  </p>
+                  {uhmcWarning?.details?.[0] ? (
+                    <p className="text-[11px] leading-relaxed text-muted-foreground">
+                      {uhmcWarning.details[0]}
+                    </p>
+                  ) : null}
+                  {uhmcWarning?.updatedAt ? (
+                    <p className="text-[10px] text-muted-foreground">
+                      {uhmcWarning.updatedAt}
+                    </p>
+                  ) : null}
+                  <Link
+                    href={uhmcWarning?.sourceUrl ?? "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex text-[10px] font-medium text-primary hover:text-primary/80"
+                  >
+                    {t.hydrometSource}
+                  </Link>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
 
@@ -594,6 +751,28 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             </div>
           </section>
         ) : null}
+
+        {popularRegionCities.length > 0 && (
+          <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label={popularRegionTitle}>
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                {popularRegionTitle}
+              </h2>
+            </div>
+            <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-4">
+              {popularRegionCities.map((regionCity) => (
+                <Link
+                  key={regionCity.href}
+                  href={regionCity.href}
+                  className="text-sm text-primary transition-colors hover:text-primary/80 hover:underline"
+                >
+                  {regionCity.name}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Dynamic SEO text */}
         <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label={t.aboutPage}>
