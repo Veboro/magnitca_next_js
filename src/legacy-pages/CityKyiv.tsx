@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCityWeather, getWeatherLabel, getWeatherEmoji, getAqiLabel } from "@/hooks/useCityWeather";
 import { useCitySunTimes } from "@/hooks/useCitySunTimes";
 import { useNoaaScales, useKpIndex } from "@/hooks/useSpaceWeather";
@@ -13,6 +14,7 @@ import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, Aler
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import type { SiteLocale } from "@/lib/locale";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
+import { absoluteUrl } from "@/lib/site";
 
 type LegacyLocale = Extract<SiteLocale, "uk" | "ru">;
 
@@ -69,6 +71,9 @@ const copy = {
     hydrometWarning: "Попередження від гідрометцентру",
     hydrometSource: "Джерело: УкрГМЦ",
     hydrometUnavailable: "Попередження тимчасово недоступні",
+    home: "Головна",
+    oblast: "м. Київ",
+    breadcrumbAria: "Навігація сторінкою",
   },
   ru: {
     title: "Магнитные бури в Киеве сегодня — погода, качество воздуха",
@@ -122,6 +127,9 @@ const copy = {
     hydrometWarning: "Предупреждение гидрометцентра",
     hydrometSource: "Источник: УкрГМЦ",
     hydrometUnavailable: "Предупреждение временно недоступно",
+    home: "Главная",
+    oblast: "г. Киев",
+    breadcrumbAria: "Навигация по странице",
   },
 } as const;
 
@@ -198,11 +206,49 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
     year: "numeric",
     timeZone: "Europe/Kyiv",
   });
+  const homeHref = locale === "ru" ? "/ru" : "/";
+  const oblastHref = locale === "ru" ? "/ru/oblast/kiev" : "/oblast/kyiv";
+  const cityHref = locale === "ru" ? "/ru/city/kiev" : "/city/kyiv";
+  const breadcrumbItems = [
+    { name: t.home, url: absoluteUrl(homeHref) },
+    { name: t.oblast, url: absoluteUrl(oblastHref) },
+    { name: locale === "ru" ? "Киев" : "Київ", url: absoluteUrl(cityHref) },
+  ];
 
   return (
     <div className="min-h-screen bg-background grid-bg">
       <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: breadcrumbItems.map((item, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: item.name,
+                item: item.url,
+              })),
+            }),
+          }}
+        />
         <h1 className="sr-only">{t.title}</h1>
+
+        <nav
+          aria-label={t.breadcrumbAria}
+          className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+        >
+          <Link href={homeHref} className="transition-colors hover:text-primary">
+            {t.home}
+          </Link>
+          <span>/</span>
+          <Link href={oblastHref} className="transition-colors hover:text-primary">
+            {t.oblast}
+          </Link>
+          <span>/</span>
+          <span className="font-medium text-foreground">{locale === "ru" ? "Киев" : "Київ"}</span>
+        </nav>
 
         {/* Three-column hero */}
         {/* Storm + Sun/Coords row */}

@@ -1,4 +1,5 @@
 import { EXTRA_UK_CITIES } from "./ukraine-city-catalog";
+import { buildUkCitySeoDescription, buildUkCitySeoTitle } from "@/lib/city-seo";
 
 export interface CityConfig {
   slug: string;
@@ -12,10 +13,6 @@ export interface CityConfig {
   utcOffset: string;
   seoTitle: string;
   seoDescription: string;
-}
-
-function buildUkSeoTitle(nameGenitive: string) {
-  return `Магнітні бурі в ${nameGenitive} сьогодні, kp-індекс та сонячний вітер`;
 }
 
 export const CITIES: CityConfig[] = [
@@ -359,7 +356,8 @@ export const CITIES: CityConfig[] = [
   },
 ].map((city) => ({
   ...city,
-  seoTitle: buildUkSeoTitle(city.nameGenitive),
+  seoTitle: buildUkCitySeoTitle(city.slug, city.name, city.nameGenitive),
+  seoDescription: buildUkCitySeoDescription(city.slug, city.name, city.nameGenitive),
 }));
 
 export const ALL_UK_CITIES: CityConfig[] = [...CITIES, ...EXTRA_UK_CITIES];

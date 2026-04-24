@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
+import { OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
 import { getLatestNews } from "@/lib/server-news";
 import { SITE_URL } from "@/lib/site";
 
@@ -81,6 +82,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.75,
   }));
 
+  const oblastPages: MetadataRoute.Sitemap = OBLAST_ROUTE_MAP.map((route) => ({
+    url: `${SITE_URL}/oblast/${route.slugUk}`,
+    changeFrequency: "hourly",
+    priority: 0.75,
+  }));
+
+  const ruOblastPages: MetadataRoute.Sitemap = OBLAST_ROUTE_MAP.map((route) => ({
+    url: `${SITE_URL}/ru/oblast/${route.slugRu}`,
+    changeFrequency: "hourly",
+    priority: 0.7,
+  }));
+
   const newsPages = await getLatestNews(1000, "uk")
     .then((items) =>
       items.map((item) => ({
@@ -103,5 +116,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
     .catch(() => []);
 
-  return [...staticPages, ...ruStaticPages, ...plStaticPages, ...cityPages, ...ruCityPages, ...plCityPages, ...newsPages, ...ruNewsPages];
+  return [
+    ...staticPages,
+    ...ruStaticPages,
+    ...plStaticPages,
+    ...cityPages,
+    ...ruCityPages,
+    ...plCityPages,
+    ...oblastPages,
+    ...ruOblastPages,
+    ...newsPages,
+    ...ruNewsPages,
+  ];
 }

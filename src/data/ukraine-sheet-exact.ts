@@ -1,4 +1,10 @@
 import type { CityConfig } from "./cities";
+import {
+  buildRuCitySeoDescription,
+  buildRuCitySeoTitle,
+  buildUkCitySeoDescription,
+  buildUkCitySeoTitle,
+} from "@/lib/city-seo";
 
 type ExactRegionGroup = {
   key: string;
@@ -6,14 +12,6 @@ type ExactRegionGroup = {
   titleRu: string;
   slugs: string[];
 };
-
-function buildUkSeoTitle(nameGenitive: string) {
-  return `Магнітні бурі в ${nameGenitive} сьогодні, kp-індекс та сонячний вітер`;
-}
-
-function buildRuSeoTitle(nameGenitive: string) {
-  return `Магнитные бури в ${nameGenitive} сегодня, kp-индекс и солнечный ветер`;
-}
 
 type ExactSeed = {
   slug: string;
@@ -243,7 +241,7 @@ const EXACT_CITY_SEEDS: ExactSeed[] = [
   { slug: "kominternivske", nameUk: "Комінтернівське", nameUkLoc: "Комінтернівське", nameRu: "Доброслав", nameRuLoc: "Доброславе", slugRu: "dobroslav", lat: 46.8210, lon: 30.9452 },
   { slug: "fontanka", nameUk: "Фонтанка", nameUkLoc: "Фонтанкі", nameRu: "Фонтанка", nameRuLoc: "Фонтанке", slugRu: "fontanka", lat: 46.5702, lon: 30.8547 },
   { slug: "kreminchuk", nameUk: "Кремінчук", nameUkLoc: "Кремінчукі", nameRu: "Кременчуг", nameRuLoc: "Кременчуге", slugRu: "kremenchug", lat: 49.0625, lon: 33.4048 },
-  { slug: "horishni-plavni", nameUk: "Горішні Плавні", nameUkLoc: "Горішні Плавніі", nameRu: "Горишние Плавни", nameRuLoc: "Горишние Плавние", slugRu: "gorishnie-plavni", lat: 49.0084, lon: 33.6293 },
+  { slug: "horishni-plavni", nameUk: "Горішні Плавні", nameUkLoc: "Горішніх Плавнях", nameRu: "Горишние Плавни", nameRuLoc: "Горишних Плавнях", slugRu: "gorishnie-plavni", lat: 49.0084, lon: 33.6293 },
   { slug: "hadiach", nameUk: "Гадяч", nameUkLoc: "Гадячі", nameRu: "Гадяч", nameRuLoc: "Гадяче", slugRu: "gadyach", lat: 50.3691, lon: 33.9970 },
   { slug: "karlivka", nameUk: "Карлівка", nameUkLoc: "Карлівкі", nameRu: "Карловка", nameRuLoc: "Карловке", slugRu: "karlovka", lat: 49.4555, lon: 35.1349 },
   { slug: "pyriatyn", nameUk: "Пирятин", nameUkLoc: "Пирятині", nameRu: "Пирятин", nameRuLoc: "Пирятине", slugRu: "piryatin", lat: 50.2439, lon: 32.5203 },
@@ -311,7 +309,7 @@ const EXACT_CITY_SEEDS: ExactSeed[] = [
   { slug: "khorostkiv", nameUk: "Хоростків", nameUkLoc: "Хоростківі", nameRu: "Хоростков", nameRuLoc: "Хоросткове", slugRu: "khorostkov", lat: 49.2139, lon: 25.9196 },
   { slug: "kopychyntsi", nameUk: "Копичинці", nameUkLoc: "Копичинціі", nameRu: "Копычинцы", nameRuLoc: "Копычинцые", slugRu: "kopychintsy", lat: 49.1030, lon: 25.9116 },
   { slug: "skala-padzilska", nameUk: "Скала-Подільська", nameUkLoc: "Скалі-Подільській", nameRu: "Скала-Подольская", nameRuLoc: "Скала-Подольской", slugRu: "skala-podolskaya", lat: 48.8501, lon: 26.2006 },
-  { slug: "synkiv", nameUk: "Синьків", nameUkLoc: "Синькова", nameRu: "Синьков", nameRuLoc: "Синькове", slugRu: "sinkov", lat: 48.6173, lon: 25.9573 },
+  { slug: "synkiv", nameUk: "Синьків", nameUkLoc: "Синькові", nameRu: "Синьков", nameRuLoc: "Синькове", slugRu: "sinkov", lat: 48.6173, lon: 25.9573 },
   { slug: "trybukhivtsi", nameUk: "Трибухівці", nameUkLoc: "Трибухівціі", nameRu: "Трибуховцы", nameRuLoc: "Трибуховцые", slugRu: "tribukhovtsy", lat: 49.0460, lon: 25.4469 },
   { slug: "skalat", nameUk: "Скалат", nameUkLoc: "Скалаті", nameRu: "Скалат", nameRuLoc: "Скалате", slugRu: "skalat", lat: 49.4254, lon: 25.9760 },
   { slug: "melnytsia-podilska", nameUk: "Мельниця-Подільська", nameUkLoc: "Мельниця-Подільські", nameRu: "Мельница-Подольская", nameRuLoc: "Мельница-Подольскае", slugRu: "melnitsa-podolskaya", lat: 48.6082, lon: 26.1666 },
@@ -438,8 +436,8 @@ export const SHEET_EXACT_EXTRA_UK_CITIES: CityConfig[] = EXACT_CITY_SEEDS.map((c
   lonLabel: `${Math.abs(city.lon).toFixed(4)}° ${city.lon >= 0 ? "Сх" : "Зх"}`,
   timezone: "Europe/Kyiv",
   utcOffset: "UTC+2 (EET)",
-  seoTitle: buildUkSeoTitle(city.nameUkLoc),
-  seoDescription: `${city.nameUk}: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані в реальному часі.`,
+  seoTitle: buildUkCitySeoTitle(city.slug, city.nameUk, city.nameUkLoc),
+  seoDescription: buildUkCitySeoDescription(city.slug, city.nameUk, city.nameUkLoc),
 }));
 
 export const SHEET_EXACT_RU_CITIES = Object.fromEntries(
@@ -449,8 +447,8 @@ export const SHEET_EXACT_RU_CITIES = Object.fromEntries(
       slug: city.slugRu,
       name: city.nameRu,
       nameGenitive: city.nameRuLoc,
-      seoTitle: buildRuSeoTitle(city.nameRuLoc),
-      seoDescription: `${city.nameRu}: Kp индекс, погода и качество воздуха. Актуальные данные в реальном времени.`,
+      seoTitle: buildRuCitySeoTitle(city.slug, city.nameRu, city.nameRuLoc),
+      seoDescription: buildRuCitySeoDescription(city.slug, city.nameRu, city.nameRuLoc),
     },
   ]),
 ) as Record<string, { slug?: string; name: string; nameGenitive: string; seoTitle: string; seoDescription: string }>;

@@ -22,6 +22,8 @@ import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import type { SiteLocale } from "@/lib/locale";
 import { getUhmcRegionCode } from "@/lib/uhmc-warning";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
+import { getOblastPathsByKey, getOblastTitle } from "@/lib/oblast-routes";
+import { absoluteUrl } from "@/lib/site";
 
 type LegacyLocale = SiteLocale;
 
@@ -93,6 +95,8 @@ const copy = {
     hydrometWarning: "Попередження від гідрометцентру",
     hydrometSource: "Джерело: УкрГМЦ",
     hydrometUnavailable: "Попередження тимчасово недоступні",
+    home: "Головна",
+    breadcrumbAria: "Навігація сторінкою",
   },
   ru: {
     calm: "Спокойно",
@@ -161,6 +165,8 @@ const copy = {
     hydrometWarning: "Предупреждение гидрометцентра",
     hydrometSource: "Источник: УкрГМЦ",
     hydrometUnavailable: "Предупреждение временно недоступно",
+    home: "Главная",
+    breadcrumbAria: "Навигация по странице",
   },
   pl: {
     calm: "Spokojnie",
@@ -229,6 +235,8 @@ const copy = {
     hydrometWarning: "Ostrzeżenie hydrometcentrum",
     hydrometSource: "Źródło: UHGMC",
     hydrometUnavailable: "Ostrzeżenie chwilowo niedostępne",
+    home: "Strona główna",
+    breadcrumbAria: "Nawigacja po stronie",
   },
 } as const;
 
@@ -386,6 +394,24 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             const href = locale === "ru" ? `/ru/city/${getRuCitySlug(candidate)}` : `/city/${candidate.slug}`;
             return { name: localized.name, href };
           });
+  const oblastPaths = regionGroup && locale !== "pl" ? getOblastPathsByKey(regionGroup.key) : null;
+  const oblastHref =
+    locale === "ru"
+      ? oblastPaths?.ru
+      : locale === "uk"
+        ? oblastPaths?.uk
+        : null;
+  const oblastName =
+    regionGroup && locale !== "pl"
+      ? getOblastTitle(locale === "ru" ? "ru" : "uk", regionGroup.key) ?? regionTitle
+      : null;
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : "/";
+  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : `/city/${city.slug}`;
+  const breadcrumbItems = [
+    { name: t.home, url: absoluteUrl(homeHref) },
+    ...(oblastHref && oblastName ? [{ name: oblastName, url: absoluteUrl(oblastHref) }] : []),
+    { name: city.name, url: absoluteUrl(cityHref) },
+  ];
   const uhmcRegionCode = locale === "pl" ? null : getUhmcRegionCode(regionGroup?.key);
   const { data: uhmcWarning } = useQuery({
     queryKey: ["uhmc-warning", uhmcRegionCode, locale],
@@ -441,9 +467,43 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
   return (
     <div className="min-h-screen bg-background grid-bg">
       <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: breadcrumbItems.map((item, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: item.name,
+                item: item.url,
+              })),
+            }),
+          }}
+        />
         <h1 className="sr-only">
           {t.srOnlyHeading} {city.nameGenitive} — {t.srOnlySuffix}
         </h1>
+
+        <nav
+          aria-label={t.breadcrumbAria}
+          className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+        >
+          <Link href={homeHref} className="transition-colors hover:text-primary">
+            {t.home}
+          </Link>
+          {oblastHref && oblastName ? (
+            <>
+              <span>/</span>
+              <Link href={oblastHref} className="transition-colors hover:text-primary">
+                {oblastName}
+              </Link>
+            </>
+          ) : null}
+          <span>/</span>
+          <span className="font-medium text-foreground">{city.name}</span>
+        </nav>
 
         {/* Storm Banner + Sidebar */}
         <section

@@ -19,6 +19,7 @@ import type { KpForecastEntry } from "@/hooks/useKpForecast";
 import { CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
+import { getOblastRouteByKey, getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
 import type { SiteLocale } from "@/lib/locale";
 
 const getKpStatus = (kp: number) => {
@@ -87,6 +88,21 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
     : locale === "pl"
       ? CITIES_PL.map((c) => ({ name: c.name, slug: c.slug }))
       : CITIES.map((c) => ({ name: c.name, slug: c.slug }));
+  const oblastList = OBLAST_ROUTE_MAP.map((route) => {
+    const href =
+      locale === "ru"
+        ? `/ru/oblast/${route.slugRu}`
+        : `/oblast/${route.slugUk}`;
+
+    return {
+      key: route.regionKey,
+      href,
+      name:
+        locale === "ru"
+          ? getOblastTitle("ru", route.regionKey) || route.regionKey
+          : getOblastTitle("uk", route.regionKey) || route.regionKey,
+    };
+  });
 
   const todayFormatted = new Date().toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/Kyiv" });
 
@@ -149,25 +165,24 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         </section>
       </main>
 
-      <section className="mx-auto max-w-7xl px-6 py-10" aria-label={t("index.citiesTitle")}>
-        <h2 className="text-lg font-display font-semibold text-foreground/90 mb-5">{t("index.citiesTitle")}</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-6 gap-y-3 text-sm">
-          {cityList.map((city) => (
-            <a key={city.slug} href={`${langPrefix}/city/${city.slug}`} className="text-primary hover:underline whitespace-nowrap">
-              {t("index.citiesLink")} <span className="font-semibold">{city.name}</span>
+      <section
+        className="mx-auto max-w-7xl px-6 py-10"
+        aria-label={locale === "ru" ? "Космическая погода по областям Украины" : "Космічна погода по областях України"}
+      >
+        <h2 className="mb-5 text-lg font-display font-semibold text-foreground/90">
+          {locale === "ru" ? "Космическая погода по областям Украины" : "Космічна погода по областях України"}
+        </h2>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {oblastList.map((oblast) => (
+            <a
+              key={oblast.key}
+              href={oblast.href}
+              className="whitespace-nowrap text-primary transition-colors hover:text-primary/80 hover:underline"
+            >
+              <span className="font-semibold">{oblast.name}</span>
             </a>
           ))}
         </div>
-        {locale !== "pl" ? (
-          <div className="mt-6">
-            <a
-              href={`${langPrefix}/cities`}
-              className="inline-flex items-center rounded-full border border-border/60 bg-card/60 px-5 py-3 text-sm font-medium text-foreground transition-colors hover:bg-card"
-            >
-              {t("index.citiesMore")}
-            </a>
-          </div>
-        ) : null}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label={t("index.aboutService")}>

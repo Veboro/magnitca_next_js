@@ -1,5 +1,6 @@
 import { CityConfig } from "./cities";
 import { SHEET_EXACT_RU_CITIES } from "./ukraine-sheet-exact";
+import { buildRuCitySeoDescription, buildRuCitySeoTitle } from "@/lib/city-seo";
 
 /** Russian names for cities — keyed by slug */
 type RuCityConfig = {
@@ -9,10 +10,6 @@ type RuCityConfig = {
   seoTitle: string;
   seoDescription: string;
 };
-
-function buildRuSeoTitle(nameGenitive: string) {
-  return `Магнитные бури в ${nameGenitive} сегодня, kp-индекс и солнечный ветер`;
-}
 
 export const CITIES_RU: Record<string, RuCityConfig> = Object.fromEntries(
   Object.entries({
@@ -218,7 +215,8 @@ export const CITIES_RU: Record<string, RuCityConfig> = Object.fromEntries(
     slug,
     {
       ...city,
-      seoTitle: buildRuSeoTitle(city.nameGenitive),
+      seoTitle: buildRuCitySeoTitle(slug, city.name, city.nameGenitive),
+      seoDescription: buildRuCitySeoDescription(slug, city.name, city.nameGenitive),
     },
   ]),
 ) as Record<string, RuCityConfig>;

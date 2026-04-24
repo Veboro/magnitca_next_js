@@ -1,5 +1,6 @@
 import type { CityConfig } from "./cities";
 import { SHEET_EXACT_EXTRA_UK_CITIES, SHEET_EXACT_REGION_GROUPS } from "./ukraine-sheet-exact";
+import { buildUkCitySeoDescription, buildUkCitySeoTitle } from "@/lib/city-seo";
 
 type RegionGroup = {
   key: string;
@@ -28,8 +29,8 @@ function makeCity(
     lonLabel: `${Math.abs(lon).toFixed(4)}° ${lonSuffix}`,
     timezone: "Europe/Kyiv",
     utcOffset: "UTC+2 (EET)",
-    seoTitle: `Магнітні бурі в ${nameGenitive} сьогодні, kp-індекс та сонячний вітер`,
-    seoDescription: `${name}: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані в реальному часі.`,
+    seoTitle: buildUkCitySeoTitle(slug, name, nameGenitive),
+    seoDescription: buildUkCitySeoDescription(slug, name, nameGenitive),
   };
 }
 

@@ -8,6 +8,7 @@ import { getPathForLocale, getSafeLocaleSwitchPath, isPlPath, isRuPath, type Sit
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
+import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
 
 const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: typeof Activity }>> = {
   uk: [
@@ -76,19 +77,22 @@ export function PublicHeader() {
 
   const searchCopy = {
     uk: {
-      placeholder: "Пошук міста",
+      placeholder: "Пошук міста або області",
       empty: "Нічого не знайдено",
-      section: "Сторінки міст",
+      citySection: "Сторінки міст",
+      oblastSection: "Сторінки областей",
     },
     ru: {
-      placeholder: "Поиск города",
+      placeholder: "Поиск города или области",
       empty: "Ничего не найдено",
-      section: "Страницы городов",
+      citySection: "Страницы городов",
+      oblastSection: "Страницы областей",
     },
     pl: {
       placeholder: "Szukaj miasta",
       empty: "Nic nie znaleziono",
-      section: "Strony miast",
+      citySection: "Strony miast",
+      oblastSection: "Strony obwodow",
     },
   } as const;
 
@@ -121,6 +125,27 @@ export function PublicHeader() {
     }));
   }, [locale]);
 
+  const oblastSearchItems = useMemo<SearchCityItem[]>(() => {
+    if (locale === "pl") {
+      return [];
+    }
+
+    return OBLAST_ROUTE_MAP.map((oblast) => {
+      const name =
+        locale === "ru"
+          ? getOblastTitle("ru", oblast.regionKey) || oblast.regionKey
+          : getOblastTitle("uk", oblast.regionKey) || oblast.regionKey;
+      const slug = locale === "ru" ? oblast.slugRu : oblast.slugUk;
+      const href = locale === "ru" ? `/ru/oblast/${oblast.slugRu}` : `/oblast/${oblast.slugUk}`;
+
+      return {
+        name,
+        href,
+        searchText: `${name} ${slug}`.toLowerCase(),
+      };
+    });
+  }, [locale]);
+
   const normalizedQuery = cityQuery.trim().toLowerCase();
   const filteredCities = useMemo(() => {
     if (!normalizedQuery) {
@@ -131,6 +156,15 @@ export function PublicHeader() {
       .filter((city) => city.searchText.includes(normalizedQuery))
       .slice(0, 8);
   }, [citySearchItems, normalizedQuery]);
+  const filteredOblasts = useMemo(() => {
+    if (!normalizedQuery) {
+      return oblastSearchItems.slice(0, 8);
+    }
+
+    return oblastSearchItems
+      .filter((oblast) => oblast.searchText.includes(normalizedQuery))
+      .slice(0, 8);
+  }, [oblastSearchItems, normalizedQuery]);
 
   useEffect(() => {
     const savedTheme = window.localStorage.getItem("theme");
@@ -227,27 +261,53 @@ export function PublicHeader() {
           </div>
           {searchOpen && (
             <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
-              <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                {searchCopy[locale].section}
-              </p>
-              {filteredCities.length > 0 ? (
-                <div className="space-y-1">
-                  {filteredCities.map((city) => (
-                    <Link
-                      key={city.href}
-                      href={city.href}
-                      onClick={() => {
-                        setSearchOpen(false);
-                        setCityQuery("");
-                      }}
-                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
-                    >
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span>{city.name}</span>
-                    </Link>
-                  ))}
+              {filteredCities.length > 0 && (
+                <div className="mb-2">
+                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {searchCopy[locale].citySection}
+                  </p>
+                  <div className="space-y-1">
+                    {filteredCities.map((city) => (
+                      <Link
+                        key={city.href}
+                        href={city.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setCityQuery("");
+                        }}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                      >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{city.name}</span>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              ) : (
+              )}
+              {filteredOblasts.length > 0 && (
+                <div>
+                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {searchCopy[locale].oblastSection}
+                  </p>
+                  <div className="space-y-1">
+                    {filteredOblasts.map((oblast) => (
+                      <Link
+                        key={oblast.href}
+                        href={oblast.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setCityQuery("");
+                        }}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                      >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{oblast.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {filteredCities.length === 0 && filteredOblasts.length === 0 && (
                 <p className="px-3 py-2 text-sm text-muted-foreground">{searchCopy[locale].empty}</p>
               )}
             </div>
@@ -369,27 +429,53 @@ export function PublicHeader() {
               />
             </div>
             <div className="mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
-              <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                {searchCopy[locale].section}
-              </p>
-              {filteredCities.length > 0 ? (
-                <div className="space-y-1">
-                  {filteredCities.map((city) => (
-                    <Link
-                      key={city.href}
-                      href={city.href}
-                      onClick={() => {
-                        setSearchOpen(false);
-                        setCityQuery("");
-                      }}
-                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
-                    >
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span>{city.name}</span>
-                    </Link>
-                  ))}
+              {filteredCities.length > 0 && (
+                <div className="mb-2">
+                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {searchCopy[locale].citySection}
+                  </p>
+                  <div className="space-y-1">
+                    {filteredCities.map((city) => (
+                      <Link
+                        key={city.href}
+                        href={city.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setCityQuery("");
+                        }}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                      >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{city.name}</span>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
-              ) : (
+              )}
+              {filteredOblasts.length > 0 && (
+                <div>
+                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {searchCopy[locale].oblastSection}
+                  </p>
+                  <div className="space-y-1">
+                    {filteredOblasts.map((oblast) => (
+                      <Link
+                        key={oblast.href}
+                        href={oblast.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setCityQuery("");
+                        }}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                      >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{oblast.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {filteredCities.length === 0 && filteredOblasts.length === 0 && (
                 <p className="px-3 py-2 text-sm text-muted-foreground">{searchCopy[locale].empty}</p>
               )}
             </div>
