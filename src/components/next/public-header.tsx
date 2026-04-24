@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind } from "lucide-react";
+import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind, X } from "lucide-react";
 import { getPathForLocale, getSafeLocaleSwitchPath, isPlPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
@@ -220,6 +220,19 @@ export function PublicHeader() {
     setMobileLocaleOpen(false);
   }, [pathnameValue]);
 
+  useEffect(() => {
+    if (!searchOpen) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [searchOpen]);
+
   const toggleTheme = () => {
     const nextThemeIsDark = !isDarkTheme;
     setIsDarkTheme(nextThemeIsDark);
@@ -228,8 +241,98 @@ export function PublicHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/40 bg-background/85 backdrop-blur">
-      <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
+    <>
+      {searchOpen && (
+        <div className="fixed inset-0 z-[100] flex flex-col bg-background lg:hidden">
+          <div className="border-b border-border/40 px-4 pb-4 pt-4 sm:px-6">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-foreground">{searchCopy[locale].placeholder}</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchOpen(false);
+                  setCityQuery("");
+                }}
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/60 text-muted-foreground transition-colors hover:text-foreground"
+                aria-label="Закрити пошук"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                value={cityQuery}
+                onChange={(event) => setCityQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    setSearchOpen(false);
+                  }
+                }}
+                autoFocus
+                placeholder={searchCopy[locale].placeholder}
+                className="h-12 w-full rounded-xl border border-border/50 bg-card pl-10 pr-4 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary/50"
+              />
+            </div>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 sm:px-6">
+            <div className="rounded-2xl border border-border/50 bg-popover p-2 shadow-xl">
+              {filteredCities.length > 0 && (
+                <div className="mb-2">
+                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {searchCopy[locale].citySection}
+                  </p>
+                  <div className="space-y-1">
+                    {filteredCities.map((city) => (
+                      <Link
+                        key={city.href}
+                        href={city.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setCityQuery("");
+                        }}
+                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-base text-foreground transition-colors hover:bg-card"
+                      >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{city.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {filteredOblasts.length > 0 && (
+                <div>
+                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                    {searchCopy[locale].oblastSection}
+                  </p>
+                  <div className="space-y-1">
+                    {filteredOblasts.map((oblast) => (
+                      <Link
+                        key={oblast.href}
+                        href={oblast.href}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setCityQuery("");
+                        }}
+                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-base text-foreground transition-colors hover:bg-card"
+                      >
+                        <MapPin className="h-4 w-4 text-primary" />
+                        <span>{oblast.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {filteredCities.length === 0 && filteredOblasts.length === 0 && (
+                <p className="px-3 py-3 text-base text-muted-foreground">{searchCopy[locale].empty}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      <header className="sticky top-0 z-40 border-b border-border/40 bg-background/85 backdrop-blur">
+      <div className={`relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 ${searchOpen ? "max-lg:opacity-0 max-lg:pointer-events-none" : ""}`}>
         <Link href={getPathForLocale("/", locale)} className="min-w-0 flex items-center gap-3">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-sm">
             <Activity className="h-5 w-5" />
@@ -410,79 +513,8 @@ export function PublicHeader() {
             )}
           </div>
         </div>
-        {searchOpen && (
-          <div className="absolute left-4 right-4 top-[calc(100%-0.25rem)] z-50 lg:hidden sm:left-6 sm:right-6">
-            <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <input
-                type="text"
-                value={cityQuery}
-                onChange={(event) => setCityQuery(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Escape") {
-                    setSearchOpen(false);
-                  }
-                }}
-                autoFocus
-                placeholder={searchCopy[locale].placeholder}
-                className="h-11 w-full rounded-xl border border-border/50 bg-card/60 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary/50 focus:bg-card"
-              />
-            </div>
-            <div className="mt-2 max-h-[60vh] overflow-y-auto rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
-              {filteredCities.length > 0 && (
-                <div className="mb-2">
-                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    {searchCopy[locale].citySection}
-                  </p>
-                  <div className="space-y-1">
-                    {filteredCities.map((city) => (
-                      <Link
-                        key={city.href}
-                        href={city.href}
-                        onClick={() => {
-                          setSearchOpen(false);
-                          setCityQuery("");
-                        }}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
-                      >
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span>{city.name}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {filteredOblasts.length > 0 && (
-                <div>
-                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
-                    {searchCopy[locale].oblastSection}
-                  </p>
-                  <div className="space-y-1">
-                    {filteredOblasts.map((oblast) => (
-                      <Link
-                        key={oblast.href}
-                        href={oblast.href}
-                        onClick={() => {
-                          setSearchOpen(false);
-                          setCityQuery("");
-                        }}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
-                      >
-                        <MapPin className="h-4 w-4 text-primary" />
-                        <span>{oblast.name}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {filteredCities.length === 0 && filteredOblasts.length === 0 && (
-                <p className="px-3 py-2 text-sm text-muted-foreground">{searchCopy[locale].empty}</p>
-              )}
-            </div>
-          </div>
-        )}
       </div>
-      <nav className="border-t border-border/30 bg-card/30">
+      <nav className={`border-t border-border/30 bg-card/30 ${searchOpen ? "max-lg:hidden" : ""}`}>
         <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-6 py-2">
           {navItems[locale].map((item) => (
             <Link
@@ -499,5 +531,6 @@ export function PublicHeader() {
         </div>
       </nav>
     </header>
+    </>
   );
 }
