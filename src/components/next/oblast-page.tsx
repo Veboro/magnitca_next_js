@@ -31,6 +31,7 @@ const copy = {
     impactMagnetic: "Магнітні бурі",
     impactWind: "Сонячний вітер",
     impactTotal: "Загальний вплив",
+    telegramButton: "Підключити сповіщення в Telegram",
     warningTitle: "Попередження від гідрометцентру",
     warningNone: "Попереджень немає",
     warningSource: "Джерело: УкрГМЦ",
@@ -77,6 +78,7 @@ const copy = {
     impactMagnetic: "Магнитные бури",
     impactWind: "Солнечный ветер",
     impactTotal: "Общее влияние",
+    telegramButton: "Подключить уведомления в Telegram",
     warningTitle: "Предупреждение гидрометцентра",
     warningNone: "Предупреждений нет",
     warningSource: "Источник: УкрГМЦ",
@@ -225,13 +227,23 @@ function getWindScore10(speed: number) {
   return Math.min(10, Math.max(1, normalized));
 }
 
+function getKyivTodayKey() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Kyiv",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function aggregateForecastDays(items: KpForecastEntry[] | null) {
   if (!items?.length) return [];
 
+  const todayKey = getKyivTodayKey();
   const byDate = new Map<string, number>();
   for (const item of items) {
     const date = item.time_tag?.slice(0, 10);
-    if (!date) continue;
+    if (!date || date < todayKey) continue;
     byDate.set(date, Math.max(byDate.get(date) ?? 0, Number(item.kp) || 0));
   }
 
@@ -485,6 +497,14 @@ export async function OblastPage({
                     );
                   })}
                 </div>
+                <a
+                  href="https://t.me/+7UKzAK5ur8UxZmMy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl border border-primary/40 bg-primary/10 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:border-primary/60 hover:bg-primary/15 hover:text-primary"
+                >
+                  {t.telegramButton}
+                </a>
               </div>
             </div>
           </section>

@@ -231,6 +231,7 @@ function summarizeTodayWindows(todayForecast: Array<{ timeTag: string; kp: numbe
     return {
       strongestStart: null as string | null,
       strongestEnd: null as string | null,
+      strongestWindowLabel: null as string | null,
       strongestMaxKp: 0,
       strongestG: 0,
       windowsText: "прогноз на добу поки обмежений",
@@ -238,10 +239,10 @@ function summarizeTodayWindows(todayForecast: Array<{ timeTag: string; kp: numbe
   }
 
   const windows = [
-    { key: "night", label: "вночі", hours: [0, 3, 6] },
-    { key: "morning", label: "вранці", hours: [6, 9, 12] },
-    { key: "day", label: "вдень", hours: [12, 15, 18] },
-    { key: "evening", label: "увечері", hours: [18, 21, 24] },
+    { key: "night", label: "00:00–06:00", hours: [0, 3, 6] },
+    { key: "morning", label: "06:00–12:00", hours: [6, 9, 12] },
+    { key: "day", label: "12:00–18:00", hours: [12, 15, 18] },
+    { key: "evening", label: "18:00–24:00", hours: [18, 21, 24] },
   ];
 
   const dataByHour = new Map<number, number>();
@@ -277,10 +278,40 @@ function summarizeTodayWindows(todayForecast: Array<{ timeTag: string; kp: numbe
   return {
     strongestStart: strongest?.hours?.[0] !== undefined ? `${String(strongest.hours[0]).padStart(2, "0")}:00` : null,
     strongestEnd: strongest?.hours?.[1] !== undefined ? `${String(strongest.hours[1]).padStart(2, "0")}:00` : null,
+    strongestWindowLabel: strongest?.label ?? null,
     strongestMaxKp: strongest?.maxKp ?? 0,
     strongestG: strongest?.gScale ?? 0,
     windowsText,
   };
+}
+
+function describeTimeRelation({
+  currentHour,
+  strongestStart,
+  strongestEnd,
+  strongestWindowLabel,
+}: {
+  currentHour: number;
+  strongestStart: string | null;
+  strongestEnd: string | null;
+  strongestWindowLabel: string | null;
+}) {
+  if (!strongestStart || !strongestEnd || !strongestWindowLabel) {
+    return "Немає достатньо даних, щоб визначити, чи піковий відрізок уже минув, триває зараз чи ще попереду.";
+  }
+
+  const startHour = Number(strongestStart.slice(0, 2));
+  const endHour = Number(strongestEnd.slice(0, 2));
+
+  if (currentHour >= endHour) {
+    return `Найсильніший відрізок сьогодні вже минув: ${strongestWindowLabel}. Якщо згадуєш його в тексті, використовуй тільки минулий час: "був", "спостерігався", "припав на", "у перші години доби фон був вищим". Не пиши "очікується".`;
+  }
+
+  if (currentHour >= startHour && currentHour < endHour) {
+    return `Найсильніший відрізок триває зараз: ${strongestWindowLabel}. Якщо згадуєш його в тексті, використовуй теперішній час: "триває", "зараз активність вища", "у проміжку ${strongestWindowLabel} фон підвищений".`;
+  }
+
+  return `Найсильніший відрізок ще попереду: ${strongestWindowLabel}. Якщо згадуєш його в тексті, можна використовувати майбутній час: "очікується", "можливе посилення", "найвищий фон прогнозується у проміжку ${strongestWindowLabel}".`;
 }
 
 async function generateAiText({
@@ -296,8 +327,10 @@ async function generateAiText({
   todayWindowsText,
   strongestStart,
   strongestEnd,
+  strongestWindowLabel,
   strongestMaxKp,
   strongestG,
+  strongestTimeRelationHint,
 }: {
   openAiApiKey: string;
   dateLabel: string;
@@ -311,8 +344,10 @@ async function generateAiText({
   todayWindowsText: string;
   strongestStart: string | null;
   strongestEnd: string | null;
+  strongestWindowLabel: string | null;
   strongestMaxKp: number;
   strongestG: number;
+  strongestTimeRelationHint: string;
 }) {
   const forecastEmojiLines = buildForecastEmojiLines(dateLabel, todayMaxKp, upcoming);
   const likelyBodyImpact =
@@ -351,6 +386,7 @@ async function generateAiText({
 - Густина сонячного вітру: ${windDensity.toFixed(1)} p/cm³
 - Картина по відрізках доби: ${todayWindowsText}
 - Найпомітніший відрізок: ${strongestStart && strongestEnd ? `${strongestStart}–${strongestEnd}, до Kp ${strongestMaxKp.toFixed(1)}` : "даних недостатньо"}
+- Готова підказка щодо часу: ${strongestTimeRelationHint}
 - Наступні дні: ${upcoming.map((item) => `${formatKyivShortDate(item.date)}: max Kp ${item.maxKp.toFixed(1)}, avg Kp ${item.avgKp.toFixed(1)}`).join("; ")}
 - Ймовірний висновок по самопочуттю: ${likelyBodyImpact}
 - Формат блоку прогнозу по днях: ${forecastEmojiLines}
@@ -364,14 +400,23 @@ async function generateAiText({
 - якщо день загалом спокійний, але ввечері можливе посилення, скажи це прямо
 - окремо коротко поясни, чи можливий вплив на самопочуття і в які години це ймовірніше
 - не перебільшуй загрозу, якщо дані цього не підтверджують
-- довжина: 700-1100 символів
+- довжина: 550-900 символів
 - не використовуй сухі фрази типу "ми спостерігаємо", "ситуація характеризується", "відбуватиметься"
 - не пиши як пресреліз або машинний звіт
 - стиль має бути близьким до телеграм-поста з прикладу
 - не допускай логічних суперечностей у часових формулюваннях
-- якщо найсильніший відрізок припадає на ніч, не пиши, що "день розпочнеться" з цього піку
-- оскільки пост виходить о 07:00 за Києвом, ніч можна згадувати тільки як те, що вже відбулося: наприклад "уночі активність була вищою", "ніч пройшла спокійно", "найпомітніший стрибок уже був уночі"
-- не подавай ніч як майбутній відрізок після публікації поста
+- не використовуй розмиті часові слова без прив'язки: "вночі", "вранці", "вдень", "увечері", якщо поруч немає конкретних годин або дати
+- основний варіант — писати через інтервали годин: "з 00:00 до 03:00", "у проміжку 06:00–12:00", "після 18:00"
+- якщо згадуєш ніч після 07:00 ранку, це може бути тільки минула ніч або "ніч на [дата]"
+- якщо найсильніший відрізок припадає на 00:00–06:00, прямо пиши, що це було в перші години доби або з 00:00 до 06:00
+- не подавай ніч як майбутній відрізок після публікації поста, якщо не вказана точна дата "у ніч на ..."
+- якщо є ризик двозначності, завжди обирай формулювання з годинами, а не з частиною доби
+- обов'язково дотримуйся підказки "Готова підказка щодо часу" і не супереч їй
+- не повторюй ті самі числа і висновки кілька разів у різних реченнях
+- якщо значення низькі й день спокійний, не драматизуй і не розтягуй пояснення
+- не пиши суперечливих пар на кшталт "день загалом спокійний", а далі "найспокійнішими будуть лише кілька годин", якщо дані цього не показують
+- не дублюй однакове значення Kp в кількох сусідніх реченнях без потреби
+- пиши так, ніби це живий короткий щоденний апдейт каналу: щільно, ясно, без води
 - тон: живий, але стриманий; ніби канал пояснює ситуацію своїм читачам
 - речення мають бути короткими або середніми, без перевантажених конструкцій
 - якщо день загалом неважкий, прямо скажи про це: без драматизації, але й без сухості
@@ -613,6 +658,12 @@ Deno.serve(async (req) => {
     const todayMaxKp = todayForecast.length ? Math.max(...todayForecast.map((item) => item.kp)) : latestKp;
     const upcoming = buildUpcomingDays(kpForecastRaw, kyivDateKey);
     const todayWindows = summarizeTodayWindows(todayForecast);
+    const strongestTimeRelationHint = describeTimeRelation({
+      currentHour: kyivHour,
+      strongestStart: todayWindows.strongestStart,
+      strongestEnd: todayWindows.strongestEnd,
+      strongestWindowLabel: todayWindows.strongestWindowLabel,
+    });
 
     const { title, text } = await generateAiText({
       openAiApiKey: OPENAI_API_KEY,
@@ -627,8 +678,10 @@ Deno.serve(async (req) => {
       todayWindowsText: todayWindows.windowsText,
       strongestStart: todayWindows.strongestStart,
       strongestEnd: todayWindows.strongestEnd,
+      strongestWindowLabel: todayWindows.strongestWindowLabel,
       strongestMaxKp: todayWindows.strongestMaxKp,
       strongestG: todayWindows.strongestG,
+      strongestTimeRelationHint,
     });
     const telegramCaption = clampTelegramCaption(text);
 

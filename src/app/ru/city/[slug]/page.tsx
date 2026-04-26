@@ -30,7 +30,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const localizedCity = getLocalizedCity(city, "ru");
 
   return {
-    title: localizedCity.seoTitle,
+    title: {
+      absolute: `${localizedCity.seoTitle} | Магнитка`,
+    },
     description: localizedCity.seoDescription,
     alternates: {
       canonical: `/ru/city/${getRuCitySlug(city)}`,

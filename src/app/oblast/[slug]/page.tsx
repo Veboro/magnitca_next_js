@@ -38,7 +38,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = `${regionTitle}: поточний Kp-індекс, прогноз на 3 дні, попередження УкрГМЦ та сторінки міст області з детальними даними.`;
 
   return {
-    title: `${title} | ${SITE_NAME}`,
+    title: {
+      absolute: `${title} | ${SITE_NAME}`,
+    },
     description,
     alternates: {
       canonical: paths.uk,

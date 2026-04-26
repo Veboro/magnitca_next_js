@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind, X } from "lucide-react";
@@ -69,6 +69,8 @@ export function PublicHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileLocaleOpen, setMobileLocaleOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const headerRef = useRef<HTMLElement | null>(null);
+  const mobileSearchOverlayRef = useRef<HTMLDivElement | null>(null);
   const [localeLinks, setLocaleLinks] = useState<Record<SiteLocale, string | null>>({
     uk: getSafeLocaleSwitchPath(pathnameValue, "uk"),
     ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
@@ -233,6 +235,30 @@ export function PublicHeader() {
     };
   }, [searchOpen]);
 
+  useEffect(() => {
+    if (!searchOpen) return;
+
+    const handlePointerDown = (event: MouseEvent | TouchEvent) => {
+      const target = event.target as Node | null;
+      if (!target) return;
+
+      const clickedInsideHeader = headerRef.current?.contains(target);
+      const clickedInsideMobileOverlay = mobileSearchOverlayRef.current?.contains(target);
+
+      if (clickedInsideHeader || clickedInsideMobileOverlay) return;
+
+      setSearchOpen(false);
+    };
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("touchstart", handlePointerDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("touchstart", handlePointerDown);
+    };
+  }, [searchOpen]);
+
   const toggleTheme = () => {
     const nextThemeIsDark = !isDarkTheme;
     setIsDarkTheme(nextThemeIsDark);
@@ -243,7 +269,7 @@ export function PublicHeader() {
   return (
     <>
       {searchOpen && (
-        <div className="fixed inset-0 z-[100] flex flex-col bg-background lg:hidden">
+        <div ref={mobileSearchOverlayRef} className="fixed inset-0 z-[100] flex flex-col bg-background lg:hidden">
           <div className="border-b border-border/40 px-4 pb-4 pt-4 sm:px-6">
             <div className="mb-3 flex items-center justify-between gap-3">
               <p className="text-sm font-semibold text-foreground">{searchCopy[locale].placeholder}</p>
@@ -331,7 +357,7 @@ export function PublicHeader() {
           </div>
         </div>
       )}
-      <header className="sticky top-0 z-40 border-b border-border/40 bg-background/85 backdrop-blur">
+      <header ref={headerRef} className="sticky top-0 z-40 border-b border-border/40 bg-background/85 backdrop-blur">
       <div className={`relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 ${searchOpen ? "max-lg:opacity-0 max-lg:pointer-events-none" : ""}`}>
         <Link href={getPathForLocale("/", locale)} className="min-w-0 flex items-center gap-3">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-sm">

@@ -28,18 +28,14 @@ const kpBadgeBg = (kp: number) => {
 };
 
 const groupFutureDays = (entries: KpForecastEntry[], locale: string) => {
-  const now = new Date();
-  const tomorrow = new Date(now);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowKey = tomorrow.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
-
-  const groups = new Map<string, KpForecastEntry[]>();
+  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+  const groups = new Map<string, { label: string; entries: KpForecastEntry[] }>();
 
   entries.forEach((entry) => {
     const date = new Date(entry.time_tag);
     const dayKey = date.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
 
-    if (dayKey < tomorrowKey) return;
+    if (dayKey < todayKey) return;
 
     const label = date.toLocaleDateString(locale, {
       weekday: "short",
@@ -48,14 +44,17 @@ const groupFutureDays = (entries: KpForecastEntry[], locale: string) => {
       timeZone: "Europe/Kyiv",
     });
 
-    if (!groups.has(label)) {
-      groups.set(label, []);
+    if (!groups.has(dayKey)) {
+      groups.set(dayKey, { label, entries: [] });
     }
 
-    groups.get(label)!.push(entry);
+    groups.get(dayKey)!.entries.push(entry);
   });
 
-  return Array.from(groups.values()).slice(0, 3);
+  return Array.from(groups.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(0, 3)
+    .map(([, group]) => group.entries);
 };
 
 export const KpForecast3Day = ({ className, initialData }: { className?: string; initialData?: KpForecastEntry[] | null }) => {

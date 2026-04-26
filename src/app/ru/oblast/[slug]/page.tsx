@@ -8,7 +8,7 @@ import {
   getOblastTitle,
   OBLAST_ROUTE_MAP,
 } from "@/lib/oblast-routes";
-import { absoluteUrl, SITE_NAME } from "@/lib/site";
+import { absoluteUrl } from "@/lib/site";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -38,7 +38,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = `${regionTitle}: текущий Kp-индекс, прогноз на 3 дня, предупреждения УкрГМЦ и страницы городов области с подробными данными.`;
 
   return {
-    title: `${title} | ${SITE_NAME}`,
+    title: {
+      absolute: `${title} | Магнитка`,
+    },
     description,
     alternates: {
       canonical: paths.ru,

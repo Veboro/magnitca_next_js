@@ -27,7 +27,9 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 
   return {
-    title: city.seoTitle,
+    title: {
+      absolute: `${city.seoTitle} | Magnitca`,
+    },
     description: city.seoDescription,
     alternates: {
       canonical: `/pl/city/${city.slug}`,
