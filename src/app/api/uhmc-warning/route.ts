@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     const payload = await fetchUhmcWarning(regionCode, locale);
     return NextResponse.json(payload, {
       headers: {
-        "Cache-Control": "public, s-maxage=900, stale-while-revalidate=300",
+        "Cache-Control": "no-store, max-age=0",
       },
     });
   } catch {
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       {
         status: 502,
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=300",
+          "Cache-Control": "no-store, max-age=0",
         },
       }
     );
