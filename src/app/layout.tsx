@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Suspense } from "react";
 import "../index.css";
 import { GoogleAnalytics } from "@/components/next/google-analytics";
@@ -48,6 +49,12 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link rel="preconnect" href="https://xdysdmtwhhnkvdbaaflm.supabase.co" />
         <link rel="preload" as="image" href="/hero-bg.jpg" fetchPriority="high" />
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8479466204387928"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body>
         <Suspense fallback={null}>
