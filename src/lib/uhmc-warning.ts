@@ -130,7 +130,9 @@ export function getUhmcRegionCode(regionKey: string | undefined) {
 }
 
 export async function fetchUhmcWarning(regionCode: number, locale: Extract<SiteLocale, "uk" | "ru">): Promise<UhmcWarningSummary> {
-  const response = await fetch(UHMC_WARNINGS_URL, { next: { revalidate: 900 } });
+  // Hydromet warnings are time-sensitive, so stale ISR cache is more harmful than
+  // an extra request here. We always fetch the latest source payload.
+  const response = await fetch(UHMC_WARNINGS_URL, { cache: "no-store" });
 
   if (!response.ok) {
     throw new Error(`UHMC warnings request failed: ${response.status}`);
