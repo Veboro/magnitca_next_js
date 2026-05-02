@@ -2,6 +2,7 @@
 
 import { useSolarWind, useMagData } from "@/hooks/useSpaceWeather";
 import type { SolarWindEntry, MagEntry } from "@/hooks/useSpaceWeather";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import { cn } from "@/lib/utils";
 import { AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { Wind, TrendingUp, Info, HelpCircle, Gauge, Zap } from "lucide-react";
@@ -343,6 +344,10 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
             </div>
           </div>
         </section>
+
+        <div className="md:hidden">
+          <MobileAdsenseSlot />
+        </div>
 
         {/* Speed & Density Chart */}
         <section className="rounded-lg border border-border/50 bg-card p-6" aria-label={t.speedChartAria}>

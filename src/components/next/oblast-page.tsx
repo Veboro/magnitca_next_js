@@ -3,6 +3,7 @@ import { Activity, AlertTriangle, ArrowDownRight, ArrowRight, ArrowUpRight, Gaug
 import { ALL_UK_CITIES } from "@/data/cities";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import { UKRAINE_REGION_GROUPS } from "@/data/ukraine-city-catalog";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 import { fetchUhmcWarning, getUhmcRegionCode } from "@/lib/uhmc-warning";
 import type { KpForecastEntry } from "@/hooks/useKpForecast";
@@ -423,6 +424,10 @@ export async function OblastPage({
           </div>
         </section>
 
+        <div className="lg:hidden">
+          <MobileAdsenseSlot />
+        </div>
+
         <section className="grid gap-6 lg:grid-cols-[0.62fr_1.45fr]">
           <section className="flex h-full flex-col rounded-lg border border-border/50 bg-card p-6">
             <div className="mb-4 flex items-center gap-2">
@@ -571,6 +576,10 @@ export async function OblastPage({
           </div>
 
         </section>
+
+        <div className="lg:hidden">
+          <MobileAdsenseSlot />
+        </div>
 
         <section className="rounded-lg border border-border/50 bg-card p-6">
           <div className="mb-4 flex items-center gap-2">

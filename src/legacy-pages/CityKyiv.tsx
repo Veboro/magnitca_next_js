@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, AlertTriangle, MapPin, Info, CalendarDays } from "lucide-react";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import type { SiteLocale } from "@/lib/locale";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
 import { absoluteUrl } from "@/lib/site";
@@ -252,7 +253,7 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
 
         {/* Three-column hero */}
         {/* Storm + Sun/Coords row */}
-        <section className="grid grid-cols-1 xl:grid-cols-[5.5fr_2.6fr_3fr] gap-4 items-stretch" aria-label={t.geoAria}>
+        <section className="space-y-4 xl:hidden" aria-label={t.geoAria}>
           <div className="flex flex-col">
             <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
               <MapPin className="h-4 w-4 text-primary" />
@@ -264,6 +265,8 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
               <StormStatusBanner />
             </div>
           </div>
+
+          <MobileAdsenseSlot />
 
           {data?.current ? (
             <CityImpactPanel
@@ -343,6 +346,103 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
             </div>
           </div>
         </section>
+
+        <section className="hidden xl:grid xl:grid-cols-[5.5fr_2.6fr_3fr] gap-4 items-stretch" aria-label={t.geoAria}>
+          <div className="flex flex-col">
+            <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
+              <MapPin className="h-4 w-4 text-primary" />
+              <h2 className="text-sm font-medium text-muted-foreground">
+                {t.geo} — {today}
+              </h2>
+            </div>
+            <div className="flex-1 [&>div]:rounded-t-none">
+              <StormStatusBanner />
+            </div>
+          </div>
+
+          {data?.current ? (
+            <CityImpactPanel
+              locale={locale}
+              magneticKp={cityMagneticKp}
+              currentPressure={data.current.pressure}
+              hourlyPressures={cityHourlyPressures}
+            />
+          ) : null}
+
+          <div className="rounded-lg border border-border/50 bg-card p-4 space-y-3 flex flex-col text-sm">
+            {data?.current && (
+              <div className="space-y-1.5">
+                <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                  <Sun className="h-3.5 w-3.5 text-primary" />
+                  {t.sunriseSunset}
+                </h3>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5 text-muted-foreground"><Sunrise className="h-3.5 w-3.5 text-amber-400" />{t.sunrise}</span>
+                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(sunTimes?.sunrise ?? data.current.sunrise)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-1.5 text-muted-foreground"><Sunset className="h-3.5 w-3.5 text-orange-400" />{t.sunset}</span>
+                  <span className="font-mono font-medium text-foreground">{formatApiLocalTime(sunTimes?.sunset ?? data.current.sunset)}</span>
+                </div>
+                <div className="flex items-center justify-between text-xs border-t border-border/30 pt-1.5">
+                  <span className="text-muted-foreground">{t.dayLength}</span>
+                  <span className="font-mono font-medium text-foreground">{sunTimes?.dayLength ?? data.current.dayLength}</span>
+                </div>
+              </div>
+            )}
+            <div className="space-y-1.5 border-t border-border/30 pt-2">
+              <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                <MapPin className="h-3.5 w-3.5 text-primary" />
+                {t.coordinates}
+              </h3>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{t.latitude}</span>
+                <span className="font-mono text-foreground">50.4501° {t.north}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{t.longitude}</span>
+                <span className="font-mono text-foreground">30.5234° {t.east}</span>
+              </div>
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-muted-foreground">{t.timezone}</span>
+                <span className="font-mono text-foreground">UTC+2 (EET)</span>
+              </div>
+            </div>
+            <div className="space-y-1.5 border-t border-border/30 pt-2">
+              <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
+                <AlertTriangle className="h-3.5 w-3.5 text-primary" />
+                {t.hydrometWarning}
+              </h3>
+              <div className="space-y-1 rounded-xl border border-primary/20 bg-primary/5 p-3 shadow-[0_0_0_1px_rgba(0,255,255,0.03)]">
+                <p className="font-mono text-sm font-bold text-foreground">
+                  {uhmcWarning?.summary ?? t.hydrometUnavailable}
+                </p>
+                {uhmcWarning?.details?.[0] ? (
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
+                    {uhmcWarning.details[0]}
+                  </p>
+                ) : null}
+                {uhmcWarning?.updatedAt ? (
+                  <p className="text-[10px] text-muted-foreground">
+                    {uhmcWarning.updatedAt}
+                  </p>
+                ) : null}
+                <Link
+                  href={uhmcWarning?.sourceUrl ?? "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex text-[10px] font-medium text-primary hover:text-primary/80"
+                >
+                  {t.hydrometSource}
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="xl:hidden">
+          <MobileAdsenseSlot />
+        </div>
 
         {/* 3-day Kp forecast */}
         <section className="rounded-lg border border-border/50 bg-card p-5 space-y-4" aria-label={t.forecast3Aria}>

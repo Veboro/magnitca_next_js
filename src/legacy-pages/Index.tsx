@@ -10,6 +10,7 @@ import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 
 const SolarWindChart = dynamic(() => import("@/components/dashboard/SolarWindChart").then(m => ({ default: m.SolarWindChart })), { ssr: false });
 const BzChart = dynamic(() => import("@/components/dashboard/BzChart").then(m => ({ default: m.BzChart })), { ssr: false });
@@ -128,7 +129,12 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         </div>
 
         <section aria-label={t("index.stormStatus")}>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="space-y-6 lg:hidden">
+            <StormStatusBanner initialKp={initialKp} initialScales={initialScales} initialForecast={initialForecast3} />
+            <MobileAdsenseSlot />
+            <HumanImpact initialKp={initialKp} initialForecast={initialForecast3} />
+          </div>
+          <div className="hidden gap-6 lg:grid lg:grid-cols-2">
             <StormStatusBanner initialKp={initialKp} initialScales={initialScales} initialForecast={initialForecast3} />
             <HumanImpact initialKp={initialKp} initialForecast={initialForecast3} />
           </div>
@@ -144,6 +150,10 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
             <MetricCard icon={Activity} title={t("metrics.gScale")} value={`G${gLevel}`} status={gLevel > 2 ? "strong" : gLevel > 0 ? "moderate" : "quiet"} trendValue={gLevel > 0 ? t("metrics.storm") : t("metrics.calm")} trend="stable" tooltip={t("metrics.gTooltip")} />
           </div>
         </section>
+
+        <div className="md:hidden">
+          <MobileAdsenseSlot />
+        </div>
 
         <section aria-label={t("index.forecast3day")}>
           <KpForecast3Day initialData={initialForecast3} />

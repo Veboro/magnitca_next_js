@@ -4,6 +4,7 @@ import { useKpIndex, useNoaaScales } from "@/hooks/useSpaceWeather";
 import type { KpEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
 import { KpIndexGauge } from "@/components/dashboard/KpIndexGauge";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import { cn } from "@/lib/utils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { Gauge, TrendingUp, Info, HelpCircle } from "lucide-react";
@@ -254,6 +255,10 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
             </div>
           </div>
         </section>
+
+        <div className="md:hidden">
+          <MobileAdsenseSlot />
+        </div>
 
         {/* 24h Chart */}
         <section className="rounded-lg border border-border/50 bg-card p-6" aria-label={t.chartAria}>
