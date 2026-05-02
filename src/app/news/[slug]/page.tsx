@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { getNewsArticleBySlug } from "@/lib/server-news";
 import { absoluteUrl } from "@/lib/site";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 
 export const revalidate = 300;
 
@@ -107,6 +108,9 @@ export default async function NewsArticlePage({ params }: Params) {
   return (
     <main className="mx-auto max-w-4xl px-6 py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <div className="mb-6">
+        <MobileAdsenseSlot />
+      </div>
       <article className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm">
         {article.image_url ? (
           <img src={article.image_url} alt={article.title} className="aspect-[2/1] w-full object-cover" />
@@ -129,6 +133,9 @@ export default async function NewsArticlePage({ params }: Params) {
             ) : (
               <div className="whitespace-pre-line text-base leading-8">{article.content}</div>
             )}
+          </div>
+          <div className="mt-6">
+            <MobileAdsenseSlot />
           </div>
         </div>
       </article>
