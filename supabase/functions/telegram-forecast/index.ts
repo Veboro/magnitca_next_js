@@ -609,9 +609,9 @@ Deno.serve(async (req) => {
     const dateLabel = formatKyivDate(now);
     const slugUk = `mahnitni-buri-sogodni-${kyivDateKey}`;
 
-    if (!force && kyivHour !== 7) {
+    if (!force && kyivHour < 7) {
       return new Response(
-        JSON.stringify({ success: true, skipped: true, reason: "Outside 07:00 Europe/Kyiv publishing window" }),
+        JSON.stringify({ success: true, skipped: true, reason: "Before 07:00 Europe/Kyiv publishing window" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

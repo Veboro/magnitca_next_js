@@ -218,9 +218,9 @@ Deno.serve(async (req) => {
     const slugUk = `mahnitni-buri-sogodni-${todayKey}`;
     const slugRu = `magnitnye-buri-segodnya-${todayKey}`;
 
-    if (!force && hour !== 7) {
+    if (!force && hour < 7) {
       return new Response(
-        JSON.stringify({ success: true, skipped: true, reason: "Outside 07:00 Europe/Kyiv publishing window" }),
+        JSON.stringify({ success: true, skipped: true, reason: "Before 07:00 Europe/Kyiv publishing window" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
