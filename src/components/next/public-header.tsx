@@ -236,6 +236,12 @@ export function PublicHeader() {
   }, [searchOpen]);
 
   useEffect(() => {
+    if (cityQuery.trim()) {
+      setSearchOpen(true);
+    }
+  }, [cityQuery]);
+
+  useEffect(() => {
     if (!searchOpen) return;
 
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
