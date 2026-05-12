@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight, HelpCircle, Sunrise, Sunset, SunMedium, TimerReset } from "lucide-react";
+import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import type { SunriseOverviewCity } from "@/lib/sunrise-overview";
+import { absoluteUrl } from "@/lib/site";
 
 type SunriseOverviewPageProps = {
   locale?: "uk" | "ru";
@@ -23,8 +25,15 @@ export function SunriseOverviewPage({
   latestSunrise,
   averageDayLengthLabel,
 }: SunriseOverviewPageProps) {
+  const sunriseTodayHref = locale === "ru" ? "/ru/sunrise" : "/sunrise";
+  const sunriseTomorrowHref = locale === "ru" ? "/ru/sunrise-tomorrow" : "/sunrise-tomorrow";
+  const sunsetTodayHref = locale === "ru" ? "/ru/sunset" : "/sunset";
+  const sunsetTomorrowHref = locale === "ru" ? "/ru/sunset-tomorrow" : "/sunset-tomorrow";
+  const currentPath = mode === "tomorrow" ? sunriseTomorrowHref : sunriseTodayHref;
+
   const t = locale === "ru"
     ? {
+        home: "Главная",
         h1: mode === "tomorrow" ? "Восход солнца в Украине завтра" : "Восход солнца в Украине сегодня",
         intro:
           "Точное время восхода и захода солнца в Киеве и других городах Украины на",
@@ -44,6 +53,17 @@ export function SunriseOverviewPage({
         dusk: "Сумерки",
         dayLength: "Продолжительность дня",
         faq: "Частые вопросы",
+        todayLink: "Восход солнца сегодня",
+        tomorrowLink: "Восход солнца завтра",
+        seoTitle: "Как меняется восход солнца в Украине",
+        seoBody:
+          "Время восхода солнца в городах Украины отличается в зависимости от региона, даты и географического положения. На этой странице собраны актуальные данные по крупным городам, чтобы можно было быстро сравнить время рассвета, восхода, заката и продолжительность дня.",
+        seoLinksIntro: "Также полезно посмотреть",
+        seoLinks: [
+          { href: mode === "tomorrow" ? sunriseTodayHref : sunriseTomorrowHref, label: mode === "tomorrow" ? "восход солнца сегодня" : "восход солнца завтра" },
+          { href: sunsetTodayHref, label: "закат солнца сегодня" },
+          { href: sunsetTomorrowHref, label: "закат солнца завтра" },
+        ],
         faqItems: [
           {
             q: mode === "tomorrow" ? "Во сколько завтра восходит солнце в Украине?" : "Во сколько сегодня восходит солнце в Украине?",
@@ -70,6 +90,7 @@ export function SunriseOverviewPage({
         ],
       }
     : {
+        home: "Головна",
         h1: mode === "tomorrow" ? "Схід сонця в Україні завтра" : "Схід сонця в Україні сьогодні",
         intro:
           "Точний час сходу і заходу сонця в Києві та інших містах України на",
@@ -89,6 +110,17 @@ export function SunriseOverviewPage({
         dusk: "Сутінки",
         dayLength: "Тривалість дня",
         faq: "Часті запитання",
+        todayLink: "Схід сонця сьогодні",
+        tomorrowLink: "Схід сонця завтра",
+        seoTitle: "Як змінюється схід сонця в Україні",
+        seoBody:
+          "Час сходу сонця в містах України відрізняється залежно від регіону, дати та географічного положення. На цій сторінці зібрані актуальні дані по великих містах, щоб можна було швидко порівняти час світанку, сходу, заходу сонця і тривалість дня.",
+        seoLinksIntro: "Також варто подивитися",
+        seoLinks: [
+          { href: mode === "tomorrow" ? sunriseTodayHref : sunriseTomorrowHref, label: mode === "tomorrow" ? "схід сонця сьогодні" : "схід сонця завтра" },
+          { href: sunsetTodayHref, label: "захід сонця сьогодні" },
+          { href: sunsetTomorrowHref, label: "захід сонця завтра" },
+        ],
         faqItems: [
           {
             q: mode === "tomorrow" ? "О котрій завтра сходить сонце в Україні?" : "О котрій сьогодні сходить сонце в Україні?",
@@ -140,17 +172,68 @@ export function SunriseOverviewPage({
     })),
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: t.home,
+        item: absoluteUrl(locale === "ru" ? "/ru" : "/"),
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: t.h1,
+        item: absoluteUrl(currentPath),
+      },
+    ],
+  };
+
   return (
     <main className="mx-auto max-w-6xl space-y-8 px-6 py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       <header className="space-y-3">
+        <nav className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
+          <Link href={locale === "ru" ? "/ru" : "/"} className="transition-colors hover:text-foreground">
+            {t.home}
+          </Link>
+          <span>/</span>
+          <span className="text-foreground">{t.h1}</span>
+        </nav>
         <h1 className="font-display text-3xl font-bold text-foreground sm:text-4xl">{t.h1}</h1>
         <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">
           {t.intro} {dateLabel}
           {t.introTail}
         </p>
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Link
+            href={sunriseTodayHref}
+            className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+              mode === "today"
+                ? "border-primary/50 bg-primary/10 text-primary"
+                : "border-border/50 bg-card/50 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t.todayLink}
+          </Link>
+          <Link
+            href={sunriseTomorrowHref}
+            className={`rounded-full border px-4 py-2 text-sm transition-colors ${
+              mode === "tomorrow"
+                ? "border-primary/50 bg-primary/10 text-primary"
+                : "border-border/50 bg-card/50 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {t.tomorrowLink}
+          </Link>
+        </div>
       </header>
+
+      <MobileAdsenseSlot />
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <div className="rounded-2xl border border-border/50 bg-card p-5">
@@ -190,6 +273,8 @@ export function SunriseOverviewPage({
           </div>
         </div>
       </section>
+
+      <MobileAdsenseSlot />
 
       <section className="rounded-2xl border border-border/50 bg-card p-6">
         <div className="mb-5 flex items-center gap-2">
@@ -340,6 +425,22 @@ export function SunriseOverviewPage({
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-border/50 bg-card p-6">
+        <h2 className="text-lg font-semibold text-foreground">{t.seoTitle}</h2>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{t.seoBody}</p>
+        <p className="mt-4 text-sm text-muted-foreground">
+          {t.seoLinksIntro}:{" "}
+          {t.seoLinks.map((item, index) => (
+            <span key={item.href}>
+              <Link href={item.href} className="text-primary transition-colors hover:text-primary/80 hover:underline">
+                {item.label}
+              </Link>
+              {index < t.seoLinks.length - 1 ? ", " : "."}
+            </span>
+          ))}
+        </p>
       </section>
 
       <section className="rounded-2xl border border-border/50 bg-card p-6" aria-label="Часті запитання">

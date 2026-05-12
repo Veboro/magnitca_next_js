@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SunriseOverviewPage } from "@/components/next/sunrise-overview-page";
+import { SunsetOverviewPage } from "@/components/next/sunset-overview-page";
 import { getSunriseOverview } from "@/lib/sunrise-overview";
 import { absoluteUrl } from "@/lib/site";
 
@@ -21,9 +21,9 @@ function formatMinutes(minutes: number) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Восход солнца в Украине сегодня — время по городам";
+  const title = "Закат солнца в Украине сегодня — время по городам";
   const description =
-    "Восход солнца в Украине сегодня: точное время в Киеве, Львове, Одессе, Днепре и других городах. Также смотрите закат солнца и продолжительность дня.";
+    "Закат солнца в Украине сегодня: точное время в Киеве, Львове, Одессе, Днепре и других городах. Также смотрите восход солнца и продолжительность дня.";
 
   return {
     title: {
@@ -31,34 +31,33 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     alternates: {
-      canonical: "/ru/sunrise",
+      canonical: "/ru/sunset",
       languages: {
-        uk: "/sunrise",
-        ru: "/ru/sunrise",
-        "x-default": "/sunrise",
+        uk: "/sunset",
+        ru: "/ru/sunset",
+        "x-default": "/sunset",
       },
     },
     openGraph: {
       title,
       description,
-      url: absoluteUrl("/ru/sunrise"),
+      url: absoluteUrl("/ru/sunset"),
       locale: "ru_RU",
       type: "website",
     },
   };
 }
 
-export default async function RussianSunrisePage() {
+export default async function RussianSunsetPage() {
   const overview = await getSunriseOverview();
 
   return (
-    <SunriseOverviewPage
+    <SunsetOverviewPage
       locale="ru"
       dateLabel={formatPageDate(overview.date)}
       cities={overview.cities}
-      earliestSunrise={overview.earliestSunrise}
-      latestSunrise={overview.latestSunrise}
-      averageDayLengthLabel={formatMinutes(overview.averageDayLengthMinutes)}
+      earliestSunset={overview.earliestSunset}
+      latestSunset={overview.latestSunset}
     />
   );
 }

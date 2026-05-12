@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SunriseOverviewPage } from "@/components/next/sunrise-overview-page";
+import { SunsetOverviewPage } from "@/components/next/sunset-overview-page";
 import { getSunriseOverview } from "@/lib/sunrise-overview";
 import { absoluteUrl, SITE_NAME } from "@/lib/site";
 
@@ -21,9 +21,9 @@ function formatMinutes(minutes: number) {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Схід сонця в Україні завтра — час по містах";
+  const title = "Захід сонця в Україні сьогодні — час по містах";
   const description =
-    "Схід сонця в Україні завтра: точний час у Києві, Львові, Одесі, Дніпрі та інших містах. Також дивіться захід сонця, сутінки і тривалість дня.";
+    "Захід сонця в Україні сьогодні: точний час у Києві, Львові, Одесі, Дніпрі та інших містах. Також дивіться схід сонця і тривалість дня.";
 
   return {
     title: {
@@ -31,34 +31,32 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description,
     alternates: {
-      canonical: "/sunrise-tomorrow",
+      canonical: "/sunset",
       languages: {
-        uk: "/sunrise-tomorrow",
-        ru: "/ru/sunrise-tomorrow",
-        "x-default": "/sunrise-tomorrow",
+        uk: "/sunset",
+        ru: "/ru/sunset",
+        "x-default": "/sunset",
       },
     },
     openGraph: {
       title,
       description,
-      url: absoluteUrl("/sunrise-tomorrow"),
+      url: absoluteUrl("/sunset"),
       locale: "uk_UA",
       type: "website",
     },
   };
 }
 
-export default async function SunriseTomorrowPage() {
-  const overview = await getSunriseOverview(1);
+export default async function SunsetPage() {
+  const overview = await getSunriseOverview();
 
   return (
-    <SunriseOverviewPage
-      mode="tomorrow"
+    <SunsetOverviewPage
       dateLabel={formatPageDate(overview.date)}
       cities={overview.cities}
-      earliestSunrise={overview.earliestSunrise}
-      latestSunrise={overview.latestSunrise}
-      averageDayLengthLabel={formatMinutes(overview.averageDayLengthMinutes)}
+      earliestSunset={overview.earliestSunset}
+      latestSunset={overview.latestSunset}
     />
   );
 }

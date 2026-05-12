@@ -3,7 +3,7 @@ import { SunriseOverviewPage } from "@/components/next/sunrise-overview-page";
 import { getSunriseOverview } from "@/lib/sunrise-overview";
 import { absoluteUrl, SITE_NAME } from "@/lib/site";
 
-export const revalidate = 21600;
+export const revalidate = 3600;
 
 function formatPageDate(dateKey: string) {
   return new Intl.DateTimeFormat("uk-UA", {

@@ -60,6 +60,21 @@ type SearchCityItem = {
   searchText: string;
 };
 
+const sunMenuItems: Record<Exclude<SiteLocale, "pl">, Array<{ href: string; label: string }>> = {
+  uk: [
+    { href: "/sunrise", label: "Схід сьогодні" },
+    { href: "/sunrise-tomorrow", label: "Схід завтра" },
+    { href: "/sunset", label: "Захід сьогодні" },
+    { href: "/sunset-tomorrow", label: "Захід завтра" },
+  ],
+  ru: [
+    { href: "/sunrise", label: "Восход сегодня" },
+    { href: "/sunrise-tomorrow", label: "Восход завтра" },
+    { href: "/sunset", label: "Закат сегодня" },
+    { href: "/sunset-tomorrow", label: "Закат завтра" },
+  ],
+};
+
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
@@ -68,6 +83,7 @@ export function PublicHeader() {
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileLocaleOpen, setMobileLocaleOpen] = useState(false);
+  const [sunMenuOpen, setSunMenuOpen] = useState(false);
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const headerRef = useRef<HTMLElement | null>(null);
   const mobileSearchOverlayRef = useRef<HTMLDivElement | null>(null);
@@ -220,6 +236,7 @@ export function PublicHeader() {
     setCityQuery("");
     setSearchOpen(false);
     setMobileLocaleOpen(false);
+    setSunMenuOpen(false);
   }, [pathnameValue]);
 
   useEffect(() => {
@@ -254,6 +271,7 @@ export function PublicHeader() {
       if (clickedInsideHeader || clickedInsideMobileOverlay) return;
 
       setSearchOpen(false);
+      setSunMenuOpen(false);
     };
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -271,6 +289,10 @@ export function PublicHeader() {
     document.documentElement.classList.toggle("dark", nextThemeIsDark);
     window.localStorage.setItem("theme", nextThemeIsDark ? "dark" : "light");
   };
+
+  const localizedSunMenu = locale === "pl" ? [] : sunMenuItems[locale];
+  const sunMenuLabel = locale === "ru" ? "Солнце" : "Сонце";
+  const sunMenuActive = pathnameValue.startsWith("/sunrise") || pathnameValue.startsWith("/sunset") || pathnameValue.startsWith("/ru/sunrise") || pathnameValue.startsWith("/ru/sunset");
 
   return (
     <>
@@ -547,7 +569,7 @@ export function PublicHeader() {
         </div>
       </div>
       <nav className={`border-t border-border/30 bg-card/30 ${searchOpen ? "max-lg:hidden" : ""}`}>
-        <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-6 py-2">
+        <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-6 py-2 lg:overflow-visible">
           {navItems[locale].map((item) => (
             <Link
               key={item.href}
@@ -560,7 +582,58 @@ export function PublicHeader() {
               {item.label}
             </Link>
           ))}
+          {localizedSunMenu.length > 0 && (
+            <div className="relative shrink-0">
+              <button
+                type="button"
+                onClick={() => setSunMenuOpen((value) => !value)}
+                className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors ${
+                  sunMenuActive ? "bg-card text-foreground" : "text-muted-foreground hover:bg-card hover:text-foreground"
+                }`}
+                aria-expanded={sunMenuOpen}
+                aria-haspopup="menu"
+              >
+                <span className="mr-1.5 inline-flex items-center">
+                  <Sun className="h-3.5 w-3.5" />
+                </span>
+                {sunMenuLabel}
+                <ChevronDown className={`ml-1.5 h-3.5 w-3.5 transition-transform ${sunMenuOpen ? "rotate-180" : ""}`} />
+              </button>
+              {sunMenuOpen && (
+                <div className="absolute left-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur lg:block">
+                  <div className="space-y-1">
+                    {localizedSunMenu.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={locale === "ru" ? `/ru${item.href}` : item.href}
+                        onClick={() => setSunMenuOpen(false)}
+                        className="flex items-center rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
+        {sunMenuOpen && localizedSunMenu.length > 0 && (
+          <div className="border-t border-border/30 px-4 pb-3 pt-2 lg:hidden">
+            <div className="space-y-1 rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
+              {localizedSunMenu.map((item) => (
+                <Link
+                  key={item.href}
+                  href={locale === "ru" ? `/ru${item.href}` : item.href}
+                  onClick={() => setSunMenuOpen(false)}
+                  className="flex items-center rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </nav>
     </header>
     </>

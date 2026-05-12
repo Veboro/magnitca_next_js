@@ -41,7 +41,7 @@ async function fetchSunTimesForCity(city: CityConfig, dayOffset = 0): Promise<Su
     `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}` +
       `&daily=sunrise,sunset&timezone=${encodeURIComponent(city.timezone)}` +
       `&start_date=${date}&end_date=${date}`,
-    { next: { revalidate: 21600 } }
+    { next: { revalidate: 3600 } }
   );
 
   if (!response.ok) return null;
@@ -78,6 +78,8 @@ export async function getSunriseOverview(dayOffset = 0) {
 
   const earliestSunrise = [...cities].sort((a, b) => a.sunrise.localeCompare(b.sunrise))[0] ?? null;
   const latestSunrise = [...cities].sort((a, b) => b.sunrise.localeCompare(a.sunrise))[0] ?? null;
+  const earliestSunset = [...cities].sort((a, b) => a.sunset.localeCompare(b.sunset))[0] ?? null;
+  const latestSunset = [...cities].sort((a, b) => b.sunset.localeCompare(a.sunset))[0] ?? null;
   const averageDayLengthMinutes = cities.length
     ? Math.round(cities.reduce((sum, item) => sum + item.dayLengthMinutes, 0) / cities.length)
     : 0;
@@ -87,6 +89,8 @@ export async function getSunriseOverview(dayOffset = 0) {
     cities,
     earliestSunrise,
     latestSunrise,
+    earliestSunset,
+    latestSunset,
     averageDayLengthMinutes,
   };
 }
