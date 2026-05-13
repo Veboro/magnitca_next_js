@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
+import { getMoonMonthRoutes2026 } from "@/lib/moon-calendar";
 import { OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
 import { getLatestNews } from "@/lib/server-news";
 import { SITE_URL } from "@/lib/site";
@@ -14,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/calendar",
     "/kp-index",
     "/solar-wind",
+    "/moon-calendar",
     "/sunrise",
     "/sunrise-tomorrow",
     "/sunset",
@@ -37,6 +39,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/ru/calendar",
     "/ru/kp-index",
     "/ru/solar-wind",
+    "/ru/moon-calendar",
     "/ru/sunrise",
     "/ru/sunrise-tomorrow",
     "/ru/sunset",
@@ -60,6 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/pl/calendar",
     "/pl/kp-index",
     "/pl/solar-wind",
+    "/pl/moon-calendar",
     "/pl/faq",
     "/pl/about",
     "/pl/contacts",
@@ -102,6 +106,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const moonMonthRoutes = getMoonMonthRoutes2026();
+  const moonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefUk}`,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  const ruMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefRu}`,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+
+  const plMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefPl}`,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+
   const newsPages = await getLatestNews(1000, "uk")
     .then((items) =>
       items.map((item) => ({
@@ -133,6 +156,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...plCityPages,
     ...oblastPages,
     ...ruOblastPages,
+    ...moonCalendarPages,
+    ...ruMoonCalendarPages,
+    ...plMoonCalendarPages,
     ...newsPages,
     ...ruNewsPages,
   ];

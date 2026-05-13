@@ -177,19 +177,29 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
 
       <section
         className="mx-auto max-w-7xl px-6 py-10"
-        aria-label={locale === "ru" ? "Космическая погода по областям Украины" : "Космічна погода по областях України"}
+        aria-label={
+          locale === "pl"
+            ? "Pogoda kosmiczna w miastach Polski"
+            : locale === "ru"
+              ? "Космическая погода по областям Украины"
+              : "Космічна погода по областях України"
+        }
       >
         <h2 className="mb-5 text-lg font-display font-semibold text-foreground/90">
-          {locale === "ru" ? "Космическая погода по областям Украины" : "Космічна погода по областях України"}
+          {locale === "pl"
+            ? "Pogoda kosmiczna w miastach Polski"
+            : locale === "ru"
+              ? "Космическая погода по областям Украины"
+              : "Космічна погода по областях України"}
         </h2>
         <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {oblastList.map((oblast) => (
+          {(locale === "pl" ? cityList : oblastList).map((item) => (
             <a
-              key={oblast.key}
-              href={oblast.href}
+              key={locale === "pl" ? item.slug : item.key}
+              href={locale === "pl" ? `/pl/city/${item.slug}` : item.href}
               className="whitespace-nowrap text-primary transition-colors hover:text-primary/80 hover:underline"
             >
-              <span className="font-semibold">{oblast.name}</span>
+              <span className="font-semibold">{item.name}</span>
             </a>
           ))}
         </div>
