@@ -4,12 +4,24 @@ import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip as Rechart
 
 export const SolarWindChart = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
+  const locale = i18n.language.startsWith("ru")
+    ? "ru-RU"
+    : i18n.language.startsWith("pl")
+      ? "pl-PL"
+      : i18n.language.startsWith("ro")
+        ? "ro-MD"
+        : "uk-UA";
+  const timeZone = i18n.language.startsWith("pl")
+    ? "Europe/Warsaw"
+    : i18n.language.startsWith("ro")
+      ? "Europe/Chisinau"
+      : "Europe/Kyiv";
+  const densityUnit = i18n.language.startsWith("uk") || i18n.language.startsWith("ru") ? "p/см³" : "p/cm³";
   const { data: rawData, isLoading } = useSolarWind();
 
   const toTime = (utc: string) => {
     const d = new Date(utc.includes("T") ? utc : utc.replace(" ", "T") + "Z");
-    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: i18n.language === "pl" ? "Europe/Warsaw" : "Europe/Kyiv" });
+    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone });
   };
 
   const chartData = (rawData || []).filter((_, i) => i % 3 === 0).map((d) => ({ time: toTime(d.time_tag), speed: d.speed, density: d.density }));
@@ -21,7 +33,7 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
         <p className="mb-1 font-mono text-xs text-muted-foreground">{label} {t("charts.kyiv")}</p>
         {payload.map((entry: any, i: number) => (
           <p key={i} className="font-mono text-sm" style={{ color: entry.color }}>
-            {entry.name}: {entry.value} {entry.name === t("charts.speed") ? t("common.kmPerSec") : "p/см³"}
+            {entry.name}: {entry.value} {entry.name === t("charts.speed") ? t("common.kmPerSec") : densityUnit}
           </p>
         ))}
       </div>

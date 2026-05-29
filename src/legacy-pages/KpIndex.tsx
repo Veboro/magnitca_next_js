@@ -159,12 +159,68 @@ const copy = {
   },
 } as const;
 
-const todayStr = (localeTag: string) =>
+const localizedCopy = {
+  ...copy,
+  ro: {
+    ...copy.pl,
+    pageTitle: "Indice Kp online în timp real — prognoza furtunilor magnetice",
+    pageDescription:
+      "Indicele Kp acum în timp real. Valoarea curentă, graficul pentru ultimele 24 de ore și prognoza activității geomagnetice pe 3 zile.",
+    heroTitle: "Indicele Kp astăzi",
+    heroText:
+      "Indicele planetar al activității geomagnetice în timp real. Valoarea curentă, graficul pentru ultimele 24 de ore și prognoza NOAA SWPC pe 3 zile.",
+    currentKpLabel: "Indice Kp curent",
+    currentState: "Starea curentă",
+    chartAria: "Graficul indicelui Kp pentru 24 de ore",
+    chartTitle: "Indicele Kp în ultimele",
+    hours: "ore",
+    forecastAria: "Prognoza indicelui Kp pe 3 zile",
+    forecastTitle: "Prognoza indicelui Kp pe 3 zile (intervale de 3 ore)",
+    loading: "Se încarcă prognoza...",
+    unavailable: "Datele prognozei sunt indisponibile.",
+    maxKp: "max. Kp",
+    scaleAria: "Scara indicelui Kp",
+    scaleTitle: "Scara indicelui Kp (0-9)",
+    seoAria: "Despre indicele Kp",
+    seoHeading: "Ce este indicele Kp și de ce este important?",
+    seoText1:
+      "<strong>Indicele Kp</strong> este un indicator global al activității geomagnetice a Pământului pe o scară de la 0 la 9. Valorile 0-3 indică un fond calm, Kp 4 arată instabilitate, iar Kp 5 sau mai mult înseamnă furtună geomagnetică.",
+    seoText2:
+      "Indicele Kp ajută la evaluarea influenței activității solare asupra comunicațiilor, navigației și stării de bine a persoanelor meteosensibile. Pe această pagină vezi valoarea curentă, graficul și prognoza pe 3 zile.",
+    faqAria: "Întrebări frecvente despre indicele Kp",
+    faqTitle: "Întrebări frecvente",
+    gScale: "Scara G",
+    rScale: "Scara R",
+    sScale: "Scara S",
+    kpLevels: [
+      { kp: "0-1", status: "Calm", color: "bg-storm-quiet", description: "Activitate geomagnetică minimă, fără impact vizibil." },
+      { kp: "2-3", status: "Activitate scăzută", color: "bg-storm-quiet", description: "Oscilații mici ale câmpului magnetic." },
+      { kp: "4", status: "Instabil", color: "bg-storm-minor", description: "Activitate ridicată; persoanele sensibile pot simți disconfort ușor." },
+      { kp: "5 (G1)", status: "Furtună slabă", color: "bg-storm-moderate", description: "Furtună geomagnetică slabă, posibil impact minor." },
+      { kp: "6 (G2)", status: "Furtună moderată", color: "bg-storm-moderate", description: "Risc mai mare de perturbări și reacții la meteosensibili." },
+      { kp: "7 (G3)", status: "Furtună puternică", color: "bg-storm-strong", description: "Perturbări mai vizibile ale câmpului geomagnetic." },
+      { kp: "8 (G4)", status: "Foarte puternică", color: "bg-storm-severe", description: "Furtună severă cu potențial impact tehnologic." },
+      { kp: "9 (G5)", status: "Extremă", color: "bg-storm-severe", description: "Furtună geomagnetică extremă." },
+    ],
+    faqItems: [
+      { q: "Ce este indicele Kp?", a: "Indicele Kp măsoară activitatea geomagnetică globală pe o scară de la 0 la 9." },
+      { q: "Când începe o furtună magnetică?", a: "De obicei, furtuna geomagnetică începe de la Kp 5, ceea ce corespunde nivelului G1 pe scara NOAA." },
+      { q: "Cât de des se actualizează datele?", a: "Valorile estimate sunt actualizate frecvent, iar prognoza NOAA este revizuită regulat." },
+      { q: "Poate Kp influența starea de bine?", a: "Unele persoane sensibile pot simți oboseală, dureri de cap sau somn mai agitat în perioadele cu activitate ridicată." },
+      { q: "Unde văd prognoza?", a: "Pe această pagină este afișată prognoza Kp pe 3 zile, împreună cu valoarea curentă și graficul." },
+    ],
+  },
+};
+
+const getPageTimeZone = (locale: LegacyLocale) =>
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : "Europe/Kyiv";
+
+const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
     day: "numeric",
     month: "long",
     year: "numeric",
-    timeZone: "Europe/Kyiv",
+    timeZone,
   });
 
 interface KpIndexProps {
@@ -174,9 +230,10 @@ interface KpIndexProps {
 }
 
 const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
-  const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
-  const today = todayStr(localeTag);
+  const t = localizedCopy[locale];
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const timeZone = getPageTimeZone(locale);
+  const today = todayStr(localeTag, timeZone);
 
   const { data: kpData } = useKpIndex(initialKp ?? undefined);
   const { data: scales } = useNoaaScales(initialScales ?? undefined);
@@ -188,7 +245,7 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   // Sample every 10th point for smoother chart
   const sampled = kpData?.filter((_, i) => i % 10 === 0) ?? [];
   const chartData = sampled.map((d) => ({
-    time: new Date(d.time_tag).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone: locale === "pl" ? "Europe/Warsaw" : "Europe/Kyiv" }),
+    time: new Date(d.time_tag).toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone }),
     kp: d.kp,
   }));
 
@@ -313,13 +370,13 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
             const todayKey = `${todayDate.getFullYear()}-${String(todayDate.getMonth() + 1).padStart(2, "0")}-${String(todayDate.getDate()).padStart(2, "0")}`;
             const filtered = forecast.filter((row) => {
               const d = new Date(row.time_tag + "Z");
-              const kyivStr = d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
-              return kyivStr >= todayKey;
+              const localStr = d.toLocaleDateString("sv-SE", { timeZone });
+              return localStr >= todayKey;
             });
             const grouped = new Map<string, typeof forecast>();
             filtered.forEach((row) => {
-              const dateKey = new Date(row.time_tag + "Z").toLocaleDateString("uk-UA", {
-                weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv",
+              const dateKey = new Date(row.time_tag + "Z").toLocaleDateString(localeTag, {
+                weekday: "short", day: "numeric", month: "short", timeZone,
               });
               if (!grouped.has(dateKey)) grouped.set(dateKey, []);
               grouped.get(dateKey)!.push(row);
@@ -350,7 +407,7 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
                           return (
                             <div key={j} className="flex items-center justify-between text-xs">
                               <span className="text-muted-foreground font-mono">
-                                {new Date(row.time_tag + "Z").toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "Europe/Kyiv" })}
+                                {new Date(row.time_tag + "Z").toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", hour12: false, timeZone })}
                               </span>
                               <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
                                 <div

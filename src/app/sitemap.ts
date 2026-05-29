@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { ALL_UK_CITIES } from "@/data/cities";
+import { CITIES_MD, RO_COUNTRIES } from "@/data/cities-md";
 import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
 import { getMoonMonthRoutes2026 } from "@/lib/moon-calendar";
@@ -64,6 +65,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/pl/kp-index",
     "/pl/solar-wind",
     "/pl/moon-calendar",
+    "/pl/sunrise",
+    "/pl/sunrise-tomorrow",
+    "/pl/sunset",
+    "/pl/sunset-tomorrow",
     "/pl/faq",
     "/pl/about",
     "/pl/contacts",
@@ -74,6 +79,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}${path}`,
     changeFrequency: path === "/pl" ? "hourly" : "daily",
     priority: path === "/pl" ? 0.85 : 0.6,
+  }));
+
+  const roStaticPages: MetadataRoute.Sitemap = [
+    "/ro",
+    "/ro/test",
+    "/ro/calendar",
+    "/ro/kp-index",
+    "/ro/solar-wind",
+    "/ro/moon-calendar",
+    "/ro/faq",
+    "/ro/about",
+    "/ro/contacts",
+    "/ro/privacy",
+    "/ro/cookies",
+    "/ro/terms",
+  ].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    changeFrequency: path === "/ro" ? "hourly" : "daily",
+    priority: path === "/ro" ? 0.85 : 0.6,
   }));
 
   const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
@@ -93,6 +117,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: "hourly",
     priority: 0.75,
   }));
+
+  const roCityPages: MetadataRoute.Sitemap = CITIES_MD.map((city) => ({
+    url: `${SITE_URL}/ro/city/${city.slug}`,
+    changeFrequency: "hourly",
+    priority: 0.75,
+  }));
+
+  const roCountryPages: MetadataRoute.Sitemap = RO_COUNTRIES.map((country) => ({
+    url: `${SITE_URL}/ro/country/${country.slug}`,
+    changeFrequency: "daily",
+    priority: 0.65,
+  }));
+
+  const roCountrySunPages: MetadataRoute.Sitemap = RO_COUNTRIES.flatMap((country) =>
+    ["sunrise", "sunrise-tomorrow", "sunset", "sunset-tomorrow"].map((sunPage) => ({
+      url: `${SITE_URL}/ro/country/${country.slug}/${sunPage}`,
+      changeFrequency: "daily" as const,
+      priority: 0.62,
+    }))
+  );
 
   const oblastPages: MetadataRoute.Sitemap = OBLAST_ROUTE_MAP.map((route) => ({
     url: `${SITE_URL}/oblast/${route.slugUk}`,
@@ -125,6 +169,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
+  const roMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefRo}`,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+
   const newsPages = await getLatestNews(1000, "uk")
     .then((items) =>
       items.map((item) => ({
@@ -151,14 +201,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...staticPages,
     ...ruStaticPages,
     ...plStaticPages,
+    ...roStaticPages,
     ...cityPages,
     ...ruCityPages,
     ...plCityPages,
+    ...roCityPages,
+    ...roCountryPages,
+    ...roCountrySunPages,
     ...oblastPages,
     ...ruOblastPages,
     ...moonCalendarPages,
     ...ruMoonCalendarPages,
     ...plMoonCalendarPages,
+    ...roMoonCalendarPages,
     ...newsPages,
     ...ruNewsPages,
   ];

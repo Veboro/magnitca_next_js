@@ -1,6 +1,7 @@
 import SunCalc from "suncalc";
 import { CITIES, type CityConfig } from "@/data/cities";
 import { formatApiLocalTime, formatDayLength, getDateInTimeZone } from "@/lib/city-sun-times";
+import type { SiteLocale } from "@/lib/locale";
 
 export type SunriseOverviewCity = {
   city: CityConfig;
@@ -20,8 +21,9 @@ function getMinutesDiff(startIso: string, endIso: string) {
   return Math.max(0, Math.round((new Date(endIso).getTime() - new Date(startIso).getTime()) / 60000));
 }
 
-function formatTimeInZone(value: Date, timezone: string) {
-  return new Intl.DateTimeFormat("uk-UA", {
+function formatTimeInZone(value: Date, timezone: string, locale: SiteLocale = "uk") {
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  return new Intl.DateTimeFormat(localeTag, {
     timeZone: timezone,
     hour: "2-digit",
     minute: "2-digit",
@@ -35,7 +37,7 @@ function getDateWithOffset(timezone: string, dayOffset: number) {
   return getDateInTimeZone(timezone, target);
 }
 
-async function fetchSunTimesForCity(city: CityConfig, dayOffset = 0): Promise<SunriseOverviewCity | null> {
+async function fetchSunTimesForCity(city: CityConfig, dayOffset = 0, locale: SiteLocale = "uk"): Promise<SunriseOverviewCity | null> {
   const date = getDateWithOffset(city.timezone, dayOffset);
   const response = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}` +
@@ -58,20 +60,26 @@ async function fetchSunTimesForCity(city: CityConfig, dayOffset = 0): Promise<Su
   return {
     city,
     date,
-    dawnLabel: formatTimeInZone(sunTimes.dawn, city.timezone),
+    dawnLabel: formatTimeInZone(sunTimes.dawn, city.timezone, locale),
     sunrise,
     sunset,
-    solarNoonLabel: formatTimeInZone(sunTimes.solarNoon, city.timezone),
-    duskLabel: formatTimeInZone(sunTimes.dusk, city.timezone),
+    solarNoonLabel: formatTimeInZone(sunTimes.solarNoon, city.timezone, locale),
+    duskLabel: formatTimeInZone(sunTimes.dusk, city.timezone, locale),
     sunriseLabel: formatApiLocalTime(sunrise),
     sunsetLabel: formatApiLocalTime(sunset),
-    dayLength: formatDayLength(sunrise, sunset, "uk"),
+    dayLength: formatDayLength(sunrise, sunset, locale),
     dayLengthMinutes,
   };
 }
 
-export async function getSunriseOverview(dayOffset = 0) {
-  const results = await Promise.allSettled(CITIES.map((city) => fetchSunTimesForCity(city, dayOffset)));
+export async function getSunriseOverview(
+  dayOffset = 0,
+  options: { cities?: CityConfig[]; timezone?: string; locale?: SiteLocale } = {}
+) {
+  const sourceCities = options.cities ?? CITIES;
+  const locale = options.locale ?? "uk";
+  const timezone = options.timezone ?? "Europe/Kyiv";
+  const results = await Promise.allSettled(sourceCities.map((city) => fetchSunTimesForCity(city, dayOffset, locale)));
   const cities = results
     .map((result) => (result.status === "fulfilled" ? result.value : null))
     .filter((item): item is SunriseOverviewCity => Boolean(item));
@@ -85,7 +93,7 @@ export async function getSunriseOverview(dayOffset = 0) {
     : 0;
 
   return {
-    date: getDateWithOffset("Europe/Kyiv", dayOffset),
+    date: getDateWithOffset(timezone, dayOffset),
     cities,
     earliestSunrise,
     latestSunrise,

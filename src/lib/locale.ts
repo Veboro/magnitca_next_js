@@ -1,4 +1,4 @@
-export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl"] as const;
+export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl", "ro"] as const;
 
 export type SiteLocale = (typeof SUPPORTED_SITE_LOCALES)[number];
 
@@ -13,7 +13,11 @@ export function getPathForLocale(path: string, locale: SiteLocale) {
     return normalized === "/" ? "/ru" : `/ru${normalized}`;
   }
 
-  return normalized === "/" ? "/pl" : `/pl${normalized}`;
+  if (locale === "pl") {
+    return normalized === "/" ? "/pl" : `/pl${normalized}`;
+  }
+
+  return normalized === "/" ? "/ro" : `/ro${normalized}`;
 }
 
 export function isRuPath(pathname: string) {
@@ -24,10 +28,14 @@ export function isPlPath(pathname: string) {
   return pathname === "/pl" || pathname.startsWith("/pl/");
 }
 
+export function isRoPath(pathname: string) {
+  return pathname === "/ro" || pathname.startsWith("/ro/");
+}
+
 export function switchPathLocale(pathname: string, locale: SiteLocale) {
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-  const basePath = isRuPath(normalized) || isPlPath(normalized)
-    ? normalized.replace(/^\/(ru|pl)(?=\/|$)/, "") || "/"
+  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized)
+    ? normalized.replace(/^\/(ru|pl|ro)(?=\/|$)/, "") || "/"
     : normalized;
 
   return getPathForLocale(basePath, locale);
@@ -35,24 +43,24 @@ export function switchPathLocale(pathname: string, locale: SiteLocale) {
 
 export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-  const currentLocale: SiteLocale = isPlPath(normalized) ? "pl" : isRuPath(normalized) ? "ru" : "uk";
-  const basePath = isRuPath(normalized) || isPlPath(normalized)
-    ? normalized.replace(/^\/(ru|pl)(?=\/|$)/, "") || "/"
+  const currentLocale: SiteLocale = isRoPath(normalized) ? "ro" : isPlPath(normalized) ? "pl" : isRuPath(normalized) ? "ru" : "uk";
+  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized)
+    ? normalized.replace(/^\/(ru|pl|ro)(?=\/|$)/, "") || "/"
     : normalized;
 
   const isCityPage = basePath.startsWith("/city/");
   const isCitiesCatalogPage = basePath === "/cities" || basePath.startsWith("/cities/");
   const isNewsPage = basePath === "/news" || basePath.startsWith("/news/");
 
-  if (isCityPage && (currentLocale === "pl" || locale === "pl")) {
+  if (isCityPage && (currentLocale === "pl" || locale === "pl" || currentLocale === "ro" || locale === "ro")) {
     return getPathForLocale("/", locale);
   }
 
-  if (isCitiesCatalogPage && locale === "pl") {
+  if (isCitiesCatalogPage && (locale === "pl" || locale === "ro")) {
     return getPathForLocale("/", locale);
   }
 
-  if (isNewsPage && (currentLocale === "pl" || locale === "pl")) {
+  if (isNewsPage && (currentLocale === "pl" || locale === "pl" || currentLocale === "ro" || locale === "ro")) {
     return getPathForLocale("/", locale);
   }
 

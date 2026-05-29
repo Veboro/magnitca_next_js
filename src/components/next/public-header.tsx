@@ -4,8 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind, X } from "lucide-react";
-import { getPathForLocale, getSafeLocaleSwitchPath, isPlPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, getSafeLocaleSwitchPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
+import { CITIES_MD } from "@/data/cities-md";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
@@ -40,6 +41,15 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/test", label: "Test", icon: ClipboardCheck },
     { href: "/faq", label: "FAQ", icon: HelpCircle },
   ],
+  ro: [
+    { href: "/", label: "Acasă", icon: Activity },
+    { href: "/kp-index", label: "Indice Kp", icon: Gauge },
+    { href: "/solar-wind", label: "Vânt solar", icon: Wind },
+    { href: "/moon-calendar", label: "Calendar lunar", icon: Moon },
+    { href: "/calendar", label: "Calendar", icon: CalendarDays },
+    { href: "/test", label: "Test", icon: ClipboardCheck },
+    { href: "/faq", label: "FAQ", icon: HelpCircle },
+  ],
 };
 
 const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
@@ -55,6 +65,10 @@ const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
     brand: "Magnitca",
     tagline: "Pogoda kosmiczna i burze magnetyczne",
   },
+  ro: {
+    brand: "Magnitca",
+    tagline: "Vreme spațială și furtuni magnetice",
+  },
 };
 
 type SearchCityItem = {
@@ -63,7 +77,7 @@ type SearchCityItem = {
   searchText: string;
 };
 
-const sunMenuItems: Record<Exclude<SiteLocale, "pl">, Array<{ href: string; label: string }>> = {
+const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> = {
   uk: [
     { href: "/sunrise", label: "Схід сьогодні" },
     { href: "/sunrise-tomorrow", label: "Схід завтра" },
@@ -76,12 +90,28 @@ const sunMenuItems: Record<Exclude<SiteLocale, "pl">, Array<{ href: string; labe
     { href: "/sunset", label: "Закат сегодня" },
     { href: "/sunset-tomorrow", label: "Закат завтра" },
   ],
+  ro: [
+    { href: "/ro/country/moldova/sunrise", label: "Moldova: răsărit azi" },
+    { href: "/ro/country/moldova/sunrise-tomorrow", label: "Moldova: răsărit mâine" },
+    { href: "/ro/country/moldova/sunset", label: "Moldova: apus azi" },
+    { href: "/ro/country/moldova/sunset-tomorrow", label: "Moldova: apus mâine" },
+    { href: "/ro/country/romania/sunrise", label: "România: răsărit azi" },
+    { href: "/ro/country/romania/sunrise-tomorrow", label: "România: răsărit mâine" },
+    { href: "/ro/country/romania/sunset", label: "România: apus azi" },
+    { href: "/ro/country/romania/sunset-tomorrow", label: "România: apus mâine" },
+  ],
+  pl: [
+    { href: "/pl/sunrise", label: "Wschód dzisiaj" },
+    { href: "/pl/sunrise-tomorrow", label: "Wschód jutro" },
+    { href: "/pl/sunset", label: "Zachód dzisiaj" },
+    { href: "/pl/sunset-tomorrow", label: "Zachód jutro" },
+  ],
 };
 
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const locale: SiteLocale = pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const pathnameValue = pathname || "/";
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -94,6 +124,7 @@ export function PublicHeader() {
     uk: getSafeLocaleSwitchPath(pathnameValue, "uk"),
     ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
     pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
+    ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
   });
 
   const searchCopy = {
@@ -115,9 +146,23 @@ export function PublicHeader() {
       citySection: "Strony miast",
       oblastSection: "Strony obwodow",
     },
+    ro: {
+      placeholder: "Caută orașul",
+      empty: "Nimic găsit",
+      citySection: "Orașe",
+      oblastSection: "Regiuni",
+    },
   } as const;
 
   const citySearchItems = useMemo<SearchCityItem[]>(() => {
+    if (locale === "ro") {
+      return CITIES_MD.map((city) => ({
+        name: city.name,
+        href: `/ro/city/${city.slug}`,
+        searchText: `${city.name} ${city.slug} ${city.country ?? ""}`.toLowerCase(),
+      }));
+    }
+
     if (locale === "pl") {
       return CITIES_PL.map((city) => ({
         name: city.name,
@@ -147,7 +192,7 @@ export function PublicHeader() {
   }, [locale]);
 
   const oblastSearchItems = useMemo<SearchCityItem[]>(() => {
-    if (locale === "pl") {
+    if (locale === "pl" || locale === "ro") {
       return [];
     }
 
@@ -199,11 +244,13 @@ export function PublicHeader() {
       uk: getSafeLocaleSwitchPath(pathnameValue, "uk"),
       ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
       pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
+      ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
     };
 
     const ukAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="uk"]');
     const ruAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ru"]');
     const plAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="pl"]');
+    const roAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ro"]');
 
     const toRelativePath = (href: string | null | undefined) => {
       if (!href) return null;
@@ -219,6 +266,7 @@ export function PublicHeader() {
     const ukPath = toRelativePath(ukAlternate?.href);
     const ruPath = toRelativePath(ruAlternate?.href);
     const plPath = toRelativePath(plAlternate?.href);
+    const roPath = toRelativePath(roAlternate?.href);
 
     if (ukPath) {
       nextLinks.uk = ukPath;
@@ -230,6 +278,10 @@ export function PublicHeader() {
 
     if (plPath) {
       nextLinks.pl = plPath;
+    }
+
+    if (roPath) {
+      nextLinks.ro = roPath;
     }
 
     setLocaleLinks(nextLinks);
@@ -293,9 +345,9 @@ export function PublicHeader() {
     window.localStorage.setItem("theme", nextThemeIsDark ? "dark" : "light");
   };
 
-  const localizedSunMenu = locale === "pl" ? [] : sunMenuItems[locale];
-  const sunMenuLabel = locale === "ru" ? "Солнце" : "Сонце";
-  const sunMenuActive = pathnameValue.startsWith("/sunrise") || pathnameValue.startsWith("/sunset") || pathnameValue.startsWith("/ru/sunrise") || pathnameValue.startsWith("/ru/sunset");
+  const localizedSunMenu = sunMenuItems[locale];
+  const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : "Сонце";
+  const sunMenuActive = pathnameValue.startsWith("/sunrise") || pathnameValue.startsWith("/sunset") || pathnameValue.startsWith("/ru/sunrise") || pathnameValue.startsWith("/ru/sunset") || pathnameValue.startsWith("/pl/sun") || /^\/ro\/country\/[^/]+\/sun/.test(pathnameValue);
 
   return (
     <>
@@ -510,7 +562,7 @@ export function PublicHeader() {
             </button>
             {mobileLocaleOpen && (
               <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[88px] rounded-2xl border border-border/50 bg-popover/95 p-1.5 shadow-xl backdrop-blur">
-                {(["uk", "ru", "pl"] as SiteLocale[]).map((nextLocale) => {
+                {(["uk", "ru", "pl", "ro"] as SiteLocale[]).map((nextLocale) => {
                   const nextPath = localeLinks[nextLocale] ?? getSafeLocaleSwitchPath(pathnameValue, nextLocale);
                   const isActive = locale === nextLocale;
 
@@ -566,6 +618,16 @@ export function PublicHeader() {
                 }`}
               >
                 PL
+              </Link>
+            )}
+            {localeLinks.ro && (
+              <Link
+                href={localeLinks.ro}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  locale === "ro" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                RO
               </Link>
             )}
           </div>

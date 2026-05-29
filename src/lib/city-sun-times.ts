@@ -19,6 +19,7 @@ export function formatDayLength(sunrise: string, sunset: string, locale: SiteLoc
   const h = Math.floor(diff / 3600000);
   const m = Math.floor((diff % 3600000) / 60000);
   if (locale === "pl") return `${h} godz. ${m} min`;
+  if (locale === "ro") return `${h} h ${m} min`;
   if (locale === "ru") return `${h} ч ${m} мин`;
   return `${h}год ${m}хв`;
 }

@@ -169,17 +169,77 @@ const copy = {
   },
 } as const;
 
-const todayStr = (localeTag: string) =>
+const localizedCopy = {
+  ...copy,
+  ro: {
+    ...copy.pl,
+    pageTitle: "Vânt solar online în timp real — viteză și densitate",
+    pageDescription:
+      "Vântul solar acum în timp real: viteză, densitate și grafic pentru ultimele 2 ore pe baza datelor NOAA DSCOVR.",
+    heroTitle: "Vântul solar astăzi",
+    heroText:
+      "Viteza și densitatea vântului solar în timp real. Grafic pentru ultimele 2 ore și componenta câmpului magnetic interplanetar IMF Bz.",
+    currentAria: "Valorile curente ale vântului solar",
+    speed: "Viteză",
+    density: "Densitate",
+    normal: "Normală",
+    elevated: "Ridicată",
+    stronglySouth: "Puternic sudic",
+    south: "Sudic",
+    weaklySouth: "Ușor sudic",
+    north: "Nordic",
+    speedChartAria: "Graficul vitezei și densității vântului solar",
+    speedChartTitle: "Viteză și densitate — ultimele 2 ore",
+    bzChartAria: "Grafic IMF Bz",
+    bzChartTitle: "Câmp magnetic interplanetar (Bz) — ultimele 2 ore",
+    loading: "Se încarcă...",
+    bzNote:
+      "Valorile negative ale Bz facilitează pătrunderea vântului solar în magnetosferă. Când Bz scade sub -5 nT, riscul de furtună geomagnetică crește.",
+    scaleAria: "Scara vitezei vântului solar",
+    scaleTitle: "Scara vitezei vântului solar (km/s)",
+    seoAria: "Despre vântul solar",
+    seoHeading: "Ce este vântul solar și de ce contează?",
+    seoText1:
+      "Vântul solar este un flux continuu de particule încărcate care vine din coroana Soarelui. Viteza sa variază de obicei între 300 și peste 800 km/s.",
+    seoText2:
+      "Când viteza și densitatea cresc, presiunea asupra magnetosferei devine mai mare. Componenta Bz este importantă deoarece valorile negative cresc probabilitatea perturbărilor geomagnetice.",
+    faqAria: "Întrebări frecvente despre vântul solar",
+    faqTitle: "Întrebări frecvente",
+    tooltipKyiv: "ora locală",
+    areaSpeed: "Viteză",
+    areaDensity: "Densitate",
+    speedLevels: [
+      { range: "< 300", status: "Lent", color: "bg-storm-quiet", description: "Vânt solar lent, de obicei fără impact important." },
+      { range: "300-400", status: "Normal", color: "bg-storm-quiet", description: "Viteză tipică și condiții geomagnetice calme." },
+      { range: "400-500", status: "Ridicat", color: "bg-storm-minor", description: "Poate favoriza ușoare perturbări geomagnetice." },
+      { range: "500-600", status: "Înalt", color: "bg-storm-moderate", description: "Crește riscul unor perturbări mai vizibile." },
+      { range: "600-800", status: "Foarte înalt", color: "bg-storm-strong", description: "Poate contribui la furtuni magnetice mai puternice." },
+      { range: "> 800", status: "Extrem", color: "bg-storm-severe", description: "Flux foarte rapid cu potențial ridicat de perturbări." },
+    ],
+    faqItems: [
+      { q: "Ce este vântul solar?", a: "Este fluxul de particule încărcate emis de Soare și transportat prin spațiu." },
+      { q: "De ce contează viteza?", a: "Viteza mai mare înseamnă presiune mai mare asupra magnetosferei Pământului." },
+      { q: "Ce este densitatea?", a: "Densitatea arată câte particule se află într-un volum dat al vântului solar." },
+      { q: "Ce înseamnă Bz?", a: "Bz este componenta verticală a câmpului magnetic interplanetar. Valorile negative cresc riscul de activitate geomagnetică." },
+      { q: "Cât de des se actualizează datele?", a: "Datele sunt preluate din măsurători NOAA și se actualizează regulat." },
+    ],
+  },
+};
+
+const getPageTimeZone = (locale: LegacyLocale) =>
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : "Europe/Kyiv";
+
+const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
     day: "numeric",
     month: "long",
     year: "numeric",
-    timeZone: "Europe/Kyiv",
+    timeZone,
   });
 
-const toKyivTime = (utc: string, localeTag: string) => {
+const toLocalTime = (utc: string, localeTag: string, timeZone: string) => {
   const d = new Date(utc.includes("T") ? utc : utc.replace(" ", "T") + "Z");
-  return d.toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+  return d.toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", timeZone });
 };
 
 const getSpeedColor = (speed: number) => {
@@ -191,7 +251,7 @@ const getSpeedColor = (speed: number) => {
 };
 
 const getSpeedStatus = (speed: number, locale: SiteLocale) => {
-  const levels = copy[locale];
+  const levels = localizedCopy[locale];
   if (speed >= 800) return levels.speedLevels[5].status;
   if (speed >= 600) return levels.speedLevels[4].status;
   if (speed >= 500) return levels.speedLevels[3].status;
@@ -202,13 +262,15 @@ const getSpeedStatus = (speed: number, locale: SiteLocale) => {
 
 const CustomTooltip = ({ active, payload, label, locale = "uk" }: any) => {
   if (!active || !payload) return null;
-  const t = copy[locale as SiteLocale];
+  const t = localizedCopy[locale as SiteLocale];
+  const speedUnit = locale === "uk" || locale === "ru" ? "км/с" : "km/s";
+  const densityUnit = locale === "uk" ? "p/см³" : locale === "ru" ? "p/см³" : "p/cm³";
   return (
     <div className="rounded-md border border-border bg-card p-3 shadow-lg">
       <p className="mb-1 font-mono text-xs text-muted-foreground">{label} {t.tooltipKyiv}</p>
       {payload.map((entry: any, i: number) => (
         <p key={i} className="font-mono text-sm" style={{ color: entry.color }}>
-          {entry.name}: {entry.value} {entry.name === t.areaSpeed ? "км/с" : entry.name === t.areaDensity ? "p/см³" : "нТ"}
+          {entry.name}: {entry.value} {entry.name === t.areaSpeed ? speedUnit : entry.name === t.areaDensity ? densityUnit : "nT"}
         </p>
       ))}
     </div>
@@ -222,9 +284,12 @@ interface SolarWindProps {
 }
 
 const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) => {
-  const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
-  const today = todayStr(localeTag);
+  const t = localizedCopy[locale];
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const timeZone = getPageTimeZone(locale);
+  const speedUnit = locale === "uk" || locale === "ru" ? "км/с" : "km/s";
+  const densityUnit = locale === "uk" || locale === "ru" ? "p/см³" : "p/cm³";
+  const today = todayStr(localeTag, timeZone);
 
   const { data: windData, isLoading: windLoading } = useSolarWind(initialWind ?? undefined);
   const { data: magData, isLoading: magLoading } = useMagData(initialMag ?? undefined);
@@ -235,7 +300,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
   const speedChartData = (windData || [])
     .filter((_, i) => i % 3 === 0)
     .map((d) => ({
-      time: toKyivTime(d.time_tag, localeTag),
+      time: toLocalTime(d.time_tag, localeTag, timeZone),
       speed: d.speed,
       density: d.density,
     }));
@@ -243,7 +308,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
   const magChartData = (magData || [])
     .filter((_, i) => i % 3 === 0)
     .map((d) => ({
-      time: toKyivTime(d.time_tag, localeTag),
+      time: toLocalTime(d.time_tag, localeTag, timeZone),
       bz: d.bz,
       bt: d.bt,
     }));
@@ -290,7 +355,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                 <span className={cn("font-mono text-5xl font-bold text-glow-cyan", getSpeedColor(latestWind?.speed ?? 0))}>
                   {latestWind?.speed?.toFixed(0) ?? "—"}
                 </span>
-                <span className="text-muted-foreground text-sm">км/с</span>
+                <span className="text-muted-foreground text-sm">{speedUnit}</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 {getSpeedStatus(latestWind?.speed ?? 0, locale)}
@@ -310,7 +375,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                 <span className="font-mono text-5xl font-bold text-foreground text-glow-cyan">
                   {latestWind?.density?.toFixed(1) ?? "—"}
                 </span>
-                <span className="text-muted-foreground text-sm">p/см³</span>
+                <span className="text-muted-foreground text-sm">{densityUnit}</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 {(latestWind?.density ?? 0) > 10 ? t.elevated : t.normal}
@@ -383,7 +448,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                   />
                   <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
                   <Tooltip content={<CustomTooltip locale={locale} />} />
-                  <ReferenceLine y={500} stroke="hsl(var(--destructive))" strokeDasharray="4 4" label={{ value: "500 км/с", fontSize: 10, fill: "hsl(var(--destructive))" }} />
+                  <ReferenceLine y={500} stroke="hsl(var(--destructive))" strokeDasharray="4 4" label={{ value: `500 ${speedUnit}`, fontSize: 10, fill: "hsl(var(--destructive))" }} />
                   <Area type="monotone" dataKey="speed" name={t.areaSpeed} stroke="hsl(180, 100%, 50%)" fill="url(#swSpeedGrad)" strokeWidth={2} />
                   <Area type="monotone" dataKey="density" name={t.areaDensity} stroke="hsl(35, 100%, 55%)" fill="url(#swDensityGrad)" strokeWidth={2} />
                 </AreaChart>
@@ -440,7 +505,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                 <span className={cn("mt-0.5 h-3 w-3 shrink-0 rounded-full", level.color)} />
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-bold text-foreground">{level.range} км/с</span>
+                    <span className="font-mono text-sm font-bold text-foreground">{level.range} {speedUnit}</span>
                     <span className="text-xs text-muted-foreground">— {level.status}</span>
                   </div>
                   <p className="text-xs text-muted-foreground/80 mt-0.5">{level.description}</p>

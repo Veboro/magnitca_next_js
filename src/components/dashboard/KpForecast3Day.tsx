@@ -27,13 +27,26 @@ const kpBadgeBg = (kp: number) => {
   return "bg-red-500/15 text-red-400 border-red-500/30";
 };
 
-const groupFutureDays = (entries: KpForecastEntry[], locale: string) => {
-  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+const getForecastLocale = (language: string) => {
+  if (language.startsWith("ru")) return "ru-RU";
+  if (language.startsWith("pl")) return "pl-PL";
+  if (language.startsWith("ro")) return "ro-MD";
+  return "uk-UA";
+};
+
+const getForecastTimeZone = (language: string) => {
+  if (language.startsWith("pl")) return "Europe/Warsaw";
+  if (language.startsWith("ro")) return "Europe/Chisinau";
+  return "Europe/Kyiv";
+};
+
+const groupFutureDays = (entries: KpForecastEntry[], locale: string, timeZone: string) => {
+  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone });
   const groups = new Map<string, { label: string; entries: KpForecastEntry[] }>();
 
   entries.forEach((entry) => {
     const date = new Date(entry.time_tag);
-    const dayKey = date.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+    const dayKey = date.toLocaleDateString("sv-SE", { timeZone });
 
     if (dayKey < todayKey) return;
 
@@ -41,7 +54,7 @@ const groupFutureDays = (entries: KpForecastEntry[], locale: string) => {
       weekday: "short",
       day: "numeric",
       month: "short",
-      timeZone: "Europe/Kyiv",
+      timeZone,
     });
 
     if (!groups.has(dayKey)) {
@@ -59,19 +72,20 @@ const groupFutureDays = (entries: KpForecastEntry[], locale: string) => {
 
 export const KpForecast3Day = ({ className, initialData }: { className?: string; initialData?: KpForecastEntry[] | null }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
+  const locale = getForecastLocale(i18n.language);
+  const timeZone = getForecastTimeZone(i18n.language);
   const { data: entries = [], isLoading } = useKpForecast(initialData ?? undefined);
-  const days = groupFutureDays(entries, locale);
+  const days = groupFutureDays(entries, locale, timeZone);
   const MAX_KP = 9;
 
   const formatHour = (timeTag: string) => {
     const d = new Date(timeTag);
-    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone });
   };
 
   const formatDayHeader = (timeTag: string) => {
     const d = new Date(timeTag);
-    return d.toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/Kyiv" });
+    return d.toLocaleDateString(locale, { weekday: "short", day: "numeric", month: "short", timeZone });
   };
 
   return (

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-type SiteLocale = "uk" | "ru" | "pl";
+type SiteLocale = "uk" | "ru" | "pl" | "ro";
 
 const copy = {
   uk: {
@@ -28,6 +28,14 @@ const copy = {
     pressureRange: "wahanie",
     currentPressure: "ciśnienie teraz",
     total: "Wpływ łączny",
+  },
+  ro: {
+    title: "Influența asupra organismului",
+    magnetic: "Furtuni magnetice",
+    pressure: "Presiune atmosferică",
+    pressureRange: "variație",
+    currentPressure: "presiune acum",
+    total: "Influență totală",
   },
 } as const;
 

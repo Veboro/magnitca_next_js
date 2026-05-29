@@ -24,7 +24,13 @@ const kpDot = (kp: number) => {
 
 export const Forecast27Day = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
+  const locale = i18n.language.startsWith("ru")
+    ? "ru-RU"
+    : i18n.language.startsWith("pl")
+      ? "pl-PL"
+      : i18n.language.startsWith("ro")
+        ? "ro-MD"
+        : "uk-UA";
   const weekdays = [t("forecast27.mon"), t("forecast27.tue"), t("forecast27.wed"), t("forecast27.thu"), t("forecast27.fri"), t("forecast27.sat"), t("forecast27.sun")];
   const { data: days = [], isLoading } = useKpForecast27Day();
 

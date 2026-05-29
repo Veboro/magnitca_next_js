@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays, AlertTriangle } from "lucide-react";
 import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
+import { getCityByMdSlug } from "@/data/cities-md";
 import { getCityByPlSlug } from "@/data/cities-pl";
 import { UKRAINE_REGION_GROUPS } from "@/data/ukraine-city-catalog";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
@@ -239,6 +240,76 @@ const copy = {
     home: "Strona główna",
     breadcrumbAria: "Nawigacja po stronie",
   },
+  ro: {
+    calm: "Calm",
+    low: "Activitate scăzută",
+    moderate: "Furtună moderată",
+    strong: "Furtună puternică",
+    extreme: "Furtună extremă",
+    geoSituation: "Situația geomagnetică în",
+    sunriseSunset: "Răsărit / Apus",
+    sunrise: "Răsărit",
+    sunset: "Apus",
+    dayLength: "Durata zilei",
+    coordinates: "Coordonate",
+    latitude: "Latitudine",
+    longitude: "Longitudine",
+    timezone: "Fus orar",
+    radiation: "Fond de radiații",
+    normal: "În limite normale",
+    forecast3: "Prognoza indicelui Kp pentru",
+    forecast3suffix: "pe 3 zile (intervale de 3 ore)",
+    loading: "Se încarcă prognoza...",
+    unavailable: "Datele prognozei sunt indisponibile.",
+    max: "max. Kp",
+    forecast3Foot1: "Prognoza indicelui Kp pentru orașul",
+    forecast3Foot2: "de la NOAA Space Weather Prediction Center. Ora este locală",
+    forecast27: "Prognoza Kp pe 27 de zile —",
+    forecast27Foot1: "Prognoza indicelui Kp pe 27 de zile pentru orașul",
+    forecast27Foot2: "de la NOAA SWPC. Precizia scade cu fiecare zi — folosește datele orientativ.",
+    airQuality: "Calitatea aerului",
+    currentMetrics: "Indicatori curenți",
+    wind: "Vânt",
+    humidity: "Umiditate",
+    pressure: "Presiune",
+    cloudiness: "Nebulozitate",
+    uv: "Indice UV",
+    kpIndex: "Indice Kp",
+    high: "Ridicată",
+    medium: "Moderată",
+    lowHumidity: "Scăzută",
+    overcast: "Închis",
+    variable: "Variabil",
+    clear: "Senin",
+    uvVeryHigh: "Foarte ridicat",
+    uvHigh: "Ridicat",
+    uvMedium: "Moderat",
+    uvLow: "Scăzut",
+    aboutPage: "Despre pagină",
+    cityNotFound: "Orașul nu a fost găsit",
+    srOnlyHeading: "Furtuni magnetice în",
+    srOnlySuffix: "vreme și calitatea aerului",
+    geoActivityStatus: "Statusul activității geomagnetice în",
+    forecast3Aria: "Prognoza indicelui Kp pe 3 zile",
+    forecast27Aria: "Prognoza Kp pe 27 de zile",
+    seoHeading: "Furtuni magnetice în",
+    today: "astăzi",
+    currentKp: "Indice Kp curent",
+    stormLevel: "nivelul furtunii geomagnetice",
+    forecastRange: "Intervalul Kp prognozat pentru zi",
+    radioBlackout: "Scara blackout radio",
+    radiationStorm: "scara furtunilor de radiații",
+    temperature: "Temperatura aerului",
+    windSpeed: "vânt",
+    airIndex: "Indicele calității aerului AQI",
+    dataSource: "Date",
+    popularInRegion: "Orașe populare",
+    hydrometWarning: "Avertizare hidrometeorologică",
+    hydrometSource: "Sursa: serviciul meteo",
+    hydrometUnavailable: "Avertizarea este temporar indisponibilă",
+    home: "Acasă",
+    breadcrumbAria: "Navigare pe pagină",
+  },
 } as const;
 
 const getKpStatus = (kp: number, locale: SiteLocale) => {
@@ -283,7 +354,7 @@ function toRuRegionGenitive(title: string) {
 function getWindDirection(deg: number, locale: SiteLocale): string {
   const dirs = locale === "ru"
     ? ["С", "СВ", "В", "ЮВ", "Ю", "ЮЗ", "З", "СЗ"]
-    : locale === "pl"
+    : locale === "pl" || locale === "ro"
       ? ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
       : ["Пн", "ПнСх", "Сх", "ПдСх", "Пд", "ПдЗх", "Зх", "ПнЗх"];
   return dirs[Math.round(deg / 45) % 8];
@@ -335,11 +406,13 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
   const cityBase = resolvedSlug
     ? locale === "pl"
       ? getCityByPlSlug(resolvedSlug)
+      : locale === "ro"
+        ? getCityByMdSlug(resolvedSlug)
       : getCityBySlug(resolvedSlug)
     : undefined;
   const city = cityBase ? (locale === "ru" ? getLocalizedCity(cityBase, "ru") : cityBase) : undefined;
   const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
 
   const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, initialWeather ?? undefined, locale);
   const { data: sunTimes } = useCitySunTimes({
@@ -384,7 +457,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         : `${t.popularInRegion} ${regionTitleForHeading}`
     : t.popularInRegion;
   const popularRegionCities =
-    locale === "pl" || !regionGroup || !cityBase
+    locale === "pl" || locale === "ro" || !regionGroup || !cityBase
       ? []
       : regionGroup.slugs
           .filter((candidateSlug) => candidateSlug !== cityBase.slug)
@@ -395,7 +468,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             const href = locale === "ru" ? `/ru/city/${getRuCitySlug(candidate)}` : `/city/${candidate.slug}`;
             return { name: localized.name, href };
           });
-  const oblastPaths = regionGroup && locale !== "pl" ? getOblastPathsByKey(regionGroup.key) : null;
+  const oblastPaths = regionGroup && locale !== "pl" && locale !== "ro" ? getOblastPathsByKey(regionGroup.key) : null;
   const oblastHref =
     locale === "ru"
       ? oblastPaths?.ru
@@ -403,17 +476,20 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         ? oblastPaths?.uk
         : null;
   const oblastName =
-    regionGroup && locale !== "pl"
+    regionGroup && locale !== "pl" && locale !== "ro"
       ? getOblastTitle(locale === "ru" ? "ru" : "uk", regionGroup.key) ?? regionTitle
       : null;
-  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : "/";
-  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : `/city/${city.slug}`;
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : "/";
+  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : locale === "ro" ? `/ro/city/${city.slug}` : `/city/${city.slug}`;
+  const countryName = locale === "ro" ? city.country : null;
+  const countryHref = locale === "ro" && city.countrySlug ? `/ro/country/${city.countrySlug}` : null;
   const breadcrumbItems = [
     { name: t.home, url: absoluteUrl(homeHref) },
+    ...(countryName && countryHref ? [{ name: countryName, url: absoluteUrl(countryHref) }] : []),
     ...(oblastHref && oblastName ? [{ name: oblastName, url: absoluteUrl(oblastHref) }] : []),
     { name: city.name, url: absoluteUrl(cityHref) },
   ];
-  const uhmcRegionCode = locale === "pl" ? null : getUhmcRegionCode(regionGroup?.key);
+  const uhmcRegionCode = locale === "pl" || locale === "ro" ? null : getUhmcRegionCode(regionGroup?.key);
   const { data: uhmcWarning } = useQuery({
     queryKey: ["uhmc-warning", uhmcRegionCode, locale],
     queryFn: async () => {
@@ -456,7 +532,9 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
       ? `Магнитные бури в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, качество воздуха в реальном времени.`
       : locale === "pl"
         ? `Burze magnetyczne w ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoza, pogoda i jakość powietrza w czasie rzeczywistym.`
-      : `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
+        : locale === "ro"
+          ? `Furtuni magnetice în ${city.nameGenitive}, ${city.country ?? "Moldova"} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoză, vreme și calitatea aerului în timp real.`
+          : `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
     : "";
 
   if (!city) return null;
@@ -494,6 +572,18 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
           <Link href={homeHref} className="transition-colors hover:text-primary">
             {t.home}
           </Link>
+          {countryName ? (
+            <>
+              <span>/</span>
+              {countryHref ? (
+                <Link href={countryHref} className="transition-colors hover:text-primary">
+                  {countryName}
+                </Link>
+              ) : (
+                <span className="transition-colors">{countryName}</span>
+              )}
+            </>
+          ) : null}
           {oblastHref && oblastName ? (
             <>
               <span>/</span>
@@ -574,7 +664,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 <span className="font-mono text-foreground">{city.utcOffset}</span>
               </div>
             </div>
-            {locale === "pl" ? (
+            {locale === "pl" || locale === "ro" ? (
               <div className="space-y-1.5 border-t border-border/30 pt-2">
                 <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
                   <Activity className="h-3.5 w-3.5 text-primary" />
@@ -686,7 +776,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 <span className="font-mono text-foreground">{city.utcOffset}</span>
               </div>
             </div>
-            {locale === "pl" ? (
+            {locale === "pl" || locale === "ro" ? (
               <div className="space-y-1.5 border-t border-border/30 pt-2">
                 <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
                   <Activity className="h-3.5 w-3.5 text-primary" />
@@ -889,10 +979,10 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.pm25 > 25} />
-                <AqiItem label="PM10" value={data.airQuality.pm10} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.pm10 > 50} />
-                <AqiItem label="NO₂" value={data.airQuality.no2} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.no2 > 40} />
-                <AqiItem label="O₃" value={data.airQuality.o3} unit={locale === "pl" ? "µg/m³" : "мкг/м³"} warn={data.airQuality.o3 > 100} />
+                <AqiItem label="PM2.5" value={data.airQuality.pm25} unit={locale === "uk" || locale === "ru" ? "мкг/м³" : "µg/m³"} warn={data.airQuality.pm25 > 25} />
+                <AqiItem label="PM10" value={data.airQuality.pm10} unit={locale === "uk" || locale === "ru" ? "мкг/м³" : "µg/m³"} warn={data.airQuality.pm10 > 50} />
+                <AqiItem label="NO₂" value={data.airQuality.no2} unit={locale === "uk" || locale === "ru" ? "мкг/м³" : "µg/m³"} warn={data.airQuality.no2 > 40} />
+                <AqiItem label="O₃" value={data.airQuality.o3} unit={locale === "uk" || locale === "ru" ? "мкг/м³" : "µg/m³"} warn={data.airQuality.o3 > 100} />
               </div>
               <div className="space-y-1">
                 <div className="flex h-2 rounded-full overflow-hidden">
@@ -921,9 +1011,9 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         ) : data?.current ? (
           <section aria-label={t.currentMetrics}>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
-              <MiniCard icon={Wind} label={t.wind} value={`${Math.round(data.current.windSpeed)} ${locale === "pl" ? "km/h" : "км/г"}`} sub={getWindDirection(data.current.windDirection, locale)} />
+              <MiniCard icon={Wind} label={t.wind} value={`${Math.round(data.current.windSpeed)} ${locale === "uk" || locale === "ru" ? "км/г" : "km/h"}`} sub={getWindDirection(data.current.windDirection, locale)} />
               <MiniCard icon={Droplets} label={t.humidity} value={`${data.current.humidity}%`} sub={data.current.humidity > 80 ? t.high : data.current.humidity > 50 ? t.medium : t.lowHumidity} />
-              <MiniCard icon={Gauge} label={t.pressure} value={`${Math.round(data.current.pressure)}`} sub={locale === "pl" ? "hPa" : "гПа"} />
+              <MiniCard icon={Gauge} label={t.pressure} value={`${Math.round(data.current.pressure)}`} sub={locale === "uk" || locale === "ru" ? "гПа" : "hPa"} />
               <MiniCard icon={Cloud} label={t.cloudiness} value={`${data.current.cloudCover}%`} sub={data.current.cloudCover > 80 ? t.overcast : data.current.cloudCover > 40 ? t.variable : t.clear} />
               <MiniCard icon={Sun} label={t.uv} value={`${Math.round(data.current.uvIndex)}`} sub={data.current.uvIndex > 8 ? t.uvVeryHigh : data.current.uvIndex > 5 ? t.uvHigh : data.current.uvIndex > 2 ? t.uvMedium : t.uvLow} />
               <MiniCard icon={Activity} label={t.kpIndex} value={`${Math.round(latestKp)}`} sub={kpStatus.label} color={kpStatus.color} />
@@ -977,8 +1067,8 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 {city.name}, {dateStr}. {t.currentKp} — {latestKp.toFixed(1)}, {t.stormLevel} — G{gLevel}.
                 {kpValues.length > 0 && ` ${t.forecastRange}: ${minKp.toFixed(1)}–${maxKp.toFixed(1)}.`}
                 {" "}{t.radioBlackout} — R{rScale}, {t.radiationStorm} — S{sScale}.
-                {data?.current && ` ${t.temperature} — ${Math.round(data.current.temperature)}°C, ${t.pressure.toLowerCase()} — ${Math.round(data.current.pressure)} ${locale === "pl" ? "hPa" : "гПа"}, ${t.humidity.toLowerCase()} — ${data.current.humidity}%, ${t.windSpeed} — ${Math.round(data.current.windSpeed)} ${locale === "pl" ? "km/h" : "км/год"} (${getWindDirection(data.current.windDirection, locale)}).`}
-                {data?.airQuality && ` ${t.airIndex} — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} ${locale === "pl" ? "µg/m³" : "мкг/м³"}.`}
+                {data?.current && ` ${t.temperature} — ${Math.round(data.current.temperature)}°C, ${t.pressure.toLowerCase()} — ${Math.round(data.current.pressure)} ${locale === "uk" || locale === "ru" ? "гПа" : "hPa"}, ${t.humidity.toLowerCase()} — ${data.current.humidity}%, ${t.windSpeed} — ${Math.round(data.current.windSpeed)} ${locale === "uk" || locale === "ru" ? "км/год" : "km/h"} (${getWindDirection(data.current.windDirection, locale)}).`}
+                {data?.airQuality && ` ${t.airIndex} — ${data.airQuality.aqi}, PM2.5 — ${(Math.round(data.airQuality.pm25 * 10) / 10)} ${locale === "uk" || locale === "ru" ? "мкг/м³" : "µg/m³"}.`}
                 {" "}{t.dataSource}: NOAA SWPC, Open-Meteo.
               </p>
             );

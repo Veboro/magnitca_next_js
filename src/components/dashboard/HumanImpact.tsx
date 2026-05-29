@@ -46,7 +46,13 @@ export const HumanImpact = ({
   const { data: kpData } = useKpIndex(initialKp ?? undefined);
   const { data: forecast } = useKpForecast(initialForecast ?? undefined);
   const { user } = useAuth();
-  const langPrefix = i18n.language === "ru" ? "/ru" : i18n.language === "pl" ? "/pl" : "";
+  const langPrefix = i18n.language.startsWith("ru")
+    ? "/ru"
+    : i18n.language.startsWith("pl")
+      ? "/pl"
+      : i18n.language.startsWith("ro")
+        ? "/ro"
+        : "";
 
   const { data: latestResult } = useQuery({
     queryKey: ["latest-test-result", user?.id],

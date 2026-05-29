@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar } from "@/hooks/useStormCalendar";
 import type { StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
-import { pl, ru, uk } from "date-fns/locale";
+import { pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
 
@@ -40,6 +40,13 @@ const levelLabels = {
     moderate: "Umiarkowana burza (Kp5)",
     strong: "Silna burza (Kp6-7)",
     severe: "Ekstremalna burza (Kp8-9)",
+  },
+  ro: {
+    none: "Calm",
+    minor: "Furtună slabă (Kp4)",
+    moderate: "Furtună moderată (Kp5)",
+    strong: "Furtună puternică (Kp6-7)",
+    severe: "Furtună extremă (Kp8-9)",
   },
 };
 
@@ -114,10 +121,34 @@ const copy = {
   },
 } as const;
 
+const localizedCopy = {
+  ...copy,
+  ro: {
+    badge: "CALENDARUL FURTUNILOR MAGNETICE",
+    pageTitlePrefix: "Calendarul furtunilor magnetice pentru",
+    pageTitleSuffix: "— Magnitca Moldova",
+    pageDescriptionPrefix: "Calendarul furtunilor magnetice pentru",
+    pageDescriptionSuffix: "Zilele cu perturbări geomagnetice sunt marcate după intensitate.",
+    intro:
+      "Zilele cu furtuni magnetice sunt marcate prin culoare în funcție de intensitate. Chenarul punctat indică prognoza pentru zilele următoare.",
+    forecast: "Prognoză",
+    disturbanceDays: "Zile cu perturbări geomagnetice",
+    forecastBadge: "prognoză",
+    seo1Prefix: "Pe această pagină este afișat",
+    seo1StrongPrefix: "calendarul furtunilor magnetice pentru",
+    seo1Rest:
+      "cu date despre activitatea geomagnetică pentru fiecare zi. Zilele cu activitate ridicată sunt marcate prin culoare: de la niveluri slabe până la furtuni extreme.",
+    seo2:
+      "Furtunile geomagnetice sunt evaluate prin indicele Kp și scara G NOAA. Când indicele Kp ajunge la 4 sau mai mult, activitatea devine mai vizibilă, iar de la Kp 5 începe furtuna geomagnetică.",
+    seo3:
+      "Calendarul este actualizat automat pe baza datelor NOAA Space Weather Prediction Center și poate fi folosit pentru planificare și monitorizarea stării de bine.",
+  },
+};
+
 export default function StormCalendar({ locale = "uk", initialData }: { locale?: LegacyLocale; initialData?: StormDay[] | null }) {
-  const t = copy[locale];
-  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : uk;
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
+  const t = localizedCopy[locale];
+  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : uk;
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 

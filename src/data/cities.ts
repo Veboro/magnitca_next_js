@@ -13,6 +13,9 @@ export interface CityConfig {
   utcOffset: string;
   seoTitle: string;
   seoDescription: string;
+  country?: string;
+  countryCode?: string;
+  countrySlug?: string;
 }
 
 export const CITIES: CityConfig[] = [

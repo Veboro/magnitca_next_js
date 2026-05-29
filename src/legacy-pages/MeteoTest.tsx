@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import type { SiteLocale } from "@/lib/locale";
 
+type BaseLocale = Extract<SiteLocale, "uk" | "ru" | "pl">;
 type LegacyLocale = SiteLocale;
 
 interface PersonalInfo {
@@ -20,7 +21,7 @@ interface PersonalInfo {
 type Step = "info" | "questions" | "calculating" | "result";
 
 const copy: Record<
-  LegacyLocale,
+  BaseLocale,
   {
     title: string;
     description: string;
@@ -308,7 +309,90 @@ const copy: Record<
   },
 };
 
-function calculateScore(answers: number[], info: PersonalInfo, locale: SiteLocale): number {
+const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
+  ...copy,
+  ro: {
+    title: "Test de meteosensibilitate — Magnitca Moldova",
+    description:
+      "Test gratuit de meteosensibilitate. Află cât de sensibil poate fi organismul tău la furtuni magnetice și activitate geomagnetică.",
+    backHome: "La pagina principală",
+    heading: "Test de meteosensibilitate",
+    subtitle:
+      "Află cât de sensibil este organismul tău la furtuni magnetice. Testul durează 2-3 minute.",
+    introTitle: "Cum funcționează testul",
+    introText:
+      "Acest test ajută la o estimare orientativă a sensibilității la schimbări geomagnetice, variații de presiune și simptome asociate.",
+    howItWorksTitle: "Ce se ia în calcul",
+    howItWorksItems: [
+      "reacțiile tale obișnuite la furtuni magnetice și schimbări de vreme",
+      "vârsta, nivelul de activitate fizică și prezența afecțiunilor cronice",
+      "frecvența simptomelor: dureri de cap, oboseală, insomnie, variații de tensiune, anxietate",
+    ],
+    resultsInfoTitle: "Ce înseamnă rezultatul",
+    resultsInfoText:
+      "După răspunsuri vei primi o estimare procentuală a meteosensibilității. Cu cât scorul este mai mare, cu atât este mai probabil ca perioadele de activitate geomagnetică sau schimbările bruște de vreme să influențeze starea ta.",
+    disclaimerTitle: "Important",
+    disclaimerText:
+      "Acesta nu este un diagnostic medical și nu înlocuiește consultația unui medic. Testul oferă doar o estimare orientativă.",
+    yourName: "Numele tău",
+    enterName: "Introdu numele",
+    age: "Vârsta",
+    gender: "Gen",
+    physicalActivity: "Nivelul de activitate fizică",
+    hasChronic: "Am afecțiuni cronice (cardiovasculare, neurologice etc.)",
+    startTest: "Începe testul",
+    questionProgress: "Întrebarea",
+    analyzing: "Analizăm răspunsurile tale...",
+    processingPersonal: "Prelucrarea datelor personale...",
+    comparingMeteo: "Comparare cu baza de date meteo...",
+    calculatingIndex: "Calcularea indicelui de sensibilitate...",
+    formingResult: "Pregătirea rezultatului...",
+    yourResult: "Rezultatul tău",
+    tryAgain: "Repetă testul",
+    telegramTitle: "Nu rata furtunile magnetice!",
+    telegramText:
+      "Abonează-te la canalul nostru Telegram și primește prognoze zilnice despre furtuni magnetice direct în messenger.",
+    telegramButton: "Abonează-te pe Telegram",
+    answerOptions: [
+      { label: "Niciodată", value: 0 },
+      { label: "Rar", value: 1 },
+      { label: "Uneori", value: 2 },
+      { label: "Des", value: 3 },
+      { label: "Întotdeauna", value: 4 },
+    ],
+    genderOptions: ["Masculin", "Feminin", "Altul"],
+    activityOptions: ["Scăzută", "Moderată", "Ridicată"],
+    questions: [
+      "Ai dureri de cap în timpul furtunilor magnetice?",
+      "Te simți mai obosit în zilele cu perturbări geomagnetice?",
+      "Ai probleme cu somnul înainte sau în timpul furtunilor magnetice?",
+      "Observi schimbări bruște de dispoziție legate de activitatea solară?",
+      "Simți variații ale tensiunii arteriale în timpul furtunilor?",
+      "Ai amețeli în perioadele de activitate geomagnetică?",
+      "Simți dureri articulare sau musculare în timpul furtunilor magnetice?",
+      "Apare anxietate sau neliniște în timpul furtunilor magnetice?",
+      "Ai dificultăți de concentrare în perioadele cu perturbări geomagnetice?",
+      "Observi tulburări ale ritmului cardiac în timpul furtunilor?",
+      "Simți schimbările de vreme înainte ca ele să apară?",
+      "Se agravează afecțiunile cronice în timpul furtunilor magnetice?",
+    ],
+    labels: {
+      high: "Meteosensibilitate ridicată",
+      highDesc:
+        "Organismul tău pare să reacționeze clar la activitatea geomagnetică. Merită să urmărești prognozele și să îți adaptezi ritmul zilei în perioade active.",
+      moderate: "Meteosensibilitate moderată",
+      moderateDesc:
+        "Ești moderat sensibil la schimbările vremii spațiale. Acordă atenție zilelor cu activitate geomagnetică crescută.",
+      low: "Meteosensibilitate scăzută",
+      lowDesc:
+        "Furtunile magnetice probabil nu îți influențează puternic starea, deși ocazional poți simți un disconfort ușor.",
+      resistant: "Rezistență bună",
+      resistantDesc: "Foarte bine! Activitatea geomagnetică pare să aibă un impact minim asupra organismului tău.",
+    },
+  },
+};
+
+function calculateScore(answers: number[], info: PersonalInfo, locale: LegacyLocale): number {
   const maxRaw = answers.length * 4;
   let raw = answers.reduce((a, b) => a + b, 0);
   const age = parseInt(info.age, 10) || 30;
@@ -319,8 +403,8 @@ function calculateScore(answers: number[], info: PersonalInfo, locale: SiteLocal
 
   if (info.hasChronic) raw += 4;
 
-  const lowActivity = locale === "ru" ? "Низкая" : locale === "pl" ? "Niska" : "Низька";
-  const moderateActivity = locale === "ru" ? "Умеренная" : locale === "pl" ? "Umiarkowana" : "Помірна";
+  const lowActivity = localizedCopy[locale].activityOptions[0];
+  const moderateActivity = localizedCopy[locale].activityOptions[1];
 
   if (info.physicalActivity === lowActivity) raw += 2;
   else if (info.physicalActivity === moderateActivity) raw += 1;
@@ -329,8 +413,8 @@ function calculateScore(answers: number[], info: PersonalInfo, locale: SiteLocal
   return Math.round((adjusted / (maxRaw + 10)) * 100);
 }
 
-function getResultLabel(score: number, locale: SiteLocale) {
-  const t = copy[locale].labels;
+function getResultLabel(score: number, locale: LegacyLocale) {
+  const t = localizedCopy[locale].labels;
   if (score >= 75) return { label: t.high, color: "text-red-400", description: t.highDesc };
   if (score >= 50) return { label: t.moderate, color: "text-orange-400", description: t.moderateDesc };
   if (score >= 25) return { label: t.low, color: "text-yellow-400", description: t.lowDesc };
@@ -338,9 +422,13 @@ function getResultLabel(score: number, locale: SiteLocale) {
 }
 
 const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
-  const t = copy[locale];
+  const t = localizedCopy[locale];
 
-  usePageMeta(t.title, t.description, locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : "/test");
+  usePageMeta(
+    t.title,
+    t.description,
+    locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : locale === "ro" ? "/ro/test" : "/test"
+  );
 
   const [step, setStep] = useState<Step>("info");
   const [currentQ, setCurrentQ] = useState(0);
@@ -410,7 +498,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
     personalInfo.physicalActivity;
 
   const result = getResultLabel(score, locale);
-  const homeHref = locale === "ru" ? "/ru" : "/";
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : "/";
 
   return (
     <div className="min-h-screen bg-background grid-bg">

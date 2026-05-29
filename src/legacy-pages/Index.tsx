@@ -18,6 +18,7 @@ import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/use
 import type { KpEntry, SolarWindEntry, MagEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import type { KpForecastEntry } from "@/hooks/useKpForecast";
 import { CITIES } from "@/data/cities";
+import { CITIES_MD, RO_COUNTRIES } from "@/data/cities-md";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastRouteByKey, getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
@@ -62,10 +63,10 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
     return value;
   };
 
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
   const REFRESH_INTERVAL = 60;
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
-  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : "";
+  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : "";
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -84,11 +85,19 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
   const latestMag = magData?.length ? magData[magData.length - 1] : null;
   const gLevel = scales?.g?.Scale ?? 0;
 
-  const cityList = locale === "ru"
+  const cityList: Array<{ name: string; slug: string; countrySlug?: string }> = locale === "ru"
     ? CITIES.map((c) => ({ name: CITIES_RU[c.slug]?.name || c.name, slug: getRuCitySlug(c) }))
-    : locale === "pl"
-      ? CITIES_PL.map((c) => ({ name: c.name, slug: c.slug }))
+      : locale === "pl"
+        ? CITIES_PL.map((c) => ({ name: c.name, slug: c.slug }))
+      : locale === "ro"
+        ? CITIES_MD.map((c) => ({ name: c.name, slug: c.slug, countrySlug: c.countrySlug }))
       : CITIES.map((c) => ({ name: c.name, slug: c.slug }));
+  const roCountryCityGroups = locale === "ro"
+    ? RO_COUNTRIES.map((country) => ({
+        ...country,
+        cities: cityList.filter((city) => city.countrySlug === country.slug),
+      })).filter((country) => country.cities.length > 0)
+    : [];
   const oblastList = OBLAST_ROUTE_MAP.map((route) => {
     const href =
       locale === "ru"
@@ -180,6 +189,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         aria-label={
           locale === "pl"
             ? "Pogoda kosmiczna w miastach Polski"
+            : locale === "ro"
+              ? "Vreme spațială în orașele Moldovei și României"
             : locale === "ru"
               ? "Космическая погода по областям Украины"
               : "Космічна погода по областях України"
@@ -188,21 +199,52 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         <h2 className="mb-5 text-lg font-display font-semibold text-foreground/90">
           {locale === "pl"
             ? "Pogoda kosmiczna w miastach Polski"
+            : locale === "ro"
+              ? "Vreme spațială în orașele Moldovei și României"
             : locale === "ru"
               ? "Космическая погода по областям Украины"
               : "Космічна погода по областях України"}
         </h2>
-        <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {(locale === "pl" ? cityList : oblastList).map((item) => (
-            <a
-              key={locale === "pl" ? item.slug : item.key}
-              href={locale === "pl" ? `/pl/city/${item.slug}` : item.href}
-              className="whitespace-nowrap text-primary transition-colors hover:text-primary/80 hover:underline"
-            >
-              <span className="font-semibold">{item.name}</span>
-            </a>
-          ))}
-        </div>
+        {locale === "ro" ? (
+          <div className="space-y-8">
+            {roCountryCityGroups.map((country) => (
+              <div key={country.slug} className="space-y-4">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/50 pb-3">
+                  <h3 className="font-display text-base font-semibold text-foreground/90">{country.title}</h3>
+                  <a
+                    href={`/ro/country/${country.slug}`}
+                    className="text-xs font-medium text-muted-foreground transition-colors hover:text-primary hover:underline"
+                  >
+                    Vezi toate orașele
+                  </a>
+                </div>
+                <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+                  {country.cities.map((item) => (
+                    <a
+                      key={item.slug}
+                      href={`/ro/city/${item.slug}`}
+                      className="whitespace-nowrap text-primary transition-colors hover:text-primary/80 hover:underline"
+                    >
+                      <span className="font-semibold">{item.name}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {(locale === "pl" ? cityList : oblastList).map((item) => (
+              <a
+                key={locale === "pl" ? item.slug : item.key}
+                href={locale === "pl" ? `/pl/city/${item.slug}` : item.href}
+                className="whitespace-nowrap text-primary transition-colors hover:text-primary/80 hover:underline"
+              >
+                <span className="font-semibold">{item.name}</span>
+              </a>
+            ))}
+          </div>
+        )}
       </section>
 
       <section className="mx-auto max-w-7xl px-6 py-10" aria-label={t("index.aboutService")}>

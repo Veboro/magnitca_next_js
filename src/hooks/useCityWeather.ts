@@ -88,10 +88,38 @@ const weatherCodeLabels: Record<SiteLocale, Record<number, string>> = {
     96: "Burza z gradem",
     99: "Silna burza z gradem",
   },
+  ro: {
+    0: "Senin",
+    1: "Predominant senin",
+    2: "Parțial noros",
+    3: "Noros",
+    45: "Ceață",
+    48: "Chiciură",
+    51: "Burniță",
+    53: "Burniță moderată",
+    55: "Burniță puternică",
+    61: "Ploaie slabă",
+    63: "Ploaie moderată",
+    65: "Ploaie puternică",
+    66: "Ploaie înghețată",
+    67: "Ploaie înghețată puternică",
+    71: "Ninsoare slabă",
+    73: "Ninsoare moderată",
+    75: "Ninsoare puternică",
+    77: "Măzăriche",
+    80: "Averse",
+    81: "Averse moderate",
+    82: "Averse puternice",
+    85: "Ninsoare",
+    86: "Ninsoare puternică",
+    95: "Furtună",
+    96: "Furtună cu grindină",
+    99: "Furtună puternică cu grindină",
+  },
 };
 
 export const getWeatherLabel = (code: number, locale: SiteLocale = "uk") =>
-  weatherCodeLabels[locale][code] ?? (locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : "Невідомо");
+  weatherCodeLabels[locale][code] ?? (locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : "Невідомо");
 
 export const getWeatherEmoji = (code: number) => {
   if (code === 0) return "☀️";
@@ -107,7 +135,9 @@ export const getWeatherEmoji = (code: number) => {
 };
 
 export const getAqiLabel = (aqi: number, locale: SiteLocale = "uk") => {
-  const labels = locale === "pl"
+  const labels = locale === "ro"
+    ? ["Foarte bună", "Bună", "Moderată", "Slabă", "Foarte slabă", "Periculoasă"]
+    : locale === "pl"
     ? ["Bardzo dobra", "Dobra", "Umiarkowana", "Słaba", "Bardzo słaba", "Niebezpieczna"]
     : locale === "ru"
       ? ["Отличная", "Хорошая", "Умеренная", "Плохая", "Очень плохая", "Опасная"]

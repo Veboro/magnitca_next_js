@@ -9,6 +9,7 @@ import {
 import { HelpCircle, Zap, Heart, Wifi, Sun, Shield, Globe, Activity } from "lucide-react";
 import type { SiteLocale } from "@/lib/locale";
 
+type BaseLocale = Extract<SiteLocale, "uk" | "ru" | "pl">;
 type LegacyLocale = SiteLocale;
 
 type FAQSection = {
@@ -18,7 +19,7 @@ type FAQSection = {
 };
 
 const copy: Record<
-  LegacyLocale,
+  BaseLocale,
   {
     metaTitle: string;
     metaDescription: string;
@@ -421,6 +422,92 @@ const copy: Record<
   },
 };
 
+const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
+  ...copy,
+  ro: {
+    metaTitle: "FAQ — Magnitca Moldova | Întrebări despre furtuni magnetice",
+    metaDescription:
+      "Răspunsuri la întrebări frecvente despre furtuni magnetice, indicele Kp, vânt solar și influența asupra organismului.",
+    heading: "Întrebări frecvente",
+    intro:
+      "Tot ce trebuie să știi despre furtuni magnetice, activitatea solară și influența asupra organismului — explicat simplu.",
+    sections: [
+      {
+        title: "Bazele furtunilor magnetice",
+        icon: Zap,
+        items: [
+          {
+            q: "Ce este o furtună magnetică?",
+            a: "O furtună magnetică este o perturbare temporară a câmpului magnetic al Pământului cauzată de particule încărcate venite de la Soare.",
+          },
+          {
+            q: "Ce este indicele Kp?",
+            a: "Indicele Kp este un indicator global al activității geomagnetice pe o scară de la 0 la 9. De la Kp 5 începe furtuna geomagnetică.",
+          },
+          {
+            q: "Ce înseamnă scara G1-G5?",
+            a: "Scara NOAA clasifică furtunile geomagnetice de la G1 la G5, unde G1 este slabă, iar G5 este extremă.",
+          },
+          {
+            q: "Furtunile magnetice depind de oraș?",
+            a: "Activitatea geomagnetică este globală. Diferențele locale țin mai ales de latitudine, vreme și condițiile de observare, nu de valoarea Kp în sine.",
+          },
+        ],
+      },
+      {
+        title: "Activitatea solară",
+        icon: Sun,
+        items: [
+          {
+            q: "Ce este vântul solar?",
+            a: "Vântul solar este un flux de particule încărcate care pleacă permanent de la Soare. Viteza și densitatea lui influențează presiunea asupra magnetosferei.",
+          },
+          {
+            q: "Ce este componenta Bz?",
+            a: "Bz este componenta verticală a câmpului magnetic interplanetar. Valorile negative cresc probabilitatea unor perturbări geomagnetice.",
+          },
+          {
+            q: "Ce este o erupție solară?",
+            a: "O erupție solară este o eliberare bruscă de energie pe Soare. Erupțiile puternice pot influența comunicațiile radio și vremea spațială.",
+          },
+        ],
+      },
+      {
+        title: "Influența asupra organismului",
+        icon: Heart,
+        items: [
+          {
+            q: "Furtunile magnetice pot afecta starea de bine?",
+            a: "Unele persoane meteosensibile pot simți oboseală, dureri de cap, iritabilitate sau somn mai agitat în perioadele cu activitate geomagnetică ridicată.",
+          },
+          {
+            q: "Ce pot face în zilele active?",
+            a: "Menține un ritm mai calm, hidratează-te, evită suprasolicitarea și urmărește prognoza. Informațiile de pe site nu înlocuiesc sfatul medicului.",
+          },
+        ],
+      },
+      {
+        title: "Date și prognoză",
+        icon: Activity,
+        items: [
+          {
+            q: "De unde provin datele?",
+            a: "Datele despre vremea spațială sunt preluate din surse deschise NOAA SWPC, iar datele meteo locale din surse meteo deschise.",
+          },
+          {
+            q: "Cât de des se actualizează prognoza?",
+            a: "Indicatorii se actualizează regulat în timpul zilei, în funcție de disponibilitatea datelor sursă.",
+          },
+          {
+            q: "Site-ul este gratuit?",
+            a: "Da, informațiile principale sunt disponibile gratuit și nu necesită cont pentru vizualizare.",
+          },
+        ],
+      },
+    ],
+  },
+};
+
 function buildFaqJsonLd(sections: FAQSection[]) {
   return {
     "@context": "https://schema.org",
@@ -439,7 +526,7 @@ function buildFaqJsonLd(sections: FAQSection[]) {
 }
 
 const FAQ = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
-  const t = copy[locale];
+  const t = localizedCopy[locale];
   const faqJsonLd = buildFaqJsonLd(t.sections);
 
   return (

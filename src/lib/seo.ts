@@ -104,10 +104,55 @@ const PL_PAGE_META: Record<string, { title: string; description: string }> = {
   },
 };
 
+const RO_PAGE_META: Record<string, { title: string; description: string }> = {
+  home: {
+    title: "Magnitca Moldova — furtuni magnetice astăzi și prognoza indicelui Kp",
+    description:
+      "Magnitca monitorizează furtunile magnetice, indicele Kp, vântul solar și vremea spațială în timp real pentru Moldova.",
+  },
+  about: {
+    title: "Despre Magnitca Moldova",
+    description: "Informații despre proiectul Magnitca Moldova, sursele de date NOAA și abordarea editorială.",
+  },
+  contacts: {
+    title: "Contacte",
+    description: "Contact cu echipa Magnitca: întrebări, colaborări și raportarea erorilor.",
+  },
+  privacy: {
+    title: "Politica de confidențialitate",
+    description: "Informații despre confidențialitate, analiză și prelucrarea datelor în serviciul Magnitca.",
+  },
+  cookies: {
+    title: "Politica cookie",
+    description: "Informații despre fișierele cookie și instrumentele de analiză folosite de Magnitca.",
+  },
+  terms: {
+    title: "Termeni de utilizare",
+    description: "Reguli de utilizare a serviciului Magnitca, limitări de răspundere și caracterul informativ al conținutului.",
+  },
+  faq: {
+    title: "FAQ despre furtuni magnetice",
+    description: "Întrebări frecvente despre furtuni magnetice, indicele Kp și influența asupra organismului.",
+  },
+  kp_index: {
+    title: "Indice Kp",
+    description: "Indicele Kp curent, grafic și prognoza activității geomagnetice pentru versiunea română Magnitca.",
+  },
+  solar_wind: {
+    title: "Vânt solar",
+    description: "Viteza vântului solar, densitatea și componenta IMF Bz în timp real.",
+  },
+  calendar: {
+    title: "Calendarul furtunilor magnetice",
+    description: "Calendarul activității geomagnetice și prognoza pentru următoarele zile.",
+  },
+};
+
 const OG_LOCALE: Record<SiteLocale, string> = {
   uk: "uk_UA",
   ru: "ru_RU",
   pl: "pl_PL",
+  ro: "ro_MD",
 };
 
 export async function resolveLocalizedMetadata(
@@ -119,12 +164,15 @@ export async function resolveLocalizedMetadata(
   const ukUrl = getPathForLocale(path, "uk");
   const ruUrl = getPathForLocale(path, "ru");
   const plUrl = getPathForLocale(path, "pl");
+  const roUrl = getPathForLocale(path, "ro");
   const meta =
     locale === "uk"
       ? await getPageMeta(pageKey)
       : locale === "ru"
         ? RU_PAGE_META[pageKey]
-        : PL_PAGE_META[pageKey];
+        : locale === "ro"
+          ? RO_PAGE_META[pageKey]
+          : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
   const description = meta?.description || SITE_DESCRIPTION;
   const languages: Record<string, string> = {
@@ -135,6 +183,10 @@ export async function resolveLocalizedMetadata(
 
   if (pageKey !== "news" && pageKey !== "cities") {
     languages.pl = plUrl;
+  }
+
+  if (locale === "ro" || pageKey === "home") {
+    languages.ro = roUrl;
   }
 
   return {

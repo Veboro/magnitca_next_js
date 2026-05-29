@@ -5,7 +5,7 @@ import type { KeyMoonPhase, MoonCalendarDay, MoonMonthRoute } from "@/lib/moon-c
 import { absoluteUrl } from "@/lib/site";
 
 type MoonCalendarPageProps = {
-  locale?: "uk" | "ru" | "pl";
+  locale?: "uk" | "ru" | "pl" | "ro";
   heading?: string;
   introText?: string;
   contextLabel?: string;
@@ -48,12 +48,15 @@ export function MoonCalendarPage({
 }: MoonCalendarPageProps) {
   const isRu = locale === "ru";
   const isPl = locale === "pl";
-  const currentPath = isRu ? "/ru/moon-calendar" : isPl ? "/pl/moon-calendar" : "/moon-calendar";
+  const isRo = locale === "ro";
+  const currentPath = isRu ? "/ru/moon-calendar" : isPl ? "/pl/moon-calendar" : isRo ? "/ro/moon-calendar" : "/moon-calendar";
   const weekdayHeaders = isRu
     ? ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"]
     : isPl
       ? ["Pn", "Wt", "Śr", "Cz", "Pt", "Sb", "Nd"]
-      : ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
+      : isRo
+        ? ["Lu", "Ma", "Mi", "Jo", "Vi", "Sâ", "Du"]
+        : ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"];
   const monthNumber = Number(days[0]?.dateKey.split("-")[1] || "1");
   const t = isRu
     ? {
@@ -127,6 +130,42 @@ export function MoonCalendarPage({
             },
           ],
         }
+      : isRo
+        ? {
+            home: "Acasă",
+            h1: "Calendar lunar",
+            intro:
+              "Fazele Lunii pentru luna curentă, datele importante ale Lunii noi și Lunii pline, plus un calendar vizual pe zile.",
+            today: "Astăzi",
+            currentPhase: "Faza curentă a Lunii",
+            averageLight: "Iluminare medie",
+            averageLightSub: "Pentru zilele lunii curente",
+            keyPhases: "Fazele principale ale lunii",
+            gridTitle: "Fazele Lunii pe zile",
+            monthLabel: "Luna curentă",
+            illum: "Iluminare",
+            faq: "Întrebări frecvente",
+            articleTitle: "Prognoza lunară pentru această lună",
+            monthLinksTitle: "Calendar lunar pe luni 2026",
+            faqItems: [
+              {
+                q: "Ce sunt fazele Lunii?",
+                a: "Fazele Lunii sunt schimbările vizibile ale părții iluminate a discului lunar observate de pe Pământ. Ele apar din cauza poziției Lunii față de Pământ și Soare.",
+              },
+              {
+                q: "Prin ce diferă Luna nouă, Luna plină și pătrarele?",
+                a: "Luna nouă este momentul când partea iluminată aproape nu se vede de pe Pământ. Luna plină înseamnă disc iluminat maxim, iar pătrarele sunt faze intermediare.",
+              },
+              {
+                q: "Ce arată procentul de iluminare?",
+                a: "Procentul de iluminare arată cât din discul vizibil al Lunii este luminat de Soare. Cu cât valoarea este mai mare, cu atât Luna pare mai luminoasă noaptea.",
+              },
+              {
+                q: "Cum se folosește calendarul lunar pe zile?",
+                a: "Calendarul te ajută să vezi rapid faza Lunii pentru o anumită dată, zilele cu faze principale și cât de luminoasă va fi Luna în acea noapte.",
+              },
+            ],
+          }
       : {
         home: "Головна",
         h1: "Місячний календар",
@@ -181,7 +220,7 @@ export function MoonCalendarPage({
         "@type": "ListItem",
         position: 1,
         name: t.home,
-        item: absoluteUrl(isRu ? "/ru" : isPl ? "/pl" : "/"),
+        item: absoluteUrl(isRu ? "/ru" : isPl ? "/pl" : isRo ? "/ro" : "/"),
       },
       {
         "@type": "ListItem",
@@ -192,7 +231,7 @@ export function MoonCalendarPage({
     ],
   };
 
-  const currentPhaseLabel = isRu ? currentPhase.phaseLabelRu : isPl ? currentPhase.phaseLabelPl : currentPhase.phaseLabelUk;
+  const currentPhaseLabel = isRu ? currentPhase.phaseLabelRu : isPl ? currentPhase.phaseLabelPl : isRo ? currentPhase.phaseLabelRo : currentPhase.phaseLabelUk;
   const resolvedHeading = heading ?? t.h1;
   const resolvedIntro = introText ?? t.intro;
   const resolvedContextLabel = contextLabel ?? t.today;
@@ -253,7 +292,21 @@ export function MoonCalendarPage({
       11: { first: "Skorpion", second: "Strzelec" },
       12: { first: "Strzelec", second: "Koziorożec" },
     };
-    return isRu ? ruMap[month] : isPl ? plMap[month] : ukMap[month];
+    const roMap: Record<number, { first: string; second: string }> = {
+      1: { first: "Capricorn", second: "Vărsător" },
+      2: { first: "Vărsător", second: "Pești" },
+      3: { first: "Pești", second: "Berbec" },
+      4: { first: "Berbec", second: "Taur" },
+      5: { first: "Taur", second: "Gemeni" },
+      6: { first: "Gemeni", second: "Rac" },
+      7: { first: "Rac", second: "Leu" },
+      8: { first: "Leu", second: "Fecioară" },
+      9: { first: "Fecioară", second: "Balanță" },
+      10: { first: "Balanță", second: "Scorpion" },
+      11: { first: "Scorpion", second: "Săgetător" },
+      12: { first: "Săgetător", second: "Capricorn" },
+    };
+    return isRu ? ruMap[month] : isPl ? plMap[month] : isRo ? roMap[month] : ukMap[month];
   }
 
   const zodiac = getZodiacPair(monthNumber);
@@ -268,7 +321,12 @@ export function MoonCalendarPage({
           `${capitalizedMonthLabel} przebiega pod wyraźnym wpływem czterech głównych faz Księżyca. Nów wypada ${newMoonDay} dnia miesiąca, pierwsza kwadra ${firstQuarterDay}, pełnia ${fullMoonDay}, a ostatnia kwadra ${lastQuarterDay}. W pierwszej części miesiąca tarcza Księżyca stopniowo staje się jaśniejsza, dlatego nocne niebo bywa bardziej rozświetlone i lepiej nadaje się do obserwacji przybywającego Księżyca. W okolicach pełni jasność osiąga maksimum, a później Księżyc zaczyna ubywać i noce stają się znowu ciemniejsze.`,
           `Pod względem bardziej astrologicznego tła miesiąc przebiega na styku znaków ${zodiac.first} i ${zodiac.second}. Zwykle do trzeciej dekady mocniej odczuwalna jest energia pierwszego znaku, a potem akcent przesuwa się na drugi. Dzięki temu kalendarz można traktować nie tylko jako listę faz, ale też jako praktyczny przewodnik do planowania obserwacji nieba, wieczornej aktywności i oceny, jak jasny będzie Księżyc w konkretnych dniach miesiąca.`,
         ]
-      : [
+      : isRo
+        ? [
+            `${capitalizedMonthLabel} este marcată de patru faze principale ale Lunii. Luna nouă este așteptată în ziua ${newMoonDay}, primul pătrar în ziua ${firstQuarterDay}, Luna plină în ziua ${fullMoonDay}, iar ultimul pătrar în ziua ${lastQuarterDay}. În prima parte a lunii, discul lunar devine treptat mai luminos, iar nopțile sunt mai potrivite pentru observarea Lunii în creștere. În jurul Lunii pline iluminarea atinge maximul, apoi Luna începe să descrească.`,
+            `Din punct de vedere al fundalului astrologic general, luna trece prin influența semnelor ${zodiac.first} și ${zodiac.second}. Calendarul poate fi folosit nu doar ca listă de faze, ci și ca reper practic pentru observarea cerului, fotografii nocturne și planificarea activităților de seară.`,
+          ]
+        : [
         `${capitalizedMonthLabel} проходить під помітним впливом чотирьох ключових фаз Місяця. Молодик очікується ${newMoonDay} числа, перша чверть припадає на ${firstQuarterDay}, повня — на ${fullMoonDay}, а остання чверть — на ${lastQuarterDay}. У першій частині місяця місячний диск поступово набирає яскравість, тому нічне небо стає світлішим і краще підходить для спостереження за зростаючим Місяцем. Ближче до повні освітленість досягає максимуму, а після неї Місяць починає спадати й ночі знову стають темнішими.`,
         `З погляду загального астрологічного фону місяць проходить на стику знаків ${zodiac.first} і ${zodiac.second}. Зазвичай до третьої декади сильніше відчувається енергія першого знака, а далі акцент зміщується до другого. Тому цей календар зручно використовувати не лише як список фаз Місяця, а і як орієнтир для планування спостережень, вечірньої активності та розуміння того, наскільки яскравим буде Місяць у конкретні дати місяця.`,
       ];
@@ -280,7 +338,7 @@ export function MoonCalendarPage({
 
       <header className="space-y-3">
         <nav className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
-          <Link href={isRu ? "/ru" : isPl ? "/pl" : "/"} className="transition-colors hover:text-foreground">
+          <Link href={isRu ? "/ru" : isPl ? "/pl" : isRo ? "/ro" : "/"} className="transition-colors hover:text-foreground">
             {t.home}
           </Link>
           <span>/</span>
@@ -346,11 +404,11 @@ export function MoonCalendarPage({
             <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {monthLinks.map((item) => (
                 <Link
-                  key={isRu ? item.slugRu : isPl ? item.slugPl : item.slugUk}
-                  href={isRu ? item.hrefRu : isPl ? item.hrefPl : item.hrefUk}
+                  key={isRu ? item.slugRu : isPl ? item.slugPl : isRo ? item.slugRo : item.slugUk}
+                  href={isRu ? item.hrefRu : isPl ? item.hrefPl : isRo ? item.hrefRo : item.hrefUk}
                   className="rounded-xl border border-border/40 bg-background/40 px-4 py-3 text-sm text-foreground transition-colors hover:border-primary/40 hover:text-primary"
                 >
-                  {isRu ? item.labelRu : isPl ? item.labelPl : item.labelUk}
+                  {isRu ? item.labelRu : isPl ? item.labelPl : isRo ? item.labelRo : item.labelUk}
                 </Link>
               ))}
             </div>
@@ -373,10 +431,10 @@ export function MoonCalendarPage({
                 </span>
               </div>
               <h3 className="mt-4 text-lg font-semibold text-foreground">
-                {isRu ? phase.day.phaseLabelRu : isPl ? phase.day.phaseLabelPl : phase.day.phaseLabelUk}
+                {isRu ? phase.day.phaseLabelRu : isPl ? phase.day.phaseLabelPl : isRo ? phase.day.phaseLabelRo : phase.day.phaseLabelUk}
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                {isRu ? phase.day.weekdayShortRu : isPl ? phase.day.weekdayShortPl : phase.day.weekdayShortUk}, {phase.day.dayNumber}
+                {isRu ? phase.day.weekdayShortRu : isPl ? phase.day.weekdayShortPl : isRo ? phase.day.weekdayShortRo : phase.day.weekdayShortUk}, {phase.day.dayNumber}
               </p>
               <p className="mt-3 text-sm text-muted-foreground">
                 {t.illum}: <span className="font-medium text-foreground">{phase.day.illuminationPercent}%</span>
@@ -415,7 +473,7 @@ export function MoonCalendarPage({
                 >
                   <div className="text-center">
                     <p className="text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
-                      {isRu ? day.weekdayShortRu : isPl ? day.weekdayShortPl : day.weekdayShortUk}
+                      {isRu ? day.weekdayShortRu : isPl ? day.weekdayShortPl : isRo ? day.weekdayShortRo : day.weekdayShortUk}
                     </p>
                     <p className="mt-1 font-display text-lg font-bold text-foreground">{day.dayNumber}</p>
                     <div className="mt-1 text-2xl leading-none">{day.phaseEmoji}</div>
@@ -457,7 +515,7 @@ export function MoonCalendarPage({
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                          {isRu ? day.weekdayShortRu : isPl ? day.weekdayShortPl : day.weekdayShortUk}
+                          {isRu ? day.weekdayShortRu : isPl ? day.weekdayShortPl : isRo ? day.weekdayShortRo : day.weekdayShortUk}
                         </p>
                         <p className="mt-2 font-display text-2xl font-bold text-foreground">{day.dayNumber}</p>
                       </div>
@@ -465,7 +523,7 @@ export function MoonCalendarPage({
                     </div>
                     <div className="mt-4 space-y-1">
                       <p className="text-sm font-medium text-foreground">
-                        {isRu ? day.phaseLabelRu : isPl ? day.phaseLabelPl : day.phaseLabelUk}
+                        {isRu ? day.phaseLabelRu : isPl ? day.phaseLabelPl : isRo ? day.phaseLabelRo : day.phaseLabelUk}
                       </p>
                       <p className="text-sm text-muted-foreground">
                         {t.illum}: {day.illuminationPercent}%

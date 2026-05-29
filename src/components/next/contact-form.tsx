@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { CheckCircle, Loader2, Send } from "lucide-react";
 
-type ContactFormLocale = "uk" | "ru" | "pl";
+type ContactFormLocale = "uk" | "ru" | "pl" | "ro";
 
 const copy: Record<
   ContactFormLocale,
@@ -58,6 +58,19 @@ const copy: Record<
     message: "Wiadomosc",
     sending: "Wysylanie...",
     send: "Wyslij wiadomosc",
+  },
+  ro: {
+    sendError: "Nu am reușit să trimitem mesajul.",
+    unknownError: "A apărut o eroare la trimitere.",
+    successTitle: "Mulțumim pentru mesaj",
+    successText:
+      "Mesajul a fost trimis. Dacă este urgent, scrie-ne și la",
+    sendAnother: "Trimite încă un mesaj",
+    name: "Numele tău",
+    email: "Email",
+    message: "Mesaj",
+    sending: "Se trimite...",
+    send: "Trimite mesajul",
   },
 };
 

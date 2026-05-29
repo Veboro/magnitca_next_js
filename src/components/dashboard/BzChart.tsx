@@ -4,12 +4,23 @@ import { Line, LineChart, CartesianGrid, ResponsiveContainer, Tooltip as Rechart
 
 export const BzChart = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
+  const locale = i18n.language.startsWith("ru")
+    ? "ru-RU"
+    : i18n.language.startsWith("pl")
+      ? "pl-PL"
+      : i18n.language.startsWith("ro")
+        ? "ro-MD"
+        : "uk-UA";
+  const timeZone = i18n.language.startsWith("pl")
+    ? "Europe/Warsaw"
+    : i18n.language.startsWith("ro")
+      ? "Europe/Chisinau"
+      : "Europe/Kyiv";
   const { data: rawData, isLoading } = useMagData();
 
   const toTime = (utc: string) => {
     const d = new Date(utc.includes("T") ? utc : utc.replace(" ", "T") + "Z");
-    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone: i18n.language === "pl" ? "Europe/Warsaw" : "Europe/Kyiv" });
+    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone });
   };
 
   const chartData = (rawData || []).filter((_, i) => i % 3 === 0).map((d) => ({ time: toTime(d.time_tag), bz: d.bz }));
