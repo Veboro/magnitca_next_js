@@ -15,12 +15,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const route = findMoonMonthRouteBySlug("ro", slug);
   if (!route) return {};
 
-  const title = `Calendar lunar pentru ${route.labelRo}`;
+  const title = `Calendar lunar pentru ${route.labelRo} — fazele Lunii pe zile`;
   const description = `Calendar lunar pentru ${route.labelRo}: fazele Lunii pe zile, Luna nouă, Luna plină, pătrarele și iluminarea discului lunar.`;
 
   return {
     title: {
-      absolute: `${title} | Magnitca Moldova`,
+      absolute: `${title} | Magnitca`,
     },
     description,
     alternates: {

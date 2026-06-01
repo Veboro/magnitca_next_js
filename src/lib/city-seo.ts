@@ -33,18 +33,18 @@ export function isOblastCenterSlug(slug: string) {
 
 export function buildUkCitySeoTitle(slug: string, name: string, nameGenitive: string) {
   if (isOblastCenterSlug(slug)) {
-    return `Магнітні бурі в ${nameGenitive} сьогодні, kp-індекс та сонячний вітер`;
+    return `Магнітні бурі в ${nameGenitive} сьогодні — Kp-індекс та сонячний вітер`;
   }
 
-  return `${name}: магнітні бурі сьогодні, прогноз на 3 та 27 днів`;
+  return `${name}: магнітні бурі сьогодні, прогноз Kp на 3 та 27 днів`;
 }
 
 export function buildRuCitySeoTitle(slug: string, name: string, nameGenitive: string) {
   if (isOblastCenterSlug(slug)) {
-    return `Магнитные бури в ${nameGenitive} сегодня, kp-индекс и солнечный ветер`;
+    return `Магнитные бури в ${nameGenitive} сегодня — Kp-индекс и солнечный ветер`;
   }
 
-  return `${name}: магнитные бури сегодня, прогноз на 3 и 27 дней`;
+  return `${name}: магнитные бури сегодня, прогноз Kp на 3 и 27 дней`;
 }
 
 export function buildUkCitySeoDescription(slug: string, name: string, nameGenitive: string) {

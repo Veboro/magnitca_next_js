@@ -506,6 +506,142 @@ const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
       },
     ],
   },
+  hu: {
+    metaTitle: "GYIK — Magnitca Magyarország | Kérdések a mágneses viharokról",
+    metaDescription:
+      "Válaszok a mágneses viharokkal, Kp-indexszel, napszéllel és a szervezetre gyakorolt hatással kapcsolatos gyakori kérdésekre.",
+    heading: "Gyakori kérdések",
+    intro:
+      "Rövid, érthető magyarázatok a mágneses viharokról, a naptevékenységről, a Kp-indexről és az űridőjárás hatásairól.",
+    sections: [
+      {
+        title: "A mágneses viharok alapjai",
+        icon: Zap,
+        items: [
+          {
+            q: "Mi az a mágneses vihar?",
+            a: "A mágneses vihar a Föld mágneses terének átmeneti zavara, amelyet a Napból érkező töltött részecskék okoznak.",
+          },
+          {
+            q: "Mi az a Kp-index?",
+            a: "A Kp-index a globális geomágneses aktivitás 0 és 9 közötti mutatója. A 0-3 érték nyugodtnak számít, 5 felett pedig már geomágneses viharról beszélünk.",
+          },
+          {
+            q: "Mit jelent a G1-G5 skála?",
+            a: "A NOAA G-skála a geomágneses viharok erősségét jelöli. A G1 gyenge vihart, a G5 extrém vihart jelent.",
+          },
+          {
+            q: "Milyen gyakran fordulnak elő mágneses viharok?",
+            a: "Ez a Nap körülbelül 11 éves aktivitási ciklusától függ. Napmaximum idején gyakoribbak az erősebb geomágneses zavarok, napminimum idején pedig ritkábban fordulnak elő jelentős viharok.",
+          },
+          {
+            q: "Függ a mágneses vihar egy adott várostól vagy országtól?",
+            a: "A Kp-index globális mutató, ezért maga a geomágneses aktivitás nem városonként változik. A különbség inkább abban van, hogy a földrajzi szélesség, az időjárás és a helyi körülmények befolyásolják például a sarki fény megfigyelhetőségét.",
+          },
+        ],
+      },
+      {
+        title: "Naptevékenység",
+        icon: Sun,
+        items: [
+          {
+            q: "Mi a napszél?",
+            a: "A napszél töltött részecskék folyamatos áramlása a Napból. Sebessége és sűrűsége befolyásolja, mekkora nyomás éri a Föld magnetoszféráját.",
+          },
+          {
+            q: "Mi az IMF Bz komponens?",
+            a: "A Bz az interplanetáris mágneses tér függőleges komponense. A negatív, déli irányú értékek növelhetik a geomágneses zavar esélyét.",
+          },
+          {
+            q: "Miért változik napközben az előrejelzés?",
+            a: "Az űridőjárás dinamikus. A napszél, a Bz komponens és a NOAA-előrejelzések új mérések alapján frissülhetnek.",
+          },
+          {
+            q: "Mi az a koronakidobódás?",
+            a: "A koronakidobódás, vagy CME, a Napból kilökődő nagy mennyiségű plazma és mágneses tér. Ha a Föld felé halad, 1-3 nap múlva geomágneses vihart okozhat.",
+          },
+          {
+            q: "Mik a napkitörések?",
+            a: "A napkitörések hirtelen energiafelszabadulások a Nap felszínén és légkörében. Erős kitörések rádiózavarokat okozhatnak, és ha anyagkidobódással járnak, a későbbi geomágneses aktivitást is befolyásolhatják.",
+          },
+          {
+            q: "Mit jelentenek az R és S skálák?",
+            a: "Az R-skála a rádiókommunikációt érintő napkitöréses zavarokat, az S-skála pedig a sugárzási viharokat jelöli. Ezek főleg műholdakra, rádiózásra, repülésre és űreszközökre lehetnek fontosak.",
+          },
+        ],
+      },
+      {
+        title: "Hatás a közérzetre",
+        icon: Heart,
+        items: [
+          {
+            q: "Érezhetők a mágneses viharok?",
+            a: "Egyes időjárásra érzékeny emberek fáradtságot, fejfájást, ingerlékenységet vagy nyugtalanabb alvást tapasztalhatnak emelkedett geomágneses aktivitás idején.",
+          },
+          {
+            q: "Mit érdemes tenni aktív napokon?",
+            a: "Érdemes nyugodtabb tempót tartani, elegendő vizet inni, kerülni a túlterhelést és figyelni az előrejelzést. A webhely nem helyettesíti az orvosi tanácsot.",
+          },
+          {
+            q: "Kik lehetnek érzékenyebbek a geomágneses aktivitásra?",
+            a: "Gyakrabban említik az idősebbeket, a szív- és érrendszeri problémákkal élőket, a krónikus betegséggel rendelkezőket és az időjárás-változásokra egyébként is érzékeny embereket. A reakció azonban nagyon egyéni.",
+          },
+          {
+            q: "Orvosi tanácsnak számítanak ezek az információk?",
+            a: "Nem. A Magnitca tájékoztató adatokat és általános magyarázatokat ad. Tartós panaszok, erős tünetek vagy krónikus betegség esetén mindig orvossal érdemes egyeztetni.",
+          },
+        ],
+      },
+      {
+        title: "Hatás technológiára",
+        icon: Wifi,
+        items: [
+          {
+            q: "Befolyásolhatja a mágneses vihar a GPS-t?",
+            a: "Erősebb geomágneses viharok idején az ionoszféra zavarai ronthatják a műholdas navigáció pontosságát. A mindennapi használatban ez gyakran nem látványos, de professzionális rendszereknél fontos lehet.",
+          },
+          {
+            q: "Hat a mágneses vihar a mobiltelefonokra?",
+            a: "A hétköznapi telefonok közvetlenül általában nem sérülnek. Erős viharok idején azonban bizonyos kommunikációs vagy navigációs rendszerek pontossága romolhat.",
+          },
+          {
+            q: "Miért figyelik az energiarendszerek az űridőjárást?",
+            a: "Nagyon erős geomágneses viharok elektromos áramokat indukálhatnak nagy kiterjedésű vezető rendszerekben, például távvezetékekben. Emiatt az energiaszektor számára a G-skála figyelése fontos kockázatkezelési eszköz.",
+          },
+        ],
+      },
+      {
+        title: "Adatok és előrejelzés",
+        icon: Activity,
+        items: [
+          {
+            q: "Honnan származnak az adatok?",
+            a: "Az űridőjárási adatok nyílt NOAA SWPC forrásokból származnak. A Magnitca ezeket érthetőbb formában jeleníti meg.",
+          },
+          {
+            q: "Milyen gyakran frissülnek az adatok?",
+            a: "A mutatók a forrásadatok elérhetőségétől függően rendszeresen frissülnek a nap folyamán.",
+          },
+          {
+            q: "Ingyenes a szolgáltatás?",
+            a: "Igen, a fő információk ingyenesen, regisztráció nélkül elérhetők.",
+          },
+          {
+            q: "Mennyire pontos a 3 napos előrejelzés?",
+            a: "A rövidebb távú előrejelzés általában hasznosabb, mert több friss mérés áll rendelkezésre. Ennek ellenére az űridőjárás gyorsan változhat, ezért a számokat aktuális helyzetképnek érdemes tekinteni.",
+          },
+          {
+            q: "Miért térhet el a jelenlegi Kp és a napi maximum?",
+            a: "A jelenlegi Kp az aktuális állapotot mutatja, míg a napi maximum az adott napra várt vagy már mért legmagasabb érték. Ezért előfordulhat, hogy reggel magasabb volt az aktivitás, délután pedig már nyugodtabb a helyzet.",
+          },
+          {
+            q: "Használható a Magnitca kritikus döntésekhez?",
+            a: "Kritikus műszaki, repülési, energetikai vagy egészségügyi döntésekhez mindig az elsődleges hivatalos forrásokat és szakmai protokollokat kell ellenőrizni. A Magnitca célja a közérthető tájékoztatás.",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 function buildFaqJsonLd(sections: FAQSection[]) {

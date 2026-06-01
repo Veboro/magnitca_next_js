@@ -1,7 +1,7 @@
 import type { CityConfig } from "./cities";
 
 function buildRoSeoTitle(name: string, country: string) {
-  return `Furtuni magnetice în ${name}, ${country} astăzi, indice Kp și vânt solar`;
+  return `${name}, ${country}: furtuni magnetice astăzi, prognoza Kp pe 3 și 27 de zile`;
 }
 
 function buildRoSeoDescription(name: string, country: string) {

@@ -19,6 +19,7 @@ import type { KpEntry, SolarWindEntry, MagEntry, NoaaScales } from "@/hooks/useS
 import type { KpForecastEntry } from "@/hooks/useKpForecast";
 import { CITIES } from "@/data/cities";
 import { CITIES_MD, RO_COUNTRIES } from "@/data/cities-md";
+import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastRouteByKey, getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
@@ -63,10 +64,10 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
     return value;
   };
 
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
   const REFRESH_INTERVAL = 60;
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
-  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : "";
+  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "";
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -91,6 +92,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         ? CITIES_PL.map((c) => ({ name: c.name, slug: c.slug }))
       : locale === "ro"
         ? CITIES_MD.map((c) => ({ name: c.name, slug: c.slug, countrySlug: c.countrySlug }))
+      : locale === "hu"
+        ? CITIES_HU.map((c) => ({ name: c.name, slug: c.slug }))
       : CITIES.map((c) => ({ name: c.name, slug: c.slug }));
   const roCountryCityGroups = locale === "ro"
     ? RO_COUNTRIES.map((country) => ({
@@ -191,6 +194,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
             ? "Pogoda kosmiczna w miastach Polski"
             : locale === "ro"
               ? "Vreme spațială în orașele Moldovei și României"
+            : locale === "hu"
+              ? "Űridőjárás Magyarországon"
             : locale === "ru"
               ? "Космическая погода по областям Украины"
               : "Космічна погода по областях України"
@@ -201,6 +206,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
             ? "Pogoda kosmiczna w miastach Polski"
             : locale === "ro"
               ? "Vreme spațială în orașele Moldovei și României"
+            : locale === "hu"
+              ? "Űridőjárás Magyarországon"
             : locale === "ru"
               ? "Космическая погода по областям Украины"
               : "Космічна погода по областях України"}
@@ -234,10 +241,10 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
           </div>
         ) : (
           <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {(locale === "pl" ? cityList : oblastList).map((item) => (
+            {(locale === "pl" || locale === "hu" ? cityList : oblastList).map((item) => (
               <a
-                key={locale === "pl" ? item.slug : item.key}
-                href={locale === "pl" ? `/pl/city/${item.slug}` : item.href}
+                key={locale === "pl" || locale === "hu" ? item.slug : item.key}
+                href={locale === "pl" ? `/pl/city/${item.slug}` : locale === "hu" ? `/hu/city/${item.slug}` : item.href}
                 className="whitespace-nowrap text-primary transition-colors hover:text-primary/80 hover:underline"
               >
                 <span className="font-semibold">{item.name}</span>

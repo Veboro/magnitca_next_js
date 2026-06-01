@@ -116,10 +116,38 @@ const weatherCodeLabels: Record<SiteLocale, Record<number, string>> = {
     96: "Furtună cu grindină",
     99: "Furtună puternică cu grindină",
   },
+  hu: {
+    0: "Derült",
+    1: "Többnyire derült",
+    2: "Változóan felhős",
+    3: "Borult",
+    45: "Köd",
+    48: "Zúzmara",
+    51: "Szitálás",
+    53: "Mérsékelt szitálás",
+    55: "Erős szitálás",
+    61: "Gyenge eső",
+    63: "Mérsékelt eső",
+    65: "Erős eső",
+    66: "Ónos eső",
+    67: "Erős ónos eső",
+    71: "Gyenge havazás",
+    73: "Mérsékelt havazás",
+    75: "Erős havazás",
+    77: "Hódara",
+    80: "Zápor",
+    81: "Mérsékelt zápor",
+    82: "Erős zápor",
+    85: "Hózápor",
+    86: "Erős hózápor",
+    95: "Zivatar",
+    96: "Zivatar jégesővel",
+    99: "Erős zivatar jégesővel",
+  },
 };
 
 export const getWeatherLabel = (code: number, locale: SiteLocale = "uk") =>
-  weatherCodeLabels[locale][code] ?? (locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : "Невідомо");
+  weatherCodeLabels[locale][code] ?? (locale === "hu" ? "Ismeretlen" : locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : "Невідомо");
 
 export const getWeatherEmoji = (code: number) => {
   if (code === 0) return "☀️";

@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar } from "@/hooks/useStormCalendar";
 import type { StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
-import { pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
+import { hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
 
@@ -47,6 +47,13 @@ const levelLabels = {
     moderate: "Furtună moderată (Kp5)",
     strong: "Furtună puternică (Kp6-7)",
     severe: "Furtună extremă (Kp8-9)",
+  },
+  hu: {
+    none: "Nyugodt",
+    minor: "Gyenge vihar (Kp4)",
+    moderate: "Mérsékelt vihar (Kp5)",
+    strong: "Erős vihar (Kp6-7)",
+    severe: "Extrém vihar (Kp8-9)",
   },
 };
 
@@ -143,12 +150,32 @@ const localizedCopy = {
     seo3:
       "Calendarul este actualizat automat pe baza datelor NOAA Space Weather Prediction Center și poate fi folosit pentru planificare și monitorizarea stării de bine.",
   },
+  hu: {
+    badge: "MÁGNESES VIHAR NAPTÁR",
+    pageTitlePrefix: "Mágneses vihar naptár",
+    pageTitleSuffix: "— Magnitca Magyarország",
+    pageDescriptionPrefix: "Mágneses vihar naptár",
+    pageDescriptionSuffix: "A geomágneses zavarok napjai intenzitás szerint vannak jelölve.",
+    intro:
+      "A mágneses viharok napjai színnel jelennek meg az intenzitás szerint. A szaggatott keret a következő napokra vonatkozó előrejelzést jelöli.",
+    forecast: "Előrejelzés",
+    disturbanceDays: "Geomágneses zavarok napjai",
+    forecastBadge: "előrejelzés",
+    seo1Prefix: "Ezen az oldalon látható a",
+    seo1StrongPrefix: "mágneses vihar naptár",
+    seo1Rest:
+      "a napi geomágneses aktivitási adatokkal. Az emelkedett aktivitású napok színnel vannak jelölve: a gyengébb zavaroktól az extrém viharokig.",
+    seo2:
+      "A geomágneses viharokat a planetáris Kp-index és a NOAA G-skála alapján értékeljük. Kp 5-től beszélünk geomágneses viharról, magasabb értékeknél pedig nőhet a technológiai és közérzeti hatás esélye.",
+    seo3:
+      "A naptár NOAA Space Weather Prediction Center adatok alapján frissül, és praktikus áttekintést ad a következő napok várható aktivitásáról.",
+  },
 };
 
 export default function StormCalendar({ locale = "uk", initialData }: { locale?: LegacyLocale; initialData?: StormDay[] | null }) {
   const t = localizedCopy[locale];
-  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : uk;
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : uk;
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 
@@ -343,7 +370,16 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
             "@type": "WebPage",
             name: `${t.pageTitlePrefix} ${monthNameGenitive} ${t.pageTitleSuffix}`,
             description: `${t.pageDescriptionPrefix} ${monthNameGenitive}. ${t.pageDescriptionSuffix}`,
-            url: locale === "ru" ? "https://magnetic-storm-hub.lovable.app/ru/calendar" : "https://magnetic-storm-hub.lovable.app/calendar",
+            url:
+              locale === "ru"
+                ? "https://magnetic-storm-hub.lovable.app/ru/calendar"
+                : locale === "pl"
+                  ? "https://magnetic-storm-hub.lovable.app/pl/calendar"
+                  : locale === "ro"
+                    ? "https://magnetic-storm-hub.lovable.app/ro/calendar"
+                    : locale === "hu"
+                      ? "https://magnetic-storm-hub.lovable.app/hu/calendar"
+                      : "https://magnetic-storm-hub.lovable.app/calendar",
           }),
         }}
       />

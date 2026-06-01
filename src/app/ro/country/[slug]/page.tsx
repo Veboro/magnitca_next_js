@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 
   return {
-    title: `${country.title} | Magnitca`,
+    title: `${country.title} — furtuni magnetice și prognoza Kp | Magnitca`,
     description: `${country.description} Lista orașelor cu prognoza indicelui Kp, vânt solar și activitate geomagnetică.`,
     alternates: {
       canonical: `/ro/country/${country.slug}`,

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 
-type SiteLocale = "uk" | "ru" | "pl" | "ro";
+type SiteLocale = "uk" | "ru" | "pl" | "ro" | "hu";
 
 const copy = {
   uk: {
@@ -36,6 +36,14 @@ const copy = {
     pressureRange: "variație",
     currentPressure: "presiune acum",
     total: "Influență totală",
+  },
+  hu: {
+    title: "Hatás a szervezetre",
+    magnetic: "Mágneses viharok",
+    pressure: "Légnyomás",
+    pressureRange: "ingadozás",
+    currentPressure: "aktuális nyomás",
+    total: "Összhatás",
   },
 } as const;
 

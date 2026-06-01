@@ -25,7 +25,7 @@
     --secondary-foreground: 155 19% 18%;
 
     --muted: 120 8% 89%;
-    --muted-foreground: 155 8% 34%;
+    --muted-foreground: 155 10% 24%;
 
     --accent: 145 22% 90%;
     --accent-foreground: 145 67% 26%;
@@ -165,7 +165,7 @@
   }
 
   :root:not(.dark) .text-muted-foreground {
-    color: hsl(155 8% 32%);
+    color: hsl(155 10% 22%);
   }
 
   h1, h2, h3, h4, h5, h6 {

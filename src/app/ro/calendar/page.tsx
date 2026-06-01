@@ -3,7 +3,7 @@ import StormCalendarClient from "@/legacy-pages/StormCalendar";
 import { getStormCalendarData } from "@/lib/space-weather-cache";
 
 export const metadata: Metadata = {
-  title: "Calendarul furtunilor magnetice — Magnitca Moldova",
+  title: "Calendarul furtunilor magnetice — prognoza activității geomagnetice | Magnitca",
   description: "Calendarul activității geomagnetice și prognoza furtunilor magnetice pentru următoarele zile.",
   alternates: {
     canonical: "/ro/calendar",

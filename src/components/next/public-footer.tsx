@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getPathForLocale, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 
 const copy: Record<
   SiteLocale,
@@ -52,11 +52,20 @@ const copy: Record<
     rss: "RSS",
     copyright: "Magnitca. Date NOAA SWPC și Open-Meteo.",
   },
+  hu: {
+    contacts: "Kapcsolat",
+    about: "A projektről",
+    privacy: "Adatvédelmi irányelvek",
+    cookies: "Cookie-szabályzat",
+    terms: "Felhasználási feltételek",
+    rss: "RSS",
+    copyright: "Magnitca. NOAA SWPC és Open-Meteo adatok.",
+  },
 };
 
 export function PublicFooter() {
   const pathname = usePathname();
-  const locale: SiteLocale = pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   return (
     <footer className="border-t border-border/30">
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-muted-foreground">

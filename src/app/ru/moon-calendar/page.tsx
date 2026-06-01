@@ -6,7 +6,7 @@ import { absoluteUrl } from "@/lib/site";
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Лунный календарь — фазы Луны на текущий месяц";
+  const title = "Лунный календарь сегодня — фазы Луны по дням";
   const description =
     "Лунный календарь на текущий месяц: фазы Луны по дням, новолуние, полнолуние, четверти и освещенность лунного диска.";
 

@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const route = findMoonMonthRouteBySlug("pl", slug);
   if (!route) return {};
 
-  const title = `Kalendarz księżycowy na ${route.labelPl}`;
+  const title = `Kalendarz księżycowy na ${route.labelPl} — fazy Księżyca dzień po dniu`;
   const description = `Kalendarz księżycowy na ${route.labelPl}: fazy Księżyca dzień po dniu, nów, pełnia, kwadry i oświetlenie tarczy księżycowej.`;
 
   return {

@@ -390,6 +390,85 @@ const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
       resistantDesc: "Foarte bine! Activitatea geomagnetică pare să aibă un impact minim asupra organismului tău.",
     },
   },
+  hu: {
+    title: "Meteoérzékenységi teszt — Magnitca Magyarország",
+    description:
+      "Ingyenes meteoérzékenységi teszt. Tudd meg, mennyire érzékenyen reagálhat a szervezeted a mágneses viharokra és a geomágneses aktivitásra.",
+    backHome: "Vissza a főoldalra",
+    heading: "Meteoérzékenységi teszt",
+    subtitle:
+      "Tudd meg, mennyire érzékeny a szervezeted a mágneses viharokra. A teszt 2-3 percet vesz igénybe.",
+    introTitle: "Hogyan működik a teszt",
+    introText:
+      "A teszt tájékoztató becslést ad arról, mennyire reagálhatsz a geomágneses változásokra, légnyomás-ingadozásokra és kapcsolódó tünetekre.",
+    howItWorksTitle: "Mit vesz figyelembe",
+    howItWorksItems: [
+      "szokásos reakcióid mágneses viharokra és időjárási változásokra",
+      "életkor, fizikai aktivitás és krónikus állapotok jelenléte",
+      "tünetek gyakorisága: fejfájás, fáradtság, álmatlanság, vérnyomás-ingadozás, szorongás",
+    ],
+    resultsInfoTitle: "Mit jelent az eredmény",
+    resultsInfoText:
+      "A válaszok után százalékos becslést kapsz a meteoérzékenységedről. Minél magasabb az érték, annál valószínűbb, hogy a geomágneses aktivitás vagy a hirtelen időjárási változások hatnak a közérzetedre.",
+    disclaimerTitle: "Fontos",
+    disclaimerText:
+      "Ez nem orvosi diagnózis és nem helyettesíti az orvosi konzultációt. A teszt csak tájékoztató becslést ad.",
+    yourName: "Neved",
+    enterName: "Írd be a neved",
+    age: "Életkor",
+    gender: "Nem",
+    physicalActivity: "Fizikai aktivitás szintje",
+    hasChronic: "Van krónikus betegségem (szív- és érrendszeri, neurológiai stb.)",
+    startTest: "Teszt indítása",
+    questionProgress: "Kérdés",
+    analyzing: "Elemezzük a válaszaidat...",
+    processingPersonal: "Személyes adatok feldolgozása...",
+    comparingMeteo: "Összevetés meteorológiai adatokkal...",
+    calculatingIndex: "Érzékenységi index számítása...",
+    formingResult: "Eredmény összeállítása...",
+    yourResult: "Az eredményed",
+    tryAgain: "Teszt újra",
+    telegramTitle: "Ne maradj le a mágneses viharokról!",
+    telegramText:
+      "Iratkozz fel Telegram csatornánkra, és kapj napi előrejelzést a mágneses viharokról.",
+    telegramButton: "Feliratkozás Telegramon",
+    answerOptions: [
+      { label: "Soha", value: 0 },
+      { label: "Ritkán", value: 1 },
+      { label: "Néha", value: 2 },
+      { label: "Gyakran", value: 3 },
+      { label: "Mindig", value: 4 },
+    ],
+    genderOptions: ["Férfi", "Nő", "Egyéb"],
+    activityOptions: ["Alacsony", "Mérsékelt", "Magas"],
+    questions: [
+      "Szokott fejfájásod lenni mágneses viharok idején?",
+      "Fáradtabbnak érzed magad geomágneses zavarok napján?",
+      "Romlik az alvásod mágneses viharok előtt vagy közben?",
+      "Észlelsz hirtelen hangulatváltozást naptevékenység idején?",
+      "Tapasztalsz vérnyomás-ingadozást aktív időszakokban?",
+      "Előfordul szédülés geomágneses aktivitás idején?",
+      "Jelentkezik ízületi vagy izomfájdalom mágneses viharokkor?",
+      "Érzel szorongást vagy nyugtalanságot ilyen napokon?",
+      "Nehezebb koncentrálnod geomágneses zavarok idején?",
+      "Tapasztalsz szívritmushoz kapcsolódó kellemetlenséget aktív napokon?",
+      "Megérzed az időjárás változását még mielőtt bekövetkezne?",
+      "Felerősödnek a krónikus panaszaid mágneses viharok idején?",
+    ],
+    labels: {
+      high: "Magas meteoérzékenység",
+      highDesc:
+        "A szervezeted valószínűleg jól érzékelhetően reagál a geomágneses aktivitásra. Érdemes figyelni az előrejelzést és kímélőbb napirendet tartani aktív időszakokban.",
+      moderate: "Mérsékelt meteoérzékenység",
+      moderateDesc:
+        "Közepesen érzékenyen reagálhatsz az űridőjárás változásaira. Figyelj a fokozott aktivitású napokra.",
+      low: "Alacsony meteoérzékenység",
+      lowDesc:
+        "A mágneses viharok valószínűleg nem hatnak erősen a közérzetedre, bár időnként enyhe kellemetlenség előfordulhat.",
+      resistant: "Jó ellenállóképesség",
+      resistantDesc: "Nagyszerű! A geomágneses aktivitás várhatóan csak minimálisan hat a szervezetedre.",
+    },
+  },
 };
 
 function calculateScore(answers: number[], info: PersonalInfo, locale: LegacyLocale): number {
@@ -427,7 +506,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   usePageMeta(
     t.title,
     t.description,
-    locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : locale === "ro" ? "/ro/test" : "/test"
+    locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : locale === "ro" ? "/ro/test" : locale === "hu" ? "/hu/test" : "/test"
   );
 
   const [step, setStep] = useState<Step>("info");
@@ -498,7 +577,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
     personalInfo.physicalActivity;
 
   const result = getResultLabel(score, locale);
-  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : "/";
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "/";
 
   return (
     <div className="min-h-screen bg-background grid-bg">

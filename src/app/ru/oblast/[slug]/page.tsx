@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const title = `Магнитные бури в ${heading} сегодня`;
+  const title = `${regionTitle}: магнитные бури сегодня, Kp-индекс и прогноз`;
   const description = `${regionTitle}: текущий Kp-индекс, прогноз на 3 дня, предупреждения УкрГМЦ и страницы городов области с подробными данными.`;
 
   return {

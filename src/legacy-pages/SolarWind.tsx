@@ -224,10 +224,63 @@ const localizedCopy = {
       { q: "Cât de des se actualizează datele?", a: "Datele sunt preluate din măsurători NOAA și se actualizează regulat." },
     ],
   },
+  hu: {
+    ...copy.pl,
+    pageTitle: "Napszél online valós időben — sebesség és sűrűség",
+    pageDescription:
+      "Aktuális napszél valós időben: sebesség, sűrűség és az elmúlt 2 óra grafikonja NOAA DSCOVR adatok alapján.",
+    heroTitle: "Napszél ma",
+    heroText:
+      "A napszél sebessége és sűrűsége valós időben. Grafikon az elmúlt 2 óráról és az interplanetáris mágneses tér IMF Bz komponense.",
+    currentAria: "A napszél aktuális értékei",
+    speed: "Sebesség",
+    density: "Sűrűség",
+    normal: "Normális",
+    elevated: "Emelkedett",
+    stronglySouth: "Erősen déli",
+    south: "Déli",
+    weaklySouth: "Enyhén déli",
+    north: "Északi",
+    speedChartAria: "A napszél sebességének és sűrűségének grafikonja",
+    speedChartTitle: "Sebesség és sűrűség — elmúlt 2 óra",
+    bzChartAria: "IMF Bz grafikon",
+    bzChartTitle: "Interplanetáris mágneses tér (Bz) — elmúlt 2 óra",
+    loading: "Betöltés...",
+    bzNote:
+      "A negatív Bz érték megkönnyíti a napszél bejutását a Föld magnetoszférájába. -5 nT alatt nő a geomágneses vihar esélye.",
+    scaleAria: "Napszélsebesség skála",
+    scaleTitle: "Napszélsebesség skála (km/s)",
+    seoAria: "A napszélről",
+    seoHeading: "Mi az a napszél és miért fontos?",
+    seoText1:
+      "A napszél a Nap koronájából kiáramló töltött részecskék folyamatos árama. Sebessége általában 300 és 800 km/s között mozog, de aktív időszakokban gyorsan változhat.",
+    seoText2:
+      "Ha a napszél sebessége és sűrűsége nő, erősebb nyomás éri a Föld magnetoszféráját. Különösen fontos a Bz komponens: negatív értékeknél nagyobb a geomágneses zavar esélye.",
+    faqAria: "Gyakori kérdések a napszélről",
+    faqTitle: "Gyakori kérdések",
+    tooltipKyiv: "helyi idő",
+    areaSpeed: "Sebesség",
+    areaDensity: "Sűrűség",
+    speedLevels: [
+      { range: "< 300", status: "Lassú", color: "bg-storm-quiet", description: "Lassú napszél, általában jelentős hatás nélkül." },
+      { range: "300-400", status: "Normális", color: "bg-storm-quiet", description: "Tipikus napszélsebesség és nyugodt geomágneses feltételek." },
+      { range: "400-500", status: "Emelkedett", color: "bg-storm-minor", description: "Enyhe geomágneses zavarokat segíthet elő." },
+      { range: "500-600", status: "Magas", color: "bg-storm-moderate", description: "Nő az észrevehetőbb zavarok esélye." },
+      { range: "600-800", status: "Nagyon magas", color: "bg-storm-strong", description: "Erősebb mágneses viharokhoz járulhat hozzá." },
+      { range: "> 800", status: "Extrém", color: "bg-storm-severe", description: "Nagyon gyors áramlás, magas geomágneses zavarási potenciállal." },
+    ],
+    faqItems: [
+      { q: "Mi a napszél?", a: "A napszél a Napból érkező töltött részecskék árama, amely a bolygóközi térben halad." },
+      { q: "Miért számít a sebesség?", a: "A nagyobb sebesség erősebb nyomást jelent a Föld magnetoszférájára." },
+      { q: "Mit jelent a sűrűség?", a: "A sűrűség azt mutatja, hány részecske található a napszél adott térfogatában." },
+      { q: "Mit jelent a Bz?", a: "A Bz az interplanetáris mágneses tér függőleges komponense. A negatív értékek növelik az aktivitás esélyét." },
+      { q: "Milyen gyakran frissülnek az adatok?", a: "Az adatok NOAA mérésekből származnak és rendszeresen frissülnek." },
+    ],
+  },
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -285,7 +338,7 @@ interface SolarWindProps {
 
 const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const speedUnit = locale === "uk" || locale === "ru" ? "км/с" : "km/s";
   const densityUnit = locale === "uk" || locale === "ru" ? "p/см³" : "p/cm³";

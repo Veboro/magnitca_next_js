@@ -4,16 +4,18 @@ import uk from "./locales/uk";
 import ru from "./locales/ru";
 import pl from "./locales/pl";
 import ro from "./locales/ro";
+import hu from "./locales/hu";
 
 function detectLocaleFromPath(pathname?: string) {
   if (!pathname) return "uk";
   if (pathname === "/ru" || pathname.startsWith("/ru/")) return "ru";
   if (pathname === "/pl" || pathname.startsWith("/pl/")) return "pl";
   if (pathname === "/ro" || pathname.startsWith("/ro/")) return "ro";
+  if (pathname === "/hu" || pathname.startsWith("/hu/")) return "hu";
   return "uk";
 }
 
-export const resources = { uk: { translation: uk }, ru: { translation: ru }, pl: { translation: pl }, ro: { translation: ro } };
+export const resources = { uk: { translation: uk }, ru: { translation: ru }, pl: { translation: pl }, ro: { translation: ro }, hu: { translation: hu } };
 
 export function createI18nInstance(locale: Lang): I18nInstance {
   const instance = createInstance();
@@ -38,5 +40,5 @@ i18n.init({
 });
 
 export default i18n;
-export const SUPPORTED_LANGS = ["uk", "ru", "pl", "ro"] as const;
+export const SUPPORTED_LANGS = ["uk", "ru", "pl", "ro", "hu"] as const;
 export type Lang = (typeof SUPPORTED_LANGS)[number];

@@ -210,10 +210,59 @@ const localizedCopy = {
       { q: "Unde văd prognoza?", a: "Pe această pagină este afișată prognoza Kp pe 3 zile, împreună cu valoarea curentă și graficul." },
     ],
   },
+  hu: {
+    ...copy.pl,
+    pageTitle: "Kp-index online valós időben — mágneses vihar előrejelzés",
+    pageDescription:
+      "Aktuális Kp-index valós időben. Jelenlegi érték, 24 órás grafikon és 3 napos geomágneses aktivitási előrejelzés NOAA adatok alapján.",
+    heroTitle: "Kp-index ma",
+    heroText:
+      "A planetáris geomágneses aktivitás valós idejű mutatója. Aktuális érték, az elmúlt 24 óra grafikonja és NOAA SWPC 3 napos előrejelzés.",
+    currentKpLabel: "Aktuális Kp-index",
+    currentState: "Aktuális állapot",
+    chartAria: "Kp-index grafikon 24 órára",
+    chartTitle: "Kp-index az elmúlt",
+    hours: "óra",
+    forecastAria: "3 napos Kp-index előrejelzés",
+    forecastTitle: "Kp-index előrejelzés 3 napra (3 órás intervallumok)",
+    loading: "Előrejelzés betöltése...",
+    unavailable: "Az előrejelzési adatok nem elérhetők.",
+    maxKp: "max. Kp",
+    scaleAria: "Kp-index skála",
+    scaleTitle: "Kp-index skála (0-9)",
+    seoAria: "A Kp-indexről",
+    seoHeading: "Mi az a Kp-index és miért fontos?",
+    seoText1:
+      "A <strong>Kp-index</strong> a Föld geomágneses aktivitásának globális mutatója 0 és 9 közötti skálán. A 0-3 érték nyugodt, a 4 ingadozó állapotot jelez, az 5 vagy magasabb érték pedig geomágneses vihart jelent.",
+    seoText2:
+      "A Kp-index segít megérteni, hogyan hathat a naptevékenység a kommunikációra, navigációra és az időjárásra érzékeny emberek közérzetére. Ezen az oldalon az aktuális értéket, a grafikonokat és a 3 napos előrejelzést találod.",
+    faqAria: "Gyakori kérdések a Kp-indexről",
+    faqTitle: "Gyakori kérdések",
+    gScale: "G-skála",
+    rScale: "R-skála",
+    sScale: "S-skála",
+    kpLevels: [
+      { kp: "0-1", status: "Nyugodt", color: "bg-storm-quiet", description: "Minimális geomágneses aktivitás, látható hatás nélkül." },
+      { kp: "2-3", status: "Alacsony aktivitás", color: "bg-storm-quiet", description: "Kisebb mágneses ingadozások, általában érezhető hatás nélkül." },
+      { kp: "4", status: "Ingadozó", color: "bg-storm-minor", description: "Emelkedett aktivitás; érzékeny embereknél enyhe kellemetlenség lehet." },
+      { kp: "5 (G1)", status: "Gyenge vihar", color: "bg-storm-moderate", description: "Gyenge geomágneses vihar, kisebb technikai és közérzeti hatással." },
+      { kp: "6 (G2)", status: "Mérsékelt vihar", color: "bg-storm-moderate", description: "Nagyobb esély rádiózavarokra és érzékenyebb reakciókra." },
+      { kp: "7 (G3)", status: "Erős vihar", color: "bg-storm-strong", description: "Erős zavarok, navigációs és kommunikációs hatásokkal." },
+      { kp: "8 (G4)", status: "Nagyon erős", color: "bg-storm-severe", description: "Súlyos vihar fokozott technológiai kockázattal." },
+      { kp: "9 (G5)", status: "Extrém", color: "bg-storm-severe", description: "Extrém geomágneses vihar a legnagyobb potenciális hatással." },
+    ],
+    faqItems: [
+      { q: "Mi az a Kp-index?", a: "A Kp-index a globális geomágneses aktivitás 0 és 9 közötti mutatója. Minél magasabb az érték, annál erősebb a Föld mágneses terének zavara." },
+      { q: "Mikor kezdődik mágneses vihar?", a: "Általában Kp 5-től beszélünk geomágneses viharról, ami a NOAA G1 szintnek felel meg." },
+      { q: "Milyen gyakran frissül az előrejelzés?", a: "A becsült értékek gyakran frissülnek, a NOAA előrejelzések pedig rendszeresen módosulhatnak." },
+      { q: "Hathat a Kp-index a közérzetre?", a: "Egyes érzékeny embereknél magasabb Kp mellett fáradtság, fejfájás vagy nyugtalanabb alvás előfordulhat." },
+      { q: "Hol látható a Kp-előrejelzés?", a: "Ezen az oldalon látható a 3 napos Kp-előrejelzés, az aktuális érték és az elmúlt órák grafikonja." },
+    ],
+  },
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -231,7 +280,7 @@ interface KpIndexProps {
 
 const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const today = todayStr(localeTag, timeZone);
 

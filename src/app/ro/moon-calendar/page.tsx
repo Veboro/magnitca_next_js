@@ -6,13 +6,13 @@ import { absoluteUrl } from "@/lib/site";
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Calendar lunar — fazele Lunii pentru luna curentă";
+  const title = "Calendar lunar astăzi — fazele Lunii pe zile";
   const description =
     "Calendar lunar pentru luna curentă: fazele Lunii pe zile, Luna nouă, Luna plină, pătrarele și iluminarea discului lunar.";
 
   return {
     title: {
-      absolute: `${title} | Magnitca Moldova`,
+      absolute: `${title} | Magnitca`,
     },
     description,
     alternates: {

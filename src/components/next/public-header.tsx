@@ -4,9 +4,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind, X } from "lucide-react";
-import { getPathForLocale, getSafeLocaleSwitchPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, getSafeLocaleSwitchPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
+import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
@@ -50,6 +51,15 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/test", label: "Test", icon: ClipboardCheck },
     { href: "/faq", label: "FAQ", icon: HelpCircle },
   ],
+  hu: [
+    { href: "/", label: "Főoldal", icon: Activity },
+    { href: "/kp-index", label: "Kp-index", icon: Gauge },
+    { href: "/solar-wind", label: "Napszél", icon: Wind },
+    { href: "/moon-calendar", label: "Holdnaptár", icon: Moon },
+    { href: "/calendar", label: "Naptár", icon: CalendarDays },
+    { href: "/test", label: "Teszt", icon: ClipboardCheck },
+    { href: "/faq", label: "GYIK", icon: HelpCircle },
+  ],
 };
 
 const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
@@ -69,6 +79,10 @@ const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
     brand: "Magnitca",
     tagline: "Vreme spațială și furtuni magnetice",
   },
+  hu: {
+    brand: "Magnitca",
+    tagline: "Űridőjárás és mágneses viharok",
+  },
 };
 
 type SearchCityItem = {
@@ -76,6 +90,48 @@ type SearchCityItem = {
   href: string;
   searchText: string;
 };
+
+const flagIconStops: Partial<Record<SiteLocale, string[]>> = {
+  pl: ["#ffffff", "#ffffff", "#dc143c", "#dc143c"],
+  ro: ["#002b7f", "#002b7f", "#fcd116", "#ce1126", "#ce1126"],
+  hu: ["#ce2939", "#ce2939", "#ffffff", "#477050", "#477050"],
+};
+
+function BrandIcon({ locale }: { locale: SiteLocale }) {
+  const stops = flagIconStops[locale];
+
+  if (!stops) {
+    return <Activity className="h-5 w-5" />;
+  }
+
+  const gradientId = `brand-icon-${locale}`;
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="h-5 w-5"
+      fill="none"
+      stroke={`url(#${gradientId})`}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="2" y1="12" x2="22" y2="12" gradientUnits="userSpaceOnUse">
+          {stops.map((color, index) => (
+            <stop
+              key={`${color}-${index}`}
+              offset={`${(index / Math.max(stops.length - 1, 1)) * 100}%`}
+              stopColor={color}
+            />
+          ))}
+        </linearGradient>
+      </defs>
+      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+    </svg>
+  );
+}
 
 const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> = {
   uk: [
@@ -106,12 +162,18 @@ const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> =
     { href: "/pl/sunset", label: "Zachód dzisiaj" },
     { href: "/pl/sunset-tomorrow", label: "Zachód jutro" },
   ],
+  hu: [
+    { href: "/hu/sunrise", label: "Napkelte ma" },
+    { href: "/hu/sunrise-tomorrow", label: "Napkelte holnap" },
+    { href: "/hu/sunset", label: "Napnyugta ma" },
+    { href: "/hu/sunset-tomorrow", label: "Napnyugta holnap" },
+  ],
 };
 
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const locale: SiteLocale = pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const pathnameValue = pathname || "/";
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -125,6 +187,7 @@ export function PublicHeader() {
     ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
     pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
     ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
+    hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
   });
 
   const searchCopy = {
@@ -152,6 +215,12 @@ export function PublicHeader() {
       citySection: "Orașe",
       oblastSection: "Regiuni",
     },
+    hu: {
+      placeholder: "Keresés város vagy oldal szerint",
+      empty: "Nincs találat",
+      citySection: "Városoldalak",
+      oblastSection: "Régiók",
+    },
   } as const;
 
   const citySearchItems = useMemo<SearchCityItem[]>(() => {
@@ -167,6 +236,14 @@ export function PublicHeader() {
       return CITIES_PL.map((city) => ({
         name: city.name,
         href: `/pl/city/${city.slug}`,
+        searchText: `${city.name} ${city.slug}`.toLowerCase(),
+      }));
+    }
+
+    if (locale === "hu") {
+      return CITIES_HU.map((city) => ({
+        name: city.name,
+        href: `/hu/city/${city.slug}`,
         searchText: `${city.name} ${city.slug}`.toLowerCase(),
       }));
     }
@@ -192,7 +269,7 @@ export function PublicHeader() {
   }, [locale]);
 
   const oblastSearchItems = useMemo<SearchCityItem[]>(() => {
-    if (locale === "pl" || locale === "ro") {
+    if (locale === "pl" || locale === "ro" || locale === "hu") {
       return [];
     }
 
@@ -245,12 +322,14 @@ export function PublicHeader() {
       ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
       pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
       ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
+      hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
     };
 
     const ukAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="uk"]');
     const ruAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ru"]');
     const plAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="pl"]');
     const roAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ro"]');
+    const huAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="hu"]');
 
     const toRelativePath = (href: string | null | undefined) => {
       if (!href) return null;
@@ -267,6 +346,7 @@ export function PublicHeader() {
     const ruPath = toRelativePath(ruAlternate?.href);
     const plPath = toRelativePath(plAlternate?.href);
     const roPath = toRelativePath(roAlternate?.href);
+    const huPath = toRelativePath(huAlternate?.href);
 
     if (ukPath) {
       nextLinks.uk = ukPath;
@@ -282,6 +362,10 @@ export function PublicHeader() {
 
     if (roPath) {
       nextLinks.ro = roPath;
+    }
+
+    if (huPath) {
+      nextLinks.hu = huPath;
     }
 
     setLocaleLinks(nextLinks);
@@ -346,8 +430,15 @@ export function PublicHeader() {
   };
 
   const localizedSunMenu = sunMenuItems[locale];
-  const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : "Сонце";
-  const sunMenuActive = pathnameValue.startsWith("/sunrise") || pathnameValue.startsWith("/sunset") || pathnameValue.startsWith("/ru/sunrise") || pathnameValue.startsWith("/ru/sunset") || pathnameValue.startsWith("/pl/sun") || /^\/ro\/country\/[^/]+\/sun/.test(pathnameValue);
+  const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : locale === "hu" ? "Nap" : "Сонце";
+  const sunMenuActive =
+    pathnameValue.startsWith("/sunrise") ||
+    pathnameValue.startsWith("/sunset") ||
+    pathnameValue.startsWith("/ru/sunrise") ||
+    pathnameValue.startsWith("/ru/sunset") ||
+    pathnameValue.startsWith("/pl/sun") ||
+    pathnameValue.startsWith("/hu/sun") ||
+    /^\/ro\/country\/[^/]+\/sun/.test(pathnameValue);
 
   return (
     <>
@@ -444,7 +535,7 @@ export function PublicHeader() {
       <div className={`relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 ${searchOpen ? "max-lg:opacity-0 max-lg:pointer-events-none" : ""}`}>
         <Link href={getPathForLocale("/", locale)} className="min-w-0 flex items-center gap-3">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-sm">
-            <Activity className="h-5 w-5" />
+            <BrandIcon locale={locale} />
           </span>
           <div className="min-w-0">
             <p className="font-display text-lg font-bold text-foreground">{copy[locale].brand}</p>
@@ -562,7 +653,7 @@ export function PublicHeader() {
             </button>
             {mobileLocaleOpen && (
               <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[88px] rounded-2xl border border-border/50 bg-popover/95 p-1.5 shadow-xl backdrop-blur">
-                {(["uk", "ru", "pl", "ro"] as SiteLocale[]).map((nextLocale) => {
+                {(["uk", "ru", "pl", "ro", "hu"] as SiteLocale[]).map((nextLocale) => {
                   const nextPath = localeLinks[nextLocale] ?? getSafeLocaleSwitchPath(pathnameValue, nextLocale);
                   const isActive = locale === nextLocale;
 
@@ -630,6 +721,16 @@ export function PublicHeader() {
                 RO
               </Link>
             )}
+            {localeLinks.hu && (
+              <Link
+                href={localeLinks.hu}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  locale === "hu" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                HU
+              </Link>
+            )}
           </div>
         </div>
       </div>
@@ -665,7 +766,7 @@ export function PublicHeader() {
                 <ChevronDown className={`ml-1.5 h-3.5 w-3.5 transition-transform ${sunMenuOpen ? "rotate-180" : ""}`} />
               </button>
               {sunMenuOpen && (
-                <div className="absolute left-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur lg:block">
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur lg:block">
                   <div className="space-y-1">
                     {localizedSunMenu.map((item) => (
                       <Link

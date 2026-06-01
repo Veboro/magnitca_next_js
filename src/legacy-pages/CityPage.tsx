@@ -17,12 +17,14 @@ import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapP
 import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import { getCityByMdSlug } from "@/data/cities-md";
+import { getCityByHuSlug } from "@/data/cities-hu";
 import { getCityByPlSlug } from "@/data/cities-pl";
 import { UKRAINE_REGION_GROUPS } from "@/data/ukraine-city-catalog";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import type { SiteLocale } from "@/lib/locale";
 import { getUhmcRegionCode } from "@/lib/uhmc-warning";
+import { getHungaroMetCountyForCity } from "@/lib/hungaromet-counties";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
 import { getOblastPathsByKey, getOblastTitle } from "@/lib/oblast-routes";
 import { absoluteUrl } from "@/lib/site";
@@ -310,6 +312,76 @@ const copy = {
     home: "Acasă",
     breadcrumbAria: "Navigare pe pagină",
   },
+  hu: {
+    calm: "Nyugodt",
+    low: "Alacsony aktivitás",
+    moderate: "Mérsékelt vihar",
+    strong: "Erős vihar",
+    extreme: "Extrém vihar",
+    geoSituation: "Geomágneses helyzet itt:",
+    sunriseSunset: "Napkelte / napnyugta",
+    sunrise: "Napkelte",
+    sunset: "Napnyugta",
+    dayLength: "Nappal hossza",
+    coordinates: "Koordináták",
+    latitude: "Szélesség",
+    longitude: "Hosszúság",
+    timezone: "Időzóna",
+    radiation: "Sugárzási háttér",
+    normal: "Normál tartományban",
+    forecast3: "Kp-index előrejelzés:",
+    forecast3suffix: "3 napra (3 órás bontásban)",
+    loading: "Előrejelzés betöltése...",
+    unavailable: "Az előrejelzési adatok nem érhetők el.",
+    max: "max. Kp",
+    forecast3Foot1: "Kp-index előrejelzés a városhoz:",
+    forecast3Foot2: "NOAA Space Weather Prediction Center alapján. Helyi idő szerint",
+    forecast27: "27 napos Kp-előrejelzés —",
+    forecast27Foot1: "27 napos Kp-index előrejelzés a városhoz:",
+    forecast27Foot2: "NOAA SWPC alapján. A pontosság napról napra csökken, ezért tájékoztató jellegű.",
+    airQuality: "Levegőminőség",
+    currentMetrics: "Aktuális mutatók",
+    wind: "Szél",
+    humidity: "Páratartalom",
+    pressure: "Légnyomás",
+    cloudiness: "Felhőzet",
+    uv: "UV-index",
+    kpIndex: "Kp-index",
+    high: "Magas",
+    medium: "Mérsékelt",
+    lowHumidity: "Alacsony",
+    overcast: "Borult",
+    variable: "Változó",
+    clear: "Derült",
+    uvVeryHigh: "Nagyon magas",
+    uvHigh: "Magas",
+    uvMedium: "Mérsékelt",
+    uvLow: "Alacsony",
+    aboutPage: "Az oldalról",
+    cityNotFound: "A város nem található",
+    srOnlyHeading: "Mágneses viharok itt:",
+    srOnlySuffix: "időjárás és levegőminőség",
+    geoActivityStatus: "Geomágneses aktivitás állapota itt:",
+    forecast3Aria: "3 napos Kp-index előrejelzés",
+    forecast27Aria: "27 napos Kp-előrejelzés",
+    seoHeading: "Mágneses viharok itt:",
+    today: "ma",
+    currentKp: "Aktuális Kp-index",
+    stormLevel: "geomágneses vihar szintje",
+    forecastRange: "Várható napi Kp-tartomány",
+    radioBlackout: "Rádiózavar skála",
+    radiationStorm: "sugárzási vihar skála",
+    temperature: "Levegő hőmérséklete",
+    windSpeed: "szél",
+    airIndex: "AQI levegőminőségi index",
+    dataSource: "Adatok",
+    popularInRegion: "Népszerű városok",
+    hydrometWarning: "HungaroMet figyelmeztetés",
+    hydrometSource: "Forrás: HungaroMet",
+    hydrometUnavailable: "A figyelmeztetés átmenetileg nem érhető el",
+    home: "Főoldal",
+    breadcrumbAria: "Oldalnavigáció",
+  },
 } as const;
 
 const getKpStatus = (kp: number, locale: SiteLocale) => {
@@ -354,6 +426,8 @@ function toRuRegionGenitive(title: string) {
 function getWindDirection(deg: number, locale: SiteLocale): string {
   const dirs = locale === "ru"
     ? ["С", "СВ", "В", "ЮВ", "Ю", "ЮЗ", "З", "СЗ"]
+    : locale === "hu"
+      ? ["É", "ÉK", "K", "DK", "D", "DNY", "NY", "ÉNY"]
     : locale === "pl" || locale === "ro"
       ? ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
       : ["Пн", "ПнСх", "Сх", "ПдСх", "Пд", "ПдЗх", "Зх", "ПнЗх"];
@@ -408,11 +482,13 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
       ? getCityByPlSlug(resolvedSlug)
       : locale === "ro"
         ? getCityByMdSlug(resolvedSlug)
+      : locale === "hu"
+        ? getCityByHuSlug(resolvedSlug)
       : getCityBySlug(resolvedSlug)
     : undefined;
   const city = cityBase ? (locale === "ru" ? getLocalizedCity(cityBase, "ru") : cityBase) : undefined;
   const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
 
   const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, initialWeather ?? undefined, locale);
   const { data: sunTimes } = useCitySunTimes({
@@ -457,7 +533,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         : `${t.popularInRegion} ${regionTitleForHeading}`
     : t.popularInRegion;
   const popularRegionCities =
-    locale === "pl" || locale === "ro" || !regionGroup || !cityBase
+    locale === "pl" || locale === "ro" || locale === "hu" || !regionGroup || !cityBase
       ? []
       : regionGroup.slugs
           .filter((candidateSlug) => candidateSlug !== cityBase.slug)
@@ -468,7 +544,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             const href = locale === "ru" ? `/ru/city/${getRuCitySlug(candidate)}` : `/city/${candidate.slug}`;
             return { name: localized.name, href };
           });
-  const oblastPaths = regionGroup && locale !== "pl" && locale !== "ro" ? getOblastPathsByKey(regionGroup.key) : null;
+  const oblastPaths = regionGroup && locale !== "pl" && locale !== "ro" && locale !== "hu" ? getOblastPathsByKey(regionGroup.key) : null;
   const oblastHref =
     locale === "ru"
       ? oblastPaths?.ru
@@ -476,11 +552,11 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         ? oblastPaths?.uk
         : null;
   const oblastName =
-    regionGroup && locale !== "pl" && locale !== "ro"
+    regionGroup && locale !== "pl" && locale !== "ro" && locale !== "hu"
       ? getOblastTitle(locale === "ru" ? "ru" : "uk", regionGroup.key) ?? regionTitle
       : null;
-  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : "/";
-  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : locale === "ro" ? `/ro/city/${city.slug}` : `/city/${city.slug}`;
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "/";
+  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : locale === "ro" ? `/ro/city/${city.slug}` : locale === "hu" ? `/hu/city/${city.slug}` : `/city/${city.slug}`;
   const countryName = locale === "ro" ? city.country : null;
   const countryHref = locale === "ro" && city.countrySlug ? `/ro/country/${city.countrySlug}` : null;
   const breadcrumbItems = [
@@ -489,7 +565,8 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
     ...(oblastHref && oblastName ? [{ name: oblastName, url: absoluteUrl(oblastHref) }] : []),
     { name: city.name, url: absoluteUrl(cityHref) },
   ];
-  const uhmcRegionCode = locale === "pl" || locale === "ro" ? null : getUhmcRegionCode(regionGroup?.key);
+  const uhmcRegionCode = locale === "pl" || locale === "ro" || locale === "hu" ? null : getUhmcRegionCode(regionGroup?.key);
+  const hungaroMetCounty = locale === "hu" ? getHungaroMetCountyForCity(city.slug) : null;
   const { data: uhmcWarning } = useQuery({
     queryKey: ["uhmc-warning", uhmcRegionCode, locale],
     queryFn: async () => {
@@ -511,6 +588,32 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
     enabled: Boolean(uhmcRegionCode),
     staleTime: 15 * 60 * 1000,
   });
+  const { data: hungaroMetWarning } = useQuery({
+    queryKey: ["hungaromet-warning", hungaroMetCounty],
+    queryFn: async () => {
+      const response = await fetch(`/api/hungaromet-warning?county=${encodeURIComponent(hungaroMetCounty ?? "")}`);
+      if (!response.ok) {
+        throw new Error("Failed to load HungaroMet warning");
+      }
+      return response.json() as Promise<{
+        status: "none" | "active";
+        updatedAt: string | null;
+        level: number | null;
+        types: string[];
+        periods: string[];
+        details: string[];
+        summary: string;
+        sourceUrl: string;
+      }>;
+    },
+    enabled: Boolean(hungaroMetCounty),
+    staleTime: 15 * 60 * 1000,
+  });
+  const regionalWarning = locale === "hu" ? hungaroMetWarning : uhmcWarning;
+  const regionalWarningSource =
+    locale === "hu"
+      ? "https://www.met.hu/idojaras/veszelyjelzes/figyelmezteto_elorejelzes_mara/"
+      : "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya";
 
   const todayDate = new Date().toLocaleDateString(localeTag, { day: "numeric", month: "long", year: "numeric" });
   const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: city.timezone });
@@ -534,6 +637,8 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         ? `Burze magnetyczne w ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoza, pogoda i jakość powietrza w czasie rzeczywistym.`
         : locale === "ro"
           ? `Furtuni magnetice în ${city.nameGenitive}, ${city.country ?? "Moldova"} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoză, vreme și calitatea aerului în timp real.`
+        : locale === "hu"
+          ? `${city.name} mágneses vihar előrejelzése ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Időjárás, napkelte, napnyugta és levegőminőség valós időben.`
           : `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
     : "";
 
@@ -686,20 +791,20 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 </h3>
                 <div className="space-y-1 rounded-xl border border-primary/20 bg-primary/5 p-3 shadow-[0_0_0_1px_rgba(0,255,255,0.03)]">
                   <p className="font-mono text-sm font-bold text-foreground">
-                    {uhmcWarning?.summary ?? t.hydrometUnavailable}
+                    {regionalWarning?.summary ?? t.hydrometUnavailable}
                   </p>
-                  {uhmcWarning?.details?.[0] ? (
+                  {regionalWarning?.details?.[0] ? (
                     <p className="text-[11px] leading-relaxed text-muted-foreground">
-                      {uhmcWarning.details[0]}
+                      {regionalWarning.details[0]}
                     </p>
                   ) : null}
-                  {uhmcWarning?.updatedAt ? (
+                  {regionalWarning?.updatedAt ? (
                     <p className="text-[10px] text-muted-foreground">
-                      {uhmcWarning.updatedAt}
+                      {regionalWarning.updatedAt}
                     </p>
                   ) : null}
                   <Link
-                    href={uhmcWarning?.sourceUrl ?? "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya"}
+                    href={regionalWarning?.sourceUrl ?? regionalWarningSource}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex text-[10px] font-medium text-primary hover:text-primary/80"
@@ -798,20 +903,20 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 </h3>
                 <div className="space-y-1 rounded-xl border border-primary/20 bg-primary/5 p-3 shadow-[0_0_0_1px_rgba(0,255,255,0.03)]">
                   <p className="font-mono text-sm font-bold text-foreground">
-                    {uhmcWarning?.summary ?? t.hydrometUnavailable}
+                    {regionalWarning?.summary ?? t.hydrometUnavailable}
                   </p>
-                  {uhmcWarning?.details?.[0] ? (
+                  {regionalWarning?.details?.[0] ? (
                     <p className="text-[11px] leading-relaxed text-muted-foreground">
-                      {uhmcWarning.details[0]}
+                      {regionalWarning.details[0]}
                     </p>
                   ) : null}
-                  {uhmcWarning?.updatedAt ? (
+                  {regionalWarning?.updatedAt ? (
                     <p className="text-[10px] text-muted-foreground">
-                      {uhmcWarning.updatedAt}
+                      {regionalWarning.updatedAt}
                     </p>
                   ) : null}
                   <Link
-                    href={uhmcWarning?.sourceUrl ?? "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya"}
+                    href={regionalWarning?.sourceUrl ?? regionalWarningSource}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex text-[10px] font-medium text-primary hover:text-primary/80"

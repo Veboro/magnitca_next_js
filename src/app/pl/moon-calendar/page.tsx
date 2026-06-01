@@ -6,7 +6,7 @@ import { absoluteUrl } from "@/lib/site";
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Kalendarz księżycowy — fazy Księżyca na bieżący miesiąc";
+  const title = "Kalendarz księżycowy dzisiaj — fazy Księżyca dzień po dniu";
   const description =
     "Kalendarz księżycowy na bieżący miesiąc: fazy Księżyca dzień po dniu, nów, pełnia, kwadry i oświetlenie tarczy księżycowej.";
 

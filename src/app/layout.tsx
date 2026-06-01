@@ -9,7 +9,7 @@ import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Магнітка — магнітні бурі сьогодні, прогноз Kp індексу",
+    default: "Магнітні бурі сьогодні — Kp-індекс, сонячний вітер і прогноз | Магнітка",
     template: `%s | ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     locale: "uk_UA",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: "Магнітка — магнітні бурі сьогодні, прогноз Kp індексу",
+    title: "Магнітні бурі сьогодні — Kp-індекс, сонячний вітер і прогноз | Магнітка",
     description: SITE_DESCRIPTION,
     images: [
       {
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Магнітка — магнітні бурі сьогодні, прогноз Kp індексу",
+    title: "Магнітні бурі сьогодні — Kp-індекс, сонячний вітер і прогноз | Магнітка",
     description: SITE_DESCRIPTION,
     images: ["/og-image.png"],
   },

@@ -3,7 +3,7 @@ import CityKyivPage from "@/legacy-pages/CityKyiv";
 import { getRuCitySlug } from "@/data/cities-ru";
 
 export const metadata: Metadata = {
-  title: "Магнітні бурі в Києві сьогодні — погода, якість повітря",
+  title: "Магнітні бурі в Києві сьогодні — Kp-індекс та сонячний вітер",
   description:
     "Магнітні бурі в Києві сьогодні: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані для Києва в реальному часі.",
   alternates: {

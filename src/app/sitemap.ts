@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD, RO_COUNTRIES } from "@/data/cities-md";
+import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
 import { getMoonMonthRoutes2026 } from "@/lib/moon-calendar";
@@ -100,6 +101,29 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "/ro" ? 0.85 : 0.6,
   }));
 
+  const huStaticPages: MetadataRoute.Sitemap = [
+    "/hu",
+    "/hu/test",
+    "/hu/calendar",
+    "/hu/kp-index",
+    "/hu/solar-wind",
+    "/hu/sunrise",
+    "/hu/sunrise-tomorrow",
+    "/hu/sunset",
+    "/hu/sunset-tomorrow",
+    "/hu/moon-calendar",
+    "/hu/faq",
+    "/hu/about",
+    "/hu/contacts",
+    "/hu/privacy",
+    "/hu/cookies",
+    "/hu/terms",
+  ].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    changeFrequency: path === "/hu" ? "hourly" : "daily",
+    priority: path === "/hu" ? 0.85 : 0.6,
+  }));
+
   const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/city/${city.slug}`,
     changeFrequency: "hourly",
@@ -120,6 +144,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const roCityPages: MetadataRoute.Sitemap = CITIES_MD.map((city) => ({
     url: `${SITE_URL}/ro/city/${city.slug}`,
+    changeFrequency: "hourly",
+    priority: 0.75,
+  }));
+
+  const huCityPages: MetadataRoute.Sitemap = CITIES_HU.map((city) => ({
+    url: `${SITE_URL}/hu/city/${city.slug}`,
     changeFrequency: "hourly",
     priority: 0.75,
   }));
@@ -175,6 +205,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
+  const huMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefHu}`,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+
   const newsPages = await getLatestNews(1000, "uk")
     .then((items) =>
       items.map((item) => ({
@@ -202,10 +238,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...ruStaticPages,
     ...plStaticPages,
     ...roStaticPages,
+    ...huStaticPages,
     ...cityPages,
     ...ruCityPages,
     ...plCityPages,
     ...roCityPages,
+    ...huCityPages,
     ...roCountryPages,
     ...roCountrySunPages,
     ...oblastPages,
@@ -214,6 +252,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...ruMoonCalendarPages,
     ...plMoonCalendarPages,
     ...roMoonCalendarPages,
+    ...huMoonCalendarPages,
     ...newsPages,
     ...ruNewsPages,
   ];

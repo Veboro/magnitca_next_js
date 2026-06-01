@@ -1,7 +1,7 @@
 import type { CityConfig } from "./cities";
 
 function buildPlSeoTitle(nameGenitive: string) {
-  return `Burze magnetyczne w ${nameGenitive} dzisiaj, indeks Kp i wiatr słoneczny`;
+  return `Burze magnetyczne w ${nameGenitive} dzisiaj — indeks Kp i wiatr słoneczny`;
 }
 
 export const CITIES_PL: CityConfig[] = [

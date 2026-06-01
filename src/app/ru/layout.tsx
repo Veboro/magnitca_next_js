@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    default: "Магнитка",
+    default: "Магнитные бури сегодня — Kp-индекс, солнечный ветер и прогноз | Магнитка",
     template: "%s",
   },
 };

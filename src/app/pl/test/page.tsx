@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import MeteoTestPage from "@/legacy-pages/MeteoTest";
 
 export const metadata: Metadata = {
-  title: "Test na meteowrażliwość — Magnitca",
+  title: "Test na meteowrażliwość — wrażliwość na burze magnetyczne | Magnitca",
   description:
     "Bezpłatny test na meteowrażliwość. Sprawdź, jak silnie Twój organizm reaguje na burze magnetyczne i aktywność geomagnetyczną.",
   alternates: {

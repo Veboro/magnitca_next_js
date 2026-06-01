@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const route = findMoonMonthRouteBySlug("uk", slug);
   if (!route) return {};
 
-  const title = `Місячний календар на ${route.labelUk}`;
+  const title = `Місячний календар на ${route.labelUk} — фази Місяця по днях`;
   const description = `Місячний календар на ${route.labelUk}: фази Місяця по днях, молодик, повня, чверті та освітленість місячного диска.`;
 
   return {

@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { CheckCircle, Loader2, Send } from "lucide-react";
 
-type ContactFormLocale = "uk" | "ru" | "pl" | "ro";
+type ContactFormLocale = "uk" | "ru" | "pl" | "ro" | "hu";
 
 const copy: Record<
   ContactFormLocale,
@@ -71,6 +71,19 @@ const copy: Record<
     message: "Mesaj",
     sending: "Se trimite...",
     send: "Trimite mesajul",
+  },
+  hu: {
+    sendError: "Nem sikerült elküldeni az üzenetet.",
+    unknownError: "Hiba történt a küldés közben.",
+    successTitle: "Köszönjük az üzenetet",
+    successText:
+      "Az üzenetet elküldtük. Ha sürgős, írj közvetlenül ide is:",
+    sendAnother: "Új üzenet küldése",
+    name: "Neved",
+    email: "Email",
+    message: "Üzenet",
+    sending: "Küldés...",
+    send: "Üzenet küldése",
   },
 };
 

@@ -6,7 +6,7 @@ import { absoluteUrl, SITE_NAME } from "@/lib/site";
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Місячний календар — фази Місяця на поточний місяць";
+  const title = "Місячний календар сьогодні — фази Місяця по днях";
   const description =
     "Місячний календар на поточний місяць: фази Місяця по днях, молодик, повня, чверті та освітленість місячного диска.";
 

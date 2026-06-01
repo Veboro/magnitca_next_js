@@ -3,7 +3,7 @@ import KpIndexClient from "@/legacy-pages/KpIndex";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 
 export const metadata: Metadata = {
-  title: "Indice Kp — Magnitca Moldova",
+  title: "Indice Kp astăzi — grafic online și prognoza furtunilor magnetice | Magnitca",
   description: "Indicele Kp actual, scara furtunilor geomagnetice și prognoza activității geomagnetice pentru Moldova.",
   alternates: {
     canonical: "/ro/kp-index",
