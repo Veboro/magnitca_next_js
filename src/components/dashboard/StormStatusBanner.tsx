@@ -17,6 +17,30 @@ const levelColors: Record<number, string> = {
   5: "hsl(0, 80%, 55%)",
 };
 
+const getBadgeTone = (level: number) => {
+  if (level >= 3) {
+    return {
+      bg: "hsl(0, 72%, 91%)",
+      border: "hsl(0, 78%, 48%)",
+      shadow: "hsl(0, 78%, 48%, 0.22)",
+    };
+  }
+
+  if (level >= 1) {
+    return {
+      bg: "hsl(45, 96%, 88%)",
+      border: "hsl(40, 96%, 48%)",
+      shadow: "hsl(40, 96%, 48%, 0.22)",
+    };
+  }
+
+  return {
+    bg: "hsl(145, 64%, 90%)",
+    border: "hsl(145, 72%, 36%)",
+    shadow: "hsl(145, 72%, 36%, 0.2)",
+  };
+};
+
 interface StormStatusBannerProps {
   initialKp?: KpEntry[] | null;
   initialScales?: NoaaScales | null;
@@ -34,6 +58,7 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
   const effectiveLevel = getEffectiveLevel(gLevel, latestKp);
   const color = levelColors[effectiveLevel] || levelColors[0];
+  const badgeTone = getBadgeTone(effectiveLevel);
 
   const levelLabel = t(`storm.level${effectiveLevel}`);
   const levelDesc = t(`storm.desc${effectiveLevel}`);
@@ -52,7 +77,7 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
   const ukraineOutline = i18n.language === "pl" ? undefined : "/ukraine-outline.png";
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-glow-cyan">
+    <div className="official-storm-panel relative overflow-hidden rounded-lg border border-glow-cyan">
       <div className="absolute inset-0 bg-cover bg-center opacity-20" style={{ backgroundImage: `url(${heroBg})` }} />
       {ukraineOutline && (
         <div className="absolute inset-0 bg-contain bg-no-repeat bg-right-bottom opacity-15 mix-blend-screen" style={{ backgroundImage: `url(${ukraineOutline})` }} />
@@ -72,7 +97,7 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
           </div>
           <div
             className="hidden md:flex flex-col items-center justify-center rounded-full border border-primary/20 w-24 h-24 ml-6 flex-shrink-0 transition-colors duration-700"
-            style={{ backgroundColor: `${color}15`, borderColor: `${color}40`, boxShadow: `0 0 20px ${color}20` }}
+            style={{ backgroundColor: badgeTone.bg, borderColor: badgeTone.border, boxShadow: `0 0 22px ${badgeTone.shadow}` }}
           >
             <AlertTriangle className="h-6 w-6 transition-colors duration-700" style={{ color }} />
             <p className="font-mono text-xs font-bold text-foreground mt-1">
@@ -85,23 +110,50 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
         <div className="rounded-md border border-border/40 bg-background/40 p-3 space-y-2">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("storm.todayForecast")}</p>
           {todayEntries.length > 0 && (
-            <div className="flex items-end gap-1 mt-1 h-16">
-              {todayEntries.map((entry, i) => {
-                const hour = new Date(entry.time_tag).toLocaleString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
-                const entryColor = levelColors[getEffectiveLevel(0, entry.kp)] || levelColors[0];
-                const barHeight = Math.max(10, (entry.kp / 9) * 100);
-                const isPast = new Date(entry.time_tag) < now;
-                return (
-                  <div key={i} className={`flex flex-col items-center flex-1 gap-0.5 ${isPast ? "opacity-50" : ""}`}>
-                    <span className="text-[9px] font-mono font-medium" style={{ color: entryColor }}>{entry.kp.toFixed(1)}</span>
-                    <div className="w-full rounded-sm bg-muted/30 overflow-hidden" style={{ height: "40px" }}>
-                      <div className="w-full rounded-sm transition-all duration-300" style={{ height: `${barHeight}%`, backgroundColor: entryColor, marginTop: "auto" }} />
+            <>
+              <div className="mt-1 space-y-1.5 sm:hidden">
+                {todayEntries.map((entry, i) => {
+                  const hour = new Date(entry.time_tag).toLocaleString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+                  const entryColor = levelColors[getEffectiveLevel(0, entry.kp)] || levelColors[0];
+                  const barWidth = Math.max(12, (entry.kp / 9) * 100);
+                  const isPast = new Date(entry.time_tag) < now;
+
+                  return (
+                    <div key={i} className={`flex items-center gap-2 ${isPast ? "opacity-50" : ""}`}>
+                      <span className="w-11 shrink-0 text-[9px] font-mono text-muted-foreground">{hour}</span>
+                      <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted/30">
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{ width: `${barWidth}%`, backgroundColor: entryColor }}
+                        />
+                      </div>
+                      <span className="w-8 shrink-0 text-right text-[9px] font-mono font-medium" style={{ color: entryColor }}>
+                        {entry.kp.toFixed(1)}
+                      </span>
                     </div>
-                    <span className="text-[8px] font-mono text-muted-foreground">{hour}</span>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-1 hidden h-16 grid-cols-8 items-end gap-1 overflow-hidden sm:grid">
+                {todayEntries.map((entry, i) => {
+                  const hour = new Date(entry.time_tag).toLocaleString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
+                  const entryColor = levelColors[getEffectiveLevel(0, entry.kp)] || levelColors[0];
+                  const barHeight = Math.max(10, (entry.kp / 9) * 100);
+                  const isPast = new Date(entry.time_tag) < now;
+
+                  return (
+                    <div key={i} className={`flex min-w-0 flex-col items-center gap-0.5 ${isPast ? "opacity-50" : ""}`}>
+                      <span className="truncate text-[8px] font-mono font-medium leading-none" style={{ color: entryColor }}>{entry.kp.toFixed(1)}</span>
+                      <div className="w-full overflow-hidden rounded-sm bg-muted/30" style={{ height: "40px" }}>
+                        <div className="w-full rounded-sm transition-all duration-300" style={{ height: `${barHeight}%`, backgroundColor: entryColor, marginTop: "auto" }} />
+                      </div>
+                      <span className="w-full truncate text-center text-[8px] font-mono leading-none text-muted-foreground">{hour}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
 

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Script from "next/script";
 import { Suspense } from "react";
 import "../index.css";
 import { GoogleAnalytics } from "@/components/next/google-analytics";
 import { Providers } from "@/components/next/providers";
+import { getLocaleFromPathname, type SiteLocale } from "@/lib/locale";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -44,8 +46,11 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const requestHeaders = await headers();
+  const locale: SiteLocale = getLocaleFromPathname(requestHeaders.get("x-site-locale"));
+
   return (
-    <html lang="uk" className="dark">
+    <html lang={locale} className="official-home-page">
       <head>
         <link rel="preconnect" href="https://xdysdmtwhhnkvdbaaflm.supabase.co" />
         <link rel="preload" as="image" href="/hero-bg.jpg" fetchPriority="high" />
@@ -56,11 +61,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           strategy="afterInteractive"
         />
       </head>
-      <body>
+      <body className="official-home official-home-page">
         <Suspense fallback={null}>
           <GoogleAnalytics />
         </Suspense>
-        <Providers initialLocale="uk">{children}</Providers>
+        <Providers initialLocale={locale}>{children}</Providers>
       </body>
     </html>
   );

@@ -32,7 +32,7 @@ import ru from "@/i18n/locales/ru";
 
 const queryClient = new QueryClient();
 
-const AppRoutes = (locale: "uk" | "ru", messages: Record<string, any>) => (
+const AppRoutes = (locale: "uk" | "ru", messages: Record<string, unknown>) => (
   <>
     <Route index element={<Index locale={locale} messages={messages} />} />
     <Route path="kp-index" element={<KpIndex />} />
@@ -51,41 +51,43 @@ const AppRoutes = (locale: "uk" | "ru", messages: Record<string, any>) => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider delayDuration={0}>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <SiteHeader />
-          <Routes>
-            {/* Ukrainian (default) routes */}
-            <Route element={<LanguageWrapper />}>
-              {AppRoutes("uk", uk)}
-            </Route>
+  <div className="official-home min-h-screen bg-background text-foreground">
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <TooltipProvider delayDuration={0}>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <SiteHeader />
+            <Routes>
+              {/* Ukrainian (default) routes */}
+              <Route element={<LanguageWrapper />}>
+                {AppRoutes("uk", uk)}
+              </Route>
 
-            {/* Russian routes with /ru prefix */}
-            <Route path="/ru" element={<LanguageWrapper />}>
-              {AppRoutes("ru", ru)}
-            </Route>
+              {/* Russian routes with /ru prefix */}
+              <Route path="/ru" element={<LanguageWrapper />}>
+                {AppRoutes("ru", ru)}
+              </Route>
 
-            {/* Auth & Admin — no language prefix needed */}
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/admin/news" element={<AdminNews />} />
-            <Route path="/admin/news/new" element={<AdminNewsEditor />} />
-            <Route path="/admin/news/:id/edit" element={<AdminNewsEditor />} />
+              {/* Auth & Admin — no language prefix needed */}
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/admin/news" element={<AdminNews />} />
+              <Route path="/admin/news/new" element={<AdminNewsEditor />} />
+              <Route path="/admin/news/:id/edit" element={<AdminNewsEditor />} />
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+            <SiteFooter />
             
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          <SiteFooter />
-          
-          <PwaInstallBanner />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
+            <PwaInstallBanner />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </QueryClientProvider>
+  </div>
 );
 
 export default App;

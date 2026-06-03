@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Wind, X } from "lucide-react";
+import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Sunrise, Sunset, Wind, X } from "lucide-react";
 import { getPathForLocale, getSafeLocaleSwitchPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
@@ -170,6 +170,10 @@ const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> =
   ],
 };
 
+function getSunMenuIcon(href: string) {
+  return href.includes("sunrise") ? Sunrise : Sunset;
+}
+
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
@@ -179,7 +183,6 @@ export function PublicHeader() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileLocaleOpen, setMobileLocaleOpen] = useState(false);
   const [sunMenuOpen, setSunMenuOpen] = useState(false);
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
   const headerRef = useRef<HTMLElement | null>(null);
   const mobileSearchOverlayRef = useRef<HTMLDivElement | null>(null);
   const [localeLinks, setLocaleLinks] = useState<Record<SiteLocale, string | null>>({
@@ -310,13 +313,6 @@ export function PublicHeader() {
   }, [oblastSearchItems, normalizedQuery]);
 
   useEffect(() => {
-    const savedTheme = window.localStorage.getItem("theme");
-    const prefersDark = savedTheme !== "light";
-    document.documentElement.classList.toggle("dark", prefersDark);
-    setIsDarkTheme(prefersDark);
-  }, []);
-
-  useEffect(() => {
     const nextLinks: Record<SiteLocale, string | null> = {
       uk: getSafeLocaleSwitchPath(pathnameValue, "uk"),
       ru: getSafeLocaleSwitchPath(pathnameValue, "ru"),
@@ -422,13 +418,6 @@ export function PublicHeader() {
     };
   }, [searchOpen]);
 
-  const toggleTheme = () => {
-    const nextThemeIsDark = !isDarkTheme;
-    setIsDarkTheme(nextThemeIsDark);
-    document.documentElement.classList.toggle("dark", nextThemeIsDark);
-    window.localStorage.setItem("theme", nextThemeIsDark ? "dark" : "light");
-  };
-
   const localizedSunMenu = sunMenuItems[locale];
   const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : locale === "hu" ? "Nap" : "Сонце";
   const sunMenuActive =
@@ -472,15 +461,15 @@ export function PublicHeader() {
                 }}
                 autoFocus
                 placeholder={searchCopy[locale].placeholder}
-                className="h-12 w-full rounded-xl border border-border/50 bg-card pl-10 pr-4 text-base text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary/50"
+                className="h-12 w-full rounded-xl border border-border/50 bg-card pl-10 pr-4 text-base text-white outline-none transition-colors placeholder:text-white/55 focus:border-primary/50"
               />
             </div>
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 sm:px-6">
-            <div className="rounded-2xl border border-border/50 bg-popover p-2 shadow-xl">
+            <div className="official-header-dropdown rounded-2xl border border-border/50 p-2 shadow-xl">
               {filteredCities.length > 0 && (
                 <div className="mb-2">
-                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="official-header-dropdown-label px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                     {searchCopy[locale].citySection}
                   </p>
                   <div className="space-y-1">
@@ -492,7 +481,7 @@ export function PublicHeader() {
                           setSearchOpen(false);
                           setCityQuery("");
                         }}
-                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-base text-foreground transition-colors hover:bg-card"
+                        className="official-header-dropdown-item flex items-center gap-2 rounded-xl px-3 py-3 text-base text-foreground transition-colors hover:bg-card"
                       >
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>{city.name}</span>
@@ -503,7 +492,7 @@ export function PublicHeader() {
               )}
               {filteredOblasts.length > 0 && (
                 <div>
-                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="official-header-dropdown-label px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                     {searchCopy[locale].oblastSection}
                   </p>
                   <div className="space-y-1">
@@ -515,7 +504,7 @@ export function PublicHeader() {
                           setSearchOpen(false);
                           setCityQuery("");
                         }}
-                        className="flex items-center gap-2 rounded-xl px-3 py-3 text-base text-foreground transition-colors hover:bg-card"
+                        className="official-header-dropdown-item flex items-center gap-2 rounded-xl px-3 py-3 text-base text-foreground transition-colors hover:bg-card"
                       >
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>{oblast.name}</span>
@@ -525,14 +514,14 @@ export function PublicHeader() {
                 </div>
               )}
               {filteredCities.length === 0 && filteredOblasts.length === 0 && (
-                <p className="px-3 py-3 text-base text-muted-foreground">{searchCopy[locale].empty}</p>
+                <p className="official-header-dropdown-label px-3 py-3 text-base text-muted-foreground">{searchCopy[locale].empty}</p>
               )}
             </div>
           </div>
         </div>
       )}
       <header ref={headerRef} className="sticky top-0 z-40 border-b border-border/40 bg-background/85 backdrop-blur">
-      <div className={`relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 ${searchOpen ? "max-lg:opacity-0 max-lg:pointer-events-none" : ""}`}>
+      <div className={`relative mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6 lg:px-0 ${searchOpen ? "max-lg:opacity-0 max-lg:pointer-events-none" : ""}`}>
         <Link href={getPathForLocale("/", locale)} className="min-w-0 flex items-center gap-3">
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary shadow-sm">
             <BrandIcon locale={locale} />
@@ -559,14 +548,14 @@ export function PublicHeader() {
                 }
               }}
               placeholder={searchCopy[locale].placeholder}
-              className="h-11 w-full rounded-xl border border-border/50 bg-card/60 pl-10 pr-4 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/80 focus:border-primary/50 focus:bg-card"
+              className="h-11 w-full rounded-xl border border-border/50 bg-card/60 pl-10 pr-4 text-sm text-white outline-none transition-colors placeholder:text-white/55 focus:border-primary/50 focus:bg-card"
             />
           </div>
           {searchOpen && (
-            <div className="absolute left-0 right-0 top-[calc(100%+0.5rem)] rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
+            <div className="official-header-dropdown absolute left-0 right-0 top-[calc(100%+0.5rem)] rounded-2xl border border-border/50 p-2 shadow-xl">
               {filteredCities.length > 0 && (
                 <div className="mb-2">
-                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="official-header-dropdown-label px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                     {searchCopy[locale].citySection}
                   </p>
                   <div className="space-y-1">
@@ -578,7 +567,7 @@ export function PublicHeader() {
                           setSearchOpen(false);
                           setCityQuery("");
                         }}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                        className="official-header-dropdown-item flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
                       >
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>{city.name}</span>
@@ -589,7 +578,7 @@ export function PublicHeader() {
               )}
               {filteredOblasts.length > 0 && (
                 <div>
-                  <p className="px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="official-header-dropdown-label px-3 pb-2 pt-1 text-[11px] uppercase tracking-[0.18em] text-muted-foreground">
                     {searchCopy[locale].oblastSection}
                   </p>
                   <div className="space-y-1">
@@ -601,7 +590,7 @@ export function PublicHeader() {
                           setSearchOpen(false);
                           setCityQuery("");
                         }}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                        className="official-header-dropdown-item flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
                       >
                         <MapPin className="h-4 w-4 text-primary" />
                         <span>{oblast.name}</span>
@@ -611,7 +600,7 @@ export function PublicHeader() {
                 </div>
               )}
               {filteredCities.length === 0 && filteredOblasts.length === 0 && (
-                <p className="px-3 py-2 text-sm text-muted-foreground">{searchCopy[locale].empty}</p>
+                <p className="official-header-dropdown-label px-3 py-2 text-sm text-muted-foreground">{searchCopy[locale].empty}</p>
               )}
             </div>
           )}
@@ -629,14 +618,6 @@ export function PublicHeader() {
           >
             <Search className="h-4 w-4" />
           </button>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/50 text-muted-foreground transition-colors hover:text-foreground lg:hidden"
-            aria-label={isDarkTheme ? "Увімкнути світлу тему" : "Увімкнути темну тему"}
-          >
-            {isDarkTheme ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
           <div className="relative shrink-0 lg:hidden">
             <button
               type="button"
@@ -652,7 +633,7 @@ export function PublicHeader() {
               <ChevronDown className="ml-2 h-3.5 w-3.5 text-muted-foreground" />
             </button>
             {mobileLocaleOpen && (
-              <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[88px] rounded-2xl border border-border/50 bg-popover/95 p-1.5 shadow-xl backdrop-blur">
+              <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[88px] rounded-2xl border border-border/50 p-1.5 shadow-xl">
                 {(["uk", "ru", "pl", "ro", "hu"] as SiteLocale[]).map((nextLocale) => {
                   const nextPath = localeLinks[nextLocale] ?? getSafeLocaleSwitchPath(pathnameValue, nextLocale);
                   const isActive = locale === nextLocale;
@@ -665,7 +646,7 @@ export function PublicHeader() {
                         setMobileLocaleOpen(false);
                         router.push(nextPath);
                       }}
-                      className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
+                      className={`official-header-dropdown-item flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
                         isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-card"
                       }`}
                     >
@@ -676,14 +657,6 @@ export function PublicHeader() {
               </div>
             )}
           </div>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="hidden h-10 w-10 items-center justify-center rounded-full border border-border/50 bg-card/50 text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground lg:inline-flex"
-            aria-label={isDarkTheme ? "Switch to light theme" : "Switch to dark theme"}
-          >
-            {isDarkTheme ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
           <div className="hidden items-center rounded-full border border-border/50 bg-card/50 p-1 lg:inline-flex">
             <Link
               href={localeLinks.uk}
@@ -735,12 +708,14 @@ export function PublicHeader() {
         </div>
       </div>
       <nav className={`border-t border-border/30 bg-card/30 ${searchOpen ? "max-lg:hidden" : ""}`}>
-        <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-6 py-2 lg:overflow-visible">
-          {navItems[locale].map((item) => (
+        <div className="mx-auto flex max-w-[1180px] items-center gap-2 overflow-x-auto px-4 py-2 sm:px-6 lg:px-0 lg:overflow-visible">
+          {navItems[locale].map((item, index) => (
             <Link
               key={item.href}
               href={getPathForLocale(item.href, locale)}
-              className="inline-flex whitespace-nowrap rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card hover:text-foreground"
+              className={`inline-flex whitespace-nowrap rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card hover:text-foreground ${
+                index === 0 ? "lg:pl-0" : ""
+              }`}
             >
               <span className="mr-1.5 inline-flex items-center">
                 <item.icon className="h-3.5 w-3.5" />
@@ -766,15 +741,19 @@ export function PublicHeader() {
                 <ChevronDown className={`ml-1.5 h-3.5 w-3.5 transition-transform ${sunMenuOpen ? "rotate-180" : ""}`} />
               </button>
               {sunMenuOpen && (
-                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur lg:block">
+                <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 p-2 shadow-xl lg:block">
                   <div className="space-y-1">
                     {localizedSunMenu.map((item) => (
                       <Link
                         key={item.href}
                         href={locale === "ru" ? `/ru${item.href}` : item.href}
                         onClick={() => setSunMenuOpen(false)}
-                        className="flex items-center rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                        className="official-header-dropdown-item flex items-center justify-start gap-3 rounded-xl px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-card"
                       >
+                        {(() => {
+                          const Icon = getSunMenuIcon(item.href);
+                          return <Icon className="h-4 w-4 shrink-0" />;
+                        })()}
                         {item.label}
                       </Link>
                     ))}
@@ -786,14 +765,18 @@ export function PublicHeader() {
         </div>
         {sunMenuOpen && localizedSunMenu.length > 0 && (
           <div className="border-t border-border/30 px-4 pb-3 pt-2 lg:hidden">
-            <div className="space-y-1 rounded-2xl border border-border/50 bg-popover/95 p-2 shadow-xl backdrop-blur">
+            <div className="official-header-dropdown space-y-1 rounded-2xl border border-border/50 p-2 shadow-xl">
               {localizedSunMenu.map((item) => (
                 <Link
                   key={item.href}
                   href={locale === "ru" ? `/ru${item.href}` : item.href}
                   onClick={() => setSunMenuOpen(false)}
-                  className="flex items-center rounded-xl px-3 py-2 text-sm text-foreground transition-colors hover:bg-card"
+                  className="official-header-dropdown-item flex items-center justify-start gap-3 rounded-xl px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-card"
                 >
+                  {(() => {
+                    const Icon = getSunMenuIcon(item.href);
+                    return <Icon className="h-4 w-4 shrink-0" />;
+                  })()}
                   {item.label}
                 </Link>
               ))}

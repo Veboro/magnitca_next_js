@@ -126,7 +126,7 @@ const ru = {
   // Human Impact
   impact: {
     title: "Влияние на организм",
-    meteoLevel: "Уровень метеозависимости",
+    meteoLevel: "Жизненные показатели",
     takeTest: "Пройти тест",
     retakeTest: "Пройти ещё раз",
     findOut: "Узнайте свой уровень чувствительности",

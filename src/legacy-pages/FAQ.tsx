@@ -666,13 +666,13 @@ const FAQ = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const faqJsonLd = buildFaqJsonLd(t.sections);
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="official-page-main">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <div className="container max-w-4xl py-10 space-y-8">
-        <div className="space-y-3">
+      <div className="official-page-shell container max-w-4xl py-2 space-y-8">
+        <div className="official-page-header">
           <div className="flex items-center gap-3">
             <HelpCircle className="h-8 w-8 text-primary" />
             <h1 className="font-display text-4xl font-bold text-foreground">{t.heading}</h1>

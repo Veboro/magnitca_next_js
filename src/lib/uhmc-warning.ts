@@ -111,7 +111,7 @@ function dedupe(values: string[]) {
 }
 
 function formatNoWarnings(locale: Extract<SiteLocale, "uk" | "ru">) {
-  return locale === "ru" ? "Попереджень немає" : "Попереджень немає";
+  return locale === "ru" ? "Предупреждений нет" : "Попереджень немає";
 }
 
 function formatSummary(types: string[], level: number | null, locale: Extract<SiteLocale, "uk" | "ru">) {

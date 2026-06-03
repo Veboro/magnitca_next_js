@@ -383,9 +383,10 @@ export async function OblastPage({
   });
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <main className="mx-auto max-w-6xl space-y-8 p-6">
-        <header className="space-y-2">
+    <div className="min-h-screen bg-background">
+      <main className="official-page-main">
+        <div className="official-page-shell space-y-8">
+        <header className="official-page-header space-y-2">
           <h1 className="font-display text-2xl font-bold text-foreground sm:text-3xl">
             {t.title} {regionIn} {t.today}
           </h1>
@@ -694,6 +695,7 @@ export async function OblastPage({
             ))}
           </div>
         </section>
+        </div>
       </main>
     </div>
   );

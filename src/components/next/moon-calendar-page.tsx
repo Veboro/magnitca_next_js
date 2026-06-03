@@ -20,17 +20,6 @@ type MoonCalendarPageProps = {
   monthLinks?: MoonMonthRoute[];
 };
 
-const phaseTone: Record<string, string> = {
-  new: "from-slate-900/90 via-slate-800/80 to-slate-700/70",
-  waxing_crescent: "from-cyan-950/80 via-slate-800/80 to-slate-700/70",
-  first_quarter: "from-sky-900/70 via-slate-800/80 to-slate-700/70",
-  waxing_gibbous: "from-amber-900/50 via-slate-800/80 to-slate-700/70",
-  full: "from-yellow-500/30 via-amber-200/15 to-slate-700/70",
-  waning_gibbous: "from-orange-900/40 via-slate-800/80 to-slate-700/70",
-  last_quarter: "from-indigo-900/50 via-slate-800/80 to-slate-700/70",
-  waning_crescent: "from-violet-950/50 via-slate-800/80 to-slate-700/70",
-};
-
 export function MoonCalendarPage({
   locale = "uk",
   heading,
@@ -390,12 +379,13 @@ export function MoonCalendarPage({
       ];
 
   return (
-    <main className="mx-auto max-w-6xl space-y-8 px-6 py-10">
+    <main className="official-page-main">
+      <div className="official-page-shell space-y-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
-      <header className="space-y-3">
-        <nav className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
+      <header className="official-page-header space-y-3">
+        <nav className="official-page-breadcrumb text-sm" aria-label="Breadcrumb">
           <Link href={isRu ? "/ru" : isPl ? "/pl" : isRo ? "/ro" : isHu ? "/hu" : "/"} className="transition-colors hover:text-foreground">
             {t.home}
           </Link>
@@ -406,21 +396,21 @@ export function MoonCalendarPage({
         <p className="max-w-3xl text-sm leading-relaxed text-muted-foreground sm:text-base">{resolvedIntro}</p>
       </header>
 
-      <section className={`overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br ${phaseTone[currentPhase.phaseKind]} p-6 shadow-[0_0_32px_rgba(34,211,238,0.12),0_24px_60px_-32px_rgba(255,240,180,0.42)]`}>
+      <section className="official-moon-hero overflow-hidden rounded-2xl border p-6">
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-border/50 bg-background/75 px-3 py-1 text-xs uppercase tracking-[0.18em] text-foreground/75">
-              <MoonStar className="h-4 w-4 text-primary" />
+            <div className="official-moon-hero-pill inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs uppercase tracking-[0.18em]">
+              <MoonStar className="h-4 w-4" />
               {resolvedHeroPillLabel}
             </div>
             <div className="flex items-start gap-4">
-              <div className="inline-flex h-24 w-24 items-center justify-center rounded-full border border-border/50 bg-background/80 text-5xl shadow-inner">
+              <div className="official-moon-hero-emoji inline-flex h-24 w-24 items-center justify-center rounded-full border text-5xl shadow-inner">
                 {currentPhase.phaseEmoji}
               </div>
               <div className="space-y-2">
-                <p className="text-sm text-foreground/70">{resolvedContextLabel}: {todayLabel}</p>
-                <h2 className="font-display text-3xl font-bold text-foreground">{resolvedHeroTitle}</h2>
-                <p className="max-w-xl text-sm leading-relaxed text-foreground/75 sm:text-base">
+                <p className="official-moon-hero-meta text-sm">{resolvedContextLabel}: {todayLabel}</p>
+                <h2 className="official-moon-hero-title font-display text-3xl font-bold">{resolvedHeroTitle}</h2>
+                <p className="official-moon-hero-meta max-w-xl text-sm leading-relaxed sm:text-base">
                   {t.monthLabel}: {capitalizedMonthLabel}. {t.illum}: {currentPhase.illuminationPercent}%.
                 </p>
               </div>
@@ -428,20 +418,20 @@ export function MoonCalendarPage({
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            <div className="rounded-xl border border-border/50 bg-background/80 p-4">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-foreground/70">
-                <Sparkles className="h-4 w-4 text-primary" />
+            <div className="official-moon-hero-stat rounded-xl border p-4">
+              <div className="official-moon-hero-stat-label flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em]">
+                <Sparkles className="h-4 w-4" />
                 {t.averageLight}
               </div>
-              <p className="mt-3 font-display text-3xl font-bold text-foreground">{averageIllumination}%</p>
-              <p className="mt-1 text-sm text-foreground/70">{t.averageLightSub}</p>
+              <p className="official-moon-hero-stat-value mt-3 font-display text-3xl font-bold">{averageIllumination}%</p>
+              <p className="official-moon-hero-stat-sub mt-1 text-sm">{t.averageLightSub}</p>
             </div>
-            <div className="rounded-xl border border-border/50 bg-background/80 p-4">
-              <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-foreground/70">
-                <TimerReset className="h-4 w-4 text-primary" />
+            <div className="official-moon-hero-stat rounded-xl border p-4">
+              <div className="official-moon-hero-stat-label flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em]">
+                <TimerReset className="h-4 w-4" />
                 {t.monthLabel}
               </div>
-              <p className="mt-3 font-display text-2xl font-bold text-foreground">{capitalizedMonthLabel}</p>
+              <p className="official-moon-hero-stat-value mt-3 font-display text-2xl font-bold">{capitalizedMonthLabel}</p>
             </div>
           </div>
         </div>
@@ -629,6 +619,7 @@ export function MoonCalendarPage({
           ))}
         </div>
       </section>
+      </div>
     </main>
   );
 }

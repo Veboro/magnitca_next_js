@@ -48,13 +48,13 @@ export function CityCatalogPage({ locale }: { locale: CatalogLocale }) {
   );
 
   return (
-    <main className="mx-auto max-w-7xl space-y-8 px-6 py-10">
-      <section className="rounded-3xl border border-border/50 bg-card/60 p-8 shadow-sm">
+    <main className="official-page-main space-y-8">
+      <section className="official-page-shell rounded-3xl border border-border/50 bg-card/60 p-8 shadow-sm">
         <p className="text-xs uppercase tracking-[0.18em] text-primary">{t.eyebrow}</p>
         <h1 className="mt-3 font-display text-4xl font-bold text-foreground">{t.title}</h1>
       </section>
 
-      <section aria-label={t.alphabet} className="rounded-3xl border border-border/40 bg-card/40 p-4 shadow-sm sm:p-5">
+      <section aria-label={t.alphabet} className="official-page-panel rounded-3xl border border-border/40 bg-card/40 p-4 shadow-sm sm:p-5">
         <p className="mb-3 text-sm text-muted-foreground">{t.alphabetHint}</p>
         <div className="flex flex-wrap gap-2">
           {alphabetItems.map((item) => (
@@ -98,7 +98,7 @@ export function CityCatalogPage({ locale }: { locale: CatalogLocale }) {
             <section
               key={region.key}
               id={getRegionAnchor(region)}
-              className="scroll-mt-28 rounded-3xl border border-border/40 bg-card/40 p-6 shadow-sm"
+              className="official-page-panel scroll-mt-28 rounded-3xl border border-border/40 bg-card/40 p-6 shadow-sm"
             >
               <h2 className="font-display text-2xl font-bold text-foreground">
                 {getRegionTitle(region, locale)}

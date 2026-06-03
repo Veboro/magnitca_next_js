@@ -218,7 +218,8 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
 
   return (
     <div className="min-h-screen bg-background grid-bg">
-      <main className="mx-auto max-w-7xl space-y-6 p-6" role="main">
+      <main className="official-page-main" role="main">
+        <div className="official-page-shell space-y-6">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -238,7 +239,7 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
 
         <nav
           aria-label={t.breadcrumbAria}
-          className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+          className="official-page-breadcrumb gap-x-2 gap-y-1 text-xs"
         >
           <Link href={homeHref} className="transition-colors hover:text-primary">
             {t.home}
@@ -553,19 +554,20 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
               {forecast27.map((day) => {
                 const d = new Date(day.date);
                 const isToday = day.date === new Date().toISOString().slice(0, 10);
-                const kpColor = day.kp >= 7 ? "bg-red-500/20 text-red-400 border-red-500/30"
-                  : day.kp >= 5 ? "bg-orange-500/20 text-orange-400 border-orange-500/30"
-                  : day.kp >= 4 ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-                  : "bg-green-500/20 text-green-400 border-green-500/30";
+                const kpColor = day.kp >= 5
+                  ? "city-forecast27-card city-forecast27-card-severe"
+                  : day.kp >= 4
+                    ? "city-forecast27-card city-forecast27-card-minor"
+                    : "city-forecast27-card city-forecast27-card-quiet";
                 return (
                   <div
                     key={day.date}
                     className={cn("rounded-md border p-1.5 text-center text-[10px] font-mono transition-colors", kpColor, isToday && "ring-1 ring-primary")}
                     title={`${day.date}: Kp ${day.kp}`}
                   >
-                    <div className="text-muted-foreground/70">{d.toLocaleDateString(localeTag, { weekday: "narrow" })}</div>
+                    <div className="text-[10px] font-medium opacity-80">{d.toLocaleDateString(localeTag, { weekday: "narrow" })}</div>
                     <div className="text-xs font-bold">{d.getDate()}</div>
-                    <div className="text-[9px] opacity-80">Kp {day.kp}</div>
+                    <div className="text-[9px] font-semibold opacity-90">Kp {day.kp}</div>
                   </div>
                 );
               })}
@@ -666,6 +668,7 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
             );
           })()}
         </section>
+        </div>
       </main>
     </div>
   );

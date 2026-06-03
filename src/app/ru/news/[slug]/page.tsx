@@ -62,7 +62,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function RussianNewsArticlePage({ params }: Params) {
   const { slug } = await params;
-  let article = await getNewsArticleBySlug(slug, "ru").catch(() => null);
+  const article = await getNewsArticleBySlug(slug, "ru").catch(() => null);
 
   if (!article) {
     const ukrainianArticle = await getNewsArticleBySlug(slug, "uk").catch(() => null);
@@ -107,37 +107,39 @@ export default async function RussianNewsArticlePage({ params }: Params) {
   };
 
   return (
-    <main className="mx-auto max-w-4xl px-6 py-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="mb-6">
-        <MobileAdsenseSlot />
-      </div>
-      <article className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm">
-        {article.image_url ? (
-          <img src={article.image_url} alt={article.title} className="aspect-[2/1] w-full object-cover" />
-        ) : null}
-        <div className="p-6 sm:p-8">
-          <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-            {new Date(article.published_at).toLocaleDateString("ru-RU", {
-              weekday: "long",
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-            })}
-          </p>
-          <h1 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">{article.title}</h1>
-          <div className="mt-6 prose prose-sm max-w-none text-foreground dark:prose-invert">
-            {article.content.includes("<") && article.content.includes(">") ? (
-              <div dangerouslySetInnerHTML={{ __html: article.content }} />
-            ) : (
-              <div className="whitespace-pre-line text-base leading-8">{article.content}</div>
-            )}
-          </div>
-          <div className="mt-6">
-            <MobileAdsenseSlot />
-          </div>
+    <main className="official-page-main">
+      <div className="official-page-shell">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+        <div className="mb-6">
+          <MobileAdsenseSlot />
         </div>
-      </article>
+        <article className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm">
+          {article.image_url ? (
+            <img src={article.image_url} alt={article.title} className="aspect-[2/1] w-full object-cover" />
+          ) : null}
+          <div className="p-6 sm:p-8">
+            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
+              {new Date(article.published_at).toLocaleDateString("ru-RU", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </p>
+            <h1 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">{article.title}</h1>
+            <div className="news-article-body official-page-prose prose prose-sm max-w-none">
+              {article.content.includes("<") && article.content.includes(">") ? (
+                <div dangerouslySetInnerHTML={{ __html: article.content }} />
+              ) : (
+                <div className="whitespace-pre-line text-base leading-8">{article.content}</div>
+              )}
+            </div>
+            <div className="mt-6">
+              <MobileAdsenseSlot />
+            </div>
+          </div>
+        </article>
+      </div>
     </main>
   );
 }

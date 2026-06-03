@@ -71,7 +71,7 @@ export const RichTextEditor = ({ content, onChange, placeholder }: RichTextEdito
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm dark:prose-invert max-w-none min-h-[250px] px-3 py-2 focus:outline-none text-sm leading-relaxed",
+          "prose prose-sm max-w-none min-h-[250px] px-3 py-2 focus:outline-none text-sm leading-relaxed",
       },
     },
     onUpdate: ({ editor }) => {

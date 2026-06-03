@@ -107,7 +107,7 @@ const ro = {
   impact: {
     ...uk.impact,
     title: "Influența asupra organismului",
-    meteoLevel: "Nivel de meteosensibilitate",
+    meteoLevel: "Indicatori vitali",
     takeTest: "Fă testul",
     retakeTest: "Repetă testul",
     findOut: "Află nivelul tău de sensibilitate",

@@ -1,4 +1,4 @@
-import { Moon, Sun, Activity, HelpCircle, CalendarDays, Newspaper, LogOut, ClipboardCheck, ChevronDown, Shield, Gauge, Wind } from "lucide-react";
+import { Activity, HelpCircle, CalendarDays, Newspaper, LogOut, ClipboardCheck, ChevronDown, Shield, Gauge, Wind } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,19 +36,13 @@ export const SiteHeader = () => {
     { href: "/faq", label: t("nav.faq"), icon: HelpCircle },
   ];
 
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      return document.documentElement.classList.contains("dark");
-    }
-    return true;
-  });
   const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) { setIsAdmin(false); return; }
-    supabase.rpc("has_role" as any, { _user_id: user.id, _role: "admin" })
+    supabase.rpc("has_role", { _user_id: user.id, _role: "admin" })
       .then(({ data }) => setIsAdmin(data === true));
   }, [user]);
 
@@ -58,20 +52,6 @@ export const SiteHeader = () => {
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const toggleTheme = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    localStorage.setItem("theme", next ? "dark" : "light");
-  };
-
-  useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    const prefersDark = saved === "dark" || !saved;
-    setIsDark(prefersDark);
-    document.documentElement.classList.toggle("dark", prefersDark);
   }, []);
 
   // Determine active path without lang prefix
@@ -92,14 +72,6 @@ export const SiteHeader = () => {
             aria-label="Switch language"
           >
             {isRu ? "UA" : "RU"}
-          </button>
-
-          <button
-            onClick={toggleTheme}
-            className="flex items-center justify-center h-7 w-7 rounded-md border border-border/50 bg-secondary/50 text-muted-foreground hover:text-foreground transition-colors"
-            aria-label={t("header.toggleTheme")}
-          >
-            {isDark ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
           </button>
 
           {!authLoading && user && isAdmin && (

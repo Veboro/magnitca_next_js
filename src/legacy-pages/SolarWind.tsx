@@ -377,15 +377,16 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
   };
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <main className="mx-auto max-w-5xl space-y-8 p-6" role="main">
+    <div className="min-h-screen bg-background">
+      <main className="official-page-main" role="main">
+        <div className="official-page-shell space-y-8">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
         />
 
         {/* Hero */}
-        <header className="space-y-2">
+        <header className="official-page-header space-y-2">
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
             {t.heroTitle}, {today}
           </h1>
@@ -599,6 +600,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
             ))}
           </div>
         </section>
+        </div>
       </main>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useKpIndex, useNoaaScales } from "@/hooks/useSpaceWeather";
 import type { KpEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import { useKpForecast } from "@/hooks/useKpForecast";
@@ -315,8 +316,9 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <main className="mx-auto max-w-5xl space-y-8 p-6" role="main">
+    <div className="official-home min-h-screen">
+      <main className="mx-auto max-w-[1180px] px-2 pb-10 pt-4 sm:px-6 lg:px-0" role="main">
+        <div className="official-home-shell space-y-8 px-2 py-5 sm:px-6 lg:px-8">
         {/* JSON-LD */}
         <script
           type="application/ld+json"
@@ -324,7 +326,7 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
         />
 
         {/* Hero */}
-        <header className="space-y-2">
+        <header className="space-y-2 border-b border-border/60 pb-5">
           <h1 className="font-display text-2xl sm:text-3xl font-bold text-foreground">
             {t.heroTitle}, {today}
           </h1>
@@ -380,12 +382,12 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
                 <XAxis
                   dataKey="time"
-                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fontSize: 10, fill: "hsl(36, 20%, 10%)" }}
                   interval={Math.floor(chartData.length / 6)}
                 />
                 <YAxis
                   domain={[0, 9]}
-                  tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  tick={{ fontSize: 10, fill: "hsl(36, 20%, 10%)" }}
                   ticks={[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}
                 />
                 <Tooltip
@@ -397,7 +399,7 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
                   }}
                 />
                 <ReferenceLine y={5} stroke="hsl(var(--destructive))" strokeDasharray="4 4" label={{ value: "G1", fontSize: 10, fill: "hsl(var(--destructive))" }} />
-                <Line type="monotone" dataKey="kp" stroke="hsl(var(--primary))" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="kp" stroke="hsl(35, 100%, 50%)" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -514,7 +516,7 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
         </section>
 
         {/* SEO Text */}
-        <section className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed" aria-label={t.seoAria}>
+        <section className="rounded-lg border border-border/50 bg-card p-6 text-sm leading-relaxed text-muted-foreground" aria-label={t.seoAria}>
           <h2 className="text-lg font-display font-semibold text-foreground/90">
             {t.seoHeading}
           </h2>
@@ -542,6 +544,7 @@ const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
             ))}
           </div>
         </section>
+        </div>
       </main>
     </div>
   );

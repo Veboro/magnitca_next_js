@@ -107,7 +107,7 @@ const hu = {
   impact: {
     ...uk.impact,
     title: "Hatás a szervezetre",
-    meteoLevel: "Meteoérzékenységi szint",
+    meteoLevel: "Életjelek",
     takeTest: "Teszt kitöltése",
     retakeTest: "Teszt újra",
     findOut: "Tudd meg az érzékenységi szintedet",

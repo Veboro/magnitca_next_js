@@ -580,8 +580,9 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "/";
 
   return (
-    <div className="min-h-screen bg-background grid-bg">
-      <main className="mx-auto max-w-2xl p-6 space-y-6">
+    <div className="min-h-screen bg-background">
+      <main className="official-page-main">
+        <div className="official-page-shell space-y-6">
         <Link
           href={homeHref}
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -848,6 +849,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
             </div>
           </div>
         )}
+        </div>
       </main>
     </div>
   );

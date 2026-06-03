@@ -126,7 +126,7 @@ const uk = {
   // Human Impact
   impact: {
     title: "Вплив на організм",
-    meteoLevel: "Рівень метеозалежності",
+    meteoLevel: "Життєві показники",
     takeTest: "Пройти тест",
     retakeTest: "Пройти ще раз",
     findOut: "Дізнайтесь свій рівень чутливості",

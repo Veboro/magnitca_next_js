@@ -33,7 +33,7 @@ export const KpIndexGauge = ({ className }: { className?: string }) => {
         {Array.from({ length: 10 }, (_, i) => (
           <div key={i} className="flex flex-1 flex-col items-center gap-1">
             <div className={cn("w-full rounded-sm transition-all duration-500", i <= value ? kpColors[i] : "bg-secondary", i <= value ? "opacity-100" : "opacity-30")} style={{ height: `${12 + i * 6}px` }} />
-            <span className="font-mono text-[10px] text-muted-foreground">{i}</span>
+            <span className="font-mono text-[10px] text-foreground">{i}</span>
           </div>
         ))}
       </div>
@@ -42,10 +42,10 @@ export const KpIndexGauge = ({ className }: { className?: string }) => {
           <span className={cn("h-3 w-3 rounded-full animate-pulse-glow", kpColors[value])} />
           <span className="font-mono text-2xl font-bold text-foreground text-glow-cyan">Kp {value}</span>
         </div>
-        <span className="text-sm font-medium text-muted-foreground">{kpLabel}</span>
+        <span className="text-sm font-medium text-foreground">{kpLabel}</span>
       </div>
       <div className="mt-3 flex items-center justify-between border-t border-border/30 pt-3">
-        <p className="text-[11px] leading-relaxed text-muted-foreground/60">{t("gauge.note")}</p>
+        <p className="text-[11px] leading-relaxed text-foreground">{t("gauge.note")}</p>
         <Link href={`${langPrefix}/kp-index`} className="inline-flex items-center gap-1 shrink-0 ml-3 text-[11px] font-medium text-primary hover:text-primary/80 transition-colors">
           {t("gauge.details")} <ArrowRight className="h-3 w-3" />
         </Link>

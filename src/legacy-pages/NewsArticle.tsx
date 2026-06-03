@@ -1,8 +1,12 @@
 import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { Database } from "@/integrations/supabase/types";
 import { CalendarDays, Clock, ArrowLeft } from "lucide-react";
 import { Link, useParams } from "react-router-dom";
+
+type NewsArticleRow = Database["public"]["Tables"]["news"]["Row"];
+
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return d.toLocaleDateString("uk-UA", {
@@ -25,7 +29,7 @@ const formatTime = (dateStr: string) => {
 const NewsArticle = () => {
   const { slug } = useParams<{ slug: string }>();
 
-  const { data: article, isLoading } = useQuery({
+  const { data: article, isLoading } = useQuery<NewsArticleRow | null>({
     queryKey: ["news", slug],
     queryFn: async () => {
       // Try slug first, fallback to id
@@ -48,8 +52,8 @@ const NewsArticle = () => {
     enabled: !!slug,
   });
 
-  const articleTitle = (article as any)?.meta_title || article?.title || "Новина";
-  const articleDescRaw = (article as any)?.meta_description || article?.content?.slice(0, 150)?.replace(/<[^>]*>/g, "")?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
+  const articleTitle = article?.meta_title || article?.title || "Новина";
+  const articleDescRaw = article?.meta_description || article?.content?.slice(0, 150)?.replace(/<[^>]*>/g, "")?.replace(/\n/g, " ") || "Читайте новину на Магнітці";
   const articleSlugOrId = article?.slug || article?.id || slug;
 
   // Update OG image if article has one
@@ -151,7 +155,7 @@ const NewsArticle = () => {
               </header>
               {article.content.includes("<") && article.content.includes(">") ? (
                 <div
-                  className="text-sm leading-relaxed text-foreground/85 prose prose-sm dark:prose-invert max-w-none"
+                  className="news-article-body official-page-prose prose prose-sm max-w-none text-sm leading-relaxed text-foreground/85"
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
               ) : (

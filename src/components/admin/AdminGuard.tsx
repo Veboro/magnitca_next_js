@@ -20,7 +20,7 @@ export const AdminGuard = ({ children }: AdminGuardProps) => {
     }
 
     const checkAdmin = async () => {
-      const { data, error } = await supabase.rpc("has_role" as any, {
+      const { data, error } = await supabase.rpc("has_role", {
         _user_id: user.id,
         _role: "admin",
       });

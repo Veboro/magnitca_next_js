@@ -192,12 +192,13 @@ export function SunriseOverviewPage({
   };
 
   return (
-    <main className="mx-auto max-w-6xl space-y-8 px-6 py-10">
+    <main className="official-page-main">
+      <div className="official-page-shell space-y-8">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
-      <header className="space-y-3">
-        <nav className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground" aria-label="Breadcrumb">
+      <header className="official-page-header space-y-3">
+        <nav className="official-page-breadcrumb text-sm" aria-label="Breadcrumb">
           <Link href={locale === "ru" ? "/ru" : "/"} className="transition-colors hover:text-foreground">
             {t.home}
           </Link>
@@ -460,6 +461,7 @@ export function SunriseOverviewPage({
           ))}
         </div>
       </section>
+      </div>
     </main>
   );
 }

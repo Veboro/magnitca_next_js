@@ -95,7 +95,7 @@ const pl = {
   impact: {
     ...uk.impact,
     title: "Wplyw na organizm",
-    meteoLevel: "Poziom meteowrazliwosci",
+    meteoLevel: "Parametry zyciowe",
     takeTest: "Wykonaj test",
     retakeTest: "Wykonaj ponownie",
     findOut: "Sprawdz swoj poziom wrazliwosci",

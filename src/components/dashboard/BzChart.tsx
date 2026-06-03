@@ -46,15 +46,15 @@ export const BzChart = ({ className }: { className?: string }) => {
         <ResponsiveContainer width="100%" height={240}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsla(200, 40%, 18%, 0.8)" />
-            <XAxis dataKey="time" tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} tickLine={false} axisLine={false} />
+            <XAxis dataKey="time" tick={{ fill: "hsl(36, 20%, 10%)", fontSize: 11 }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fill: "hsl(36, 20%, 10%)", fontSize: 11 }} tickLine={false} axisLine={false} />
             <RechartsTooltip content={<CustomTooltip />} />
             <ReferenceLine y={0} stroke="hsl(215, 20%, 35%)" strokeDasharray="3 3" />
-            <Line type="monotone" dataKey="bz" stroke="hsl(180, 100%, 50%)" strokeWidth={2} dot={false} />
+            <Line type="monotone" dataKey="bz" stroke="hsl(35, 100%, 50%)" strokeWidth={2} dot={false} />
           </LineChart>
         </ResponsiveContainer>
       )}
-      <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground/60 border-t border-border/30 pt-3">{t("charts.bzNote")}</p>
+      <p className="mt-3 text-[11px] leading-relaxed text-foreground border-t border-border/30 pt-3">{t("charts.bzNote")}</p>
     </div>
   );
 };

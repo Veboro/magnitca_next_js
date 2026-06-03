@@ -52,20 +52,20 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
           <AreaChart data={chartData}>
             <defs>
               <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(180, 100%, 50%)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(180, 100%, 50%)" stopOpacity={0} />
+                <stop offset="0%" stopColor="hsl(35, 100%, 82%)" stopOpacity={1} />
+                <stop offset="100%" stopColor="hsl(35, 100%, 82%)" stopOpacity={1} />
               </linearGradient>
               <linearGradient id="densityGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(35, 100%, 55%)" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="hsl(35, 100%, 55%)" stopOpacity={0} />
+                <stop offset="0%" stopColor="hsl(35, 90%, 82%)" stopOpacity={1} />
+                <stop offset="100%" stopColor="hsl(35, 90%, 82%)" stopOpacity={1} />
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsla(200, 40%, 18%, 0.8)" />
-            <XAxis dataKey="time" tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: "hsl(215, 20%, 55%)", fontSize: 11 }} tickLine={false} axisLine={false} />
+            <XAxis dataKey="time" tick={{ fill: "hsl(36, 20%, 10%)", fontSize: 11 }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fill: "hsl(36, 20%, 10%)", fontSize: 11 }} tickLine={false} axisLine={false} />
             <RechartsTooltip content={<CustomTooltip />} />
-            <Area type="monotone" dataKey="speed" name={t("charts.speed")} stroke="hsl(180, 100%, 50%)" fill="url(#speedGrad)" strokeWidth={2} />
-            <Area type="monotone" dataKey="density" name={t("charts.density")} stroke="hsl(35, 100%, 55%)" fill="url(#densityGrad)" strokeWidth={2} />
+            <Area type="monotone" dataKey="speed" name={t("charts.speed")} stroke="hsl(35, 100%, 50%)" fill="url(#speedGrad)" fillOpacity={1} strokeWidth={2} />
+            <Area type="monotone" dataKey="density" name={t("charts.density")} stroke="hsl(35, 100%, 55%)" fill="url(#densityGrad)" fillOpacity={1} strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
       )}

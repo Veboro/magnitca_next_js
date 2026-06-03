@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
         types: [],
         periods: [],
         details: [],
-        summary: locale === "ru" ? "Попередження тимчасово недоступні" : "Попередження тимчасово недоступні",
+        summary: locale === "ru" ? "Предупреждения временно недоступны" : "Попередження тимчасово недоступні",
         sourceUrl: "https://www.meteo.gov.ua/ua/Meteorolohichni-poperedzhennya",
       },
       {

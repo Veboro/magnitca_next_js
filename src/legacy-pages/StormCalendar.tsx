@@ -11,12 +11,28 @@ import type { SiteLocale } from "@/lib/locale";
 
 type LegacyLocale = SiteLocale;
 
-const levelColors: Record<StormLevel, string> = {
-  none: "",
-  minor: "bg-storm-minor/20 text-storm-minor border border-storm-minor/40",
-  moderate: "bg-storm-moderate/20 text-storm-moderate border border-storm-moderate/40",
-  strong: "bg-storm-strong/20 text-storm-strong border border-storm-strong/40",
-  severe: "bg-storm-severe/20 text-storm-severe border border-storm-severe/40 animate-pulse",
+const levelListStyles: Record<StormLevel, React.CSSProperties> = {
+  none: {},
+  minor: {
+    backgroundColor: "hsl(41 92% 42% / 0.18)",
+    color: "hsl(39 90% 26%)",
+    borderColor: "hsl(45 100% 58% / 0.48)",
+  },
+  moderate: {
+    backgroundColor: "hsl(24 86% 42% / 0.18)",
+    color: "hsl(22 88% 28%)",
+    borderColor: "hsl(24 96% 56% / 0.46)",
+  },
+  strong: {
+    backgroundColor: "hsl(12 72% 40% / 0.18)",
+    color: "hsl(10 76% 28%)",
+    borderColor: "hsl(12 84% 54% / 0.46)",
+  },
+  severe: {
+    backgroundColor: "hsl(0 62% 31% / 0.22)",
+    color: "hsl(0 72% 26%)",
+    borderColor: "hsl(0 82% 55% / 0.5)",
+  },
 };
 
 const levelLabels = {
@@ -57,12 +73,12 @@ const levelLabels = {
   },
 };
 
-const levelDotColors: Record<StormLevel, string> = {
-  none: "bg-storm-quiet",
-  minor: "bg-storm-minor",
-  moderate: "bg-storm-moderate",
-  strong: "bg-storm-strong",
-  severe: "bg-storm-severe",
+const levelDotStyles: Record<StormLevel, React.CSSProperties> = {
+  none: { backgroundColor: "hsl(145 58% 24%)" },
+  minor: { backgroundColor: "hsl(41 92% 42%)" },
+  moderate: { backgroundColor: "hsl(24 86% 42%)" },
+  strong: { backgroundColor: "hsl(12 72% 40%)" },
+  severe: { backgroundColor: "hsl(0 62% 31%)" },
 };
 
 const copy = {
@@ -209,26 +225,30 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
 
   const modifiersStyles = {
     minor: {
-      backgroundColor: "hsla(45, 93%, 47%, 0.15)",
-      color: "hsl(45, 93%, 47%)",
+      backgroundColor: "hsl(41 92% 42% / 0.18)",
+      color: "hsl(39 90% 26%)",
+      border: "1px solid hsl(45 100% 58% / 0.5)",
       borderRadius: "6px",
       fontWeight: 600,
     },
     moderate: {
-      backgroundColor: "hsla(25, 95%, 53%, 0.15)",
-      color: "hsl(25, 95%, 53%)",
+      backgroundColor: "hsl(24 86% 42% / 0.18)",
+      color: "hsl(22 88% 28%)",
+      border: "1px solid hsl(24 96% 56% / 0.46)",
       borderRadius: "6px",
       fontWeight: 600,
     },
     strong: {
-      backgroundColor: "hsla(0, 72%, 50%, 0.15)",
-      color: "hsl(0, 72%, 50%)",
+      backgroundColor: "hsl(12 72% 40% / 0.18)",
+      color: "hsl(10 76% 28%)",
+      border: "1px solid hsl(12 84% 54% / 0.46)",
       borderRadius: "6px",
       fontWeight: 600,
     },
     severe: {
-      backgroundColor: "hsla(0, 72%, 50%, 0.25)",
-      color: "hsl(0, 84%, 60%)",
+      backgroundColor: "hsl(0 62% 31% / 0.22)",
+      color: "hsl(0 72% 26%)",
+      border: "1px solid hsl(0 82% 55% / 0.5)",
       borderRadius: "6px",
       fontWeight: 700,
     },
@@ -243,9 +263,10 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
   const monthNameTitle = monthNameGenitive.charAt(0).toUpperCase() + monthNameGenitive.slice(1);
 
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+    <main className="official-page-main">
+      <div className="official-page-shell">
       {/* Header */}
-      <div className="mb-8 text-center">
+      <div className="official-page-header mb-8 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 mb-4">
           <CalendarDays className="h-4 w-4 text-primary" />
           <span className="font-mono text-xs text-primary">{t.badge}</span>
@@ -262,7 +283,7 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
       <div className="mb-6 flex flex-wrap items-center justify-center gap-3 sm:gap-5">
         {(["minor", "moderate", "strong", "severe"] as StormLevel[]).map((level) => (
           <div key={level} className="flex items-center gap-1.5">
-            <span className={`h-3 w-3 rounded-full ${levelDotColors[level]}`} />
+            <span className="h-3 w-3 rounded-full" style={levelDotStyles[level]} />
             <span className="font-mono text-xs text-muted-foreground">{levelLabels[locale][level]}</span>
           </div>
         ))}
@@ -314,10 +335,11 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
               .map((d) => (
                 <div
                   key={d.date}
-                  className={`flex items-center justify-between rounded-lg px-4 py-2.5 ${levelColors[d.level]}`}
+                  className={`flex items-center justify-between rounded-lg border px-4 py-2.5 ${d.level === "severe" ? "animate-pulse" : ""}`}
+                  style={levelListStyles[d.level]}
                 >
                   <div className="flex items-center gap-2">
-                    <span className={`h-2 w-2 rounded-full ${levelDotColors[d.level]}`} />
+                    <span className="h-2 w-2 rounded-full" style={levelDotStyles[d.level]} />
                     <span className="font-mono text-sm">
                       {new Date(d.date + "T00:00:00").toLocaleDateString(localeTag, {
                         day: "numeric",
@@ -349,7 +371,7 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
 
       {/* SEO text */}
       <section className="mt-10 border-t border-border/30 pt-8">
-        <div className="prose prose-invert prose-sm max-w-none space-y-4 text-muted-foreground/80 text-sm leading-relaxed">
+        <div className="official-page-prose prose prose-sm max-w-none space-y-4 text-sm leading-relaxed">
           <h2 className="text-lg font-display font-semibold text-foreground/90">
             {t.pageTitlePrefix} {monthNameTitle}
           </h2>
@@ -383,6 +405,7 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
           }),
         }}
       />
+      </div>
     </main>
   );
 }

@@ -2,6 +2,44 @@ export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl", "ro", "hu"] as const;
 
 export type SiteLocale = (typeof SUPPORTED_SITE_LOCALES)[number];
 
+export function getLocaleFromPathname(pathname?: string | null): SiteLocale {
+  const normalized = pathname ? pathname.split("?")[0]?.split("#")[0] || "/" : "/";
+
+  if (normalized === "hu") {
+    return "hu";
+  }
+
+  if (normalized === "ro") {
+    return "ro";
+  }
+
+  if (normalized === "pl") {
+    return "pl";
+  }
+
+  if (normalized === "ru") {
+    return "ru";
+  }
+
+  if (normalized === "/hu" || normalized.startsWith("/hu/")) {
+    return "hu";
+  }
+
+  if (normalized === "/ro" || normalized.startsWith("/ro/")) {
+    return "ro";
+  }
+
+  if (normalized === "/pl" || normalized.startsWith("/pl/")) {
+    return "pl";
+  }
+
+  if (normalized === "/ru" || normalized.startsWith("/ru/")) {
+    return "ru";
+  }
+
+  return "uk";
+}
+
 export function getPathForLocale(path: string, locale: SiteLocale) {
   const normalized = path === "/" ? "/" : path.replace(/\/$/, "");
 

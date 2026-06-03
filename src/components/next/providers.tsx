@@ -6,7 +6,7 @@ import { PropsWithChildren, useLayoutEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createI18nInstance } from "@/i18n/config";
 import { AppShell } from "@/components/next/app-shell";
-import { isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getLocaleFromPathname, type SiteLocale } from "@/lib/locale";
 
 export function Providers({
   children,
@@ -14,15 +14,7 @@ export function Providers({
 }: PropsWithChildren<{ initialLocale: SiteLocale }>) {
   const [queryClient] = useState(() => new QueryClient());
   const pathname = usePathname();
-  const currentLocale: SiteLocale = pathname && isHuPath(pathname)
-    ? "hu"
-    : pathname && isRoPath(pathname)
-    ? "ro"
-    : pathname && isPlPath(pathname)
-    ? "pl"
-    : pathname && isRuPath(pathname)
-      ? "ru"
-      : "uk";
+  const currentLocale: SiteLocale = pathname ? getLocaleFromPathname(pathname) : initialLocale;
   const i18n = useMemo(() => createI18nInstance(currentLocale), [currentLocale]);
 
   useLayoutEffect(() => {
