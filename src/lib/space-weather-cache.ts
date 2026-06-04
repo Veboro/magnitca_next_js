@@ -5,6 +5,7 @@ import type { KpForecastEntry } from "@/hooks/useKpForecast";
 import type { StormDay } from "@/hooks/useStormCalendar";
 
 const SWPC_BASE = "https://services.swpc.noaa.gov";
+const SPACE_WEATHER_MAX_AGE_MS = 15 * 60 * 1000;
 
 export const SPACE_WEATHER_KEYS = [
   "kp-index",
@@ -23,11 +24,22 @@ export async function getSpaceWeatherCache<T>(cacheKey: SpaceWeatherCacheKey): P
     const supabase = getSupabaseAdminClient() as any;
     const { data, error } = await supabase
       .from("space_weather_cache" as never)
-      .select("payload")
+      .select("payload, fetched_at")
       .eq("cache_key", cacheKey)
       .maybeSingle();
 
     if (error || !data) {
+      return null;
+    }
+
+    const fetchedAt = Date.parse(data.fetched_at ?? "");
+    if (!Number.isFinite(fetchedAt)) {
+      return null;
+    }
+
+    // If the background refresh job stalls, fall back to a live NOAA fetch instead
+    // of embedding stale space weather data into the rendered HTML.
+    if (Date.now() - fetchedAt > SPACE_WEATHER_MAX_AGE_MS) {
       return null;
     }
 

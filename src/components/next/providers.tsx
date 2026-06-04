@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { PropsWithChildren, useLayoutEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createI18nInstance } from "@/i18n/config";
-import { AppShell } from "@/components/next/app-shell";
 import { getLocaleFromPathname, type SiteLocale } from "@/lib/locale";
 
 export function Providers({
@@ -23,9 +22,7 @@ export function Providers({
 
   return (
     <I18nextProvider i18n={i18n} defaultNS="translation" key={currentLocale}>
-      <QueryClientProvider client={queryClient}>
-        <AppShell>{children}</AppShell>
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     </I18nextProvider>
   );
 }

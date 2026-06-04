@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import MeteoTestPage from "@/legacy-pages/MeteoTest";
 
 export const metadata: Metadata = {
-  title: "Тест на метеозависимость — чувствительность к магнитным бурям | Магнитка",
+  title: {
+    absolute: "Тест на метеозависимость — чувствительность к магнитным бурям | Магнитка",
+  },
   description:
     "Бесплатный тест на метеочувствительность. Узнайте, насколько ваш организм чувствителен к магнитным бурям и геомагнитной активности.",
   alternates: {

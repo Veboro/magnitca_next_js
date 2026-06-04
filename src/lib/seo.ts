@@ -58,6 +58,11 @@ const RU_PAGE_META: Record<string, { title: string; description: string }> = {
     description:
       "Календарь магнитных бурь на текущий месяц и ближайший прогноз геомагнитной активности.",
   },
+  news: {
+    title: "Новости магнитных бурь",
+    description:
+      "Ежедневные новости о магнитных бурях, геомагнитной активности, прогнозах NOAA и влиянии космической погоды на самочувствие.",
+  },
 };
 
 const PL_PAGE_META: Record<string, { title: string; description: string }> = {
