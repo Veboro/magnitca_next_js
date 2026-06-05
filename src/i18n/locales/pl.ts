@@ -88,9 +88,9 @@ const pl = {
     desc0: "Aktywnosc geomagnetyczna jest spokojna. Nie przewiduje sie silniejszych zaburzen.",
     desc1: "Mozliwe slabsze wahania w sieciach wysokich szerokosci i niewielkie skutki dla wrazliwych osob.",
     desc2: "Mozliwe bardziej widoczne zaburzenia geomagnetyczne oraz odczuwalny wplyw na samopoczucie.",
-    desc3: "Silniejsza aktywnosc moze prowadzic do zaklocen lacznosci i bardziej wyraznych objawow meteowrazliwosci.",
-    desc4: "Bardzo silna burza geomagnetyczna moze powodowac szersze zaklocenia techniczne.",
-    desc5: "Ekstremalna aktywnosc geomagnetyczna moze silnie oddzialywac na infrastrukture i lacznosc.",
+    desc3: "Wyraznie podwyzszona aktywnosc: osoby meteowrazliwe moga odczuwac zmeczenie, bol glowy i spadek koncentracji.",
+    desc4: "Bardzo silne tlo geomagnetyczne moze nasilac dyskomfort, drazliwosc i problemy ze snem.",
+    desc5: "Ekstremalna aktywnosc: osoby wrazliwe powinny ograniczyc wysilek i uwazniej obserwowac samopoczucie.",
   },
   impact: {
     ...uk.impact,

@@ -56,12 +56,6 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
 
   const gLevel = scales?.g?.Scale ?? 0;
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
-  const effectiveLevel = getEffectiveLevel(gLevel, latestKp);
-  const color = levelColors[effectiveLevel] || levelColors[0];
-  const badgeTone = getBadgeTone(effectiveLevel);
-
-  const levelLabel = t(`storm.level${effectiveLevel}`);
-  const levelDesc = t(`storm.desc${effectiveLevel}`);
 
   const now = new Date();
   const kyivDate = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Kyiv" }));
@@ -73,6 +67,19 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
     return tag === todayStr || (t2 >= now && t2 <= new Date(now.getTime() + 24 * 60 * 60 * 1000));
   });
   const todayEntries = forecast.filter((e) => e.time_tag.slice(0, 10) === todayStr);
+  const todayMaxForecastKp = todayEntries.reduce((max, entry) => Math.max(max, entry.kp), 0);
+  const currentEffectiveLevel = getEffectiveLevel(gLevel, latestKp);
+  const forecastEffectiveLevel = getEffectiveLevel(0, todayMaxForecastKp);
+  const effectiveLevel = Math.max(currentEffectiveLevel, forecastEffectiveLevel);
+  const isForecastDriven = forecastEffectiveLevel > currentEffectiveLevel;
+  const color = levelColors[effectiveLevel] || levelColors[0];
+  const badgeTone = getBadgeTone(effectiveLevel);
+  const badgeMeta = isForecastDriven
+    ? `Kp ${todayMaxForecastKp.toFixed(1)}`
+    : `R${scales?.r?.Scale ?? 0} S${scales?.s?.Scale ?? 0} G${gLevel}`;
+
+  const levelLabel = t(`storm.level${effectiveLevel}`);
+  const levelDesc = t(`storm.desc${effectiveLevel}`);
   const heroBg = "/hero-bg.jpg";
   const ukraineOutline = i18n.language === "pl" ? undefined : "/ukraine-outline.png";
 
@@ -103,7 +110,7 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
             <p className="font-mono text-xs font-bold text-foreground mt-1">
               {effectiveLevel > 0 ? t("storm.active") : t("storm.normal")}
             </p>
-            <p className="text-[10px] text-muted-foreground">R{scales?.r?.Scale ?? 0} S{scales?.s?.Scale ?? 0} G{gLevel}</p>
+            <p className="text-[10px] text-muted-foreground">{badgeMeta}</p>
           </div>
         </div>
 
