@@ -1,4 +1,4 @@
-export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl", "ro", "hu"] as const;
+export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl", "ro", "hu", "en"] as const;
 
 export type SiteLocale = (typeof SUPPORTED_SITE_LOCALES)[number];
 
@@ -7,6 +7,10 @@ export function getLocaleFromPathname(pathname?: string | null): SiteLocale {
 
   if (normalized === "hu") {
     return "hu";
+  }
+
+  if (normalized === "en") {
+    return "en";
   }
 
   if (normalized === "ro") {
@@ -23,6 +27,10 @@ export function getLocaleFromPathname(pathname?: string | null): SiteLocale {
 
   if (normalized === "/hu" || normalized.startsWith("/hu/")) {
     return "hu";
+  }
+
+  if (normalized === "/en" || normalized.startsWith("/en/")) {
+    return "en";
   }
 
   if (normalized === "/ro" || normalized.startsWith("/ro/")) {
@@ -59,6 +67,10 @@ export function getPathForLocale(path: string, locale: SiteLocale) {
     return normalized === "/" ? "/hu" : `/hu${normalized}`;
   }
 
+  if (locale === "en") {
+    return normalized === "/" ? "/en" : `/en${normalized}`;
+  }
+
   return normalized === "/" ? "/ro" : `/ro${normalized}`;
 }
 
@@ -78,10 +90,14 @@ export function isHuPath(pathname: string) {
   return pathname === "/hu" || pathname.startsWith("/hu/");
 }
 
+export function isEnPath(pathname: string) {
+  return pathname === "/en" || pathname.startsWith("/en/");
+}
+
 export function switchPathLocale(pathname: string, locale: SiteLocale) {
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized)
-    ? normalized.replace(/^\/(ru|pl|ro|hu)(?=\/|$)/, "") || "/"
+  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized) || isEnPath(normalized)
+    ? normalized.replace(/^\/(ru|pl|ro|hu|en)(?=\/|$)/, "") || "/"
     : normalized;
 
   return getPathForLocale(basePath, locale);
@@ -89,24 +105,32 @@ export function switchPathLocale(pathname: string, locale: SiteLocale) {
 
 export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-  const currentLocale: SiteLocale = isHuPath(normalized) ? "hu" : isRoPath(normalized) ? "ro" : isPlPath(normalized) ? "pl" : isRuPath(normalized) ? "ru" : "uk";
-  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized)
-    ? normalized.replace(/^\/(ru|pl|ro|hu)(?=\/|$)/, "") || "/"
+  const currentLocale: SiteLocale = isEnPath(normalized) ? "en" : isHuPath(normalized) ? "hu" : isRoPath(normalized) ? "ro" : isPlPath(normalized) ? "pl" : isRuPath(normalized) ? "ru" : "uk";
+  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized) || isEnPath(normalized)
+    ? normalized.replace(/^\/(ru|pl|ro|hu|en)(?=\/|$)/, "") || "/"
     : normalized;
 
   const isCityPage = basePath.startsWith("/city/");
   const isCitiesCatalogPage = basePath === "/cities" || basePath.startsWith("/cities/");
-  const isNewsPage = basePath === "/news" || basePath.startsWith("/news/");
+  const isUnsupportedCityLocale = (itemLocale: SiteLocale) =>
+    itemLocale === "pl" || itemLocale === "ro" || itemLocale === "hu" || itemLocale === "en";
 
-  if (isCityPage && (currentLocale === "pl" || locale === "pl" || currentLocale === "ro" || locale === "ro" || currentLocale === "hu" || locale === "hu")) {
+  if (isCityPage && (isUnsupportedCityLocale(currentLocale) || isUnsupportedCityLocale(locale))) {
     return getPathForLocale("/", locale);
   }
 
-  if (isCitiesCatalogPage && (locale === "pl" || locale === "ro" || locale === "hu")) {
+  if (isCitiesCatalogPage && isUnsupportedCityLocale(locale)) {
     return getPathForLocale("/", locale);
   }
 
-  if (isNewsPage && (currentLocale === "pl" || locale === "pl" || currentLocale === "ro" || locale === "ro" || currentLocale === "hu" || locale === "hu")) {
+  const isSunPage =
+    basePath === "/sunrise" ||
+    basePath === "/sunrise-tomorrow" ||
+    basePath === "/sunset" ||
+    basePath === "/sunset-tomorrow" ||
+    /^\/country\/[^/]+\/sun/.test(basePath);
+
+  if (isSunPage && locale === "en") {
     return getPathForLocale("/", locale);
   }
 

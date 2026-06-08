@@ -2,6 +2,8 @@ import { AlertTriangle, Zap, TrendingUp } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useNoaaScales, useKpIndex, type KpEntry, type NoaaScales } from "@/hooks/useSpaceWeather";
 import { useKpForecast, type KpForecastEntry } from "@/hooks/useKpForecast";
+import { StormFeelingPoll } from "@/components/dashboard/StormFeelingPoll";
+import type { SiteLocale } from "@/lib/locale";
 
 const getEffectiveLevel = (gLevel: number, kp: number): number => {
   const kpLevel = kp < 4 ? 0 : kp < 5 ? 1 : kp < 6 ? 2 : kp < 7 ? 3 : kp < 8 ? 4 : 5;
@@ -49,7 +51,23 @@ interface StormStatusBannerProps {
 
 export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }: StormStatusBannerProps) => {
   const { t, i18n } = useTranslation();
-  const locale = i18n.language === "ru" ? "ru-RU" : i18n.language === "pl" ? "pl-PL" : "uk-UA";
+  const siteLocale: SiteLocale =
+    i18n.language === "ru" || i18n.language === "pl" || i18n.language === "ro" || i18n.language === "hu" || i18n.language === "en"
+      ? i18n.language
+      : "uk";
+  const showTelegramCta = siteLocale === "uk" || siteLocale === "ru";
+  const locale =
+    siteLocale === "ru"
+      ? "ru-RU"
+      : siteLocale === "pl"
+        ? "pl-PL"
+        : siteLocale === "ro"
+          ? "ro-MD"
+          : siteLocale === "hu"
+            ? "hu-HU"
+            : siteLocale === "en"
+              ? "en-US"
+              : "uk-UA";
   const { data: scales } = useNoaaScales(initialScales ?? undefined);
   const { data: kpData } = useKpIndex(initialKp ?? undefined);
   const { data: forecast = [] } = useKpForecast(initialForecast ?? undefined);
@@ -142,7 +160,10 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
                 })}
               </div>
 
-              <div className="mt-1 hidden h-16 grid-cols-8 items-end gap-1 overflow-hidden sm:grid">
+              <div
+                className="mt-1 hidden min-h-[74px] items-end gap-1 sm:grid"
+                style={{ gridTemplateColumns: `repeat(${todayEntries.length}, minmax(0, 1fr))` }}
+              >
                 {todayEntries.map((entry, i) => {
                   const hour = new Date(entry.time_tag).toLocaleString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
                   const entryColor = levelColors[getEffectiveLevel(0, entry.kp)] || levelColors[0];
@@ -164,17 +185,21 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
           )}
         </div>
 
-        <a
-          href="https://t.me/+7UKzAK5ur8UxZmMy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
-        >
-          <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
-            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-          </svg>
-          {t("storm.telegramCta")}
-        </a>
+        <StormFeelingPoll locale={siteLocale} kpNow={latestKp} kpTodayMax={todayMaxForecastKp} />
+
+        {showTelegramCta && (
+          <a
+            href="https://t.me/+7UKzAK5ur8UxZmMy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20"
+          >
+            <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+            </svg>
+            {t("storm.telegramCta")}
+          </a>
+        )}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Sunrise, Sunset, Wind, X } from "lucide-react";
-import { getPathForLocale, getSafeLocaleSwitchPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, getSafeLocaleSwitchPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
 import { CITIES_HU } from "@/data/cities-hu";
@@ -60,6 +60,16 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/test", label: "Teszt", icon: ClipboardCheck },
     { href: "/faq", label: "GYIK", icon: HelpCircle },
   ],
+  en: [
+    { href: "/", label: "Home", icon: Activity },
+    { href: "/kp-index", label: "Kp index", icon: Gauge },
+    { href: "/solar-wind", label: "Solar wind", icon: Wind },
+    { href: "/moon-calendar", label: "Moon calendar", icon: Moon },
+    { href: "/news", label: "News", icon: Newspaper },
+    { href: "/calendar", label: "Calendar", icon: CalendarDays },
+    { href: "/test", label: "Test", icon: ClipboardCheck },
+    { href: "/faq", label: "FAQ", icon: HelpCircle },
+  ],
 };
 
 const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
@@ -82,6 +92,10 @@ const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
   hu: {
     brand: "Magnitca",
     tagline: "Űridőjárás és mágneses viharok",
+  },
+  en: {
+    brand: "Magnitca",
+    tagline: "Space weather and magnetic storms",
   },
 };
 
@@ -168,6 +182,7 @@ const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> =
     { href: "/hu/sunset", label: "Napnyugta ma" },
     { href: "/hu/sunset-tomorrow", label: "Napnyugta holnap" },
   ],
+  en: [],
 };
 
 function getSunMenuIcon(href: string) {
@@ -177,7 +192,7 @@ function getSunMenuIcon(href: string) {
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const locale: SiteLocale = pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const pathnameValue = pathname || "/";
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -191,6 +206,7 @@ export function PublicHeader() {
     pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
     ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
     hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
+    en: getSafeLocaleSwitchPath(pathnameValue, "en"),
   });
 
   const searchCopy = {
@@ -224,9 +240,27 @@ export function PublicHeader() {
       citySection: "Városoldalak",
       oblastSection: "Régiók",
     },
+    en: {
+      placeholder: "Search pages",
+      empty: "No results found",
+      citySection: "Pages",
+      oblastSection: "Regions",
+    },
   } as const;
 
   const citySearchItems = useMemo<SearchCityItem[]>(() => {
+    if (locale === "en") {
+      return [
+        { name: "Kp index", href: "/en/kp-index", searchText: "kp index geomagnetic activity" },
+        { name: "Solar wind", href: "/en/solar-wind", searchText: "solar wind speed density bz" },
+        { name: "Magnetic storm calendar", href: "/en/calendar", searchText: "magnetic storm calendar forecast" },
+        { name: "Moon calendar", href: "/en/moon-calendar", searchText: "moon calendar lunar phases" },
+        { name: "News", href: "/en/news", searchText: "news magnetic storms" },
+        { name: "Sensitivity test", href: "/en/test", searchText: "test weather sensitivity" },
+        { name: "FAQ", href: "/en/faq", searchText: "faq questions" },
+      ];
+    }
+
     if (locale === "ro") {
       return CITIES_MD.map((city) => ({
         name: city.name,
@@ -272,7 +306,7 @@ export function PublicHeader() {
   }, [locale]);
 
   const oblastSearchItems = useMemo<SearchCityItem[]>(() => {
-    if (locale === "pl" || locale === "ro" || locale === "hu") {
+    if (locale === "pl" || locale === "ro" || locale === "hu" || locale === "en") {
       return [];
     }
 
@@ -319,6 +353,7 @@ export function PublicHeader() {
       pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
       ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
       hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
+      en: getSafeLocaleSwitchPath(pathnameValue, "en"),
     };
 
     const ukAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="uk"]');
@@ -326,6 +361,7 @@ export function PublicHeader() {
     const plAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="pl"]');
     const roAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ro"]');
     const huAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="hu"]');
+    const enAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="en"]');
 
     const toRelativePath = (href: string | null | undefined) => {
       if (!href) return null;
@@ -343,6 +379,7 @@ export function PublicHeader() {
     const plPath = toRelativePath(plAlternate?.href);
     const roPath = toRelativePath(roAlternate?.href);
     const huPath = toRelativePath(huAlternate?.href);
+    const enPath = toRelativePath(enAlternate?.href);
 
     if (ukPath) {
       nextLinks.uk = ukPath;
@@ -362,6 +399,10 @@ export function PublicHeader() {
 
     if (huPath) {
       nextLinks.hu = huPath;
+    }
+
+    if (enPath) {
+      nextLinks.en = enPath;
     }
 
     setLocaleLinks(nextLinks);
@@ -419,7 +460,7 @@ export function PublicHeader() {
   }, [searchOpen]);
 
   const localizedSunMenu = sunMenuItems[locale];
-  const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : locale === "hu" ? "Nap" : "Сонце";
+  const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : locale === "hu" ? "Nap" : "Sun";
   const sunMenuActive =
     pathnameValue.startsWith("/sunrise") ||
     pathnameValue.startsWith("/sunset") ||
@@ -634,7 +675,7 @@ export function PublicHeader() {
             </button>
             {mobileLocaleOpen && (
               <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[88px] rounded-2xl border border-border/50 p-1.5 shadow-xl">
-                {(["uk", "ru", "pl", "ro", "hu"] as SiteLocale[]).map((nextLocale) => {
+                {(["uk", "ru", "pl", "ro", "hu", "en"] as SiteLocale[]).map((nextLocale) => {
                   const nextPath = localeLinks[nextLocale] ?? getSafeLocaleSwitchPath(pathnameValue, nextLocale);
                   const isActive = locale === nextLocale;
 
@@ -702,6 +743,16 @@ export function PublicHeader() {
                 }`}
               >
                 HU
+              </Link>
+            )}
+            {localeLinks.en && (
+              <Link
+                href={localeLinks.en}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  locale === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                EN
               </Link>
             )}
           </div>

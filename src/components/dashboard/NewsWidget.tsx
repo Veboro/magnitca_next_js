@@ -12,20 +12,19 @@ export const NewsWidget = ({ className }: { className?: string }) => {
   const isRussian = i18n.language.startsWith("ru");
   const isPolish = i18n.language.startsWith("pl");
   const isRomanian = i18n.language.startsWith("ro");
-  const locale = isRussian ? "ru-RU" : isPolish ? "pl-PL" : isRomanian ? "ro-MD" : "uk-UA";
-  const langPrefix = isRussian ? "/ru" : isPolish ? "/pl" : isRomanian ? "/ro" : "";
+  const isHungarian = i18n.language.startsWith("hu");
+  const isEnglish = i18n.language.startsWith("en");
+  const locale = isRussian ? "ru-RU" : isPolish ? "pl-PL" : isRomanian ? "ro-MD" : isHungarian ? "hu-HU" : isEnglish ? "en-US" : "uk-UA";
+  const langPrefix = isRussian ? "/ru" : isPolish ? "/pl" : isRomanian ? "/ro" : isHungarian ? "/hu" : isEnglish ? "/en" : "";
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(locale, { day: "numeric", month: "short" });
 
   const { data: news = [], isLoading } = useQuery<NewsItem[]>({
     queryKey: ["news-widget", i18n.language],
     queryFn: async () => {
-      if (isPolish || isRomanian) {
-        return [];
-      }
       const { data, error } = await supabase
         .from("news")
-        .select("id, title_uk, slug_uk, title_ru, slug_ru, published_at")
+        .select("id, title_uk, slug_uk, title_ru, slug_ru, title_pl, slug_pl, title_ro, slug_ro, title_hu, slug_hu, title_en, slug_en, published_at")
         .eq("status", "published")
         .neq("source", "telegram_ai")
         .order("published_at", { ascending: false })
@@ -34,8 +33,8 @@ export const NewsWidget = ({ className }: { className?: string }) => {
       return (data ?? [])
         .map((item) => ({
           id: item.id,
-          title: isRussian ? item.title_ru : item.title_uk,
-          slug: isRussian ? item.slug_ru : item.slug_uk,
+          title: isRussian ? item.title_ru : isPolish ? item.title_pl : isRomanian ? item.title_ro : isHungarian ? item.title_hu : isEnglish ? item.title_en : item.title_uk,
+          slug: isRussian ? item.slug_ru : isPolish ? item.slug_pl : isRomanian ? item.slug_ro : isHungarian ? item.slug_hu : isEnglish ? item.slug_en : item.slug_uk,
           published_at: item.published_at,
         }))
         .filter((item) => item.title && item.slug) as NewsItem[];
@@ -50,9 +49,7 @@ export const NewsWidget = ({ className }: { className?: string }) => {
           <Newspaper className="h-4 w-4 text-primary" />
           <h3 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("newsWidget.title")}</h3>
         </div>
-        {!isPolish && !isRomanian && (
-          <Link href={`${langPrefix}/news`} className="text-xs text-primary hover:text-primary/80 transition-colors">{t("newsWidget.allNews")}</Link>
-        )}
+        <Link href={`${langPrefix}/news`} className="text-xs text-primary hover:text-primary/80 transition-colors">{t("newsWidget.allNews")}</Link>
       </div>
 
       {isLoading ? (

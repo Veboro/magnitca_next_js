@@ -10,12 +10,18 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
       ? "pl-PL"
       : i18n.language.startsWith("ro")
         ? "ro-MD"
-        : "uk-UA";
+        : i18n.language.startsWith("hu")
+          ? "hu-HU"
+          : i18n.language.startsWith("en")
+            ? "en-US"
+            : "uk-UA";
   const timeZone = i18n.language.startsWith("pl")
     ? "Europe/Warsaw"
     : i18n.language.startsWith("ro")
       ? "Europe/Chisinau"
-      : "Europe/Kyiv";
+      : i18n.language.startsWith("hu")
+        ? "Europe/Budapest"
+        : "Europe/Kyiv";
   const densityUnit = i18n.language.startsWith("uk") || i18n.language.startsWith("ru") ? "p/см³" : "p/cm³";
   const { data: rawData, isLoading } = useSolarWind();
 

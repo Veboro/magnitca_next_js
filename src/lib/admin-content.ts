@@ -7,6 +7,28 @@ export type PageMetaRecord = {
   description: string;
 };
 
+type PageMetaQueryResult<T> = {
+  data: T | null;
+  error: { message: string } | null;
+};
+
+type PageMetaQueryBuilder<T> = {
+  select(columns: string): PageMetaQueryBuilder<T>;
+  eq(column: string, value: string): PageMetaQueryBuilder<T>;
+  order(column: string): Promise<PageMetaQueryResult<T[]>>;
+  maybeSingle(): Promise<PageMetaQueryResult<T>>;
+};
+
+type PageMetaSupabaseClient = {
+  from(table: "page_metadata"): PageMetaQueryBuilder<PageMetaRecord> & {
+    upsert(input: PageMetaRecord, options: { onConflict: string }): Promise<PageMetaQueryResult<null>>;
+  };
+};
+
+function getPageMetaClient() {
+  return getSupabaseAdminClient() as unknown as PageMetaSupabaseClient;
+}
+
 export const DEFAULT_PAGE_META: Record<string, PageMetaRecord> = {
   home: {
     page_key: "home",
@@ -85,9 +107,9 @@ export async function getPageMeta(pageKey: string) {
   const fallback = DEFAULT_PAGE_META[pageKey];
 
   try {
-    const supabase = getSupabaseAdminClient() as any;
+    const supabase = getPageMetaClient();
     const { data, error } = await supabase
-      .from("page_metadata" as never)
+      .from("page_metadata")
       .select("page_key, title, description")
       .eq("page_key", pageKey)
       .maybeSingle();
@@ -107,9 +129,9 @@ export async function getPageMeta(pageKey: string) {
 }
 
 export async function listPageMeta() {
-  const supabase = getSupabaseAdminClient() as any;
+  const supabase = getPageMetaClient();
   const { data, error } = await supabase
-    .from("page_metadata" as never)
+    .from("page_metadata")
     .select("page_key, title, description")
     .order("page_key");
 
@@ -124,7 +146,7 @@ export async function listPageMeta() {
 }
 
 export async function upsertPageMeta(input: PageMetaRecord) {
-  const supabase = getSupabaseAdminClient() as any;
+  const supabase = getPageMetaClient();
   const { error } = await supabase.from("page_metadata").upsert(input, {
     onConflict: "page_key",
   });
@@ -138,10 +160,35 @@ export async function listNewsAdmin() {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("news")
-    .select("id, title_uk, slug_uk, title_ru, slug_ru, published_at, source, status")
+    .select("id, title_uk, slug_uk, title_ru, slug_ru, title_pl, slug_pl, title_ro, slug_ro, title_hu, slug_hu, title_en, slug_en, published_at, source, status")
+    .neq("source", "telegram_ai")
     .order("published_at", { ascending: false });
 
   if (error) {
+    if (error.message.includes("does not exist")) {
+      const fallback = await supabase
+        .from("news")
+        .select("id, title_uk, slug_uk, title_ru, slug_ru, published_at, source, status")
+        .neq("source", "telegram_ai")
+        .order("published_at", { ascending: false });
+
+      if (fallback.error) {
+        throw new Error(fallback.error.message);
+      }
+
+      return (fallback.data ?? []).map((item) => ({
+        ...item,
+        title_pl: null,
+        slug_pl: null,
+        title_ro: null,
+        slug_ro: null,
+        title_hu: null,
+        slug_hu: null,
+        title_en: null,
+        slug_en: null,
+      }));
+    }
+
     throw new Error(error.message);
   }
 
@@ -166,6 +213,18 @@ export async function createNewsAdmin(input: {
   title_ru: string | null;
   slug_ru: string | null;
   content_ru: string | null;
+  title_pl: string | null;
+  slug_pl: string | null;
+  content_pl: string | null;
+  title_ro: string | null;
+  slug_ro: string | null;
+  content_ro: string | null;
+  title_hu: string | null;
+  slug_hu: string | null;
+  content_hu: string | null;
+  title_en: string | null;
+  slug_en: string | null;
+  content_en: string | null;
   image_url: string | null;
   published_at: string;
   status: string;
@@ -173,6 +232,14 @@ export async function createNewsAdmin(input: {
   meta_description_uk: string | null;
   meta_title_ru: string | null;
   meta_description_ru: string | null;
+  meta_title_pl: string | null;
+  meta_description_pl: string | null;
+  meta_title_ro: string | null;
+  meta_description_ro: string | null;
+  meta_title_hu: string | null;
+  meta_description_hu: string | null;
+  meta_title_en: string | null;
+  meta_description_en: string | null;
   source: string;
 }) {
   const supabase = getSupabaseAdminClient();
@@ -205,6 +272,18 @@ export async function updateNewsAdmin(
     title_ru: string | null;
     slug_ru: string | null;
     content_ru: string | null;
+    title_pl: string | null;
+    slug_pl: string | null;
+    content_pl: string | null;
+    title_ro: string | null;
+    slug_ro: string | null;
+    content_ro: string | null;
+    title_hu: string | null;
+    slug_hu: string | null;
+    content_hu: string | null;
+    title_en: string | null;
+    slug_en: string | null;
+    content_en: string | null;
     image_url: string | null;
     published_at: string;
     status: string;
@@ -212,6 +291,14 @@ export async function updateNewsAdmin(
     meta_description_uk: string | null;
     meta_title_ru: string | null;
     meta_description_ru: string | null;
+    meta_title_pl: string | null;
+    meta_description_pl: string | null;
+    meta_title_ro: string | null;
+    meta_description_ro: string | null;
+    meta_title_hu: string | null;
+    meta_description_hu: string | null;
+    meta_title_en: string | null;
+    meta_description_en: string | null;
     source: string;
   }
 ) {
@@ -244,6 +331,21 @@ export async function deleteNewsAdmin(id: string) {
   if (error) {
     throw new Error(error.message);
   }
+}
+
+export async function listTestResultsAdmin(limit = 200) {
+  const supabase = getSupabaseAdminClient();
+  const { data, error } = await supabase
+    .from("test_results")
+    .select("id, created_at, locale, score, result_label, name, age, gender, has_chronic, physical_activity, answers, user_id")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
 }
 
 export async function resolveMetadata(pageKey: string, canonical: string): Promise<Metadata> {

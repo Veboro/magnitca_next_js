@@ -38,7 +38,11 @@ export const Forecast27Day = ({
       ? "pl-PL"
       : i18n.language.startsWith("ro")
         ? "ro-MD"
-        : "uk-UA";
+        : i18n.language.startsWith("hu")
+          ? "hu-HU"
+          : i18n.language.startsWith("en")
+            ? "en-US"
+            : "uk-UA";
   const weekdays = [t("forecast27.mon"), t("forecast27.tue"), t("forecast27.wed"), t("forecast27.thu"), t("forecast27.fri"), t("forecast27.sat"), t("forecast27.sun")];
   const { data: days = [], isLoading } = useKpForecast27Day();
 

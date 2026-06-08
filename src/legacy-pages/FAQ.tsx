@@ -642,6 +642,114 @@ const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
       },
     ],
   },
+  en: {
+    metaTitle: "FAQ — Magnitca | Magnetic storm questions",
+    metaDescription:
+      "Simple answers about magnetic storms, the Kp index, solar wind, forecasts and possible effects on wellbeing.",
+    heading: "Frequently asked questions",
+    intro:
+      "Everything you need to know about magnetic storms, solar activity and their possible impact on wellbeing, explained in plain language.",
+    sections: [
+      {
+        title: "Magnetic storm basics",
+        icon: Zap,
+        items: [
+          {
+            q: "What is a magnetic storm?",
+            a: "A magnetic storm is a temporary disturbance of Earth's magnetic field caused by charged particles from the Sun. It often follows a coronal mass ejection or a faster stream of solar wind.",
+          },
+          {
+            q: "What is the Kp index?",
+            a: "The Kp index is a global measure of geomagnetic activity on a scale from 0 to 9. Values from 0 to 3 are usually calm, Kp 4 is unsettled, and Kp 5 or higher indicates a geomagnetic storm.",
+          },
+          {
+            q: "What does the G1-G5 scale mean?",
+            a: "NOAA's G scale classifies geomagnetic storms from G1 to G5. G1 is minor, while G5 is extreme. Higher levels mean stronger potential effects on navigation, communication, power systems and sensitive people.",
+          },
+          {
+            q: "Do magnetic storms depend on a city or country?",
+            a: "Geomagnetic activity is global. Local differences are mostly related to latitude, weather and observation conditions, not to a separate Kp value for each city.",
+          },
+        ],
+      },
+      {
+        title: "Solar activity",
+        icon: Sun,
+        items: [
+          {
+            q: "What is solar wind?",
+            a: "Solar wind is a stream of charged particles flowing from the Sun. When its speed, density or magnetic field changes sharply, geomagnetic activity near Earth can increase.",
+          },
+          {
+            q: "What is IMF Bz?",
+            a: "Bz is the north-south component of the interplanetary magnetic field. Negative, or southward, Bz makes it easier for solar wind energy to enter Earth's magnetosphere.",
+          },
+          {
+            q: "What is a coronal mass ejection?",
+            a: "A coronal mass ejection, or CME, is a large cloud of solar plasma and magnetic field released from the Sun. If it is directed toward Earth, it can trigger a magnetic storm.",
+          },
+        ],
+      },
+      {
+        title: "Wellbeing",
+        icon: Heart,
+        items: [
+          {
+            q: "Can people feel magnetic storms?",
+            a: "Scientific evidence is mixed, but many weather-sensitive people report fatigue, headache, irritability, pressure changes or poorer sleep during active geomagnetic periods.",
+          },
+          {
+            q: "What should I do on active days?",
+            a: "Keep a calmer pace, drink enough water, avoid unnecessary overload and follow the forecast. Magnitca is informational and does not replace medical advice.",
+          },
+          {
+            q: "Who may be more sensitive?",
+            a: "Older people, people with cardiovascular or chronic conditions and those already sensitive to weather changes may notice active days more often. Individual reactions vary a lot.",
+          },
+        ],
+      },
+      {
+        title: "Technology",
+        icon: Wifi,
+        items: [
+          {
+            q: "Can magnetic storms affect GPS?",
+            a: "During stronger storms, ionospheric disturbances can reduce satellite navigation accuracy. For everyday users this may be subtle, but professional systems monitor it closely.",
+          },
+          {
+            q: "Can a storm damage my phone?",
+            a: "Everyday phones are not directly damaged by magnetic storms. Strong storms can affect some navigation and communication systems, but household electronics are generally safe.",
+          },
+          {
+            q: "Why do power systems monitor space weather?",
+            a: "Very strong geomagnetic storms can induce currents in long conductors such as power lines. That is why the energy sector watches NOAA storm scales.",
+          },
+        ],
+      },
+      {
+        title: "Data and forecasts",
+        icon: Activity,
+        items: [
+          {
+            q: "Where does Magnitca get the data?",
+            a: "Space weather data comes from open NOAA Space Weather Prediction Center sources. Magnitca presents it in a clearer, more everyday-friendly format.",
+          },
+          {
+            q: "How often is the data updated?",
+            a: "Indicators update throughout the day depending on source availability. Solar wind data is refreshed frequently, while official forecasts are updated by NOAA on their own schedule.",
+          },
+          {
+            q: "Why can current Kp and today's maximum differ?",
+            a: "Current Kp shows the present situation, while today's maximum is the highest value measured or expected during the day. Activity can peak earlier and become calmer later.",
+          },
+          {
+            q: "Can Magnitca be used for critical decisions?",
+            a: "For critical technical, aviation, energy or medical decisions, always check primary official sources and professional protocols. Magnitca is designed for public awareness.",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 function buildFaqJsonLd(sections: FAQSection[]) {

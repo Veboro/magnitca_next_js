@@ -8,6 +8,7 @@ const ROOT_TITLES: Record<SiteLocale, string> = {
   pl: "Burze magnetyczne dzisiaj — indeks Kp, wiatr słoneczny i prognoza | Magnitca",
   ro: "Furtuni magnetice astăzi — indice Kp, vânt solar și prognoză | Magnitca",
   hu: "Mágneses viharok ma — Kp-index, napszél és előrejelzés | Magnitca",
+  en: "Magnetic storms today — Kp index, solar wind and forecast | Magnitca",
 };
 
 const OG_LOCALE: Record<SiteLocale, string> = {
@@ -16,6 +17,7 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   pl: "pl_PL",
   ro: "ro_MD",
   hu: "hu_HU",
+  en: "en_US",
 };
 
 export function createRootMetadata(locale: SiteLocale): Metadata {

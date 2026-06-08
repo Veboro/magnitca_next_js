@@ -26,6 +26,7 @@ import type { SiteLocale } from "@/lib/locale";
 import { getUhmcRegionCode } from "@/lib/uhmc-warning";
 import { getHungaroMetCountyForCity } from "@/lib/hungaromet-counties";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
+import { CityStormFeelingSummary } from "@/components/city/city-storm-feeling-summary";
 import { getOblastPathsByKey, getOblastTitle } from "@/lib/oblast-routes";
 import { absoluteUrl } from "@/lib/site";
 
@@ -721,6 +722,8 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
 
           <MobileAdsenseSlot />
 
+          <CityStormFeelingSummary locale={locale} />
+
           {data?.current ? (
             <CityImpactPanel
               locale={locale}
@@ -819,7 +822,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         </section>
 
         <section
-          className="hidden xl:grid xl:grid-cols-[5.5fr_2.6fr_3fr] gap-4 items-stretch"
+          className="hidden xl:grid xl:grid-cols-[5.5fr_5.6fr] gap-4 items-stretch"
           aria-label={`${t.geoActivityStatus} ${city.nameGenitive}`}
         >
           <div className="flex flex-col">
@@ -833,6 +836,9 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
               <StormStatusBanner initialKp={initialKp} initialScales={initialScales} initialForecast={initialForecast3} />
             </div>
           </div>
+
+          <div className="grid min-h-full grid-rows-[auto_1fr] gap-4 xl:grid-cols-[2.6fr_3fr]">
+          <CityStormFeelingSummary locale={locale} className="xl:col-span-2" />
 
           {data?.current ? (
             <CityImpactPanel
@@ -927,6 +933,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 </div>
               </div>
             )}
+          </div>
           </div>
         </section>
 

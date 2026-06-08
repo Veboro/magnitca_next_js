@@ -74,10 +74,11 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
     return value;
   };
 
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
   const REFRESH_INTERVAL = 60;
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
-  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "";
+  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : locale === "en" ? "/en" : "";
+  const showLocationLinks = locale !== "en";
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -203,6 +204,7 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
         </div>
       </main>
 
+      {showLocationLinks ? (
       <section
         className="mx-auto max-w-[1180px] px-2 pb-6 sm:px-6 lg:px-0"
         aria-label={
@@ -271,6 +273,7 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
           )}
         </div>
       </section>
+      ) : null}
 
       <section className="mx-auto max-w-[1180px] px-2 pb-10 sm:px-6 lg:px-0" aria-label={t("index.aboutService")}>
         <div className="official-home-panel prose prose-sm max-w-none space-y-4 p-5 text-sm leading-relaxed text-muted-foreground/80 sm:p-6 lg:p-7">

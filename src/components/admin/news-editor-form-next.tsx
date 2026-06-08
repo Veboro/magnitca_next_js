@@ -5,28 +5,40 @@ import { useRouter } from "next/navigation";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
-type NewsEditorInitial = {
+const NEWS_LOCALES = [
+  { code: "uk", short: "UA", label: "Українська", deepl: "UK" },
+  { code: "ru", short: "RU", label: "Російська", deepl: "RU" },
+  { code: "pl", short: "PL", label: "Польська", deepl: "PL" },
+  { code: "ro", short: "RO", label: "Румунська", deepl: "RO" },
+  { code: "hu", short: "HU", label: "Угорська", deepl: "HU" },
+  { code: "en", short: "EN", label: "Англійська", deepl: "EN-US" },
+] as const;
+
+type NewsLocale = (typeof NEWS_LOCALES)[number]["code"];
+type LocalizedField = "title" | "slug" | "content" | "meta_title" | "meta_description";
+type LocalizedKey = `${LocalizedField}_${NewsLocale}`;
+
+type NewsEditorInitial = Record<LocalizedKey, string> & {
   id?: string;
-  title_uk: string;
-  slug_uk: string;
-  content_uk: string;
-  title_ru: string;
-  slug_ru: string;
-  content_ru: string;
   image_url: string;
   published_at: string;
   status: "draft" | "published";
-  meta_title_uk: string;
-  meta_description_uk: string;
-  meta_title_ru: string;
-  meta_description_ru: string;
   source: string;
+};
+
+type TranslationPayload = {
+  title?: string;
+  content?: string;
+  meta_title?: string;
+  meta_description?: string;
 };
 
 const transliterate = (text: string): string =>
   text
     .toLowerCase()
-    .replace(/[а-яіїєґёыэъ'’`]/g, (char) => {
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[а-яіїєґёыэъ'’`łđ]/g, (char) => {
       const map: Record<string, string> = {
         а: "a",
         б: "b",
@@ -68,11 +80,17 @@ const transliterate = (text: string): string =>
         "'": "",
         "’": "",
         "`": "",
+        ł: "l",
+        đ: "d",
       };
       return map[char] ?? char;
     })
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "");
+
+function localizedKey(field: LocalizedField, locale: NewsLocale): LocalizedKey {
+  return `${field}_${locale}`;
+}
 
 export function NewsEditorForm({
   mode,
@@ -83,21 +101,109 @@ export function NewsEditorForm({
 }) {
   const router = useRouter();
   const [form, setForm] = useState(initial);
+  const [activeLocale, setActiveLocale] = useState<NewsLocale>("uk");
+  const [sourceLocale, setSourceLocale] = useState<NewsLocale>("uk");
   const [loading, setLoading] = useState(false);
+  const [translatingLocale, setTranslatingLocale] = useState<NewsLocale | null>(null);
   const [error, setError] = useState("");
-  const [slugTouchedUk, setSlugTouchedUk] = useState(Boolean(initial.slug_uk));
-  const [slugTouchedRu, setSlugTouchedRu] = useState(Boolean(initial.slug_ru));
+  const [slugTouched, setSlugTouched] = useState<Record<NewsLocale, boolean>>(() =>
+    NEWS_LOCALES.reduce(
+      (acc, locale) => ({
+        ...acc,
+        [locale.code]: Boolean(initial[localizedKey("slug", locale.code)]),
+      }),
+      {} as Record<NewsLocale, boolean>,
+    ),
+  );
+
+  const activeLocaleMeta = NEWS_LOCALES.find((locale) => locale.code === activeLocale) ?? NEWS_LOCALES[0];
+  const sourceLocaleMeta = NEWS_LOCALES.find((locale) => locale.code === sourceLocale) ?? NEWS_LOCALES[0];
 
   const metaPreview = useMemo(
     () => ({
-      title: form.meta_title_uk || form.title_uk || "Заголовок сторінки",
-      description: form.meta_description_uk || "Опис сторінки з'явиться тут.",
+      title:
+        form[localizedKey("meta_title", activeLocale)] ||
+        form[localizedKey("title", activeLocale)] ||
+        "Заголовок сторінки",
+      description: form[localizedKey("meta_description", activeLocale)] || "Опис сторінки з'явиться тут.",
     }),
-    [form.meta_description_uk, form.meta_title_uk, form.title_uk]
+    [activeLocale, form],
   );
 
   const endpoint = mode === "create" ? "/api/admin/news" : `/api/admin/news/${initial.id}`;
   const method = mode === "create" ? "POST" : "PUT";
+
+  const updateField = (field: LocalizedField, locale: NewsLocale, value: string) => {
+    setForm((current) => ({ ...current, [localizedKey(field, locale)]: value }));
+  };
+
+  const updateTitle = (locale: NewsLocale, value: string) => {
+    setForm((current) => ({
+      ...current,
+      [localizedKey("title", locale)]: value,
+      [localizedKey("slug", locale)]: slugTouched[locale]
+        ? current[localizedKey("slug", locale)]
+        : transliterate(value),
+    }));
+  };
+
+  const translateActiveLocale = async () => {
+    if (activeLocale === sourceLocale) return;
+
+    const fields: TranslationPayload = {
+      title: form[localizedKey("title", sourceLocale)],
+      content: form[localizedKey("content", sourceLocale)],
+      meta_title: form[localizedKey("meta_title", sourceLocale)],
+      meta_description: form[localizedKey("meta_description", sourceLocale)],
+    };
+
+    if (!fields.title && !fields.content) {
+      setError(`Спочатку заповни ${sourceLocaleMeta.label.toLowerCase()} версію.`);
+      return;
+    }
+
+    setError("");
+    setTranslatingLocale(activeLocale);
+
+    try {
+      const response = await fetch("/api/admin/news/translate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sourceLocale,
+          targetLocale: activeLocale,
+          fields,
+        }),
+      });
+
+      const data = (await response.json().catch(() => null)) as
+        | { translation?: TranslationPayload; error?: string }
+        | null;
+
+      if (!response.ok) {
+        throw new Error(data?.error || "Не вдалося перекласти через DeepL.");
+      }
+
+      const translation = data?.translation ?? {};
+      setForm((current) => ({
+        ...current,
+        [localizedKey("title", activeLocale)]: translation.title ?? current[localizedKey("title", activeLocale)],
+        [localizedKey("content", activeLocale)]:
+          translation.content ?? current[localizedKey("content", activeLocale)],
+        [localizedKey("meta_title", activeLocale)]:
+          translation.meta_title ?? current[localizedKey("meta_title", activeLocale)],
+        [localizedKey("meta_description", activeLocale)]:
+          translation.meta_description ?? current[localizedKey("meta_description", activeLocale)],
+        [localizedKey("slug", activeLocale)]: slugTouched[activeLocale]
+          ? current[localizedKey("slug", activeLocale)]
+          : transliterate(translation.title ?? current[localizedKey("title", activeLocale)]),
+      }));
+    } catch (translateError) {
+      setError(translateError instanceof Error ? translateError.message : "Помилка перекладу.");
+    } finally {
+      setTranslatingLocale(null);
+    }
+  };
 
   return (
     <form
@@ -131,87 +237,93 @@ export function NewsEditorForm({
     >
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
         <div className="space-y-5 rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-          <div className="space-y-5 rounded-2xl border border-border/50 bg-muted/20 p-5">
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-primary">UA</p>
-              <h2 className="mt-1 font-display text-xl font-bold">Українська версія</h2>
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Заголовок</label>
-              <input
-                value={form.title_uk}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    title_uk: event.target.value,
-                    slug_uk: slugTouchedUk ? current.slug_uk : transliterate(event.target.value),
-                  }))
-                }
-                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Slug</label>
-              <input
-                value={form.slug_uk}
-                onChange={(event) => {
-                  setSlugTouchedUk(true);
-                  setForm((current) => ({
-                    ...current,
-                    slug_uk: transliterate(event.target.value),
-                  }));
-                }}
-                className="w-full rounded-xl border border-border bg-background px-4 py-3 font-mono text-sm outline-none transition focus:border-primary"
-              />
-            </div>
-            <div>
-              <label className="mb-1 block text-sm font-medium">Контент</label>
-              <RichTextEditor
-                content={form.content_uk}
-                onChange={(content) => setForm((current) => ({ ...current, content_uk: content }))}
-              />
-            </div>
+          <div className="flex flex-wrap gap-2">
+            {NEWS_LOCALES.map((locale) => (
+              <button
+                key={locale.code}
+                type="button"
+                onClick={() => setActiveLocale(locale.code)}
+                className={`rounded-full border px-4 py-2 text-sm font-bold transition ${
+                  activeLocale === locale.code
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background hover:bg-muted/40"
+                }`}
+              >
+                {locale.short}
+              </button>
+            ))}
           </div>
 
           <div className="space-y-5 rounded-2xl border border-border/50 bg-muted/20 p-5">
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-primary">RU</p>
-              <h2 className="mt-1 font-display text-xl font-bold">Російська версія</h2>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.16em] text-primary">{activeLocaleMeta.short}</p>
+                <h2 className="mt-1 font-display text-xl font-bold">{activeLocaleMeta.label} версія</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Поля можна редагувати вручну після автоперекладу.
+                </p>
+              </div>
+              {activeLocale !== sourceLocale ? (
+                <button
+                  type="button"
+                  disabled={Boolean(translatingLocale)}
+                  onClick={translateActiveLocale}
+                  className="rounded-full border border-primary/40 bg-primary/10 px-4 py-2 text-sm font-bold text-primary transition hover:bg-primary/15 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {translatingLocale === activeLocale
+                    ? "Перекладаю..."
+                    : `Перекласти з ${sourceLocaleMeta.short} через DeepL`}
+                </button>
+              ) : null}
             </div>
+
             <div>
               <label className="mb-1 block text-sm font-medium">Заголовок</label>
               <input
-                value={form.title_ru}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    title_ru: event.target.value,
-                    slug_ru: slugTouchedRu ? current.slug_ru : transliterate(event.target.value),
-                  }))
-                }
+                value={form[localizedKey("title", activeLocale)]}
+                onChange={(event) => updateTitle(activeLocale, event.target.value)}
                 className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
               />
             </div>
+
             <div>
               <label className="mb-1 block text-sm font-medium">Slug</label>
               <input
-                value={form.slug_ru}
+                value={form[localizedKey("slug", activeLocale)]}
                 onChange={(event) => {
-                  setSlugTouchedRu(true);
-                  setForm((current) => ({
-                    ...current,
-                    slug_ru: transliterate(event.target.value),
-                  }));
+                  setSlugTouched((current) => ({ ...current, [activeLocale]: true }));
+                  updateField("slug", activeLocale, transliterate(event.target.value));
                 }}
                 className="w-full rounded-xl border border-border bg-background px-4 py-3 font-mono text-sm outline-none transition focus:border-primary"
               />
             </div>
+
             <div>
               <label className="mb-1 block text-sm font-medium">Контент</label>
               <RichTextEditor
-                content={form.content_ru}
-                onChange={(content) => setForm((current) => ({ ...current, content_ru: content }))}
+                content={form[localizedKey("content", activeLocale)]}
+                onChange={(content) => updateField("content", activeLocale, content)}
               />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div>
+                <label className="mb-1 block text-sm font-medium">Meta title</label>
+                <input
+                  value={form[localizedKey("meta_title", activeLocale)]}
+                  onChange={(event) => updateField("meta_title", activeLocale, event.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
+                />
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">Meta description</label>
+                <textarea
+                  rows={3}
+                  value={form[localizedKey("meta_description", activeLocale)]}
+                  onChange={(event) => updateField("meta_description", activeLocale, event.target.value)}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
+                />
+              </div>
             </div>
           </div>
 
@@ -260,71 +372,29 @@ export function NewsEditorForm({
                   <option value="published">Опубліковано</option>
                 </select>
               </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium">Мова-джерело для DeepL</label>
+                <select
+                  value={sourceLocale}
+                  onChange={(event) => setSourceLocale(event.target.value as NewsLocale)}
+                  className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
+                >
+                  {NEWS_LOCALES.map((locale) => (
+                    <option key={locale.code} value={locale.code}>
+                      {locale.short} · {locale.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
 
           <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
-            <h2 className="font-display text-xl font-bold">SEO</h2>
-            <div className="mt-4 space-y-4">
-              <div className="space-y-4 rounded-2xl border border-border/50 bg-muted/20 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-primary">UA SEO</p>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Meta title</label>
-                  <input
-                    value={form.meta_title_uk}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, meta_title_uk: event.target.value }))
-                    }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Meta description</label>
-                  <textarea
-                    rows={4}
-                    value={form.meta_description_uk}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        meta_description_uk: event.target.value,
-                      }))
-                    }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-4 rounded-2xl border border-border/50 bg-muted/20 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-primary">RU SEO</p>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Meta title</label>
-                  <input
-                    value={form.meta_title_ru}
-                    onChange={(event) =>
-                      setForm((current) => ({ ...current, meta_title_ru: event.target.value }))
-                    }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-sm font-medium">Meta description</label>
-                  <textarea
-                    rows={4}
-                    value={form.meta_description_ru}
-                    onChange={(event) =>
-                      setForm((current) => ({
-                        ...current,
-                        meta_description_ru: event.target.value,
-                      }))
-                    }
-                    className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm outline-none transition focus:border-primary"
-                  />
-                </div>
-              </div>
-              <div className="rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm">
-                <p className="font-medium text-foreground">{metaPreview.title}</p>
-                <p className="mt-2 text-muted-foreground">{metaPreview.description}</p>
-              </div>
+            <h2 className="font-display text-xl font-bold">SEO Preview</h2>
+            <p className="mt-1 text-xs text-muted-foreground">{activeLocaleMeta.label} версія</p>
+            <div className="mt-4 rounded-xl border border-dashed border-border/70 bg-muted/20 p-4 text-sm">
+              <p className="font-medium text-foreground">{metaPreview.title}</p>
+              <p className="mt-2 text-muted-foreground">{metaPreview.description}</p>
             </div>
           </div>
         </div>

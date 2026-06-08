@@ -1,11 +1,13 @@
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useKpIndex, type KpEntry } from "@/hooks/useSpaceWeather";
 import { useKpForecast, type KpForecastEntry } from "@/hooks/useKpForecast";
 import { useAuth } from "@/hooks/useAuth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { Activity } from "lucide-react";
+import { Activity, HeartPulse } from "lucide-react";
+import { STORM_FEELING_STATS_EVENT } from "@/components/dashboard/StormFeelingPoll";
 
 const impactBars = [
   { key: "energy", values: [92, 85, 68, 48, 30] },
@@ -13,7 +15,7 @@ const impactBars = [
   { key: "comfort", values: [96, 90, 76, 58, 40] },
 ];
 
-const overallImpactValues = [5, 10, 24, 45, 63];
+const STORM_FEELING_QUERY_KEY = ["storm-feeling-stats"] as const;
 
 const getImpactLevel = (kp: number): number => {
   if (kp <= 2) return 0;
@@ -30,6 +32,7 @@ const getImpactBarLabel = (key: string, language: string) => {
     pl: { energy: "Energia", focus: "Skupienie", comfort: "Komfort" },
     ro: { energy: "Energie", focus: "Focus", comfort: "Confort" },
     hu: { energy: "Energia", focus: "Fókusz", comfort: "Komfort" },
+    en: { energy: "Energy", focus: "Focus", comfort: "Comfort" },
   };
 
   const lang = language.startsWith("ru")
@@ -40,17 +43,20 @@ const getImpactBarLabel = (key: string, language: string) => {
         ? "ro"
         : language.startsWith("hu")
           ? "hu"
-          : "uk";
+          : language.startsWith("en")
+            ? "en"
+            : "uk";
 
   return labels[lang][key] ?? labels.uk[key];
 };
 
-const getStormBodyImpactLabel = (language: string) => {
-  if (language.startsWith("ru")) return "Влияние бури на организм";
-  if (language.startsWith("pl")) return "Wpływ burzy na organizm";
-  if (language.startsWith("ro")) return "Impactul furtunii asupra organismului";
-  if (language.startsWith("hu")) return "A vihar hatása a szervezetre";
-  return "Вплив бурі на організм";
+type StormFeelingStats = {
+  date: string;
+  total: number;
+  yes: number;
+  no: number;
+  yesPercent: number;
+  noPercent: number;
 };
 
 const getProgressColor = (value: number) => {
@@ -78,6 +84,7 @@ export const HumanImpact = ({
   initialForecast?: KpForecastEntry[] | null;
 }) => {
   const { t, i18n } = useTranslation();
+  const queryClient = useQueryClient();
   const { data: kpData } = useKpIndex(initialKp ?? undefined);
   const { data: forecast } = useKpForecast(initialForecast ?? undefined);
   const { user } = useAuth();
@@ -87,6 +94,10 @@ export const HumanImpact = ({
       ? "/pl"
       : i18n.language.startsWith("ro")
         ? "/ro"
+        : i18n.language.startsWith("hu")
+          ? "/hu"
+          : i18n.language.startsWith("en")
+            ? "/en"
         : "";
 
   const { data: latestResult } = useQuery({
@@ -104,6 +115,32 @@ export const HumanImpact = ({
     enabled: !!user,
   });
 
+  const { data: stormFeelingStats } = useQuery({
+    queryKey: STORM_FEELING_QUERY_KEY,
+    queryFn: async () => {
+      const response = await fetch("/api/storm-feelings");
+      if (!response.ok) {
+        throw new Error("Unable to load storm feeling stats");
+      }
+      return (await response.json()) as StormFeelingStats;
+    },
+    staleTime: 60_000,
+    refetchInterval: 120_000,
+    retry: 1,
+  });
+
+  useEffect(() => {
+    const handleStatsUpdate = (event: Event) => {
+      const stats = (event as CustomEvent<StormFeelingStats>).detail;
+      if (stats) {
+        queryClient.setQueryData(STORM_FEELING_QUERY_KEY, stats);
+      }
+    };
+
+    window.addEventListener(STORM_FEELING_STATS_EVENT, handleStatsUpdate);
+    return () => window.removeEventListener(STORM_FEELING_STATS_EVENT, handleStatsUpdate);
+  }, [queryClient]);
+
   const hasTestResult = !!user && !!latestResult;
   const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
 
@@ -120,78 +157,76 @@ export const HumanImpact = ({
   const finalKp = Math.max(latestKp, todayMaxKp);
 
   const impactIdx = getImpactLevel(finalKp);
-  const overallImpact = overallImpactValues[impactIdx];
-  const overallImpactColor = getImpactRiskColor(overallImpact);
+  const pollPercent = stormFeelingStats?.yesPercent ?? 0;
+  const pollTotal = stormFeelingStats?.total ?? 0;
+  const pollColor = getImpactRiskColor(pollPercent);
 
   return (
     <div className={cn("official-impact-panel rounded-lg border border-border/50 bg-card p-4", className)}>
       <h3 className="mb-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("impact.title")}</h3>
 
       <div>
-        <div className="grid gap-4 rounded-md border border-white/15 bg-white/5 p-4 sm:grid-cols-[120px_1fr]">
-          <div className="flex items-center gap-3 sm:flex-col sm:items-start">
-            <div className="relative h-28 w-4 overflow-hidden rounded-full bg-white/15 sm:h-32">
-              <div
-                className="absolute bottom-0 left-0 w-full rounded-full transition-all duration-700"
-                style={{ height: `${overallImpact}%`, backgroundColor: overallImpactColor }}
-              />
-            </div>
-            <div className="space-y-1">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                {getStormBodyImpactLabel(i18n.language)}
+        <div className="rounded-md border border-white/15 bg-white/5 p-4">
+          <div className="mb-4 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5">
+            <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+              <HeartPulse className="h-3.5 w-3.5 shrink-0" />
+              <p className="truncate text-[10px] font-semibold uppercase tracking-[0.18em]">
+                {pollTotal > 0 ? t("feelingPoll.feel", { percent: pollPercent }) : t("feelingPoll.emptyResult")}
               </p>
-              <p className="font-mono text-lg font-bold text-foreground">{overallImpact}%</p>
+            </div>
+            <div className="h-3 overflow-hidden rounded-full bg-white/15">
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${pollTotal > 0 ? pollPercent : 8}%`, backgroundColor: pollTotal > 0 ? pollColor : "hsl(0 0% 100% / 0.28)" }}
+              />
             </div>
           </div>
 
           <div>
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{t("impact.meteoLevel")}</p>
-          <div className="grid grid-cols-3 gap-3">
-            {impactBars.map((item) => {
-              const value = item.values[impactIdx];
-              const progressColor = getProgressColor(value);
-              const circumference = 2 * Math.PI * 28;
-              const dashOffset = circumference - (value / 100) * circumference;
+            <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{t("impact.meteoLevel")}</p>
+            <div className="grid grid-cols-3 gap-3">
+              {impactBars.map((item) => {
+                const value = item.values[impactIdx];
+                const progressColor = getProgressColor(value);
+                const circumference = 2 * Math.PI * 28;
+                const dashOffset = circumference - (value / 100) * circumference;
 
-              return (
-                <div key={item.key} className="flex flex-col items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-3 text-center">
-                  <div className="relative h-20 w-20">
-                    <svg className="h-20 w-20 -rotate-90" viewBox="0 0 72 72" aria-hidden="true">
-                      <circle cx="36" cy="36" r="28" fill="none" stroke="hsl(0 0% 100% / 0.14)" strokeWidth="7" />
-                      <circle
-                        cx="36"
-                        cy="36"
-                        r="28"
-                        fill="none"
-                        stroke={progressColor}
-                        strokeWidth="7"
-                        strokeLinecap="round"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={dashOffset}
-                        className="impact-progress-ring transition-all duration-700"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="font-mono text-sm font-bold text-foreground">{value}%</span>
+                return (
+                  <div key={item.key} className="flex flex-col items-center gap-2 rounded-md border border-white/10 bg-white/[0.04] px-2 py-3 text-center">
+                    <div className="relative h-20 w-20">
+                      <svg className="h-20 w-20 -rotate-90" viewBox="0 0 72 72" aria-hidden="true">
+                        <circle cx="36" cy="36" r="28" fill="none" stroke="hsl(0 0% 100% / 0.14)" strokeWidth="7" />
+                        <circle
+                          cx="36"
+                          cy="36"
+                          r="28"
+                          fill="none"
+                          stroke={progressColor}
+                          strokeWidth="7"
+                          strokeLinecap="round"
+                          strokeDasharray={circumference}
+                          strokeDashoffset={dashOffset}
+                          className="impact-progress-ring transition-all duration-700"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="font-mono text-sm font-bold text-foreground">{value}%</span>
+                      </div>
                     </div>
+                    <span className="text-xs font-semibold text-muted-foreground">{getImpactBarLabel(item.key, i18n.language)}</span>
                   </div>
-                  <span className="text-xs font-semibold text-muted-foreground">{getImpactBarLabel(item.key, i18n.language)}</span>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 border-t border-border/30 pt-3">
-        <div className="flex items-center gap-2 mb-2">
-          <Activity className="h-3.5 w-3.5 text-primary" />
-          <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">{t("impact.meteoLevel")}</span>
-        </div>
+      <div className="mt-3 border-t border-border/30 pt-4">
         {hasTestResult ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+          <div className="flex min-h-[54px] items-center justify-between gap-4">
+            <div className="flex min-w-0 flex-1 items-center gap-2">
+              <Activity className="h-3.5 w-3.5 shrink-0 text-primary" />
               <span className={cn("font-mono text-sm font-bold",
                 latestResult.score <= 30 ? "text-green-400" : latestResult.score <= 60 ? "text-yellow-400" : latestResult.score <= 80 ? "text-orange-400" : "text-red-400"
               )}>{latestResult.score}%</span>
@@ -199,12 +234,12 @@ export const HumanImpact = ({
                 {latestResult.score <= 30 ? t("impact.low") : latestResult.score <= 60 ? t("impact.moderate") : latestResult.score <= 80 ? t("impact.high") : t("impact.veryHigh")}
               </span>
             </div>
-            <a href={`${langPrefix}/test`} className="text-[10px] text-primary hover:text-primary/80 transition-colors underline underline-offset-2">{t("impact.retakeTest")}</a>
+            <a href={`${langPrefix}/test`} className="inline-flex min-h-[42px] min-w-[150px] items-center justify-center rounded-xl bg-background px-5 py-3 font-mono text-sm font-semibold text-primary transition-colors hover:bg-background/90">{t("impact.retakeTest")}</a>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
-            <p className="text-[11px] text-muted-foreground">{t("impact.findOut")}</p>
-            <a href={`${langPrefix}/test`} className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 font-mono text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90">{t("impact.takeTest")}</a>
+          <div className="flex min-h-[54px] items-center justify-between gap-5">
+            <p className="flex-1 self-center text-sm font-semibold leading-snug text-muted-foreground">{t("impact.findOut")}</p>
+            <a href={`${langPrefix}/test`} className="inline-flex min-h-[42px] min-w-[170px] items-center justify-center self-center rounded-xl bg-background px-6 py-3 font-mono text-sm font-semibold text-primary transition-colors hover:bg-background/90">{t("impact.takeTest")}</a>
           </div>
         )}
       </div>

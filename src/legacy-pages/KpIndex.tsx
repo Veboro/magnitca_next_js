@@ -260,10 +260,59 @@ const localizedCopy = {
       { q: "Hol látható a Kp-előrejelzés?", a: "Ezen az oldalon látható a 3 napos Kp-előrejelzés, az aktuális érték és az elmúlt órák grafikonja." },
     ],
   },
+  en: {
+    ...copy.uk,
+    pageTitle: "Kp index online in real time — magnetic storm forecast",
+    pageDescription:
+      "Current Kp index in real time. Live value, 24-hour chart and 3-day geomagnetic activity forecast based on NOAA data.",
+    heroTitle: "Kp index today",
+    heroText:
+      "Planetary geomagnetic activity index in real time. Current value, 24-hour history and 3-day NOAA SWPC forecast.",
+    currentKpLabel: "Current Kp index",
+    currentState: "Current state",
+    chartAria: "Kp index chart for the last 24 hours",
+    chartTitle: "Kp index for the last",
+    hours: "h",
+    forecastAria: "3-day Kp index forecast",
+    forecastTitle: "3-day Kp index forecast (3-hour intervals)",
+    loading: "Loading forecast...",
+    unavailable: "Forecast data is unavailable.",
+    maxKp: "max Kp",
+    scaleAria: "Kp index scale",
+    scaleTitle: "Kp index scale (0-9)",
+    seoAria: "About the Kp index",
+    seoHeading: "What is the Kp index and why does it matter?",
+    seoText1:
+      "<strong>The Kp index</strong> is a global measure of Earth's geomagnetic activity on a scale from 0 to 9. Values from 0 to 3 are generally calm, Kp 4 is unsettled, and Kp 5 or higher indicates a geomagnetic storm on the NOAA G scale.",
+    seoText2:
+      "The Kp index helps estimate the strength of space weather effects. Higher Kp values can affect satellite navigation and radio communication, and some weather-sensitive people may feel fatigue, headache or sleep disruption.",
+    faqAria: "Kp index FAQ",
+    faqTitle: "FAQ",
+    gScale: "G scale",
+    rScale: "R scale",
+    sScale: "S scale",
+    kpLevels: [
+      { kp: "0-1", status: "Calm", color: "bg-storm-quiet", description: "Minimal geomagnetic activity." },
+      { kp: "2-3", status: "Low activity", color: "bg-storm-quiet", description: "Small magnetic field variations." },
+      { kp: "4", status: "Unsettled", color: "bg-storm-minor", description: "Elevated activity; sensitive people may notice mild discomfort." },
+      { kp: "5 (G1)", status: "Minor storm", color: "bg-storm-moderate", description: "Minor geomagnetic storm." },
+      { kp: "6 (G2)", status: "Moderate storm", color: "bg-storm-moderate", description: "Moderate storm with stronger potential effects." },
+      { kp: "7 (G3)", status: "Strong storm", color: "bg-storm-strong", description: "Strong geomagnetic storm." },
+      { kp: "8 (G4)", status: "Severe", color: "bg-storm-severe", description: "Severe storm with significant space weather impact." },
+      { kp: "9 (G5)", status: "Extreme", color: "bg-storm-severe", description: "Extreme geomagnetic storm." },
+    ],
+    faqItems: [
+      { q: "What is the Kp index?", a: "The Kp index is a planetary measure of geomagnetic activity from 0 to 9." },
+      { q: "When does a magnetic storm begin?", a: "A geomagnetic storm usually begins at Kp 5, which corresponds to NOAA G1." },
+      { q: "How often is the forecast updated?", a: "Forecasts are updated regularly by NOAA and may change throughout the day." },
+      { q: "Can Kp affect wellbeing?", a: "Some sensitive people report fatigue, headaches or poorer sleep during higher geomagnetic activity." },
+      { q: "Where can I see the forecast?", a: "This page shows the current value, recent chart and 3-day Kp forecast." },
+    ],
+  },
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "en" ? "UTC" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -281,7 +330,7 @@ interface KpIndexProps {
 
 const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const today = todayStr(localeTag, timeZone);
 

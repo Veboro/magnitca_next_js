@@ -3,6 +3,8 @@ import { Activity, AlertTriangle, ArrowDownRight, ArrowRight, ArrowUpRight, Gaug
 import { ALL_UK_CITIES } from "@/data/cities";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import { UKRAINE_REGION_GROUPS } from "@/data/ukraine-city-catalog";
+import { CityStormFeelingSummary } from "@/components/city/city-storm-feeling-summary";
+import { StormFeelingPoll } from "@/components/dashboard/StormFeelingPoll";
 import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 import { fetchUhmcWarning, getUhmcRegionCode } from "@/lib/uhmc-warning";
@@ -19,7 +21,7 @@ const copy = {
       "Прогноз магнітних бур для області на сьогодні та найближчі 3 дні. Тут зібрані поточний Kp-індекс, сонячний вітер, Bz і актуальні попередження УкрГМЦ.",
     currentStatus: "Поточна ситуація",
     currentGLevel: "G-рівень бурі",
-    currentKp: "Поточний Kp індекс",
+    currentKp: "Kp сьогодні",
     currentWind: "Сонячний вітер",
     currentBz: "Bz (IMF)",
     noaaScales: "NOAA шкали",
@@ -66,7 +68,7 @@ const copy = {
       "Прогноз магнитных бурь для области на сегодня и ближайшие 3 дня. Здесь собраны текущий Kp-индекс, солнечный ветер, Bz и актуальные предупреждения УкрГМЦ.",
     currentStatus: "Текущая ситуация",
     currentGLevel: "G-уровень бури",
-    currentKp: "Текущий Kp индекс",
+    currentKp: "Kp сегодня",
     currentWind: "Солнечный ветер",
     currentBz: "Bz (IMF)",
     noaaScales: "Шкалы NOAA",
@@ -157,6 +159,15 @@ function getGScaleLabel(scale: number, locale: OblastLocale) {
   if (scale === 3) return "Сильна буря";
   if (scale === 4) return "Дуже сильна буря";
   return "Екстремальна буря";
+}
+
+function getGScaleFromKp(kp: number) {
+  if (kp < 4) return 0;
+  if (kp < 5) return 1;
+  if (kp < 6) return 2;
+  if (kp < 7) return 3;
+  if (kp < 8) return 4;
+  return 5;
 }
 
 function getGScaleSurfaceClass(scale: number) {
@@ -321,9 +332,11 @@ export async function OblastPage({
   const currentGScale = Number(scales?.g?.Scale ?? 0);
   const forecastDays = aggregateForecastDays(forecast3Day);
   const todayMaxKp = forecastDays[0]?.maxKp ?? currentKp;
-  const kpLabel = getKpLabel(currentKp, locale);
-  const kpTone = getKpToneClass(todayMaxKp);
-  const gScaleLabel = getGScaleLabel(currentGScale, locale);
+  const statusKp = Math.max(currentKp, todayMaxKp);
+  const effectiveGScale = Math.max(currentGScale, getGScaleFromKp(todayMaxKp));
+  const kpLabel = getKpLabel(statusKp, locale);
+  const kpTone = getKpToneClass(statusKp);
+  const gScaleLabel = getGScaleLabel(effectiveGScale, locale);
   const magneticScore10 = getMagneticScore10(todayMaxKp);
   const windScore10 = getWindScore10(currentWind);
   const totalImpactScore10 = Math.min(10, Math.max(1, Math.round((magneticScore10 + windScore10) / 2)));
@@ -429,6 +442,16 @@ export async function OblastPage({
           <MobileAdsenseSlot />
         </div>
 
+        <div className="grid gap-3 lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] lg:items-stretch">
+          <StormFeelingPoll
+            locale={locale}
+            kpNow={currentKp}
+            kpTodayMax={todayMaxKp}
+            className="lg:flex lg:items-center lg:[&>div]:w-full"
+          />
+          <CityStormFeelingSummary locale={locale} />
+        </div>
+
         <section className="grid gap-6 lg:grid-cols-[0.62fr_1.45fr]">
           <section className="flex h-full flex-col rounded-lg border border-border/50 bg-card p-6">
             <div className="mb-4 flex items-center gap-2">
@@ -523,29 +546,29 @@ export async function OblastPage({
 
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
-                <div className={`rounded-lg border p-5 ${getGScaleSurfaceClass(currentGScale)}`}>
+                <div className={`rounded-lg border p-5 ${getGScaleSurfaceClass(effectiveGScale)}`}>
                   <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                     <ShieldAlert className="h-4 w-4 text-primary" />
                     {t.currentGLevel}
                   </div>
                   <div className="mt-4 flex min-h-[110px] flex-col items-center justify-center text-center">
                     <div className="min-w-0">
-                      <p className={`font-mono text-5xl font-bold leading-none ${currentGScale > 0 ? "text-amber-400" : "text-foreground"}`}>
-                        G{currentGScale}
+                      <p className={`font-mono text-5xl font-bold leading-none ${effectiveGScale > 0 ? "text-amber-400" : "text-foreground"}`}>
+                        G{effectiveGScale}
                       </p>
                       <p className="mt-3 text-sm font-medium text-foreground">{gScaleLabel}</p>
                     </div>
                   </div>
                 </div>
 
-                <div className={`rounded-lg border p-5 ${getKpSurfaceClass(currentKp)}`}>
+                <div className={`rounded-lg border p-5 ${getKpSurfaceClass(statusKp)}`}>
                   <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                     <Activity className="h-4 w-4 text-primary" />
                     {t.currentKp}
                   </div>
                   <div className="mt-4 flex min-h-[110px] flex-col items-center justify-center text-center">
                     <div className="min-w-0">
-                      <p className={`font-mono text-5xl font-bold leading-none ${kpTone}`}>{currentKp.toFixed(1)}</p>
+                      <p className={`font-mono text-5xl font-bold leading-none ${kpTone}`}>{statusKp.toFixed(1)}</p>
                       <p className="mt-3 text-sm font-medium text-foreground">{kpLabel}</p>
                     </div>
                   </div>

@@ -1,8 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-
-type SiteLocale = "uk" | "ru" | "pl" | "ro" | "hu";
+import type { SiteLocale } from "@/lib/locale";
 
 const copy = {
   uk: {
@@ -44,6 +43,14 @@ const copy = {
     pressureRange: "ingadozás",
     currentPressure: "aktuális nyomás",
     total: "Összhatás",
+  },
+  en: {
+    title: "Impact on the body",
+    magnetic: "Magnetic storms",
+    pressure: "Air pressure",
+    pressureRange: "variation",
+    currentPressure: "pressure now",
+    total: "Overall impact",
   },
 } as const;
 
@@ -95,7 +102,7 @@ function VerticalProgress({
 
   return (
     <div className="flex min-w-0 flex-1 items-end gap-3 overflow-hidden">
-      <div className="grid h-44 w-6 min-w-6 shrink-0 grid-rows-10 gap-1 rounded-full border border-border/30 bg-muted/5 p-0.5">
+      <div className="grid h-32 w-6 min-w-6 shrink-0 grid-rows-10 gap-1 rounded-full border border-border/30 bg-muted/5 p-0.5">
         {Array.from({ length: 10 }).map((_, index) => {
           const filled = 9 - index < score10;
           return (
@@ -203,7 +210,7 @@ export function CityImpactPanel({
         />
       </div>
 
-      <div className="hidden gap-4 sm:grid sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+      <div className="hidden gap-4 sm:grid sm:grid-cols-2">
         <VerticalProgress
           label={t.magnetic}
           score10={magneticScore10}

@@ -124,6 +124,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "/hu" ? 0.85 : 0.6,
   }));
 
+  const enStaticPages: MetadataRoute.Sitemap = [
+    "/en",
+    "/en/test",
+    "/en/calendar",
+    "/en/kp-index",
+    "/en/solar-wind",
+    "/en/moon-calendar",
+    "/en/faq",
+    "/en/about",
+    "/en/contacts",
+    "/en/privacy",
+    "/en/cookies",
+    "/en/terms",
+  ].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    changeFrequency: path === "/en" ? "hourly" : "daily",
+    priority: path === "/en" ? 0.85 : 0.6,
+  }));
+
   const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/city/${city.slug}`,
     changeFrequency: "hourly",
@@ -211,6 +230,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
+  const enMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefEn}`,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+
   const newsPages = await getLatestNews(1000, "uk")
     .then((items) =>
       items.map((item) => ({
@@ -233,12 +258,57 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
     .catch(() => []);
 
+  const plNewsPages = await getLatestNews(1000, "pl")
+    .then((items) =>
+      items.map((item) => ({
+        url: `${SITE_URL}/pl/news/${item.slug || item.id}`,
+        lastModified: item.published_at,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }))
+    )
+    .catch(() => []);
+
+  const roNewsPages = await getLatestNews(1000, "ro")
+    .then((items) =>
+      items.map((item) => ({
+        url: `${SITE_URL}/ro/news/${item.slug || item.id}`,
+        lastModified: item.published_at,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }))
+    )
+    .catch(() => []);
+
+  const huNewsPages = await getLatestNews(1000, "hu")
+    .then((items) =>
+      items.map((item) => ({
+        url: `${SITE_URL}/hu/news/${item.slug || item.id}`,
+        lastModified: item.published_at,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }))
+    )
+    .catch(() => []);
+
+  const enNewsPages = await getLatestNews(1000, "en")
+    .then((items) =>
+      items.map((item) => ({
+        url: `${SITE_URL}/en/news/${item.slug || item.id}`,
+        lastModified: item.published_at,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }))
+    )
+    .catch(() => []);
+
   return [
     ...staticPages,
     ...ruStaticPages,
     ...plStaticPages,
     ...roStaticPages,
     ...huStaticPages,
+    ...enStaticPages,
     ...cityPages,
     ...ruCityPages,
     ...plCityPages,
@@ -253,7 +323,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...plMoonCalendarPages,
     ...roMoonCalendarPages,
     ...huMoonCalendarPages,
+    ...enMoonCalendarPages,
     ...newsPages,
     ...ruNewsPages,
+    ...plNewsPages,
+    ...roNewsPages,
+    ...huNewsPages,
+    ...enNewsPages,
   ];
 }

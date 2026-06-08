@@ -75,6 +75,32 @@ function gScaleToLabel(g: number) {
   return "спокійна геомагнітна обстановка";
 }
 
+function kpToDisplayG(kp: number) {
+  if (kp < 4) return 0;
+  if (kp < 5) return 1;
+  if (kp < 6) return 2;
+  if (kp < 7) return 3;
+  if (kp < 8) return 4;
+  return 5;
+}
+
+function buildDayStatusSummary(todayMaxKp: number) {
+  const forecastG = kpToDisplayG(todayMaxKp);
+  if (forecastG <= 0) {
+    return `Статус дня: спокійно, максимум Kp ${todayMaxKp.toFixed(1)}`;
+  }
+
+  return `Статус дня: прогнозний G${forecastG}, можливе посилення до Kp ${todayMaxKp.toFixed(1)}`;
+}
+
+function buildCurrentNoaaSummary(currentG: number) {
+  if (currentG <= 0) {
+    return "NOAA зараз: G0, поточно без магнітної бурі";
+  }
+
+  return `NOAA зараз: G${currentG}, ${gScaleToLabel(currentG)}`;
+}
+
 function kpToEmoji(kp: number) {
   if (kp >= 7) return "🔴";
   if (kp >= 5) return "🟠";
@@ -157,7 +183,13 @@ function accentColor(currentG: number) {
   return [34, 197, 94] as const;
 }
 
-function parseLatestKp(kpData: any[]) {
+type KpRawRow = {
+  estimated_kp?: string | number | null;
+  kp_index?: string | number | null;
+  kp?: string | number | null;
+};
+
+function parseLatestKp(kpData: KpRawRow[]) {
   if (!kpData.length) return 0;
   const latest = kpData[kpData.length - 1];
   return parseFloat(latest.estimated_kp ?? latest.kp_index ?? latest.kp ?? 0) || 0;
@@ -320,6 +352,8 @@ async function generateAiText({
   dateKey,
   latestKp,
   currentG,
+  dayStatusSummary,
+  currentNoaaSummary,
   todayMaxKp,
   windSpeed,
   windDensity,
@@ -337,6 +371,8 @@ async function generateAiText({
   dateKey: string;
   latestKp: number;
   currentG: number;
+  dayStatusSummary: string;
+  currentNoaaSummary: string;
   todayMaxKp: number;
   windSpeed: number;
   windDensity: number;
@@ -363,6 +399,7 @@ async function generateAiText({
 - Дата: ${dateLabel}
 - Поточний Kp: ${latestKp.toFixed(1)}
 - Максимум на сьогодні: ${todayMaxKp.toFixed(1)}
+- ${dayStatusSummary}
 - Найпомітніший відрізок доби: ${strongestStart && strongestEnd ? `${strongestStart}–${strongestEnd}, до Kp ${strongestMaxKp.toFixed(1)}` : "даних недостатньо"}
 - Коротко по добі: ${todayWindowsText}
 
@@ -382,6 +419,8 @@ async function generateAiText({
 Дані NOAA на сьогодні (${dateLabel}, ключ дати ${dateKey}):
 - Поточний Kp-індекс: ${latestKp.toFixed(1)}
 - Максимальний прогноз Kp на сьогодні: ${todayMaxKp.toFixed(1)}
+- ${dayStatusSummary}
+- ${currentNoaaSummary}
 - Сонячний вітер: ${windSpeed.toFixed(0)} км/с
 - Густина сонячного вітру: ${windDensity.toFixed(1)} p/cm³
 - Картина по відрізках доби: ${todayWindowsText}
@@ -400,6 +439,9 @@ async function generateAiText({
 - якщо день загалом спокійний, але ввечері можливе посилення, скажи це прямо
 - окремо коротко поясни, чи можливий вплив на самопочуття і в які години це ймовірніше
 - не перебільшуй загрозу, якщо дані цього не підтверджують
+- у блоці "📊 Показники:" не пиши "NOAA: G0, без магнітної бурі", якщо максимальний прогноз Kp на сьогодні 5.0 або вище
+- якщо поточний NOAA-рівень G0, але прогнозний Kp на день 5.0 або вище, формулюй так: "NOAA зараз: G0, поточно без бурі; прогноз дня: G..., можливе посилення до Kp ..."
+- поточний NOAA-рівень і прогнозний статус дня не змішуй в один висновок "без бурі"
 - довжина: 550-900 символів
 - не використовуй сухі фрази типу "ми спостерігаємо", "ситуація характеризується", "відбуватиметься"
 - не пиши як пресреліз або машинний звіт
@@ -483,7 +525,37 @@ async function generateAiText({
   if (!title) throw new Error("AI returned empty title");
   if (!text || text.length < 250) throw new Error("AI returned insufficient Telegram text");
 
-  return { title, text };
+  return {
+    title,
+    text: normalizeTelegramForecastText(text, { currentG, todayMaxKp }),
+  };
+}
+
+function normalizeTelegramForecastText(
+  text: string,
+  { currentG, todayMaxKp }: { currentG: number; todayMaxKp: number },
+) {
+  if (todayMaxKp < 5 || currentG > 0) {
+    return text;
+  }
+
+  const forecastG = kpToDisplayG(todayMaxKp);
+  const correctedNoaaLine =
+    `NOAA зараз: G0, поточно без бурі; прогноз дня: G${forecastG}, можливе посилення до Kp ${todayMaxKp.toFixed(1)}`;
+
+  return text
+    .split("\n")
+    .map((line) => {
+      if (/^\s*NOAA\s*:\s*G0\b.*без\s+магнітної\s+бурі/i.test(line)) {
+        return correctedNoaaLine;
+      }
+
+      return line.replace(
+        /NOAA\s*:\s*G0,\s*без\s+магнітної\s+бурі/gi,
+        correctedNoaaLine,
+      );
+    })
+    .join("\n");
 }
 
 async function generateFallbackPng(currentG: number) {
@@ -656,6 +728,8 @@ Deno.serve(async (req) => {
     const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
     const todayForecast = buildTodayForecast(kpForecastRaw, kyivDateKey);
     const todayMaxKp = todayForecast.length ? Math.max(...todayForecast.map((item) => item.kp)) : latestKp;
+    const dayStatusSummary = buildDayStatusSummary(todayMaxKp);
+    const currentNoaaSummary = buildCurrentNoaaSummary(currentG);
     const upcoming = buildUpcomingDays(kpForecastRaw, kyivDateKey);
     const todayWindows = summarizeTodayWindows(todayForecast);
     const strongestTimeRelationHint = describeTimeRelation({
@@ -671,6 +745,8 @@ Deno.serve(async (req) => {
       dateKey: kyivDateKey,
       latestKp,
       currentG,
+      dayStatusSummary,
+      currentNoaaSummary,
       todayMaxKp,
       windSpeed,
       windDensity,

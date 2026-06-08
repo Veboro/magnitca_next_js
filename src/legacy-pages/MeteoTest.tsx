@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Activity, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -469,6 +469,85 @@ const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
       resistantDesc: "Nagyszerű! A geomágneses aktivitás várhatóan csak minimálisan hat a szervezetedre.",
     },
   },
+  en: {
+    title: "Weather sensitivity test — Magnitca",
+    description:
+      "A free weather sensitivity test. Learn how strongly your body may respond to magnetic storms and geomagnetic activity.",
+    backHome: "Back to home",
+    heading: "Weather sensitivity test",
+    subtitle:
+      "Find out how sensitive your body may be to magnetic storms. The test takes 2-3 minutes.",
+    introTitle: "How the test works",
+    introText:
+      "This test gives an approximate estimate of your sensitivity to geomagnetic activity, pressure changes and related symptoms.",
+    howItWorksTitle: "What is considered",
+    howItWorksItems: [
+      "your typical reactions to magnetic storms and weather changes",
+      "age, physical activity and chronic conditions",
+      "symptom frequency: headache, fatigue, insomnia, pressure changes and anxiety",
+    ],
+    resultsInfoTitle: "What the result means",
+    resultsInfoText:
+      "After answering, you will receive a percentage estimate of weather sensitivity. A higher value means active geomagnetic periods may be more noticeable for you.",
+    disclaimerTitle: "Important",
+    disclaimerText:
+      "This is not a medical diagnosis and does not replace a doctor. It is an informational estimate for better self-observation.",
+    yourName: "Your name",
+    enterName: "Enter your name",
+    age: "Age",
+    gender: "Gender",
+    physicalActivity: "Physical activity level",
+    hasChronic: "I have chronic conditions",
+    startTest: "Start test",
+    questionProgress: "Question",
+    analyzing: "Analyzing your answers...",
+    processingPersonal: "Processing personal data...",
+    comparingMeteo: "Comparing with weather data...",
+    calculatingIndex: "Calculating sensitivity index...",
+    formingResult: "Preparing result...",
+    yourResult: "Your result",
+    tryAgain: "Try again",
+    telegramTitle: "Do not miss magnetic storms!",
+    telegramText:
+      "Subscribe to our Telegram channel and get daily magnetic storm forecasts.",
+    telegramButton: "Subscribe in Telegram",
+    answerOptions: [
+      { label: "Never", value: 0 },
+      { label: "Rarely", value: 1 },
+      { label: "Sometimes", value: 2 },
+      { label: "Often", value: 3 },
+      { label: "Always", value: 4 },
+    ],
+    genderOptions: ["Male", "Female", "Other"],
+    activityOptions: ["Low", "Moderate", "High"],
+    questions: [
+      "Do you get headaches during magnetic storms?",
+      "Do you feel more tired on geomagnetically active days?",
+      "Do you have sleep problems before or during magnetic storms?",
+      "Do you notice mood changes related to solar activity?",
+      "Do you feel blood pressure fluctuations during storms?",
+      "Do you experience dizziness during geomagnetic activity?",
+      "Do you feel joint or muscle pain during magnetic storms?",
+      "Do you feel anxiety or restlessness during magnetic storms?",
+      "Do you have trouble concentrating during geomagnetic disturbances?",
+      "Do you notice heart rhythm discomfort during active days?",
+      "Do you sense weather changes before they arrive?",
+      "Do chronic conditions worsen during magnetic storms?",
+    ],
+    labels: {
+      high: "High weather sensitivity",
+      highDesc:
+        "You may respond noticeably to geomagnetic activity. Follow forecasts and consider a calmer routine during active periods.",
+      moderate: "Moderate weather sensitivity",
+      moderateDesc:
+        "You may be moderately sensitive to space weather changes. Pay attention to active days.",
+      low: "Low weather sensitivity",
+      lowDesc:
+        "Magnetic storms probably do not strongly affect your wellbeing, though mild discomfort may still happen sometimes.",
+      resistant: "Good resilience",
+      resistantDesc: "Great! Geomagnetic activity is likely to have minimal effect on you.",
+    },
+  },
 };
 
 function calculateScore(answers: number[], info: PersonalInfo, locale: LegacyLocale): number {
@@ -506,7 +585,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   usePageMeta(
     t.title,
     t.description,
-    locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : locale === "ro" ? "/ro/test" : locale === "hu" ? "/hu/test" : "/test"
+    locale === "ru" ? "/ru/test" : locale === "pl" ? "/pl/test" : locale === "ro" ? "/ro/test" : locale === "hu" ? "/hu/test" : locale === "en" ? "/en/test" : "/test"
   );
 
   const [step, setStep] = useState<Step>("info");
@@ -514,6 +593,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const [answers, setAnswers] = useState<number[]>([]);
   const [score, setScore] = useState(0);
   const [calcProgress, setCalcProgress] = useState(0);
+  const savedResultRef = useRef(false);
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     name: "",
     age: "",
@@ -543,6 +623,30 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
     return () => clearInterval(interval);
   }, [step, answers, personalInfo, locale]);
 
+  useEffect(() => {
+    if (step !== "result" || savedResultRef.current) return;
+    savedResultRef.current = true;
+    const resultLabel = getResultLabel(score, locale).label;
+
+    void fetch("/api/test-results", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        locale,
+        score,
+        resultLabel,
+        answers,
+        name: personalInfo.name,
+        age: personalInfo.age,
+        gender: personalInfo.gender,
+        hasChronic: personalInfo.hasChronic,
+        physicalActivity: personalInfo.physicalActivity,
+      }),
+    }).catch(() => {
+      savedResultRef.current = false;
+    });
+  }, [step, score, locale, answers, personalInfo]);
+
   const handleAnswer = (value: number) => {
     const nextAnswers = [...answers, value];
     setAnswers(nextAnswers);
@@ -554,6 +658,7 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   };
 
   const resetTest = () => {
+    savedResultRef.current = false;
     setStep("info");
     setCurrentQ(0);
     setAnswers([]);
@@ -577,7 +682,8 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
     personalInfo.physicalActivity;
 
   const result = getResultLabel(score, locale);
-  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "/";
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : locale === "en" ? "/en" : "/";
+  const showTelegramCta = locale === "uk" || locale === "ru";
 
   return (
     <div className="min-h-screen bg-background">
@@ -833,20 +939,22 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
               </div>
             </div>
 
-            <div className="rounded-lg border border-border/50 bg-card p-6 text-center space-y-3">
-              <Send className="h-6 w-6 text-primary mx-auto" />
-              <p className="text-sm font-medium text-foreground">{t.telegramTitle}</p>
-              <p className="text-xs text-muted-foreground max-w-sm mx-auto">{t.telegramText}</p>
-              <a
-                href="https://t.me/+7UKzAK5ur8UxZmMy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md bg-[hsl(200,80%,45%)] px-6 py-2.5 font-mono text-sm font-medium text-white transition-colors hover:bg-[hsl(200,80%,40%)]"
-              >
-                <Send className="h-4 w-4" />
-                {t.telegramButton}
-              </a>
-            </div>
+            {showTelegramCta && (
+              <div className="rounded-lg border border-border/50 bg-card p-6 text-center space-y-3">
+                <Send className="h-6 w-6 text-primary mx-auto" />
+                <p className="text-sm font-medium text-foreground">{t.telegramTitle}</p>
+                <p className="text-xs text-muted-foreground max-w-sm mx-auto">{t.telegramText}</p>
+                <a
+                  href="https://t.me/+7UKzAK5ur8UxZmMy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-md bg-[hsl(200,80%,45%)] px-6 py-2.5 font-mono text-sm font-medium text-white transition-colors hover:bg-[hsl(200,80%,40%)]"
+                >
+                  <Send className="h-4 w-4" />
+                  {t.telegramButton}
+                </a>
+              </div>
+            )}
           </div>
         )}
         </div>

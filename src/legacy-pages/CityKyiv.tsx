@@ -15,6 +15,7 @@ import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
 import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import type { SiteLocale } from "@/lib/locale";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
+import { CityStormFeelingSummary } from "@/components/city/city-storm-feeling-summary";
 import { absoluteUrl } from "@/lib/site";
 
 type LegacyLocale = Extract<SiteLocale, "uk" | "ru">;
@@ -269,6 +270,8 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
 
           <MobileAdsenseSlot />
 
+          <CityStormFeelingSummary locale={locale} />
+
           {data?.current ? (
             <CityImpactPanel
               locale={locale}
@@ -348,7 +351,7 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
           </div>
         </section>
 
-        <section className="hidden xl:grid xl:grid-cols-[5.5fr_2.6fr_3fr] gap-4 items-stretch" aria-label={t.geoAria}>
+        <section className="hidden xl:grid xl:grid-cols-[5.5fr_5.6fr] gap-4 items-stretch" aria-label={t.geoAria}>
           <div className="flex flex-col">
             <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
               <MapPin className="h-4 w-4 text-primary" />
@@ -360,6 +363,9 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
               <StormStatusBanner />
             </div>
           </div>
+
+          <div className="grid min-h-full grid-rows-[auto_1fr] gap-4 xl:grid-cols-[2.6fr_3fr]">
+          <CityStormFeelingSummary locale={locale} className="xl:col-span-2" />
 
           {data?.current ? (
             <CityImpactPanel
@@ -438,6 +444,7 @@ const CityKyiv = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
                 </Link>
               </div>
             </div>
+          </div>
           </div>
         </section>
 

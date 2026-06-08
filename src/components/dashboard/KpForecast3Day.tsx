@@ -31,12 +31,15 @@ const getForecastLocale = (language: string) => {
   if (language.startsWith("ru")) return "ru-RU";
   if (language.startsWith("pl")) return "pl-PL";
   if (language.startsWith("ro")) return "ro-MD";
+  if (language.startsWith("hu")) return "hu-HU";
+  if (language.startsWith("en")) return "en-US";
   return "uk-UA";
 };
 
 const getForecastTimeZone = (language: string) => {
   if (language.startsWith("pl")) return "Europe/Warsaw";
   if (language.startsWith("ro")) return "Europe/Chisinau";
+  if (language.startsWith("hu")) return "Europe/Budapest";
   return "Europe/Kyiv";
 };
 
@@ -80,7 +83,7 @@ export const KpForecast3Day = ({ className, initialData }: { className?: string;
 
   const formatHour = (timeTag: string) => {
     const d = new Date(timeTag);
-    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone });
+    return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", hour12: false, timeZone });
   };
 
   const formatDayHeader = (timeTag: string) => {

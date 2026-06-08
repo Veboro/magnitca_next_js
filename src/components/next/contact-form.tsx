@@ -3,7 +3,7 @@
 import { FormEvent, useState } from "react";
 import { CheckCircle, Loader2, Send } from "lucide-react";
 
-type ContactFormLocale = "uk" | "ru" | "pl" | "ro" | "hu";
+type ContactFormLocale = "uk" | "ru" | "pl" | "ro" | "hu" | "en";
 
 const copy: Record<
   ContactFormLocale,
@@ -84,6 +84,19 @@ const copy: Record<
     message: "Üzenet",
     sending: "Küldés...",
     send: "Üzenet küldése",
+  },
+  en: {
+    sendError: "Unable to send the message.",
+    unknownError: "An error occurred while sending.",
+    successTitle: "Thanks for your message",
+    successText:
+      "Your message is on its way. If the matter is urgent, you can also email us at",
+    sendAnother: "Send another message",
+    name: "Your name",
+    email: "Email",
+    message: "Message",
+    sending: "Sending...",
+    send: "Send message",
   },
 };
 

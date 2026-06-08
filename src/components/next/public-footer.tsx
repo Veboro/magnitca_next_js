@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getPathForLocale, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 
 const copy: Record<
   SiteLocale,
@@ -72,11 +72,22 @@ const copy: Record<
     usageNotice:
       "Az oldal minden anyaga, beleértve a szövegeket, grafikákat, oldalelrendezéseket, elemző összeállításokat és szerkesztőségi tartalmakat, jogi védelem alatt áll. Az anyagok újraközlése, másolása, átdolgozása vagy bármilyen egyéb felhasználása csak a magnitca.com oldalra mutató kötelező aktív hivatkozással engedélyezett; a forrásmegjelölés nélküli vagy kereskedelmi célú felhasználás a szerkesztőség írásos engedélye nélkül tilos.",
   },
+  en: {
+    contacts: "Contacts",
+    about: "About",
+    privacy: "Privacy policy",
+    cookies: "Cookie policy",
+    terms: "Terms of use",
+    rss: "RSS",
+    copyright: "Magnitca. All rights reserved.",
+    usageNotice:
+      "All site materials, including texts, graphics, page design, analytical selections and editorial publications, are protected by law. Reprinting, copying, adaptation or any other use of materials is allowed only with a mandatory active link to magnitca.com; use without source attribution or for commercial purposes without written editorial permission is prohibited.",
+  },
 };
 
 export function PublicFooter() {
   const pathname = usePathname();
-  const locale: SiteLocale = pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const regionalSource = locale === "hu"
     ? {
         href: "https://met.hu/",

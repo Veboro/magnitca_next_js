@@ -10,12 +10,18 @@ export const BzChart = ({ className }: { className?: string }) => {
       ? "pl-PL"
       : i18n.language.startsWith("ro")
         ? "ro-MD"
-        : "uk-UA";
+        : i18n.language.startsWith("hu")
+          ? "hu-HU"
+          : i18n.language.startsWith("en")
+            ? "en-US"
+            : "uk-UA";
   const timeZone = i18n.language.startsWith("pl")
     ? "Europe/Warsaw"
     : i18n.language.startsWith("ro")
       ? "Europe/Chisinau"
-      : "Europe/Kyiv";
+      : i18n.language.startsWith("hu")
+        ? "Europe/Budapest"
+        : "Europe/Kyiv";
   const { data: rawData, isLoading } = useMagData();
 
   const toTime = (utc: string) => {

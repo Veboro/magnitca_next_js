@@ -2,6 +2,15 @@ import Link from "next/link";
 import { listNewsAdmin } from "@/lib/admin-content";
 import { DeleteNewsButton } from "@/components/admin/delete-news-button";
 
+const NEWS_LOCALES = [
+  { code: "uk", label: "UA" },
+  { code: "ru", label: "RU" },
+  { code: "pl", label: "PL" },
+  { code: "ro", label: "RO" },
+  { code: "hu", label: "HU" },
+  { code: "en", label: "EN" },
+] as const;
+
 export default async function AdminNewsPage() {
   const news = await listNewsAdmin();
 
@@ -34,6 +43,25 @@ export default async function AdminNewsPage() {
                   <div className="space-y-1">
                     <div className="font-medium">{item.title_uk || "—"}</div>
                     <div className="text-xs text-muted-foreground">{item.title_ru || "—"}</div>
+                    <div className="flex flex-wrap gap-1 pt-1">
+                      {NEWS_LOCALES.map((locale) => {
+                        const hasTranslation = Boolean(
+                          item[`title_${locale.code}`] && item[`slug_${locale.code}`],
+                        );
+                        return (
+                          <span
+                            key={locale.code}
+                            className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                              hasTranslation
+                                ? "bg-emerald-500/10 text-emerald-600"
+                                : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {locale.label}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
                 </td>
                 <td className="px-4 py-3">
@@ -58,6 +86,10 @@ export default async function AdminNewsPage() {
                   <div className="space-y-1">
                     <div>{item.slug_uk || "—"}</div>
                     <div>{item.slug_ru || "—"}</div>
+                    {item.slug_pl ? <div>{item.slug_pl}</div> : null}
+                    {item.slug_ro ? <div>{item.slug_ro}</div> : null}
+                    {item.slug_hu ? <div>{item.slug_hu}</div> : null}
+                    {item.slug_en ? <div>{item.slug_en}</div> : null}
                   </div>
                 </td>
                 <td className="px-4 py-3">

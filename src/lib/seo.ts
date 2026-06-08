@@ -107,6 +107,11 @@ const PL_PAGE_META: Record<string, { title: string; description: string }> = {
     title: "Kalendarz burz magnetycznych — prognoza aktywności geomagnetycznej",
     description: "Kalendarz aktywnosci geomagnetycznej i prognoza na kolejne dni.",
   },
+  news: {
+    title: "Wiadomości o burzach magnetycznych",
+    description:
+      "Codzienne wiadomości o burzach magnetycznych, aktywności geomagnetycznej, prognozach NOAA i wpływie pogody kosmicznej na samopoczucie.",
+  },
 };
 
 const RO_PAGE_META: Record<string, { title: string; description: string }> = {
@@ -150,6 +155,11 @@ const RO_PAGE_META: Record<string, { title: string; description: string }> = {
   calendar: {
     title: "Calendarul furtunilor magnetice — prognoza activității geomagnetice",
     description: "Calendarul activității geomagnetice și prognoza pentru următoarele zile.",
+  },
+  news: {
+    title: "Știri despre furtuni magnetice",
+    description:
+      "Știri zilnice despre furtuni magnetice, activitate geomagnetică, prognoze NOAA și influența vremii spațiale asupra stării de bine.",
   },
 };
 
@@ -195,6 +205,60 @@ const HU_PAGE_META: Record<string, { title: string; description: string }> = {
     title: "Mágneses vihar naptár — geomágneses aktivitási előrejelzés",
     description: "Geomágneses aktivitási naptár és előrejelzés a következő napokra.",
   },
+  news: {
+    title: "Mágneses vihar hírek",
+    description:
+      "Napi hírek mágneses viharokról, geomágneses aktivitásról, NOAA-előrejelzésekről és az űridőjárás közérzetre gyakorolt hatásáról.",
+  },
+};
+
+const EN_PAGE_META: Record<string, { title: string; description: string }> = {
+  home: {
+    title: "Magnetic storms today — Kp index, solar wind and forecast | Magnitca",
+    description:
+      "Magnitca monitors magnetic storms, the Kp index, solar wind and space weather in real time with NOAA-based forecasts and health-focused explanations.",
+  },
+  about: {
+    title: "About Magnitca — NOAA data and magnetic storm forecasts",
+    description: "About the Magnitca project, NOAA data sources and the editorial approach behind our magnetic storm forecasts.",
+  },
+  contacts: {
+    title: "Contact Magnitca — questions and collaboration",
+    description: "Contact the Magnitca team for questions, partnerships, feedback and error reports.",
+  },
+  privacy: {
+    title: "Magnitca privacy policy",
+    description: "Information about privacy, analytics and data processing on the Magnitca service.",
+  },
+  cookies: {
+    title: "Magnitca cookie policy",
+    description: "Information about cookies and analytics tools used on Magnitca.",
+  },
+  terms: {
+    title: "Magnitca terms of use",
+    description: "Rules for using Magnitca, liability limits and the informational nature of the content.",
+  },
+  faq: {
+    title: "Magnetic storms FAQ: Kp index, solar wind and health impact",
+    description: "Frequently asked questions about magnetic storms, the Kp index, solar wind and possible effects on wellbeing.",
+  },
+  kp_index: {
+    title: "Kp index today — live chart and magnetic storm forecast",
+    description: "Current Kp index, live chart and geomagnetic activity forecast based on NOAA space weather data.",
+  },
+  solar_wind: {
+    title: "Solar wind today — speed, density and IMF Bz online",
+    description: "Solar wind speed, density and IMF Bz in real time for tracking magnetic storm conditions.",
+  },
+  calendar: {
+    title: "Magnetic storm calendar — geomagnetic activity forecast",
+    description: "Calendar of magnetic storms and geomagnetic activity forecast for the coming days.",
+  },
+  news: {
+    title: "Magnetic storm news",
+    description:
+      "Daily news about magnetic storms, geomagnetic activity, NOAA forecasts and the impact of space weather on wellbeing.",
+  },
 };
 
 const OG_LOCALE: Record<SiteLocale, string> = {
@@ -203,6 +267,7 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   pl: "pl_PL",
   ro: "ro_MD",
   hu: "hu_HU",
+  en: "en_US",
 };
 
 export async function resolveLocalizedMetadata(
@@ -216,6 +281,7 @@ export async function resolveLocalizedMetadata(
   const plUrl = getPathForLocale(path, "pl");
   const roUrl = getPathForLocale(path, "ro");
   const huUrl = getPathForLocale(path, "hu");
+  const enUrl = getPathForLocale(path, "en");
   const ukMeta = locale === "uk" ? await getPageMeta(pageKey) : null;
   const meta =
     locale === "uk"
@@ -229,7 +295,9 @@ export async function resolveLocalizedMetadata(
           ? RO_PAGE_META[pageKey]
           : locale === "hu"
             ? HU_PAGE_META[pageKey]
-            : PL_PAGE_META[pageKey];
+            : locale === "en"
+              ? EN_PAGE_META[pageKey]
+              : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
   const description = meta?.description || SITE_DESCRIPTION;
   const languages: Record<string, string> = {
@@ -238,16 +306,20 @@ export async function resolveLocalizedMetadata(
     "x-default": ukUrl,
   };
 
-  if (pageKey !== "news" && pageKey !== "cities") {
+  if (pageKey !== "cities") {
     languages.pl = plUrl;
   }
 
-  if (locale === "ro" || pageKey === "home") {
+  if (locale === "ro" || pageKey === "home" || pageKey === "news") {
     languages.ro = roUrl;
   }
 
-  if (locale === "hu" || pageKey === "home") {
+  if (locale === "hu" || pageKey === "home" || pageKey === "news") {
     languages.hu = huUrl;
+  }
+
+  if (locale === "en" || pageKey === "home" || pageKey === "news") {
+    languages.en = enUrl;
   }
 
   return {

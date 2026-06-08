@@ -17,75 +17,135 @@ export type Database = {
       news: {
         Row: {
           content: string
+          content_en: string | null
+          content_hu: string | null
+          content_pl: string | null
+          content_ro: string | null
           content_ru: string | null
           content_uk: string | null
           created_at: string
           id: string
           image_url: string | null
           meta_description: string | null
+          meta_description_en: string | null
+          meta_description_hu: string | null
+          meta_description_pl: string | null
+          meta_description_ro: string | null
           meta_description_ru: string | null
           meta_description_uk: string | null
           meta_title: string | null
+          meta_title_en: string | null
+          meta_title_hu: string | null
+          meta_title_pl: string | null
+          meta_title_ro: string | null
           meta_title_ru: string | null
           meta_title_uk: string | null
           published_at: string
           status: string
           slug: string | null
+          slug_en: string | null
+          slug_hu: string | null
+          slug_pl: string | null
+          slug_ro: string | null
           slug_ru: string | null
           slug_uk: string | null
           source: string | null
           telegram_sent: boolean | null
+          title_en: string | null
           title_ru: string | null
+          title_hu: string | null
+          title_pl: string | null
+          title_ro: string | null
           title_uk: string | null
           title: string
           updated_at: string
         }
         Insert: {
           content: string
+          content_en?: string | null
+          content_hu?: string | null
+          content_pl?: string | null
+          content_ro?: string | null
           content_ru?: string | null
           content_uk?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
           meta_description?: string | null
+          meta_description_en?: string | null
+          meta_description_hu?: string | null
+          meta_description_pl?: string | null
+          meta_description_ro?: string | null
           meta_description_ru?: string | null
           meta_description_uk?: string | null
           meta_title?: string | null
+          meta_title_en?: string | null
+          meta_title_hu?: string | null
+          meta_title_pl?: string | null
+          meta_title_ro?: string | null
           meta_title_ru?: string | null
           meta_title_uk?: string | null
           published_at?: string
           status?: string
           slug?: string | null
+          slug_en?: string | null
+          slug_hu?: string | null
+          slug_pl?: string | null
+          slug_ro?: string | null
           slug_ru?: string | null
           slug_uk?: string | null
           source?: string | null
           telegram_sent?: boolean | null
+          title_en?: string | null
           title_ru?: string | null
+          title_hu?: string | null
+          title_pl?: string | null
+          title_ro?: string | null
           title_uk?: string | null
           title: string
           updated_at?: string
         }
         Update: {
           content?: string
+          content_en?: string | null
+          content_hu?: string | null
+          content_pl?: string | null
+          content_ro?: string | null
           content_ru?: string | null
           content_uk?: string | null
           created_at?: string
           id?: string
           image_url?: string | null
           meta_description?: string | null
+          meta_description_en?: string | null
+          meta_description_hu?: string | null
+          meta_description_pl?: string | null
+          meta_description_ro?: string | null
           meta_description_ru?: string | null
           meta_description_uk?: string | null
           meta_title?: string | null
+          meta_title_en?: string | null
+          meta_title_hu?: string | null
+          meta_title_pl?: string | null
+          meta_title_ro?: string | null
           meta_title_ru?: string | null
           meta_title_uk?: string | null
           published_at?: string
           status?: string
           slug?: string | null
+          slug_en?: string | null
+          slug_hu?: string | null
+          slug_pl?: string | null
+          slug_ro?: string | null
           slug_ru?: string | null
           slug_uk?: string | null
           source?: string | null
           telegram_sent?: boolean | null
+          title_en?: string | null
           title_ru?: string | null
+          title_hu?: string | null
+          title_pl?: string | null
+          title_ro?: string | null
           title_uk?: string | null
           title?: string
           updated_at?: string
@@ -160,9 +220,14 @@ export type Database = {
           gender: string
           has_chronic: boolean
           id: string
+          ip_hash: string | null
+          locale: string
           name: string
+          physical_activity: string | null
+          result_label: string | null
           score: number
-          user_id: string
+          user_agent: string | null
+          user_id: string | null
         }
         Insert: {
           age: number
@@ -171,9 +236,14 @@ export type Database = {
           gender: string
           has_chronic?: boolean
           id?: string
+          ip_hash?: string | null
+          locale?: string
           name: string
+          physical_activity?: string | null
+          result_label?: string | null
           score: number
-          user_id: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Update: {
           age?: number
@@ -182,9 +252,14 @@ export type Database = {
           gender?: string
           has_chronic?: boolean
           id?: string
+          ip_hash?: string | null
+          locale?: string
           name?: string
+          physical_activity?: string | null
+          result_label?: string | null
           score?: number
-          user_id?: string
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }

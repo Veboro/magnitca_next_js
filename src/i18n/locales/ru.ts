@@ -123,6 +123,19 @@ const ru = {
     kpEffectLabel7: "Сильная буря",
     kpEffectLabel8: "Экстремальная",
   },
+  feelingPoll: {
+    question: "Чувствуете сегодня влияние?",
+    subtitle: "Короткий ответ помогает понять, как бурю ощущают люди.",
+    yes: "Да",
+    no: "Нет",
+    result: "{{percent}}% людей сегодня чувствуют влияние",
+    emptyResult: "Первые ответы ещё собираются",
+    responses: "{{count}} ответов",
+    feel: "Чувствуют {{percent}}% опрошенных",
+    doNotFeel: "Не чувствуют {{percent}}%",
+    loadError: "Не удалось загрузить ответы.",
+    saveError: "Не удалось сохранить ответ.",
+  },
   // Human Impact
   impact: {
     title: "Влияние на организм",

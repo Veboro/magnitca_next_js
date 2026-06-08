@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FileText, Home, Search } from "lucide-react";
+import { BarChart3, FileText, Home, Search } from "lucide-react";
 import { LogoutButton } from "@/components/admin/logout-button";
 
 export function AdminShell({
@@ -27,6 +27,10 @@ export function AdminShell({
           <Link href="/admin/news" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm hover:bg-muted/40">
             <FileText className="h-4 w-4 text-primary" />
             Новини
+          </Link>
+          <Link href="/admin/test-results" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm hover:bg-muted/40">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            Результати тестів
           </Link>
           <Link href="/admin/seo" className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm hover:bg-muted/40">
             <Search className="h-4 w-4 text-primary" />

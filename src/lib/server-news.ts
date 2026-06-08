@@ -23,7 +23,37 @@ export type LocalizedNewsArticle = {
   published_at: string;
   updated_at: string;
   alternateSlug: string | null;
+  alternateSlugs: Partial<Record<SiteLocale, string>>;
 };
+
+const NEWS_LOCALES: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "en"];
+
+function getNewsField<T extends NewsArticle, K extends "title" | "slug" | "content" | "meta_title" | "meta_description">(
+  item: T,
+  field: K,
+  locale: SiteLocale,
+) {
+  return item[`${field}_${locale}` as keyof T] as T[keyof T] | null;
+}
+
+function getAlternateSlug(item: NewsArticle, locale: SiteLocale) {
+  const fallbackLocale = locale === "uk" ? "ru" : "uk";
+  return getNewsField(item, "slug", fallbackLocale) as string | null;
+}
+
+function getAlternateSlugs(item: NewsArticle) {
+  return NEWS_LOCALES.reduce<Partial<Record<SiteLocale, string>>>((slugs, locale) => {
+    const slug = getNewsField(item, "slug", locale) as string | null;
+    const title = getNewsField(item, "title", locale) as string | null;
+    const content = getNewsField(item, "content", locale) as string | null;
+
+    if (slug && title && content) {
+      slugs[locale] = slug;
+    }
+
+    return slugs;
+  }, {});
+}
 
 function getSupabaseServerClient() {
   const url = getSupabaseUrl();
@@ -46,7 +76,8 @@ export async function getLatestNews(limit = 30, locale: SiteLocale = "uk"): Prom
   const { data, error } = await supabase
     .from("news")
     .select(
-      "id, published_at, image_url, status, title_uk, slug_uk, meta_description_uk, title_ru, slug_ru, meta_description_ru"
+      "id, published_at, image_url, status, title_uk, slug_uk, meta_description_uk, title_ru, slug_ru, meta_description_ru, title_pl, slug_pl, meta_description_pl, title_ro, slug_ro, meta_description_ro, title_hu, slug_hu, meta_description_hu"
+        + ", title_en, slug_en, meta_description_en"
     )
     .eq("status", "published")
     .neq("source", "telegram_ai")
@@ -59,19 +90,20 @@ export async function getLatestNews(limit = 30, locale: SiteLocale = "uk"): Prom
 
   return (data ?? [])
     .map((item) => {
-      const title = locale === "ru" ? item.title_ru : item.title_uk;
-      const slug = locale === "ru" ? item.slug_ru : item.slug_uk;
-      const description = locale === "ru" ? item.meta_description_ru : item.meta_description_uk;
+      const newsItem = item as unknown as NewsArticle;
+      const title = getNewsField(newsItem, "title", locale) as string | null;
+      const slug = getNewsField(newsItem, "slug", locale) as string | null;
+      const description = getNewsField(newsItem, "meta_description", locale) as string | null;
 
       if (!title || !slug) return null;
 
       return {
-        id: item.id,
+        id: newsItem.id,
         slug,
         title,
         description: description ?? null,
-        published_at: item.published_at,
-        image_url: item.image_url,
+        published_at: newsItem.published_at,
+        image_url: newsItem.image_url,
       };
     })
     .filter((item): item is LocalizedNewsListItem => Boolean(item));
@@ -82,12 +114,12 @@ export async function getNewsArticleBySlug(
   locale: SiteLocale = "uk"
 ): Promise<LocalizedNewsArticle | null> {
   const supabase = getSupabaseServerClient();
-  const slugColumn = locale === "ru" ? "slug_ru" : "slug_uk";
+  const slugColumn = NEWS_LOCALES.includes(locale) ? `slug_${locale}` : "slug_uk";
 
   let { data, error } = await supabase
     .from("news")
     .select("*")
-    .eq(slugColumn, slug)
+      .eq(slugColumn as "slug_uk", slug)
     .eq("status", "published")
     .neq("source", "telegram_ai")
     .maybeSingle();
@@ -102,18 +134,29 @@ export async function getNewsArticleBySlug(
       .maybeSingle());
   }
 
+  if (!data) {
+    ({ data, error } = await supabase
+      .from("news")
+      .select("*")
+      .or(NEWS_LOCALES.map((itemLocale) => `slug_${itemLocale}.eq.${slug}`).join(","))
+      .eq("status", "published")
+      .neq("source", "telegram_ai")
+      .maybeSingle());
+  }
+
   if (error) {
     throw new Error(error.message);
   }
 
   if (!data) return null;
 
-  const title = locale === "ru" ? data.title_ru : data.title_uk;
-  const localizedSlug = locale === "ru" ? data.slug_ru : data.slug_uk;
-  const content = locale === "ru" ? data.content_ru : data.content_uk;
-  const metaTitle = locale === "ru" ? data.meta_title_ru : data.meta_title_uk;
-  const metaDescription = locale === "ru" ? data.meta_description_ru : data.meta_description_uk;
-  const alternateSlug = locale === "ru" ? data.slug_uk : data.slug_ru;
+  const title = getNewsField(data, "title", locale) as string | null;
+  const localizedSlug = getNewsField(data, "slug", locale) as string | null;
+  const content = getNewsField(data, "content", locale) as string | null;
+  const metaTitle = getNewsField(data, "meta_title", locale) as string | null;
+  const metaDescription = getNewsField(data, "meta_description", locale) as string | null;
+  const alternateSlug = getAlternateSlug(data, locale);
+  const alternateSlugs = getAlternateSlugs(data);
 
   if (!title || !localizedSlug || !content) return null;
 
@@ -128,5 +171,6 @@ export async function getNewsArticleBySlug(
     published_at: data.published_at,
     updated_at: data.updated_at,
     alternateSlug: alternateSlug ?? null,
+    alternateSlugs,
   };
 }

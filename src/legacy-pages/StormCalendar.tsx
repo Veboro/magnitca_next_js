@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar } from "@/hooks/useStormCalendar";
 import type { StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
-import { hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
+import { enUS, hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
 
@@ -70,6 +70,13 @@ const levelLabels = {
     moderate: "Mérsékelt vihar (Kp5)",
     strong: "Erős vihar (Kp6-7)",
     severe: "Extrém vihar (Kp8-9)",
+  },
+  en: {
+    none: "Calm",
+    minor: "Minor activity (Kp4)",
+    moderate: "Moderate storm (Kp5)",
+    strong: "Strong storm (Kp6-7)",
+    severe: "Extreme storm (Kp8-9)",
   },
 };
 
@@ -186,12 +193,32 @@ const localizedCopy = {
     seo3:
       "A naptár NOAA Space Weather Prediction Center adatok alapján frissül, és praktikus áttekintést ad a következő napok várható aktivitásáról.",
   },
+  en: {
+    badge: "MAGNETIC STORM CALENDAR",
+    pageTitlePrefix: "Magnetic storm calendar for",
+    pageTitleSuffix: "— Magnitca",
+    pageDescriptionPrefix: "Magnetic storm calendar for",
+    pageDescriptionSuffix: "Days with geomagnetic disturbances are marked by intensity.",
+    intro:
+      "Days with magnetic storms are marked by intensity. A dashed border highlights forecast days.",
+    forecast: "Forecast",
+    disturbanceDays: "Days with geomagnetic disturbances",
+    forecastBadge: "forecast",
+    seo1Prefix: "This page shows the",
+    seo1StrongPrefix: "magnetic storm calendar for",
+    seo1Rest:
+      "with daily geomagnetic activity data. Elevated days are color-coded from minor disturbances to extreme storms.",
+    seo2:
+      "Geomagnetic storms are evaluated using the planetary Kp index and NOAA G scale. Kp 5 and higher indicates a geomagnetic storm.",
+    seo3:
+      "The calendar is updated automatically from NOAA Space Weather Prediction Center data and is useful for general planning and wellbeing awareness.",
+  },
 };
 
 export default function StormCalendar({ locale = "uk", initialData }: { locale?: LegacyLocale; initialData?: StormDay[] | null }) {
   const t = localizedCopy[locale];
-  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : uk;
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
+  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : locale === "en" ? enUS : uk;
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 

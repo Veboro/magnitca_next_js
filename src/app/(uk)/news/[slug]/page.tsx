@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
-import { getNewsArticleBySlug } from "@/lib/server-news";
-import { absoluteUrl } from "@/lib/site";
-import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
+import {
+  generateNewsArticleMetadata,
+  LocalizedNewsArticlePage,
+} from "@/components/next/localized-news-pages";
 
 export const revalidate = 300;
 
@@ -12,135 +12,10 @@ type Params = {
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getNewsArticleBySlug(slug, "uk").catch(() => null);
-
-  if (!article) {
-    return {
-      title: "Новину не знайдено",
-    };
-  }
-
-  const description =
-    article.meta_description ||
-    article.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
-  const canonical = `/news/${article.slug || article.id}`;
-
-  return {
-    title: article.meta_title || article.title,
-    description,
-    alternates: {
-      canonical,
-      languages: article.alternateSlug
-        ? {
-            uk: canonical,
-            ru: `/ru/news/${article.alternateSlug}`,
-            "x-default": canonical,
-          }
-        : {
-            uk: canonical,
-            "x-default": canonical,
-          },
-    },
-    openGraph: {
-      type: "article",
-      title: article.meta_title || article.title,
-      description,
-      url: canonical,
-      images: article.image_url ? [{ url: article.image_url }] : undefined,
-      publishedTime: article.published_at,
-      modifiedTime: article.updated_at,
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.meta_title || article.title,
-      description,
-      images: article.image_url ? [article.image_url] : undefined,
-    },
-  };
+  return generateNewsArticleMetadata({ locale: "uk", slug });
 }
 
 export default async function NewsArticlePage({ params }: Params) {
   const { slug } = await params;
-  const article = await getNewsArticleBySlug(slug, "uk").catch(() => null);
-
-  if (!article) {
-    const russianArticle = await getNewsArticleBySlug(slug, "ru").catch(() => null);
-    if (russianArticle?.alternateSlug) {
-      redirect(`/news/${russianArticle.alternateSlug}`);
-    }
-  }
-
-  if (!article) {
-    notFound();
-  }
-
-  const canonicalUrl = absoluteUrl(`/news/${article.slug || article.id}`);
-  const description =
-    article.meta_description ||
-    article.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
-
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "NewsArticle",
-    headline: article.title,
-    datePublished: article.published_at,
-    dateModified: article.updated_at,
-    description,
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": canonicalUrl,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: "Магнітка",
-      url: absoluteUrl("/"),
-    },
-    ...(article.image_url
-      ? {
-          image: {
-            "@type": "ImageObject",
-            url: article.image_url,
-          },
-        }
-      : {}),
-  };
-
-  return (
-    <main className="official-page-main">
-      <div className="official-page-shell">
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-        <div className="mb-6">
-          <MobileAdsenseSlot />
-        </div>
-        <article className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm">
-          {article.image_url ? (
-            <img src={article.image_url} alt={article.title} className="aspect-[2/1] w-full object-cover" />
-          ) : null}
-          <div className="p-6 sm:p-8">
-            <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">
-              {new Date(article.published_at).toLocaleDateString("uk-UA", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
-            <h1 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
-              {article.title}
-            </h1>
-            <div className="news-article-body official-page-prose prose prose-sm max-w-none">
-              {article.content.includes("<") && article.content.includes(">") ? (
-                <div dangerouslySetInnerHTML={{ __html: article.content }} />
-              ) : (
-                <div className="whitespace-pre-line text-base leading-8">{article.content}</div>
-              )}
-            </div>
-            <div className="mt-6">
-              <MobileAdsenseSlot />
-            </div>
-          </div>
-        </article>
-      </div>
-    </main>
-  );
+  return <LocalizedNewsArticlePage locale="uk" slug={slug} />;
 }

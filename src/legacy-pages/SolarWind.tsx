@@ -277,10 +277,63 @@ const localizedCopy = {
       { q: "Milyen gyakran frissülnek az adatok?", a: "Az adatok NOAA mérésekből származnak és rendszeresen frissülnek." },
     ],
   },
+  en: {
+    ...copy.uk,
+    pageTitle: "Solar wind online in real time — speed and density",
+    pageDescription:
+      "Current solar wind data in real time: speed, density and IMF Bz charts based on NOAA DSCOVR measurements.",
+    heroTitle: "Solar wind today",
+    heroText:
+      "Solar wind speed and density in real time, with IMF Bz data and recent charts from NOAA SWPC.",
+    currentAria: "Current solar wind values",
+    speed: "Speed",
+    density: "Density",
+    normal: "Normal",
+    elevated: "Elevated",
+    stronglySouth: "Strongly southward",
+    south: "Southward",
+    weaklySouth: "Weakly southward",
+    north: "Northward",
+    speedChartAria: "Solar wind speed and density chart",
+    speedChartTitle: "Speed and density — last 2 hours",
+    bzChartAria: "IMF Bz chart",
+    bzChartTitle: "Interplanetary magnetic field (Bz) — last 2 hours",
+    loading: "Loading...",
+    bzNote:
+      "Negative Bz makes it easier for solar wind energy to enter Earth's magnetosphere. Values below -5 nT increase geomagnetic storm potential.",
+    scaleAria: "Solar wind speed scale",
+    scaleTitle: "Solar wind speed scale (km/s)",
+    seoAria: "About solar wind",
+    seoHeading: "What is solar wind and why is it important?",
+    seoText1:
+      "Solar wind is a continuous stream of charged particles flowing from the Sun. Its speed, density and magnetic field determine how strongly it can interact with Earth's magnetosphere.",
+    seoText2:
+      "A rapid increase in solar wind speed or a sustained southward Bz can raise the risk of geomagnetic storms. This page shows recent data in a practical format.",
+    faqAria: "Solar wind FAQ",
+    faqTitle: "FAQ",
+    tooltipKyiv: "local time",
+    areaSpeed: "Speed",
+    areaDensity: "Density",
+    speedLevels: [
+      { range: "< 300", status: "Slow", color: "bg-storm-quiet", description: "Slow solar wind with generally calm conditions." },
+      { range: "300-400", status: "Normal", color: "bg-storm-quiet", description: "Typical solar wind speed." },
+      { range: "400-500", status: "Elevated", color: "bg-storm-minor", description: "May contribute to mild geomagnetic activity." },
+      { range: "500-600", status: "High", color: "bg-storm-moderate", description: "Higher chance of noticeable disturbances." },
+      { range: "600-800", status: "Very high", color: "bg-storm-strong", description: "Can contribute to stronger magnetic storms." },
+      { range: "> 800", status: "Extreme", color: "bg-storm-severe", description: "Very fast flow with high disturbance potential." },
+    ],
+    faqItems: [
+      { q: "What is solar wind?", a: "Solar wind is a flow of charged particles coming from the Sun." },
+      { q: "Why does speed matter?", a: "Higher speed means stronger pressure on Earth's magnetosphere." },
+      { q: "What is density?", a: "Density shows how many particles are present in a given volume of solar wind." },
+      { q: "What does Bz mean?", a: "Bz is the vertical component of the interplanetary magnetic field. Negative values increase storm potential." },
+      { q: "How often is data updated?", a: "Data comes from NOAA measurements and is refreshed regularly." },
+    ],
+  },
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "en" ? "UTC" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -338,7 +391,7 @@ interface SolarWindProps {
 
 const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const speedUnit = locale === "uk" || locale === "ru" ? "км/с" : "km/s";
   const densityUnit = locale === "uk" || locale === "ru" ? "p/см³" : "p/cm³";

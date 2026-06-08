@@ -144,10 +144,38 @@ const weatherCodeLabels: Record<SiteLocale, Record<number, string>> = {
     96: "Zivatar jégesővel",
     99: "Erős zivatar jégesővel",
   },
+  en: {
+    0: "Clear",
+    1: "Mostly clear",
+    2: "Partly cloudy",
+    3: "Cloudy",
+    45: "Fog",
+    48: "Rime",
+    51: "Drizzle",
+    53: "Moderate drizzle",
+    55: "Heavy drizzle",
+    61: "Light rain",
+    63: "Moderate rain",
+    65: "Heavy rain",
+    66: "Freezing rain",
+    67: "Heavy freezing rain",
+    71: "Light snow",
+    73: "Moderate snow",
+    75: "Heavy snow",
+    77: "Snow grains",
+    80: "Rain showers",
+    81: "Moderate showers",
+    82: "Heavy showers",
+    85: "Snow showers",
+    86: "Heavy snow showers",
+    95: "Thunderstorm",
+    96: "Thunderstorm with hail",
+    99: "Strong thunderstorm with hail",
+  },
 };
 
 export const getWeatherLabel = (code: number, locale: SiteLocale = "uk") =>
-  weatherCodeLabels[locale][code] ?? (locale === "hu" ? "Ismeretlen" : locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : "Невідомо");
+  weatherCodeLabels[locale][code] ?? (locale === "en" ? "Unknown" : locale === "hu" ? "Ismeretlen" : locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : "Невідомо");
 
 export const getWeatherEmoji = (code: number) => {
   if (code === 0) return "☀️";
