@@ -12,54 +12,78 @@ type StormFeelingStats = {
   total: number;
   yes: number;
   no: number;
+  better?: number;
+  neutral?: number;
+  worse?: number;
   yesPercent: number;
   noPercent: number;
 };
 
 const STORM_FEELING_QUERY_KEY = ["storm-feeling-stats"] as const;
 
-const copy: Record<SiteLocale, { empty: string; feel: string; responses: string }> = {
+const copy: Record<
+  SiteLocale,
+  {
+    empty: string;
+    discomfort: string;
+    responses: string;
+    better: string;
+    neutral: string;
+    worse: string;
+  }
+> = {
   uk: {
     empty: "Перші відповіді ще збираються",
-    feel: "Відчувають {{percent}}% опитаних",
+    discomfort: "Дискомфорт відчувають {{percent}}%",
     responses: "{{count}} відповідей",
+    better: "Добре {{percent}}%",
+    neutral: "Нейтрально {{percent}}%",
+    worse: "Погано {{percent}}%",
   },
   ru: {
     empty: "Первые ответы ещё собираются",
-    feel: "Чувствуют {{percent}}% опрошенных",
+    discomfort: "Дискомфорт чувствуют {{percent}}%",
     responses: "{{count}} ответов",
+    better: "Хорошо {{percent}}%",
+    neutral: "Нейтрально {{percent}}%",
+    worse: "Плохо {{percent}}%",
   },
   pl: {
     empty: "Pierwsze odpowiedzi sa jeszcze zbierane",
-    feel: "Czuje {{percent}}% ankietowanych",
+    discomfort: "Dyskomfort czuje {{percent}}%",
     responses: "{{count}} odpowiedzi",
+    better: "Dobrze {{percent}}%",
+    neutral: "Neutralnie {{percent}}%",
+    worse: "Zle {{percent}}%",
   },
   ro: {
     empty: "Primele răspunsuri se adună",
-    feel: "Simt {{percent}}% dintre respondenți",
+    discomfort: "Disconfort simt {{percent}}%",
     responses: "{{count}} răspunsuri",
+    better: "Bine {{percent}}%",
+    neutral: "Neutru {{percent}}%",
+    worse: "Rău {{percent}}%",
   },
   hu: {
     empty: "Az első válaszok még gyűlnek",
-    feel: "A válaszadók {{percent}}%-a érzi",
+    discomfort: "Kellemetlenséget érez {{percent}}%",
     responses: "{{count}} válasz",
+    better: "Jól {{percent}}%",
+    neutral: "Semleges {{percent}}%",
+    worse: "Rosszul {{percent}}%",
   },
   en: {
     empty: "The first answers are still being collected",
-    feel: "{{percent}}% of respondents feel it",
+    discomfort: "{{percent}}% feel discomfort",
     responses: "{{count}} responses",
+    better: "Good {{percent}}%",
+    neutral: "Neutral {{percent}}%",
+    worse: "Bad {{percent}}%",
   },
 };
 
 function formatTemplate(template: string, values: Record<string, number>) {
   return template.replace(/\{\{(\w+)\}\}/g, (_, key: string) => String(values[key] ?? ""));
-}
-
-function getPollColor(value: number) {
-  if (value >= 70) return "hsl(0, 78%, 56%)";
-  if (value >= 45) return "hsl(24, 94%, 55%)";
-  if (value >= 25) return "hsl(42, 96%, 52%)";
-  return "hsl(145, 78%, 45%)";
 }
 
 export function CityStormFeelingSummary({
@@ -98,13 +122,15 @@ export function CityStormFeelingSummary({
   }, [queryClient]);
 
   const total = stats?.total ?? 0;
-  const percent = stats?.yesPercent ?? 0;
-  const color = getPollColor(percent);
-  const label = total > 0 ? formatTemplate(t.feel, { percent }) : t.empty;
+  const discomfortPercent = stats?.yesPercent ?? 0;
+  const betterPercent = total > 0 ? Math.round(((stats?.better ?? 0) / total) * 100) : 0;
+  const neutralPercent = total > 0 ? Math.round(((stats?.neutral ?? 0) / total) * 100) : 0;
+  const worsePercent = total > 0 ? Math.max(0, 100 - betterPercent - neutralPercent) : 0;
+  const label = total > 0 ? formatTemplate(t.discomfort, { percent: discomfortPercent }) : t.empty;
   const responses = formatTemplate(t.responses, { count: total });
 
   return (
-    <div className={cn("rounded-lg border border-border/50 bg-card p-4", className)}>
+    <div className={cn("rounded-lg border border-border/50 bg-card p-4 shadow-sm", className)}>
       <div className="flex items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2 text-muted-foreground">
           <HeartPulse className="h-4 w-4 shrink-0 text-primary" />
@@ -112,14 +138,30 @@ export function CityStormFeelingSummary({
         </div>
         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">{responses}</span>
       </div>
-      <div className="mt-3 h-3 overflow-hidden rounded-full bg-muted/30">
-        <div
-          className="h-full rounded-full transition-all duration-700"
-          style={{
-            width: `${total > 0 ? percent : 8}%`,
-            backgroundColor: total > 0 ? color : "hsl(0 0% 100% / 0.25)",
-          }}
-        />
+      <div className="mt-3 h-3 overflow-hidden rounded-full bg-muted/40">
+        {total > 0 ? (
+          <div className="flex h-full w-full">
+            <div
+              className="h-full transition-all duration-700"
+              style={{ width: `${betterPercent}%`, backgroundColor: "hsl(145, 78%, 45%)" }}
+            />
+            <div
+              className="h-full transition-all duration-700"
+              style={{ width: `${neutralPercent}%`, backgroundColor: "hsl(42, 96%, 52%)" }}
+            />
+            <div
+              className="h-full transition-all duration-700"
+              style={{ width: `${worsePercent}%`, backgroundColor: "hsl(0, 78%, 56%)" }}
+            />
+          </div>
+        ) : (
+          <div className="h-full w-[8%] rounded-full bg-muted-foreground/25" />
+        )}
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+        <span className="mood-label-good">{formatTemplate(t.better, { percent: betterPercent })}</span>
+        <span className="mood-label-neutral text-center">{formatTemplate(t.neutral, { percent: neutralPercent })}</span>
+        <span className="mood-label-bad text-right">{formatTemplate(t.worse, { percent: worsePercent })}</span>
       </div>
     </div>
   );

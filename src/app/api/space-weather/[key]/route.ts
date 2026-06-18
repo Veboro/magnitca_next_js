@@ -2,9 +2,54 @@ import { NextResponse } from "next/server";
 import { getSpaceWeatherCache, SPACE_WEATHER_KEYS, type SpaceWeatherCacheKey } from "@/lib/space-weather-cache";
 
 const SWPC_BASE = "https://services.swpc.noaa.gov";
+const NOAA_FETCH_TIMEOUT_MS = 5_000;
+const SOLAR_WIND_PRODUCTS = [
+  "plasma-2-hour.json",
+  "plasma-6-hour.json",
+  "plasma-1-day.json",
+] as const;
+const MAG_PRODUCTS = [
+  "mag-2-hour.json",
+  "mag-6-hour.json",
+  "mag-1-day.json",
+] as const;
 
 function isSpaceWeatherKey(value: string): value is SpaceWeatherCacheKey {
   return (SPACE_WEATHER_KEYS as readonly string[]).includes(value);
+}
+
+function isNonEmptyPayload(key: SpaceWeatherCacheKey, payload: unknown) {
+  if ((key === "solar-wind" || key === "mag-data") && Array.isArray(payload)) {
+    return payload.length > 0;
+  }
+
+  return payload !== null && payload !== undefined;
+}
+
+async function fetchFirstNonEmptySolarWindProduct(products: readonly string[]) {
+  for (const product of products) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), NOAA_FETCH_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(`${SWPC_BASE}/products/solar-wind/${product}`, {
+        cache: "no-store",
+        signal: controller.signal,
+      });
+      if (!response.ok) continue;
+
+      const data: string[][] = await response.json();
+      if (Array.isArray(data) && data.length > 1) {
+        return data;
+      }
+    } catch {
+      continue;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  return null;
 }
 
 async function fetchFallback(key: SpaceWeatherCacheKey) {
@@ -18,8 +63,8 @@ async function fetchFallback(key: SpaceWeatherCacheKey) {
       }));
     }
     case "solar-wind": {
-      const response = await fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`, { cache: "no-store" });
-      const data: string[][] = await response.json();
+      const data = await fetchFirstNonEmptySolarWindProduct(SOLAR_WIND_PRODUCTS);
+      if (!data) return [];
       return data.slice(1).map((row) => ({
         time_tag: row[0],
         density: parseFloat(row[1]) || 0,
@@ -28,8 +73,8 @@ async function fetchFallback(key: SpaceWeatherCacheKey) {
       }));
     }
     case "mag-data": {
-      const response = await fetch(`${SWPC_BASE}/products/solar-wind/mag-2-hour.json`, { cache: "no-store" });
-      const data: string[][] = await response.json();
+      const data = await fetchFirstNonEmptySolarWindProduct(MAG_PRODUCTS);
+      if (!data) return [];
       return data.slice(1).map((row) => ({
         time_tag: row[0],
         bz: parseFloat(row[3]) || 0,
@@ -141,7 +186,7 @@ export async function GET(
 
   const payload = await getSpaceWeatherCache<unknown>(key);
 
-  if (payload !== null) {
+  if (isNonEmptyPayload(key, payload)) {
     return NextResponse.json(payload, {
       headers: {
         "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60",

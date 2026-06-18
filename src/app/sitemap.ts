@@ -6,6 +6,7 @@ import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
 import { getMoonMonthRoutes2026 } from "@/lib/moon-calendar";
 import { OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
+import { COUNTRY_REGION_ROUTES, getCountryRegionPath } from "@/lib/country-region-routes";
 import { getLatestNews } from "@/lib/server-news";
 import { SITE_URL } from "@/lib/site";
 
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/kp-index",
     "/solar-wind",
     "/moon-calendar",
+    "/aurora",
     "/sunrise",
     "/sunrise-tomorrow",
     "/sunset",
@@ -31,8 +33,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/terms",
   ].map((path) => ({
     url: `${SITE_URL}${path || "/"}`,
-    changeFrequency: path === "" || path === "/news" ? "hourly" : "daily",
-    priority: path === "" ? 1 : 0.7,
+    changeFrequency: path === "" || path === "/news" || path === "/aurora" ? "hourly" : "daily",
+    priority: path === "" ? 1 : path === "/aurora" ? 0.8 : 0.7,
   }));
 
   const ruStaticPages: MetadataRoute.Sitemap = [
@@ -42,6 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/ru/kp-index",
     "/ru/solar-wind",
     "/ru/moon-calendar",
+    "/ru/aurora",
     "/ru/sunrise",
     "/ru/sunrise-tomorrow",
     "/ru/sunset",
@@ -55,8 +58,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/ru/terms",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: path === "/ru" ? "hourly" : "daily",
-    priority: path === "/ru" ? 0.9 : 0.6,
+    changeFrequency: path === "/ru" || path === "/ru/aurora" ? "hourly" : "daily",
+    priority: path === "/ru" ? 0.9 : path === "/ru/aurora" ? 0.78 : 0.6,
   }));
 
   const plStaticPages: MetadataRoute.Sitemap = [
@@ -66,6 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/pl/kp-index",
     "/pl/solar-wind",
     "/pl/moon-calendar",
+    "/pl/aurora",
     "/pl/sunrise",
     "/pl/sunrise-tomorrow",
     "/pl/sunset",
@@ -78,8 +82,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/pl/terms",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: path === "/pl" ? "hourly" : "daily",
-    priority: path === "/pl" ? 0.85 : 0.6,
+    changeFrequency: path === "/pl" || path === "/pl/aurora" ? "hourly" : "daily",
+    priority: path === "/pl" ? 0.85 : path === "/pl/aurora" ? 0.78 : 0.6,
   }));
 
   const roStaticPages: MetadataRoute.Sitemap = [
@@ -89,6 +93,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/ro/kp-index",
     "/ro/solar-wind",
     "/ro/moon-calendar",
+    "/ro/aurora-romania",
+    "/ro/aurora-moldova",
     "/ro/faq",
     "/ro/about",
     "/ro/contacts",
@@ -97,8 +103,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/ro/terms",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: path === "/ro" ? "hourly" : "daily",
-    priority: path === "/ro" ? 0.85 : 0.6,
+    changeFrequency: path === "/ro" || path.startsWith("/ro/aurora-") ? "hourly" : "daily",
+    priority: path === "/ro" ? 0.85 : path.startsWith("/ro/aurora-") ? 0.76 : 0.6,
   }));
 
   const huStaticPages: MetadataRoute.Sitemap = [
@@ -107,6 +113,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/hu/calendar",
     "/hu/kp-index",
     "/hu/solar-wind",
+    "/hu/aurora",
     "/hu/sunrise",
     "/hu/sunrise-tomorrow",
     "/hu/sunset",
@@ -120,8 +127,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/hu/terms",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: path === "/hu" ? "hourly" : "daily",
-    priority: path === "/hu" ? 0.85 : 0.6,
+    changeFrequency: path === "/hu" || path === "/hu/aurora" ? "hourly" : "daily",
+    priority: path === "/hu" ? 0.85 : path === "/hu/aurora" ? 0.76 : 0.6,
   }));
 
   const enStaticPages: MetadataRoute.Sitemap = [
@@ -131,6 +138,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/en/kp-index",
     "/en/solar-wind",
     "/en/moon-calendar",
+    "/en/aurora",
     "/en/faq",
     "/en/about",
     "/en/contacts",
@@ -139,8 +147,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/en/terms",
   ].map((path) => ({
     url: `${SITE_URL}${path}`,
-    changeFrequency: path === "/en" ? "hourly" : "daily",
-    priority: path === "/en" ? 0.85 : 0.6,
+    changeFrequency: path === "/en" || path === "/en/aurora" ? "hourly" : "daily",
+    priority: path === "/en" ? 0.85 : path === "/en/aurora" ? 0.78 : 0.6,
   }));
 
   const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
@@ -197,6 +205,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     url: `${SITE_URL}/ru/oblast/${route.slugRu}`,
     changeFrequency: "hourly",
     priority: 0.7,
+  }));
+
+  const countryRegionPages: MetadataRoute.Sitemap = COUNTRY_REGION_ROUTES.map((region) => ({
+    url: `${SITE_URL}${getCountryRegionPath(region)}`,
+    changeFrequency: "hourly",
+    priority: 0.72,
   }));
 
   const moonMonthRoutes = getMoonMonthRoutes2026();
@@ -318,6 +332,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roCountrySunPages,
     ...oblastPages,
     ...ruOblastPages,
+    ...countryRegionPages,
     ...moonCalendarPages,
     ...ruMoonCalendarPages,
     ...plMoonCalendarPages,

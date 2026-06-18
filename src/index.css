@@ -104,6 +104,11 @@
     font-weight: 600;
   }
 
+  :root .aurora-faq-answer {
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+
   :root .text-muted-foreground {
     color: hsl(155 10% 22%);
   }
@@ -118,6 +123,15 @@
 }
 
 @layer utilities {
+  .mood-label-good {
+    color: hsl(145, 78%, 45%) !important;
+  }
+  .mood-label-neutral {
+    color: hsl(42, 96%, 52%) !important;
+  }
+  .mood-label-bad {
+    color: hsl(0, 78%, 56%) !important;
+  }
   .glow-cyan {
     box-shadow: var(--glow-cyan);
   }
@@ -406,6 +420,24 @@
     color: hsl(0 0% 100%);
     font-weight: 800;
   }
+  .official-home .official-impact-panel span.mood-label-good {
+    color: hsl(145, 78%, 45%) !important;
+  }
+  .official-home .official-impact-panel span.mood-label-neutral {
+    color: hsl(42, 96%, 52%) !important;
+  }
+  .official-home .official-impact-panel span.mood-label-bad {
+    color: hsl(0, 78%, 56%) !important;
+  }
+  .official-home .official-home-hero .lg\:grid > div:nth-child(2) span.mood-label-good {
+    color: hsl(145, 78%, 45%) !important;
+  }
+  .official-home .official-home-hero .lg\:grid > div:nth-child(2) span.mood-label-neutral {
+    color: hsl(42, 96%, 52%) !important;
+  }
+  .official-home .official-home-hero .lg\:grid > div:nth-child(2) span.mood-label-bad {
+    color: hsl(0, 78%, 56%) !important;
+  }
   .official-home .official-home-hero .lg\:grid > div:nth-child(2) .border-t {
     border-color: hsl(0 0% 100% / 0.22);
   }
@@ -671,6 +703,10 @@
     box-shadow: 0 24px 50px -36px hsl(36 20% 10% / 0.42);
     padding: 0.5rem 0.5rem 1rem;
   }
+  .official-page-shell.aurora-page-shell {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
   .official-page-header {
     display: flex;
     flex-direction: column;
@@ -701,6 +737,23 @@
   }
   .official-page-prose a {
     color: hsl(216 55% 27%);
+  }
+  .aurora-map-popup-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.55rem;
+    border-radius: 0.55rem;
+    background: hsl(216 55% 27%);
+    color: hsl(0 0% 100%) !important;
+    font-weight: 800;
+    line-height: 1.2;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+  }
+  .aurora-map-popup-link:hover {
+    background: hsl(216 58% 22%);
+    color: hsl(0 0% 100%) !important;
   }
   .news-article-body,
   .news-article-body p,
@@ -860,6 +913,10 @@
     .official-page-shell {
       padding: 0.75rem 1.5rem 1.5rem;
     }
+    .official-page-shell.aurora-page-shell {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+    }
   }
   @media (min-width: 1024px) {
     .official-home-page header > div,
@@ -873,6 +930,10 @@
     }
     .official-page-shell {
       padding: 0.75rem 2rem 2rem;
+    }
+    .official-page-shell.aurora-page-shell {
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
     }
   }
 }

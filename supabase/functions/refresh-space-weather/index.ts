@@ -6,6 +6,17 @@ const corsHeaders = {
 };
 
 const SWPC_BASE = "https://services.swpc.noaa.gov";
+const NOAA_FETCH_TIMEOUT_MS = 5_000;
+const SOLAR_WIND_PRODUCTS = [
+  "plasma-2-hour.json",
+  "plasma-6-hour.json",
+  "plasma-1-day.json",
+] as const;
+const MAG_PRODUCTS = [
+  "mag-2-hour.json",
+  "mag-6-hour.json",
+  "mag-1-day.json",
+] as const;
 
 type CacheRow = {
   cache_key: string;
@@ -15,13 +26,33 @@ type CacheRow = {
 };
 
 async function fetchJson<T>(url: string): Promise<T> {
-  const response = await fetch(url);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), NOAA_FETCH_TIMEOUT_MS);
+
+  const response = await fetch(url, { signal: controller.signal }).finally(() => {
+    clearTimeout(timeout);
+  });
 
   if (!response.ok) {
     throw new Error(`Fetch failed [${response.status}] ${url}`);
   }
 
   return await response.json();
+}
+
+async function fetchFirstNonEmptySolarWindProduct(products: readonly string[]) {
+  for (const product of products) {
+    try {
+      const data = await fetchJson<string[][]>(`${SWPC_BASE}/products/solar-wind/${product}`);
+      if (Array.isArray(data) && data.length > 1) {
+        return data;
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return [];
 }
 
 function mapKpIndex(data: any[]) {
@@ -145,8 +176,8 @@ Deno.serve(async (req) => {
 
     const [kpIndexRaw, solarWindRaw, magRaw, scalesRaw, forecastRaw, forecast27Raw, kpHistoricalRaw] = await Promise.all([
       fetchJson<any[]>(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
-      fetchJson<string[][]>(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
-      fetchJson<string[][]>(`${SWPC_BASE}/products/solar-wind/mag-2-hour.json`),
+      fetchFirstNonEmptySolarWindProduct(SOLAR_WIND_PRODUCTS),
+      fetchFirstNonEmptySolarWindProduct(MAG_PRODUCTS),
       fetchJson<any>(`${SWPC_BASE}/products/noaa-scales.json`),
       fetchJson<any[]>(`${SWPC_BASE}/products/noaa-planetary-k-index-forecast.json`),
       fetch(`${SWPC_BASE}/text/27-day-outlook.txt`).then((res) => {

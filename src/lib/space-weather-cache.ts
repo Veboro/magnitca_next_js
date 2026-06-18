@@ -6,6 +6,17 @@ import type { StormDay } from "@/hooks/useStormCalendar";
 
 const SWPC_BASE = "https://services.swpc.noaa.gov";
 const SPACE_WEATHER_MAX_AGE_MS = 15 * 60 * 1000;
+const NOAA_FETCH_TIMEOUT_MS = 5_000;
+const SOLAR_WIND_PRODUCTS = [
+  "plasma-2-hour.json",
+  "plasma-6-hour.json",
+  "plasma-1-day.json",
+] as const;
+const MAG_PRODUCTS = [
+  "mag-2-hour.json",
+  "mag-6-hour.json",
+  "mag-1-day.json",
+] as const;
 
 export const SPACE_WEATHER_KEYS = [
   "kp-index",
@@ -18,6 +29,40 @@ export const SPACE_WEATHER_KEYS = [
 ] as const;
 
 export type SpaceWeatherCacheKey = (typeof SPACE_WEATHER_KEYS)[number];
+
+function isNonEmptyPayload(cacheKey: SpaceWeatherCacheKey, payload: unknown) {
+  if ((cacheKey === "solar-wind" || cacheKey === "mag-data") && Array.isArray(payload)) {
+    return payload.length > 0;
+  }
+
+  return payload !== null && payload !== undefined;
+}
+
+async function fetchFirstNonEmptySolarWindProduct(products: readonly string[]) {
+  for (const product of products) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), NOAA_FETCH_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(`${SWPC_BASE}/products/solar-wind/${product}`, {
+        next: { revalidate: 300 },
+        signal: controller.signal,
+      });
+      if (!response.ok) continue;
+
+      const data: string[][] = await response.json();
+      if (Array.isArray(data) && data.length > 1) {
+        return data;
+      }
+    } catch {
+      continue;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  return null;
+}
 
 export async function getSpaceWeatherCache<T>(cacheKey: SpaceWeatherCacheKey): Promise<T | null> {
   try {
@@ -43,7 +88,12 @@ export async function getSpaceWeatherCache<T>(cacheKey: SpaceWeatherCacheKey): P
       return null;
     }
 
-    return (data.payload ?? null) as T | null;
+    const payload = data.payload ?? null;
+    if (!isNonEmptyPayload(cacheKey, payload)) {
+      return null;
+    }
+
+    return payload as T | null;
   } catch {
     return null;
   }
@@ -63,11 +113,8 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
       })) as T;
     }
     case "solar-wind": {
-      const response = await fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`, {
-        next: { revalidate: 300 },
-      });
-      if (!response.ok) return null;
-      const data: string[][] = await response.json();
+      const data = await fetchFirstNonEmptySolarWindProduct(SOLAR_WIND_PRODUCTS);
+      if (!data) return null;
       return data.slice(1).map((row) => ({
         time_tag: row[0],
         density: parseFloat(row[1]) || 0,
@@ -76,11 +123,8 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
       })) as T;
     }
     case "mag-data": {
-      const response = await fetch(`${SWPC_BASE}/products/solar-wind/mag-2-hour.json`, {
-        next: { revalidate: 300 },
-      });
-      if (!response.ok) return null;
-      const data: string[][] = await response.json();
+      const data = await fetchFirstNonEmptySolarWindProduct(MAG_PRODUCTS);
+      if (!data) return null;
       return data.slice(1).map((row) => ({
         time_tag: row[0],
         bz: parseFloat(row[3]) || 0,

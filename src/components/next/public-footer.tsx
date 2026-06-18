@@ -12,6 +12,7 @@ const copy: Record<
     privacy: string;
     cookies: string;
     terms: string;
+    faq: string;
     rss: string;
     copyright: string;
     usageNotice: string;
@@ -23,6 +24,7 @@ const copy: Record<
     privacy: "Політика конфіденційності",
     cookies: "Політика cookie",
     terms: "Умови користування",
+    faq: "FAQ",
     rss: "RSS",
     copyright: "Магнітка. Усі права захищено.",
     usageNotice:
@@ -34,6 +36,7 @@ const copy: Record<
     privacy: "Политика конфиденциальности",
     cookies: "Политика cookie",
     terms: "Условия использования",
+    faq: "FAQ",
     rss: "RSS",
     copyright: "Магнитка. Все права защищены.",
     usageNotice:
@@ -45,6 +48,7 @@ const copy: Record<
     privacy: "Polityka prywatności",
     cookies: "Polityka cookie",
     terms: "Warunki korzystania",
+    faq: "FAQ",
     rss: "RSS",
     copyright: "Magnitca. Wszelkie prawa zastrzeżone.",
     usageNotice:
@@ -56,6 +60,7 @@ const copy: Record<
     privacy: "Politica de confidențialitate",
     cookies: "Politica cookie",
     terms: "Termeni de utilizare",
+    faq: "FAQ",
     rss: "RSS",
     copyright: "Magnitca. Toate drepturile rezervate.",
     usageNotice:
@@ -67,6 +72,7 @@ const copy: Record<
     privacy: "Adatvédelmi irányelvek",
     cookies: "Cookie-szabályzat",
     terms: "Felhasználási feltételek",
+    faq: "GYIK",
     rss: "RSS",
     copyright: "Magnitca. Minden jog fenntartva.",
     usageNotice:
@@ -78,6 +84,7 @@ const copy: Record<
     privacy: "Privacy policy",
     cookies: "Cookie policy",
     terms: "Terms of use",
+    faq: "FAQ",
     rss: "RSS",
     copyright: "Magnitca. All rights reserved.",
     usageNotice:
@@ -123,6 +130,9 @@ export function PublicFooter() {
           </Link>
           <Link href={getPathForLocale("/terms", locale)} className="ml-4 border-l border-white/35 pl-4 text-white/82 transition-colors hover:text-white">
             {copy[locale].terms}
+          </Link>
+          <Link href={getPathForLocale("/faq", locale)} className="ml-4 border-l border-white/35 pl-4 text-white/82 transition-colors hover:text-white">
+            {copy[locale].faq}
           </Link>
           <a href="/rss.xml" className="ml-4 border-l border-white/35 pl-4 text-white/82 transition-colors hover:text-white">
             {copy[locale].rss}

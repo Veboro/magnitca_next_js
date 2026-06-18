@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, ArrowRight, Activity, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, Activity, BarChart3, Send, TrendingUp, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { usePageMeta } from "@/hooks/usePageMeta";
 import type { SiteLocale } from "@/lib/locale";
@@ -19,6 +19,19 @@ interface PersonalInfo {
 }
 
 type Step = "info" | "questions" | "calculating" | "result";
+
+type TestStatsResponse = {
+  total: number;
+  recentCount: number;
+  averageScore: number | null;
+  highSensitivityShare: number | null;
+  strongestGender: { key: "male" | "female" | "other"; count: number; averageScore: number | null } | null;
+  strongestAgeGroup: { key: string; count: number; averageScore: number | null } | null;
+  genderAverages: Record<"male" | "female" | "other", { count: number; averageScore: number | null }>;
+  ageAverages: Record<string, { count: number; averageScore: number | null }>;
+  chronicAverage: number | null;
+  nonChronicAverage: number | null;
+};
 
 const copy: Record<
   BaseLocale,
@@ -550,6 +563,295 @@ const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
   },
 };
 
+const statsCopy: Record<
+  LegacyLocale,
+  {
+    eyebrow: string;
+    title: string;
+    loading: string;
+    emptyTitle: string;
+    emptyText: string;
+    average: string;
+    averageSub: (total: number) => string;
+    highShare: string;
+    highShareSub: string;
+    higherIn: string;
+    agePeak: string;
+    noData: string;
+    recent: (count: number) => string;
+    gender: Record<"male" | "female" | "other", string>;
+    ageGroup: Record<string, string>;
+  }
+> = {
+  uk: {
+    eyebrow: "Статистика проходження",
+    title: "Як люди оцінюють свою метеозалежність",
+    loading: "Збираємо статистику...",
+    emptyTitle: "Перші результати ще збираються",
+    emptyText: "Коли більше людей пройдуть тест, тут з'явиться середній рівень метеозалежності та порівняння за віком і статтю.",
+    average: "Середній рівень",
+    averageSub: (total) => `${total} результатів у базі`,
+    highShare: "50%+",
+    highShareSub: "мають помірну або високу чутливість",
+    higherIn: "Вища у",
+    agePeak: "Найчутливіший вік",
+    noData: "Недостатньо даних",
+    recent: (count) => `${count} нових за 30 днів`,
+    gender: { male: "чоловіків", female: "жінок", other: "інших відповідей" },
+    ageGroup: {
+      under18: "до 18 років",
+      "18-29": "18-29 років",
+      "30-39": "30-39 років",
+      "40-49": "40-49 років",
+      "50-59": "50-59 років",
+      "60+": "60+ років",
+    },
+  },
+  ru: {
+    eyebrow: "Статистика прохождения",
+    title: "Как люди оценивают свою метеозависимость",
+    loading: "Собираем статистику...",
+    emptyTitle: "Первые результаты ещё собираются",
+    emptyText: "Когда больше людей пройдут тест, здесь появится средний уровень метеозависимости и сравнение по возрасту и полу.",
+    average: "Средний уровень",
+    averageSub: (total) => `${total} результатов в базе`,
+    highShare: "50%+",
+    highShareSub: "имеют умеренную или высокую чувствительность",
+    higherIn: "Выше у",
+    agePeak: "Самый чувствительный возраст",
+    noData: "Недостаточно данных",
+    recent: (count) => `${count} новых за 30 дней`,
+    gender: { male: "мужчин", female: "женщин", other: "других ответов" },
+    ageGroup: {
+      under18: "до 18 лет",
+      "18-29": "18-29 лет",
+      "30-39": "30-39 лет",
+      "40-49": "40-49 лет",
+      "50-59": "50-59 лет",
+      "60+": "60+ лет",
+    },
+  },
+  pl: {
+    eyebrow: "Statystyka testu",
+    title: "Jak użytkownicy oceniają swoją meteowrażliwość",
+    loading: "Zbieramy statystyki...",
+    emptyTitle: "Pierwsze wyniki są jeszcze zbierane",
+    emptyText: "Gdy więcej osób wykona test, pokażemy średni poziom meteowrażliwości oraz porównanie według wieku i płci.",
+    average: "Średni poziom",
+    averageSub: (total) => `${total} wyników w bazie`,
+    highShare: "50%+",
+    highShareSub: "ma umiarkowaną lub wysoką wrażliwość",
+    higherIn: "Wyższa u",
+    agePeak: "Najbardziej wrażliwy wiek",
+    noData: "Za mało danych",
+    recent: (count) => `${count} nowych w 30 dni`,
+    gender: { male: "mężczyzn", female: "kobiet", other: "innych odpowiedzi" },
+    ageGroup: {
+      under18: "poniżej 18 lat",
+      "18-29": "18-29 lat",
+      "30-39": "30-39 lat",
+      "40-49": "40-49 lat",
+      "50-59": "50-59 lat",
+      "60+": "60+ lat",
+    },
+  },
+  ro: {
+    eyebrow: "Statistica testului",
+    title: "Cum își evaluează oamenii meteosensibilitatea",
+    loading: "Colectăm statistici...",
+    emptyTitle: "Primele rezultate sunt încă în colectare",
+    emptyText: "Când mai multe persoane vor completa testul, aici vor apărea media și comparațiile după vârstă și gen.",
+    average: "Nivel mediu",
+    averageSub: (total) => `${total} rezultate în bază`,
+    highShare: "50%+",
+    highShareSub: "au sensibilitate moderată sau ridicată",
+    higherIn: "Mai mare la",
+    agePeak: "Vârsta cea mai sensibilă",
+    noData: "Date insuficiente",
+    recent: (count) => `${count} noi în 30 de zile`,
+    gender: { male: "bărbați", female: "femei", other: "alte răspunsuri" },
+    ageGroup: {
+      under18: "sub 18 ani",
+      "18-29": "18-29 ani",
+      "30-39": "30-39 ani",
+      "40-49": "40-49 ani",
+      "50-59": "50-59 ani",
+      "60+": "60+ ani",
+    },
+  },
+  hu: {
+    eyebrow: "Tesztstatisztika",
+    title: "Hogyan értékelik az emberek a meteoérzékenységüket",
+    loading: "Statisztikák gyűjtése...",
+    emptyTitle: "Az első eredmények még gyűlnek",
+    emptyText: "Ha több kitöltés érkezik, itt megjelenik az átlagos érzékenység, valamint az életkor és nem szerinti összevetés.",
+    average: "Átlagos szint",
+    averageSub: (total) => `${total} eredmény az adatbázisban`,
+    highShare: "50%+",
+    highShareSub: "mérsékelt vagy magas érzékenységű",
+    higherIn: "Magasabb",
+    agePeak: "Legérzékenyebb kor",
+    noData: "Nincs elég adat",
+    recent: (count) => `${count} új az elmúlt 30 napban`,
+    gender: { male: "férfiaknál", female: "nőknél", other: "egyéb válaszoknál" },
+    ageGroup: {
+      under18: "18 év alatt",
+      "18-29": "18-29 év",
+      "30-39": "30-39 év",
+      "40-49": "40-49 év",
+      "50-59": "50-59 év",
+      "60+": "60+ év",
+    },
+  },
+  en: {
+    eyebrow: "Test statistics",
+    title: "How people rate their weather sensitivity",
+    loading: "Collecting statistics...",
+    emptyTitle: "The first results are still being collected",
+    emptyText: "When more people complete the test, this block will show the average sensitivity level and comparisons by age and gender.",
+    average: "Average level",
+    averageSub: (total) => `${total} results in the database`,
+    highShare: "50%+",
+    highShareSub: "have moderate or high sensitivity",
+    higherIn: "Higher in",
+    agePeak: "Most sensitive age",
+    noData: "Not enough data",
+    recent: (count) => `${count} new in 30 days`,
+    gender: { male: "men", female: "women", other: "other answers" },
+    ageGroup: {
+      under18: "under 18",
+      "18-29": "18-29",
+      "30-39": "30-39",
+      "40-49": "40-49",
+      "50-59": "50-59",
+      "60+": "60+",
+    },
+  },
+};
+
+function clampPercent(value: number | null | undefined) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return null;
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+function getGenderComparison(stats: TestStatsResponse) {
+  const male = stats.genderAverages?.male;
+  const female = stats.genderAverages?.female;
+
+  if (male?.count && female?.count && male.averageScore !== null && female.averageScore !== null) {
+    return male.averageScore > female.averageScore
+      ? { key: "male" as const, averageScore: male.averageScore, count: male.count }
+      : { key: "female" as const, averageScore: female.averageScore, count: female.count };
+  }
+
+  return stats.strongestGender;
+}
+
+function TestStatsPanel({
+  locale,
+  stats,
+  loading,
+}: {
+  locale: LegacyLocale;
+  stats: TestStatsResponse | null;
+  loading: boolean;
+}) {
+  const t = statsCopy[locale];
+  const averageScore = clampPercent(stats?.averageScore);
+  const highShare = clampPercent(stats?.highSensitivityShare);
+  const genderComparison = stats ? getGenderComparison(stats) : null;
+  const agePeak = stats?.strongestAgeGroup ?? null;
+
+  if (loading) {
+    return (
+      <section className="rounded-xl border border-border/50 bg-card p-5 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <BarChart3 className="h-4 w-4 text-primary" />
+          {t.eyebrow}
+        </div>
+        <p className="mt-3 text-sm text-muted-foreground">{t.loading}</p>
+      </section>
+    );
+  }
+
+  if (!stats || stats.total < 3 || averageScore === null) {
+    return (
+      <section className="rounded-xl border border-border/50 bg-card p-5 shadow-sm">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          <Users className="h-4 w-4 text-primary" />
+          {t.eyebrow}
+        </div>
+        <h2 className="mt-3 font-display text-xl font-bold text-foreground">{t.emptyTitle}</h2>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">{t.emptyText}</p>
+      </section>
+    );
+  }
+
+  const cards = [
+    {
+      icon: Activity,
+      label: t.average,
+      value: `${averageScore}%`,
+      sub: t.averageSub(stats.total),
+      tone: "text-primary",
+    },
+    {
+      icon: TrendingUp,
+      label: t.highShare,
+      value: highShare === null ? "—" : `${highShare}%`,
+      sub: t.highShareSub,
+      tone: "text-orange-500",
+    },
+    {
+      icon: Users,
+      label: t.higherIn,
+      value: genderComparison ? t.gender[genderComparison.key] : t.noData,
+      sub: genderComparison?.averageScore === null || !genderComparison ? t.noData : `${genderComparison.averageScore}%`,
+      tone: "text-foreground",
+    },
+    {
+      icon: BarChart3,
+      label: t.agePeak,
+      value: agePeak ? t.ageGroup[agePeak.key] ?? agePeak.key : t.noData,
+      sub: agePeak?.averageScore === null || !agePeak ? t.noData : `${agePeak.averageScore}%`,
+      tone: "text-foreground",
+    },
+  ];
+
+  return (
+    <section className="rounded-xl border border-border/50 bg-card p-5 shadow-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            <BarChart3 className="h-4 w-4 text-primary" />
+            {t.eyebrow}
+          </div>
+          <h2 className="mt-2 font-display text-xl font-bold text-foreground">{t.title}</h2>
+        </div>
+        <span className="inline-flex w-fit rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-xs font-semibold text-primary">
+          {t.recent(stats.recentCount)}
+        </span>
+      </div>
+
+      <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => {
+          const Icon = card.icon;
+          return (
+            <div key={card.label} className="rounded-lg border border-border/50 bg-background/55 p-4">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <Icon className="h-4 w-4 text-primary" />
+                {card.label}
+              </div>
+              <p className={cn("mt-3 font-display text-2xl font-bold", card.tone)}>{card.value}</p>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">{card.sub}</p>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function calculateScore(answers: number[], info: PersonalInfo, locale: LegacyLocale): number {
   const maxRaw = answers.length * 4;
   let raw = answers.reduce((a, b) => a + b, 0);
@@ -593,6 +895,8 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
   const [answers, setAnswers] = useState<number[]>([]);
   const [score, setScore] = useState(0);
   const [calcProgress, setCalcProgress] = useState(0);
+  const [stats, setStats] = useState<TestStatsResponse | null>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
   const savedResultRef = useRef(false);
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
     name: "",
@@ -601,6 +905,27 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
     hasChronic: false,
     physicalActivity: "",
   });
+
+  useEffect(() => {
+    let mounted = true;
+    setStatsLoading(true);
+
+    fetch("/api/test-results/stats")
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload) => {
+        if (mounted) setStats(payload);
+      })
+      .catch(() => {
+        if (mounted) setStats(null);
+      })
+      .finally(() => {
+        if (mounted) setStatsLoading(false);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (step !== "calculating") return;
@@ -696,6 +1021,8 @@ const MeteoTest = ({ locale = "uk" }: { locale?: LegacyLocale }) => {
           <ArrowLeft className="h-4 w-4" />
           {t.backHome}
         </Link>
+
+        <TestStatsPanel locale={locale} stats={stats} loading={statsLoading} />
 
         {step === "info" && (
           <div className="animate-fade-in rounded-lg border border-border/50 bg-card p-8 space-y-6">

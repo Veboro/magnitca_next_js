@@ -110,6 +110,23 @@ export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
     ? normalized.replace(/^\/(ru|pl|ro|hu|en)(?=\/|$)/, "") || "/"
     : normalized;
 
+  const auroraSwitchPaths: Record<SiteLocale, string> = {
+    uk: "/aurora",
+    ru: "/ru/aurora",
+    pl: "/pl/aurora",
+    ro: "/ro/aurora-romania",
+    hu: "/hu/aurora",
+    en: "/en/aurora",
+  };
+
+  if (basePath === "/aurora" || basePath === "/aurora-romania" || basePath === "/aurora-moldova") {
+    if (locale === "ro" && (basePath === "/aurora-romania" || basePath === "/aurora-moldova")) {
+      return normalized;
+    }
+
+    return auroraSwitchPaths[locale];
+  }
+
   const isCityPage = basePath.startsWith("/city/");
   const isCitiesCatalogPage = basePath === "/cities" || basePath.startsWith("/cities/");
   const isUnsupportedCityLocale = (itemLocale: SiteLocale) =>

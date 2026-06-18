@@ -50,13 +50,55 @@ const getImpactBarLabel = (key: string, language: string) => {
   return labels[lang][key] ?? labels.uk[key];
 };
 
+const getImpactDateLabel = (language: string) => {
+  const locale = language.startsWith("ru")
+    ? "ru-RU"
+    : language.startsWith("pl")
+      ? "pl-PL"
+      : language.startsWith("ro")
+        ? "ro-RO"
+        : language.startsWith("hu")
+          ? "hu-HU"
+          : language.startsWith("en")
+            ? "en-US"
+            : "uk-UA";
+
+  return new Intl.DateTimeFormat(locale, {
+    day: "numeric",
+    month: "long",
+    timeZone: "Europe/Kyiv",
+  }).format(new Date());
+};
+
 type StormFeelingStats = {
   date: string;
   total: number;
   yes: number;
   no: number;
+  better: number;
+  neutral: number;
+  worse: number;
+  scoreCounts?: Array<{
+    score: number;
+    count: number;
+    percent: number;
+  }>;
+  timeline?: Array<{
+    label: string;
+    total: number;
+    averageScore: number;
+    worsePercent: number;
+  }>;
   yesPercent: number;
   noPercent: number;
+  averageScore?: number;
+};
+
+const getImpactRiskColor = (value: number) => {
+  if (value < 20) return "hsl(145, 78%, 45%)";
+  if (value < 40) return "hsl(42, 96%, 52%)";
+  if (value < 60) return "hsl(24, 94%, 55%)";
+  return "hsl(0, 78%, 56%)";
 };
 
 const getProgressColor = (value: number) => {
@@ -64,13 +106,6 @@ const getProgressColor = (value: number) => {
   if (value >= 65) return "hsl(70, 88%, 45%)";
   if (value >= 50) return "hsl(42, 96%, 52%)";
   if (value >= 35) return "hsl(24, 94%, 55%)";
-  return "hsl(0, 78%, 56%)";
-};
-
-const getImpactRiskColor = (value: number) => {
-  if (value < 20) return "hsl(145, 78%, 45%)";
-  if (value < 40) return "hsl(42, 96%, 52%)";
-  if (value < 60) return "hsl(24, 94%, 55%)";
   return "hsl(0, 78%, 56%)";
 };
 
@@ -142,24 +177,23 @@ export const HumanImpact = ({
   }, [queryClient]);
 
   const hasTestResult = !!user && !!latestResult;
-  const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
-
-  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
-  const todayMaxKp = forecast?.length
-    ? Math.max(...forecast.filter((e) => {
-        const d = new Date(e.time_tag.includes("Z") ? e.time_tag : e.time_tag + "Z");
-        return d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" }) === todayKey;
-      }).map((e) => e.kp), 0)
-    : 0;
-
-  // Keep the wellbeing block aligned with the visible Kp story on the page.
-  // Otherwise a stale or broader G-scale can overstate the impact versus the actual daily Kp forecast.
-  const finalKp = Math.max(latestKp, todayMaxKp);
-
-  const impactIdx = getImpactLevel(finalKp);
   const pollPercent = stormFeelingStats?.yesPercent ?? 0;
   const pollTotal = stormFeelingStats?.total ?? 0;
   const pollColor = getImpactRiskColor(pollPercent);
+  const betterPercent = pollTotal > 0 ? Math.round(((stormFeelingStats?.better ?? 0) / pollTotal) * 100) : 0;
+  const neutralPercent = pollTotal > 0 ? Math.round(((stormFeelingStats?.neutral ?? 0) / pollTotal) * 100) : 0;
+  const worsePercent = pollTotal > 0 ? Math.max(0, 100 - betterPercent - neutralPercent) : 0;
+  const latestKp = kpData?.length ? kpData[kpData.length - 1].kp : 0;
+  const todayKey = new Date().toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" });
+  const todayMaxKp = forecast?.length
+    ? Math.max(...forecast.filter((e) => {
+        const d = new Date(e.time_tag.includes("Z") ? e.time_tag : `${e.time_tag}Z`);
+        return d.toLocaleDateString("sv-SE", { timeZone: "Europe/Kyiv" }) === todayKey;
+      }).map((e) => e.kp), 0)
+    : 0;
+  const finalKp = Math.max(latestKp, todayMaxKp);
+  const impactIdx = getImpactLevel(finalKp);
+  const impactDate = getImpactDateLabel(i18n.language);
 
   return (
     <div className={cn("official-impact-panel rounded-lg border border-border/50 bg-card p-4", className)}>
@@ -167,23 +201,40 @@ export const HumanImpact = ({
 
       <div>
         <div className="rounded-md border border-white/15 bg-white/5 p-4">
-          <div className="mb-4 rounded-md border border-white/10 bg-white/[0.04] px-3 py-2.5">
-            <div className="mb-2 flex items-center gap-2 text-muted-foreground">
-              <HeartPulse className="h-3.5 w-3.5 shrink-0" />
-              <p className="truncate text-[10px] font-semibold uppercase tracking-[0.18em]">
-                {pollTotal > 0 ? t("feelingPoll.feel", { percent: pollPercent }) : t("feelingPoll.emptyResult")}
-              </p>
+          <div className="mb-4 rounded-md border border-white/10 bg-white/[0.04] px-3 py-3">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 text-muted-foreground">
+              <div className="flex min-w-0 items-center gap-2">
+                <HeartPulse className="h-3.5 w-3.5 shrink-0" />
+                <p className="truncate text-[10px] font-semibold uppercase tracking-[0.18em]">
+                  {pollTotal > 0 ? t("feelingPoll.discomfortShare", { percent: pollPercent }) : t("feelingPoll.emptyResult")}
+                </p>
+              </div>
+              <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">
+                {t("feelingPoll.responses", { count: pollTotal })}
+              </span>
             </div>
-            <div className="h-3 overflow-hidden rounded-full bg-white/15">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{ width: `${pollTotal > 0 ? pollPercent : 8}%`, backgroundColor: pollTotal > 0 ? pollColor : "hsl(0 0% 100% / 0.28)" }}
-              />
+            <div className="h-4 overflow-hidden rounded-full bg-white/15">
+              {pollTotal > 0 ? (
+                <div className="flex h-full w-full">
+                  <div className="h-full transition-all duration-700" style={{ width: `${betterPercent}%`, backgroundColor: "hsl(145, 78%, 45%)" }} />
+                  <div className="h-full transition-all duration-700" style={{ width: `${neutralPercent}%`, backgroundColor: "hsl(42, 96%, 52%)" }} />
+                  <div className="h-full transition-all duration-700" style={{ width: `${worsePercent}%`, backgroundColor: pollColor }} />
+                </div>
+              ) : (
+                <div className="h-full w-[8%] rounded-full bg-white/25" />
+              )}
+            </div>
+            <div className="mt-2 grid grid-cols-3 gap-2 text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+              <span className="mood-label-good">{t("feelingPoll.moodBetter", { percent: betterPercent })}</span>
+              <span className="mood-label-neutral text-center">{t("feelingPoll.moodNeutral", { percent: neutralPercent })}</span>
+              <span className="mood-label-bad text-right">{t("feelingPoll.moodWorse", { percent: worsePercent })}</span>
             </div>
           </div>
 
           <div>
-            <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">{t("impact.meteoLevel")}</p>
+            <p className="mb-4 text-center text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              {t("impact.meteoLevel", { date: impactDate })}
+            </p>
             <div className="grid grid-cols-3 gap-3">
               {impactBars.map((item) => {
                 const value = item.values[impactIdx];

@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Gauge, HelpCircle, MapPin, Moon, Newspaper, Search, Sun, Sunrise, Sunset, Wind, X } from "lucide-react";
+import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Eye, Gauge, MapPin, Moon, Newspaper, Search, Sun, Sunrise, Sunset, Wind, X } from "lucide-react";
 import { getPathForLocale, getSafeLocaleSwitchPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
@@ -11,6 +11,7 @@ import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
+import { getCountryRegionPath, getCountryRegionsByLocale } from "@/lib/country-region-routes";
 
 const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: typeof Activity }>> = {
   uk: [
@@ -21,7 +22,7 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/news", label: "Новини", icon: Newspaper },
     { href: "/calendar", label: "Календар", icon: CalendarDays },
     { href: "/test", label: "Тест", icon: ClipboardCheck },
-    { href: "/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/aurora", label: "Північне сяйво", icon: Eye },
   ],
   ru: [
     { href: "/", label: "Главная", icon: Activity },
@@ -31,7 +32,7 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/news", label: "Новости", icon: Newspaper },
     { href: "/calendar", label: "Календарь", icon: CalendarDays },
     { href: "/test", label: "Тест", icon: ClipboardCheck },
-    { href: "/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/aurora", label: "Северное сияние", icon: Eye },
   ],
   pl: [
     { href: "/", label: "Start", icon: Activity },
@@ -40,7 +41,7 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/moon-calendar", label: "Kalendarz księżycowy", icon: Moon },
     { href: "/calendar", label: "Kalendarz", icon: CalendarDays },
     { href: "/test", label: "Test", icon: ClipboardCheck },
-    { href: "/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/aurora", label: "Zorza polarna", icon: Eye },
   ],
   ro: [
     { href: "/", label: "Acasă", icon: Activity },
@@ -49,7 +50,7 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/moon-calendar", label: "Calendar lunar", icon: Moon },
     { href: "/calendar", label: "Calendar", icon: CalendarDays },
     { href: "/test", label: "Test", icon: ClipboardCheck },
-    { href: "/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/aurora-romania", label: "Aurora boreală", icon: Eye },
   ],
   hu: [
     { href: "/", label: "Főoldal", icon: Activity },
@@ -58,7 +59,7 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/moon-calendar", label: "Holdnaptár", icon: Moon },
     { href: "/calendar", label: "Naptár", icon: CalendarDays },
     { href: "/test", label: "Teszt", icon: ClipboardCheck },
-    { href: "/faq", label: "GYIK", icon: HelpCircle },
+    { href: "/aurora", label: "Sarki fény", icon: Eye },
   ],
   en: [
     { href: "/", label: "Home", icon: Activity },
@@ -68,7 +69,7 @@ const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: ty
     { href: "/news", label: "News", icon: Newspaper },
     { href: "/calendar", label: "Calendar", icon: CalendarDays },
     { href: "/test", label: "Test", icon: ClipboardCheck },
-    { href: "/faq", label: "FAQ", icon: HelpCircle },
+    { href: "/aurora", label: "Aurora", icon: Eye },
   ],
 };
 
@@ -183,6 +184,15 @@ const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> =
     { href: "/hu/sunset-tomorrow", label: "Napnyugta holnap" },
   ],
   en: [],
+};
+
+const sunMenuLabels: Record<SiteLocale, string> = {
+  uk: "Сонце",
+  ru: "Солнце",
+  ro: "Soare",
+  pl: "Słońce",
+  hu: "Nap",
+  en: "Sun",
 };
 
 function getSunMenuIcon(href: string) {
@@ -306,8 +316,16 @@ export function PublicHeader() {
   }, [locale]);
 
   const oblastSearchItems = useMemo<SearchCityItem[]>(() => {
-    if (locale === "pl" || locale === "ro" || locale === "hu" || locale === "en") {
+    if (locale === "en") {
       return [];
+    }
+
+    if (locale === "pl" || locale === "ro" || locale === "hu") {
+      return getCountryRegionsByLocale(locale).map((region) => ({
+        name: region.title,
+        href: getCountryRegionPath(region),
+        searchText: `${region.title} ${region.slug} ${region.country}`.toLowerCase(),
+      }));
     }
 
     return OBLAST_ROUTE_MAP.map((oblast) => {
@@ -460,7 +478,7 @@ export function PublicHeader() {
   }, [searchOpen]);
 
   const localizedSunMenu = sunMenuItems[locale];
-  const sunMenuLabel = locale === "ru" ? "Солнце" : locale === "ro" ? "Soare" : locale === "pl" ? "Słońce" : locale === "hu" ? "Nap" : "Sun";
+  const sunMenuLabel = sunMenuLabels[locale];
   const sunMenuActive =
     pathnameValue.startsWith("/sunrise") ||
     pathnameValue.startsWith("/sunset") ||
@@ -759,16 +777,16 @@ export function PublicHeader() {
         </div>
       </div>
       <nav className={`border-t border-border/30 bg-card/30 ${searchOpen ? "max-lg:hidden" : ""}`}>
-        <div className="mx-auto flex max-w-[1180px] items-center gap-2 overflow-x-auto px-4 py-2 sm:px-6 lg:px-0 lg:overflow-visible">
+        <div className="mx-auto flex max-w-[1180px] items-center gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-0 lg:overflow-visible">
           {navItems[locale].map((item, index) => (
             <Link
               key={item.href}
               href={getPathForLocale(item.href, locale)}
-              className={`inline-flex whitespace-nowrap rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-card hover:text-foreground ${
+              className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-card hover:text-foreground ${
                 index === 0 ? "lg:pl-0" : ""
               }`}
             >
-              <span className="mr-1.5 inline-flex items-center">
+              <span className="mr-1 inline-flex items-center">
                 <item.icon className="h-3.5 w-3.5" />
               </span>
               {item.label}
@@ -779,17 +797,17 @@ export function PublicHeader() {
               <button
                 type="button"
                 onClick={() => setSunMenuOpen((value) => !value)}
-                className={`inline-flex items-center whitespace-nowrap rounded-full px-3 py-1.5 text-sm transition-colors ${
+                className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition-colors ${
                   sunMenuActive ? "bg-card text-foreground" : "text-muted-foreground hover:bg-card hover:text-foreground"
                 }`}
                 aria-expanded={sunMenuOpen}
                 aria-haspopup="menu"
               >
-                <span className="mr-1.5 inline-flex items-center">
+                <span className="mr-1 inline-flex items-center">
                   <Sun className="h-3.5 w-3.5" />
                 </span>
                 {sunMenuLabel}
-                <ChevronDown className={`ml-1.5 h-3.5 w-3.5 transition-transform ${sunMenuOpen ? "rotate-180" : ""}`} />
+                <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${sunMenuOpen ? "rotate-180" : ""}`} />
               </button>
               {sunMenuOpen && (
                 <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 p-2 shadow-xl lg:block">
