@@ -3,6 +3,8 @@ import { getSpaceWeatherCache, SPACE_WEATHER_KEYS, type SpaceWeatherCacheKey } f
 
 const SWPC_BASE = "https://services.swpc.noaa.gov";
 const NOAA_FETCH_TIMEOUT_MS = 5_000;
+const RTSW_WIND_URL = `${SWPC_BASE}/json/rtsw/rtsw_wind_1m.json`;
+const RTSW_MAG_URL = `${SWPC_BASE}/json/rtsw/rtsw_mag_1m.json`;
 const SOLAR_WIND_PRODUCTS = [
   "plasma-2-hour.json",
   "plasma-6-hour.json",
@@ -52,6 +54,45 @@ async function fetchFirstNonEmptySolarWindProduct(products: readonly string[]) {
   return null;
 }
 
+function sortByTime<T extends { time_tag: string }>(rows: T[]) {
+  return rows.sort((a, b) => Date.parse(a.time_tag) - Date.parse(b.time_tag));
+}
+
+async function fetchRtswSolarWind() {
+  const response = await fetch(RTSW_WIND_URL, { cache: "no-store" });
+  if (!response.ok) return null;
+  const data = await response.json();
+  if (!Array.isArray(data) || data.length === 0) return null;
+
+  const rows = data
+    .filter((row: any) => row?.time_tag && Number.isFinite(Number(row.proton_speed)))
+    .map((row: any) => ({
+      time_tag: row.time_tag,
+      density: Number(row.proton_density) || 0,
+      speed: Number(row.proton_speed) || 0,
+      temperature: Number(row.proton_temperature) || 0,
+    }));
+
+  return rows.length ? sortByTime(rows) : null;
+}
+
+async function fetchRtswMagData() {
+  const response = await fetch(RTSW_MAG_URL, { cache: "no-store" });
+  if (!response.ok) return null;
+  const data = await response.json();
+  if (!Array.isArray(data) || data.length === 0) return null;
+
+  const rows = data
+    .filter((row: any) => row?.time_tag && Number.isFinite(Number(row.bz_gsm)))
+    .map((row: any) => ({
+      time_tag: row.time_tag,
+      bz: Number(row.bz_gsm) || 0,
+      bt: Number(row.bt) || 0,
+    }));
+
+  return rows.length ? sortByTime(rows) : null;
+}
+
 async function fetchFallback(key: SpaceWeatherCacheKey) {
   switch (key) {
     case "kp-index": {
@@ -63,6 +104,9 @@ async function fetchFallback(key: SpaceWeatherCacheKey) {
       }));
     }
     case "solar-wind": {
+      const rtswData = await fetchRtswSolarWind();
+      if (rtswData) return rtswData;
+
       const data = await fetchFirstNonEmptySolarWindProduct(SOLAR_WIND_PRODUCTS);
       if (!data) return [];
       return data.slice(1).map((row) => ({
@@ -73,6 +117,9 @@ async function fetchFallback(key: SpaceWeatherCacheKey) {
       }));
     }
     case "mag-data": {
+      const rtswData = await fetchRtswMagData();
+      if (rtswData) return rtswData;
+
       const data = await fetchFirstNonEmptySolarWindProduct(MAG_PRODUCTS);
       if (!data) return [];
       return data.slice(1).map((row) => ({

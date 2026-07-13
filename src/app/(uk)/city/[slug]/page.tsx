@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
 import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
-import { getRuCitySlug } from "@/data/cities-ru";
+import { getCityByRuSlug, getRuCitySlug } from "@/data/cities-ru";
 import { getCityWeatherCache } from "@/lib/city-weather-cache";
 import { getCitySunTimesCache } from "@/lib/city-sun-times-cache";
 import { buildCityWeatherCacheKey } from "@/lib/city-weather";
@@ -48,6 +48,11 @@ export default async function CityPage({ params }: Params) {
   const city = getCityBySlug(slug);
 
   if (!city) {
+    const ruCity = getCityByRuSlug(slug, ALL_UK_CITIES);
+    if (ruCity) {
+      redirect(`/ru/city/${slug}`);
+    }
+
     notFound();
   }
 

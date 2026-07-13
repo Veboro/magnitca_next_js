@@ -174,3 +174,38 @@ export async function getNewsArticleBySlug(
     alternateSlugs,
   };
 }
+
+export async function getNewsArticleFallbackTargetBySlug(
+  slug: string,
+  preferredLocale: SiteLocale = "uk",
+): Promise<{ locale: SiteLocale; slug: string } | null> {
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("news")
+    .select(
+      "slug_uk, title_uk, content_uk, slug_ru, title_ru, content_ru, slug_pl, title_pl, content_pl, slug_ro, title_ro, content_ro, slug_hu, title_hu, content_hu, slug_en, title_en, content_en",
+    )
+    .or(NEWS_LOCALES.map((itemLocale) => `slug_${itemLocale}.eq.${slug}`).join(","))
+    .eq("status", "published")
+    .neq("source", "telegram_ai")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (!data) return null;
+
+  const locales = [preferredLocale, "uk", "ru", "en", "pl", "ro", "hu"] satisfies SiteLocale[];
+  for (const itemLocale of locales) {
+    const localizedSlug = getNewsField(data as NewsArticle, "slug", itemLocale) as string | null;
+    const title = getNewsField(data as NewsArticle, "title", itemLocale) as string | null;
+    const content = getNewsField(data as NewsArticle, "content", itemLocale) as string | null;
+
+    if (localizedSlug && title && content) {
+      return { locale: itemLocale, slug: localizedSlug };
+    }
+  }
+
+  return null;
+}

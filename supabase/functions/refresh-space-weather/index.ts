@@ -7,6 +7,8 @@ const corsHeaders = {
 
 const SWPC_BASE = "https://services.swpc.noaa.gov";
 const NOAA_FETCH_TIMEOUT_MS = 5_000;
+const RTSW_WIND_URL = `${SWPC_BASE}/json/rtsw/rtsw_wind_1m.json`;
+const RTSW_MAG_URL = `${SWPC_BASE}/json/rtsw/rtsw_mag_1m.json`;
 const SOLAR_WIND_PRODUCTS = [
   "plasma-2-hour.json",
   "plasma-6-hour.json",
@@ -62,7 +64,46 @@ function mapKpIndex(data: any[]) {
   }));
 }
 
-function mapSolarWind(data: string[][]) {
+function sortByTime<T extends { time_tag: string }>(rows: T[]) {
+  return rows.sort((a, b) => Date.parse(a.time_tag) - Date.parse(b.time_tag));
+}
+
+async function fetchRtswSolarWind() {
+  try {
+    const data = await fetchJson<any[]>(RTSW_WIND_URL);
+    const rows = data
+      .filter((row) => row?.time_tag && Number.isFinite(Number(row.proton_speed)))
+      .map((row) => ({
+        time_tag: row.time_tag,
+        density: Number(row.proton_density) || 0,
+        speed: Number(row.proton_speed) || 0,
+        temperature: Number(row.proton_temperature) || 0,
+      }));
+
+    return rows.length ? sortByTime(rows) : [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchRtswMagData() {
+  try {
+    const data = await fetchJson<any[]>(RTSW_MAG_URL);
+    const rows = data
+      .filter((row) => row?.time_tag && Number.isFinite(Number(row.bz_gsm)))
+      .map((row) => ({
+        time_tag: row.time_tag,
+        bz: Number(row.bz_gsm) || 0,
+        bt: Number(row.bt) || 0,
+      }));
+
+    return rows.length ? sortByTime(rows) : [];
+  } catch {
+    return [];
+  }
+}
+
+function mapLegacySolarWind(data: string[][]) {
   return data.slice(1).map((row) => ({
     time_tag: row[0],
     density: parseFloat(row[1]) || 0,
@@ -71,12 +112,28 @@ function mapSolarWind(data: string[][]) {
   }));
 }
 
-function mapMagData(data: string[][]) {
+function mapLegacyMagData(data: string[][]) {
   return data.slice(1).map((row) => ({
     time_tag: row[0],
     bz: parseFloat(row[3]) || 0,
     bt: parseFloat(row[6]) || 0,
   }));
+}
+
+async function fetchSolarWindData() {
+  const rtsw = await fetchRtswSolarWind();
+  if (rtsw.length) return rtsw;
+
+  const legacy = await fetchFirstNonEmptySolarWindProduct(SOLAR_WIND_PRODUCTS);
+  return mapLegacySolarWind(legacy);
+}
+
+async function fetchMagData() {
+  const rtsw = await fetchRtswMagData();
+  if (rtsw.length) return rtsw;
+
+  const legacy = await fetchFirstNonEmptySolarWindProduct(MAG_PRODUCTS);
+  return mapLegacyMagData(legacy);
 }
 
 function mapNoaaScales(data: any) {
@@ -176,8 +233,8 @@ Deno.serve(async (req) => {
 
     const [kpIndexRaw, solarWindRaw, magRaw, scalesRaw, forecastRaw, forecast27Raw, kpHistoricalRaw] = await Promise.all([
       fetchJson<any[]>(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
-      fetchFirstNonEmptySolarWindProduct(SOLAR_WIND_PRODUCTS),
-      fetchFirstNonEmptySolarWindProduct(MAG_PRODUCTS),
+      fetchSolarWindData(),
+      fetchMagData(),
       fetchJson<any>(`${SWPC_BASE}/products/noaa-scales.json`),
       fetchJson<any[]>(`${SWPC_BASE}/products/noaa-planetary-k-index-forecast.json`),
       fetch(`${SWPC_BASE}/text/27-day-outlook.txt`).then((res) => {
@@ -197,13 +254,13 @@ Deno.serve(async (req) => {
       },
       {
         cache_key: "solar-wind",
-        payload: mapSolarWind(solarWindRaw),
+        payload: solarWindRaw,
         source: "noaa",
         fetched_at: fetchedAt,
       },
       {
         cache_key: "mag-data",
-        payload: mapMagData(magRaw),
+        payload: magRaw,
         source: "noaa",
         fetched_at: fetchedAt,
       },

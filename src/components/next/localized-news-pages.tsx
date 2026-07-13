@@ -6,7 +6,7 @@ import type { SiteLocale } from "@/lib/locale";
 import { getPathForLocale } from "@/lib/locale";
 import { resolveLocalizedMetadata } from "@/lib/seo";
 import { absoluteUrl } from "@/lib/site";
-import { getLatestNews, getNewsArticleBySlug } from "@/lib/server-news";
+import { getLatestNews, getNewsArticleBySlug, getNewsArticleFallbackTargetBySlug } from "@/lib/server-news";
 
 const NEWS_COPY: Record<
   SiteLocale,
@@ -199,6 +199,11 @@ export async function LocalizedNewsArticlePage({
   const article = await getNewsArticleBySlug(slug, locale).catch(() => null);
 
   if (!article) {
+    const fallbackTarget = await getNewsArticleFallbackTargetBySlug(slug, locale).catch(() => null);
+    if (fallbackTarget) {
+      redirect(getNewsPath(fallbackTarget.locale, fallbackTarget.slug));
+    }
+
     notFound();
   }
 

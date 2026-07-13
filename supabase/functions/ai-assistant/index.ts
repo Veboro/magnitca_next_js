@@ -7,6 +7,41 @@ const corsHeaders = {
 
 const AI_GATEWAY = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const SWPC_BASE = "https://services.swpc.noaa.gov";
+const RTSW_WIND_URL = `${SWPC_BASE}/json/rtsw/rtsw_wind_1m.json`;
+
+async function fetchSolarWindForAssistant() {
+  try {
+    const response = await fetch(RTSW_WIND_URL);
+    if (response.ok) {
+      const rows = await response.json();
+      if (Array.isArray(rows)) {
+        const latest = rows.find((row: any) => Number.isFinite(Number(row?.proton_speed)));
+        if (latest) {
+          return {
+            windSpeed: Number(latest.proton_speed) || 0,
+            windDensity: Number(latest.proton_density) || 0,
+          };
+        }
+      }
+    }
+  } catch {
+    // Keep the assistant usable even if optional solar wind data is unavailable.
+  }
+
+  try {
+    const response = await fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`);
+    if (!response.ok) return { windSpeed: 0, windDensity: 0 };
+
+    const rows = await response.json();
+    const lastWind = Array.isArray(rows) && rows.length > 1 ? rows[rows.length - 1] : null;
+    return {
+      windSpeed: lastWind ? parseFloat(lastWind[2]) || 0 : 0,
+      windDensity: lastWind ? parseFloat(lastWind[1]) || 0 : 0,
+    };
+  } catch {
+    return { windSpeed: 0, windDensity: 0 };
+  }
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -68,25 +103,23 @@ Deno.serve(async (req) => {
 
     // Fetch user's test results and current weather data in parallel
 
-    const [testRes, kpRes, scalesRes, solarWindRes, forecastRes] = await Promise.all([
+    const [testRes, kpRes, scalesRes, solarWind, forecastRes] = await Promise.all([
       serviceClient.from("test_results").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(1),
       fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
       fetch(`${SWPC_BASE}/products/noaa-scales.json`),
-      fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
+      fetchSolarWindForAssistant(),
       fetch(`${SWPC_BASE}/text/27-day-outlook.txt`),
     ]);
 
     // Parse NOAA data
     const kpData = await kpRes.json();
     const scales = await scalesRes.json();
-    const solarWindRaw: string[][] = await solarWindRes.json();
 
     const latestKp = kpData.length > 0
       ? parseFloat(kpData[kpData.length - 1].estimated_kp ?? kpData[kpData.length - 1].kp_index ?? "0")
       : 0;
-    const lastWind = solarWindRaw.length > 1 ? solarWindRaw[solarWindRaw.length - 1] : null;
-    const windSpeed = lastWind ? parseFloat(lastWind[2]) || 0 : 0;
-    const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
+    const windSpeed = solarWind.windSpeed;
+    const windDensity = solarWind.windDensity;
     const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0");
 
     // Parse 27-day forecast

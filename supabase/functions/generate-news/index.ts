@@ -8,6 +8,7 @@ const corsHeaders = {
 
 const OPENAI_API_BASE = "https://api.openai.com/v1";
 const SWPC_BASE = "https://services.swpc.noaa.gov";
+const RTSW_WIND_URL = `${SWPC_BASE}/json/rtsw/rtsw_wind_1m.json`;
 
 const UA_TRANSLIT: Record<string, string> = {
   а: "a", б: "b", в: "v", г: "h", ґ: "g", д: "d", е: "e", є: "ye", ж: "zh", з: "z", и: "y", і: "i",
@@ -57,6 +58,40 @@ function kyivHour(date: Date) {
     hour: "2-digit",
     hour12: false,
   }).format(date));
+}
+
+async function fetchSolarWindForNews() {
+  try {
+    const response = await fetch(RTSW_WIND_URL);
+    if (response.ok) {
+      const rows = await response.json();
+      if (Array.isArray(rows)) {
+        const latest = rows.find((row: any) => Number.isFinite(Number(row?.proton_speed)));
+        if (latest) {
+          return {
+            windSpeed: Number(latest.proton_speed) || 0,
+            windDensity: Number(latest.proton_density) || 0,
+          };
+        }
+      }
+    }
+  } catch {
+    // Solar wind enriches the text, but news generation should not fail without it.
+  }
+
+  try {
+    const response = await fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`);
+    if (!response.ok) return { windSpeed: 0, windDensity: 0 };
+
+    const rows = await response.json();
+    const lastWind = Array.isArray(rows) && rows.length > 1 ? rows[rows.length - 1] : null;
+    return {
+      windSpeed: lastWind ? parseFloat(lastWind[2]) || 0 : 0,
+      windDensity: lastWind ? parseFloat(lastWind[1]) || 0 : 0,
+    };
+  } catch {
+    return { windSpeed: 0, windDensity: 0 };
+  }
 }
 
 function parseLatestKp(kpData: any[]) {
@@ -239,29 +274,27 @@ Deno.serve(async (req) => {
       );
     }
 
-    const [scalesRes, kpRes, solarWindRes, kpForecastRes] = await Promise.all([
+    const [scalesRes, kpRes, solarWind, kpForecastRes] = await Promise.all([
       fetch(`${SWPC_BASE}/products/noaa-scales.json`),
       fetch(`${SWPC_BASE}/json/planetary_k_index_1m.json`),
-      fetch(`${SWPC_BASE}/products/solar-wind/plasma-2-hour.json`),
+      fetchSolarWindForNews(),
       fetch(`${SWPC_BASE}/products/noaa-planetary-k-index-forecast.json`),
     ]);
 
-    if (!scalesRes.ok || !kpRes.ok || !solarWindRes.ok || !kpForecastRes.ok) {
+    if (!scalesRes.ok || !kpRes.ok || !kpForecastRes.ok) {
       throw new Error("Failed to fetch NOAA data");
     }
 
-    const [scales, kpData, solarWindRaw, kpForecastRaw] = await Promise.all([
+    const [scales, kpData, kpForecastRaw] = await Promise.all([
       scalesRes.json(),
       kpRes.json(),
-      solarWindRes.json(),
       kpForecastRes.json(),
     ]);
 
     const latestKp = parseLatestKp(kpData);
     const currentG = parseInt(scales["-1"]?.G?.Scale ?? "0") || 0;
-    const lastWind = solarWindRaw.length > 1 ? solarWindRaw[solarWindRaw.length - 1] : null;
-    const windSpeed = lastWind ? parseFloat(lastWind[2]) || 0 : 0;
-    const windDensity = lastWind ? parseFloat(lastWind[1]) || 0 : 0;
+    const windSpeed = solarWind.windSpeed;
+    const windDensity = solarWind.windDensity;
     const upcoming = buildUpcomingDays(kpForecastRaw, todayKey);
     const forecastText = forecastSummary(upcoming);
 
