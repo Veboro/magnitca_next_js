@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import type { SiteLocale } from "@/lib/locale";
 import { getPathForLocale } from "@/lib/locale";
 import { resolveLocalizedMetadata } from "@/lib/seo";
-import { absoluteUrl } from "@/lib/site";
+import { absoluteUrl, SOCIAL_PROFILE_URLS } from "@/lib/site";
 import { getLatestNews, getNewsArticleBySlug, getNewsArticleFallbackTargetBySlug } from "@/lib/server-news";
 
 const NEWS_COPY: Record<
@@ -217,6 +218,14 @@ export async function LocalizedNewsArticlePage({
     article.meta_description ||
     article.content.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 160);
 
+  const organization = {
+    "@type": "Organization",
+    "@id": `${absoluteUrl("/")}#organization`,
+    name: copy.publisher,
+    url: absoluteUrl(getPathForLocale("/", locale)),
+    sameAs: SOCIAL_PROFILE_URLS,
+  };
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -228,10 +237,15 @@ export async function LocalizedNewsArticlePage({
       "@type": "WebPage",
       "@id": canonicalUrl,
     },
+    author: organization,
     publisher: {
-      "@type": "Organization",
-      name: copy.publisher,
-      url: absoluteUrl(getPathForLocale("/", locale)),
+      ...organization,
+      logo: {
+        "@type": "ImageObject",
+        url: absoluteUrl("/pwa-icon-512.png"),
+        width: 512,
+        height: 512,
+      },
     },
     ...(article.image_url
       ? {
@@ -252,7 +266,16 @@ export async function LocalizedNewsArticlePage({
         </div>
         <article className="overflow-hidden rounded-3xl border border-border/50 bg-card shadow-sm">
           {article.image_url ? (
-            <img src={article.image_url} alt={article.title} className="aspect-[2/1] w-full object-cover" />
+            <div className="relative aspect-[2/1] w-full">
+              <Image
+                src={article.image_url}
+                alt={article.title}
+                fill
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+                className="object-cover"
+              />
+            </div>
           ) : null}
           <div className="p-6 sm:p-8">
             <p className="text-xs uppercase tracking-[0.14em] text-muted-foreground">

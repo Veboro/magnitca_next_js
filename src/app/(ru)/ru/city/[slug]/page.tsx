@@ -8,6 +8,8 @@ import { getCitySunTimesCache } from "@/lib/city-sun-times-cache";
 import { buildCityWeatherCacheKey } from "@/lib/city-weather";
 import { buildCitySunTimesCacheKey, getDateInTimeZone } from "@/lib/city-sun-times";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
+import { ruGeoContext } from "@/lib/city-geo";
+import { absoluteUrl } from "@/lib/site";
 
 type Params = {
   params: Promise<{ slug: string }>;
@@ -28,12 +30,15 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   }
 
   const localizedCity = getLocalizedCity(city, "ru");
+  const geo = ruGeoContext(city.slug);
+  const ogTitle = `${localizedCity.seoTitle} (${geo})`;
+  const ogDescription = `${localizedCity.seoDescription} (${geo})`;
 
   return {
     title: {
-      absolute: `${localizedCity.seoTitle} | Магнитка`,
+      absolute: `${ogTitle} | Магнитка`,
     },
-    description: localizedCity.seoDescription,
+    description: ogDescription,
     alternates: {
       canonical: `/ru/city/${getRuCitySlug(city)}`,
       languages: {
@@ -41,6 +46,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
         ru: `/ru/city/${getRuCitySlug(city)}`,
         "x-default": `/city/${city.slug}`,
       },
+    },
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      url: absoluteUrl(`/ru/city/${getRuCitySlug(city)}`),
+      locale: "ru_RU",
+      type: "website",
+    },
+    twitter: {
+      title: ogTitle,
+      description: ogDescription,
     },
   };
 }

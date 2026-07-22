@@ -1,3 +1,5 @@
+import { ruPreposition, ukPreposition } from "@/lib/city-declension";
+
 const OBLAST_CENTER_SLUGS = new Set([
   "kyiv",
   "vinnytsia",
@@ -32,33 +34,37 @@ export function isOblastCenterSlug(slug: string) {
 }
 
 export function buildUkCitySeoTitle(slug: string, name: string, nameGenitive: string) {
+  const prep = ukPreposition(nameGenitive);
   if (isOblastCenterSlug(slug)) {
-    return `Магнітні бурі в ${nameGenitive} сьогодні — Kp-індекс та сонячний вітер`;
+    return `Магнітні бурі ${prep} ${nameGenitive} сьогодні — Kp-індекс та сонячний вітер`;
   }
 
-  return `${name}: магнітні бурі сьогодні, прогноз Kp на 3 та 27 днів`;
+  return `Магнітні бурі ${prep} ${nameGenitive} сьогодні: прогноз Kp на 3 та 27 днів`;
 }
 
 export function buildRuCitySeoTitle(slug: string, name: string, nameGenitive: string) {
+  const prep = ruPreposition(nameGenitive);
   if (isOblastCenterSlug(slug)) {
-    return `Магнитные бури в ${nameGenitive} сегодня — Kp-индекс и солнечный ветер`;
+    return `Магнитные бури ${prep} ${nameGenitive} сегодня — Kp-индекс и солнечный ветер`;
   }
 
-  return `${name}: магнитные бури сегодня, прогноз Kp на 3 и 27 дней`;
+  return `Магнитные бури ${prep} ${nameGenitive} сегодня: прогноз Kp на 3 и 27 дней`;
 }
 
 export function buildUkCitySeoDescription(slug: string, name: string, nameGenitive: string) {
+  const prep = ukPreposition(nameGenitive);
   if (isOblastCenterSlug(slug)) {
-    return `Магнітні бурі в ${nameGenitive} сьогодні: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані в реальному часі.`;
+    return `Магнітні бурі ${prep} ${nameGenitive} сьогодні: Kp індекс, погода, схід і захід сонця, якість повітря. Актуальні дані в реальному часі.`;
   }
 
-  return `${name}: магнітні бурі сьогодні, поточний вплив на організм, прогноз Kp на 3 та 27 днів, попередження від Укргідрометцентру.`;
+  return `Магнітні бурі ${prep} ${nameGenitive} сьогодні: поточний вплив на організм, прогноз Kp на 3 та 27 днів, попередження від Укргідрометцентру.`;
 }
 
 export function buildRuCitySeoDescription(slug: string, name: string, nameGenitive: string) {
+  const prep = ruPreposition(nameGenitive);
   if (isOblastCenterSlug(slug)) {
-    return `Магнитные бури в ${nameGenitive} сегодня: Kp индекс, погода, восход и закат солнца, качество воздуха. Актуальные данные в реальном времени.`;
+    return `Магнитные бури ${prep} ${nameGenitive} сегодня: Kp индекс, погода, восход и закат солнца, качество воздуха. Актуальные данные в реальном времени.`;
   }
 
-  return `${name}: магнитные бури сегодня, текущее влияние на организм, прогноз Kp на 3 и 27 дней, предупреждения Укргидрометцентра.`;
+  return `Магнитные бури ${prep} ${nameGenitive} сегодня: текущее влияние на организм, прогноз Kp на 3 и 27 дней, предупреждения Укргидрометцентра.`;
 }

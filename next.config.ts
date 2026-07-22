@@ -59,6 +59,22 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  images: {
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+    // News images live in our own Supabase Storage bucket. The AI pipeline
+    // uploads server-generated SVGs (never user uploads), so allowing SVG here
+    // is safe when paired with a locked-down CSP and attachment disposition.
+    dangerouslyAllowSVG: true,
+    contentDispositionType: "attachment",
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
   async redirects() {
     const moonLocaleConfig = [
       { prefix: "", slugIndex: 0 },

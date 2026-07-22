@@ -4,10 +4,13 @@ import { OblastPage } from "@/components/next/oblast-page";
 import {
   getOblastHeading,
   getOblastPathsByKey,
+  getOblastRegion,
   getOblastRouteBySlug,
   getOblastTitle,
   OBLAST_ROUTE_MAP,
 } from "@/lib/oblast-routes";
+import { getCityBySlug } from "@/data/cities";
+import { getCityGenitive, ukPreposition } from "@/lib/city-declension";
 import { absoluteUrl, SITE_NAME } from "@/lib/site";
 
 type PageProps = {
@@ -34,8 +37,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     return {};
   }
 
-  const title = `${regionTitle}: магнітні бурі сьогодні, Kp-індекс і прогноз`;
-  const description = `${regionTitle}: поточний Kp-індекс, прогноз на 3 дні, попередження УкрГМЦ та сторінки міст області з детальними даними.`;
+  const prep = ukPreposition(heading);
+  const title = `Магнітні бурі ${prep} ${heading} сьогодні — Kp-індекс і прогноз`;
+
+  const region = getOblastRegion(route.regionKey);
+  const siblingCities = (region?.slugs ?? [])
+    .slice(1, 4)
+    .map((citySlug) => getCityBySlug(citySlug))
+    .filter((city): city is NonNullable<typeof city> => Boolean(city))
+    .map((city) => getCityGenitive(city.slug, city.name, "uk"));
+  const citiesSentence = siblingCities.length
+    ? ` Окремі дані для ${siblingCities.join(", ")} та інших міст.`
+    : "";
+  const description = `Магнітні бурі ${prep} ${heading} сьогодні: поточний Kp-індекс, прогноз на 3 дні та попередження УкрГМЦ.${citiesSentence}`;
 
   return {
     title: {
@@ -47,6 +61,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       languages: {
         uk: absoluteUrl(paths.uk),
         ru: absoluteUrl(paths.ru),
+        "x-default": absoluteUrl(paths.uk),
       },
     },
     openGraph: {

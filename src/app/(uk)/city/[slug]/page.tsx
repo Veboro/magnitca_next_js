@@ -8,6 +8,8 @@ import { getCitySunTimesCache } from "@/lib/city-sun-times-cache";
 import { buildCityWeatherCacheKey } from "@/lib/city-weather";
 import { buildCitySunTimesCacheKey, getDateInTimeZone } from "@/lib/city-sun-times";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
+import { ukGeoContext } from "@/lib/city-geo";
+import { absoluteUrl } from "@/lib/site";
 
 type Params = {
   params: Promise<{ slug: string }>;
@@ -27,9 +29,13 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
+  const geo = ukGeoContext(city.slug);
+  const ogTitle = `${city.seoTitle} (${geo})`;
+  const ogDescription = `${city.seoDescription} (${geo})`;
+
   return {
-    title: city.seoTitle,
-    description: city.seoDescription,
+    title: ogTitle,
+    description: ogDescription,
     alternates: {
       canonical: `/city/${city.slug}`,
       languages: {
@@ -37,6 +43,17 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
         ru: `/ru/city/${getRuCitySlug(city)}`,
         "x-default": `/city/${city.slug}`,
       },
+    },
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      url: absoluteUrl(`/city/${city.slug}`),
+      locale: "uk_UA",
+      type: "website",
+    },
+    twitter: {
+      title: ogTitle,
+      description: ogDescription,
     },
   };
 }

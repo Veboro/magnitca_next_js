@@ -28,6 +28,7 @@ import { getHungaroMetCountyForCity } from "@/lib/hungaromet-counties";
 import { CityImpactPanel } from "@/components/city/city-impact-panel";
 import { CityStormFeelingSummary } from "@/components/city/city-storm-feeling-summary";
 import { getOblastPathsByKey, getOblastTitle } from "@/lib/oblast-routes";
+import { getCityGenitive, ruPreposition, ukPreposition } from "@/lib/city-declension";
 import { absoluteUrl } from "@/lib/site";
 
 type LegacyLocale = SiteLocale;
@@ -645,6 +646,20 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
 
   if (!city) return null;
 
+  const cityGenitive =
+    locale === "uk" || locale === "ru"
+      ? getCityGenitive(cityBase!.slug, city.name, locale)
+      : city.nameGenitive;
+
+  // t.geoSituation bakes in "в"; swap for the euphonic в/у (uk) or в/во (ru)
+  // form chosen by the sound the locative city name begins with.
+  const geoSituationLabel =
+    locale === "uk"
+      ? `${t.geoSituation.replace(/ в$/, "")} ${ukPreposition(city.nameGenitive)}`
+      : locale === "ru"
+        ? `${t.geoSituation.replace(/ в$/, "")} ${ruPreposition(city.nameGenitive)}`
+        : t.geoSituation;
+
   const today = new Date().toLocaleDateString(localeTag, {
     weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: city.timezone,
   });
@@ -712,7 +727,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
               <MapPin className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-medium text-muted-foreground">
-                {t.geoSituation} {city.nameGenitive} — {today}
+                {geoSituationLabel} {city.nameGenitive} — {today}
               </h2>
             </div>
             <div className="flex-1 [&>div]:rounded-t-none">
@@ -829,7 +844,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             <div className="flex items-center gap-2 rounded-t-lg border border-b-0 border-glow-cyan bg-card/50 px-4 py-2">
               <MapPin className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-medium text-muted-foreground">
-                {t.geoSituation} {city.nameGenitive} — {today}
+                {geoSituationLabel} {city.nameGenitive} — {today}
               </h2>
             </div>
             <div className="flex-1 [&>div]:rounded-t-none">
@@ -946,7 +961,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-primary" />
             <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              {t.forecast3} {city.nameGenitive} {t.forecast3suffix}
+              {t.forecast3} {cityGenitive} {t.forecast3suffix}
             </h2>
           </div>
           {forecastLoading ? (

@@ -1,7 +1,16 @@
 import type { Metadata } from "next";
 import { DEFAULT_PAGE_META, getPageMeta } from "@/lib/admin-content";
 import { SITE_NAME, SITE_DESCRIPTION } from "@/lib/site";
-import { getPathForLocale, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, SUPPORTED_SITE_LOCALES, type SiteLocale } from "@/lib/locale";
+
+const ALL_SITE_LOCALES: readonly SiteLocale[] = SUPPORTED_SITE_LOCALES;
+
+// Locales in which each page actually exists. Keeps hreflang reciprocal:
+// only list a page in the alternates cluster where a real route is published.
+// Pages not listed here are assumed available in every locale.
+const PAGE_AVAILABLE_LOCALES: Record<string, readonly SiteLocale[]> = {
+  cities: ["uk", "ru"],
+};
 
 const RU_PAGE_META: Record<string, { title: string; description: string }> = {
   home: {
@@ -300,27 +309,22 @@ export async function resolveLocalizedMetadata(
               : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
   const description = meta?.description || SITE_DESCRIPTION;
-  const languages: Record<string, string> = {
+
+  const localeUrls: Record<SiteLocale, string> = {
     uk: ukUrl,
     ru: ruUrl,
-    "x-default": ukUrl,
+    pl: plUrl,
+    ro: roUrl,
+    hu: huUrl,
+    en: enUrl,
   };
 
-  if (pageKey !== "cities") {
-    languages.pl = plUrl;
+  const availableLocales = PAGE_AVAILABLE_LOCALES[pageKey] ?? ALL_SITE_LOCALES;
+  const languages: Record<string, string> = {};
+  for (const availableLocale of availableLocales) {
+    languages[availableLocale] = localeUrls[availableLocale];
   }
-
-  if (locale === "ro" || pageKey === "home" || pageKey === "news") {
-    languages.ro = roUrl;
-  }
-
-  if (locale === "hu" || pageKey === "home" || pageKey === "news") {
-    languages.hu = huUrl;
-  }
-
-  if (locale === "en" || pageKey === "home" || pageKey === "news") {
-    languages.en = enUrl;
-  }
+  languages["x-default"] = ukUrl;
 
   return {
     title: {
