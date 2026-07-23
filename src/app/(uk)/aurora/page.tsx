@@ -6,9 +6,9 @@ import { getUkraineAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Карта північного сяйва в Україні | Полярне сяйво сьогодні | Magnitca";
+const pageTitle = "Північне сяйво в Україні сьогодні — карта і прогноз по областях";
 const pageDescription =
-  "Прогноз видимості північного або полярного сяйва в Україні по областях: інтерактивна карта, Kp-індекс, хмарність, темрява та умови для спостереження сьогодні.";
+  "Північне сяйво в Україні сьогодні: де і коли можна побачити полярне сяйво — прогноз по областях, Kp-індекс, хмарність, темрява та умови для спостереження на карті.";
 const pageUrl = "https://magnitca.com/aurora";
 
 export const metadata: Metadata = {
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     canonical: pageUrl,
     languages: {
       uk: pageUrl,
-      pl: "https://magnitca.com/pl/aurora",
+      ru: "https://magnitca.com/ru/aurora",
       "x-default": pageUrl,
     },
   },
@@ -169,10 +169,10 @@ export default async function UkrainianAuroraPage() {
                 Aurora watch Ukraine
               </div>
               <h1 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-                Карта північного сяйва в Україні
+                Північне сяйво в Україні
               </h1>
               <p className="max-w-3xl text-base font-medium leading-7 text-muted-foreground">
-                Карта північного сяйва в Україні на сьогодні, {forecastDate}, показує,
+                Північне сяйво в Україні сьогодні, {forecastDate}: карта по областях показує,
                 де цієї ночі є шанс побачити сяйво та які області мають найкращі умови для спостереження.
                 Якщо ви шукаєте полярне сяйво в Україні, це той самий прогноз аврори по областях.
                 Поточний прогноз враховує Kp-індекс до {forecast.effectiveKp}, геомагнітну активність,

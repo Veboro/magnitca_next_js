@@ -22,6 +22,8 @@ export async function generateMetadata(): Promise<Metadata> {
         ru: "/ru/moon-calendar",
         pl: "/pl/moon-calendar",
         ro: "/ro/moon-calendar",
+        hu: "/hu/moon-calendar",
+        en: "/en/moon-calendar",
         "x-default": "/moon-calendar",
       },
     },

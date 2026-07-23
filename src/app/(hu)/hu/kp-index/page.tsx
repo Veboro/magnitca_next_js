@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import KpIndexClient from "@/legacy-pages/KpIndex";
+import { resolveLocalizedMetadata } from "@/lib/seo";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 
-export const metadata: Metadata = {
-  title: "Kp-index ma — online grafikon és mágneses vihar előrejelzés | Magnitca",
-  description: "Aktuális Kp-index, NOAA geomágneses skála és a következő napok aktivitási előrejelzése.",
-  alternates: {
-    canonical: "/hu/kp-index",
-    languages: {
-      hu: "/hu/kp-index",
-    },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return resolveLocalizedMetadata("kp_index", "/kp-index", "hu");
+}
 
 export default async function HungarianKpIndexPage() {
   const { kpData, scales } = await getHomePageWeatherData();

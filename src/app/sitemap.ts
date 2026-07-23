@@ -11,6 +11,11 @@ import { getLatestNews } from "@/lib/server-news";
 import { SITE_URL } from "@/lib/site";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Honest freshness signal for templated city/oblast pages. Their prose is
+  // stable (region, coordinates, aurora band); only embedded live widgets
+  // refresh, so a real daily lastModified beats claiming "hourly" with no date.
+  const today = new Date().toISOString().slice(0, 10);
+
   const staticPages: MetadataRoute.Sitemap = [
     "",
     "/news",
@@ -153,31 +158,36 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/city/${city.slug}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.8,
   }));
 
   const ruCityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/ru/city/${getRuCitySlug(city)}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.7,
   }));
 
   const plCityPages: MetadataRoute.Sitemap = CITIES_PL.map((city) => ({
     url: `${SITE_URL}/pl/city/${city.slug}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.75,
   }));
 
   const roCityPages: MetadataRoute.Sitemap = CITIES_MD.map((city) => ({
     url: `${SITE_URL}/ro/city/${city.slug}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.75,
   }));
 
   const huCityPages: MetadataRoute.Sitemap = CITIES_HU.map((city) => ({
     url: `${SITE_URL}/hu/city/${city.slug}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.75,
   }));
 
@@ -197,19 +207,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const oblastPages: MetadataRoute.Sitemap = OBLAST_ROUTE_MAP.map((route) => ({
     url: `${SITE_URL}/oblast/${route.slugUk}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.75,
   }));
 
   const ruOblastPages: MetadataRoute.Sitemap = OBLAST_ROUTE_MAP.map((route) => ({
     url: `${SITE_URL}/ru/oblast/${route.slugRu}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.7,
   }));
 
   const countryRegionPages: MetadataRoute.Sitemap = COUNTRY_REGION_ROUTES.map((region) => ({
     url: `${SITE_URL}${getCountryRegionPath(region)}`,
-    changeFrequency: "hourly",
+    lastModified: today,
+    changeFrequency: "daily",
     priority: 0.72,
   }));
 

@@ -68,9 +68,6 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     description,
     alternates: {
       canonical,
-      languages: {
-        pl: canonical,
-      },
     },
     openGraph: {
       title,
@@ -78,6 +75,10 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
       url: absoluteUrl(canonical),
       locale: "pl_PL",
       type: "website",
+    },
+    twitter: {
+      title,
+      description,
     },
   };
 }

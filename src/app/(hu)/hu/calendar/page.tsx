@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import StormCalendarClient from "@/legacy-pages/StormCalendar";
+import { resolveLocalizedMetadata } from "@/lib/seo";
 import { getStormCalendarData } from "@/lib/space-weather-cache";
 
-export const metadata: Metadata = {
-  title: "Mágneses vihar naptár — geomágneses aktivitási előrejelzés | Magnitca",
-  description: "Geomágneses aktivitási naptár, Kp-előrejelzés és a mágneses viharok várható napjai.",
-  alternates: {
-    canonical: "/hu/calendar",
-    languages: {
-      hu: "/hu/calendar",
-    },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return resolveLocalizedMetadata("calendar", "/calendar", "hu");
+}
 
 export default async function HungarianStormCalendarPage() {
   const initialData = await getStormCalendarData();

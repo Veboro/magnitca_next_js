@@ -4,9 +4,9 @@ import { getMoldovaAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Prognoza aurorei boreale în Moldova | Hartă pe raioane | Magnitca";
+const pageTitle = "Aurora boreală în Moldova azi — hartă și prognoză pe raioane | Magnitca";
 const pageDescription =
-  "Hartă live pentru șansa de a vedea aurora boreală în Republica Moldova pe raioane: Kp-index, nori, Lună și condiții de observare.";
+  "Aurora boreală în Moldova azi: unde și când poți vedea aurora — prognoză pe raioane, Kp-index, nori, Lună și condiții de observare pe hartă.";
 const pageUrl = "https://magnitca.com/ro/aurora-moldova";
 
 export const metadata: Metadata = {
@@ -98,8 +98,8 @@ export default async function MoldovaAuroraPage() {
       homeLabel="Magnitca"
       breadcrumbLabel="Aurora boreală Moldova"
       badge="Aurora watch Moldova"
-      title="Prognoza aurorei boreale în Moldova"
-      intro={`Harta aurorei boreale în Republica Moldova pentru ${date} arată pe raioane unde există șanse de observare în această noapte. Prognoza ia în calcul Kp-index până la ${forecast.effectiveKp}, activitatea geomagnetică, latitudinea raioanelor, ${clouds} și iluminarea Lunii de ${forecast.moonIllumination}%.`}
+      title="Aurora boreală în Moldova"
+      intro={`Aurora boreală în Republica Moldova azi, ${date}: harta pe raioane arată unde există șanse de observare în această noapte. Prognoza ia în calcul Kp-index până la ${forecast.effectiveKp}, activitatea geomagnetică, latitudinea raioanelor, ${clouds} și iluminarea Lunii de ${forecast.moonIllumination}%.`}
       chanceLabel="Șansa de a vedea aurora:"
       todayLabel="astăzi"
       tonightLabel="în noaptea asta"

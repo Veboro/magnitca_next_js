@@ -151,5 +151,15 @@ export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
     return getPathForLocale("/", locale);
   }
 
+  // A news article translation lives under a different slug per locale, so the
+  // switcher (which only knows the pathname) cannot map it. Switching to another
+  // language would otherwise land on /{locale}/news/{uk-slug}, which has no
+  // article and redirects back to Ukrainian. Send it to that locale's homepage
+  // instead. The news listing (/news exactly) still switches normally.
+  const isNewsArticlePage = basePath.startsWith("/news/");
+  if (isNewsArticlePage && locale !== currentLocale) {
+    return getPathForLocale("/", locale);
+  }
+
   return getPathForLocale(basePath, locale);
 }

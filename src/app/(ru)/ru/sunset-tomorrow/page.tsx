@@ -39,6 +39,10 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: "ru_RU",
       type: "website",
     },
+    twitter: {
+      title,
+      description,
+    },
   };
 }
 

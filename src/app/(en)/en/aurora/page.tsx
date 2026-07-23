@@ -6,9 +6,9 @@ import { getEuropeAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Aurora Forecast Europe Today | Northern Lights Map | Magnitca";
+const pageTitle = "Northern Lights in Europe Tonight — Aurora Map & Forecast | Magnitca";
 const pageDescription =
-  "Live aurora forecast map for Europe today: northern lights chance by country, Kp index, cloud cover, Moon illumination and practical viewing conditions tonight.";
+  "Northern lights in Europe tonight: where and when to see the aurora — forecast by country, Kp index, cloud cover, Moon illumination and practical viewing conditions on the map.";
 const pageUrl = "https://magnitca.com/en/aurora";
 
 export const metadata: Metadata = {
@@ -18,8 +18,6 @@ export const metadata: Metadata = {
     canonical: pageUrl,
     languages: {
       en: pageUrl,
-      uk: "https://magnitca.com/aurora",
-      pl: "https://magnitca.com/pl/aurora",
       "x-default": pageUrl,
     },
   },
@@ -180,12 +178,12 @@ export default async function EnglishEuropeAuroraPage() {
                 Aurora watch Europe
               </div>
               <h1 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-                Aurora forecast map for Europe
+                Northern lights in Europe
               </h1>
               <p className="max-w-3xl text-base font-medium leading-7 text-muted-foreground">
-                This Europe aurora forecast for today, {forecastDate}, shows where the
-                northern lights or polar lights may be visible tonight by country. The live
-                aurora borealis map combines the expected Kp index up to {forecast.effectiveKp},
+                Northern lights in Europe tonight, {forecastDate}: this live map shows where the
+                aurora or polar lights may be visible by country. The
+                aurora borealis forecast combines the expected Kp index up to {forecast.effectiveKp},
                 current geomagnetic activity, country latitude, a dark northern horizon,
                 {` ${cloudCondition}`} and Moon phase: {moonCondition}.
               </p>

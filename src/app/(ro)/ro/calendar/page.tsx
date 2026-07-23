@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import StormCalendarClient from "@/legacy-pages/StormCalendar";
+import { resolveLocalizedMetadata } from "@/lib/seo";
 import { getStormCalendarData } from "@/lib/space-weather-cache";
 
-export const metadata: Metadata = {
-  title: "Calendarul furtunilor magnetice — prognoza activității geomagnetice | Magnitca",
-  description: "Calendarul activității geomagnetice și prognoza furtunilor magnetice pentru următoarele zile.",
-  alternates: {
-    canonical: "/ro/calendar",
-    languages: {
-      ro: "/ro/calendar",
-    },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return resolveLocalizedMetadata("calendar", "/calendar", "ro");
+}
 
 export default async function RomanianStormCalendarPage() {
   const initialData = await getStormCalendarData();

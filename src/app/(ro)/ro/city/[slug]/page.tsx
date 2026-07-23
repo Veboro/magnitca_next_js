@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
 import { CITIES_MD, getCityByMdSlug } from "@/data/cities-md";
+import { getRegionForCity } from "@/lib/country-region-routes";
+import { absoluteUrl } from "@/lib/site";
 import { getCityWeatherCache } from "@/lib/city-weather-cache";
 import { getCitySunTimesCache } from "@/lib/city-sun-times-cache";
 import { buildCityWeatherCacheKey } from "@/lib/city-weather";
@@ -26,16 +28,37 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
+  // seoTitle/seoDescription already include the country, so only append the
+  // administrative region (județ/raion/municipiu) to avoid duplicating it.
+  const region = getRegionForCity("ro", city.slug);
+  const title = region ? `${city.seoTitle} (${region.title})` : city.seoTitle;
+  const description = region
+    ? `${city.seoDescription} (${region.title})`
+    : city.seoDescription;
+  const canonical = `/ro/city/${city.slug}`;
+
   return {
     title: {
-      absolute: `${city.seoTitle} | Magnitca`,
+      absolute: `${title} | Magnitca`,
     },
-    description: city.seoDescription,
+    description,
     alternates: {
-      canonical: `/ro/city/${city.slug}`,
+      canonical,
       languages: {
-        ro: `/ro/city/${city.slug}`,
+        ro: canonical,
+        "x-default": canonical,
       },
+    },
+    openGraph: {
+      title,
+      description,
+      url: absoluteUrl(canonical),
+      locale: "ro_RO",
+      type: "website",
+    },
+    twitter: {
+      title,
+      description,
     },
   };
 }

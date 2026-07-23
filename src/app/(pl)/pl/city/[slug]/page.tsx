@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
 import { CITIES_PL, getCityByPlSlug } from "@/data/cities-pl";
+import { getRegionForCity } from "@/lib/country-region-routes";
+import { absoluteUrl } from "@/lib/site";
 import { getCityWeatherCache } from "@/lib/city-weather-cache";
 import { getCitySunTimesCache } from "@/lib/city-sun-times-cache";
 import { buildCityWeatherCacheKey } from "@/lib/city-weather";
@@ -26,16 +28,34 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
     };
   }
 
+  const region = getRegionForCity("pl", city.slug);
+  const geo = region ? `${region.title}, Polska` : "Polska";
+  const title = `${city.seoTitle} (${geo})`;
+  const description = `${city.seoDescription} (${geo})`;
+  const canonical = `/pl/city/${city.slug}`;
+
   return {
     title: {
-      absolute: `${city.seoTitle} | Magnitca`,
+      absolute: `${title} | Magnitca`,
     },
-    description: city.seoDescription,
+    description,
     alternates: {
-      canonical: `/pl/city/${city.slug}`,
+      canonical,
       languages: {
-        pl: `/pl/city/${city.slug}`,
+        pl: canonical,
+        "x-default": canonical,
       },
+    },
+    openGraph: {
+      title,
+      description,
+      url: absoluteUrl(canonical),
+      locale: "pl_PL",
+      type: "website",
+    },
+    twitter: {
+      title,
+      description,
     },
   };
 }

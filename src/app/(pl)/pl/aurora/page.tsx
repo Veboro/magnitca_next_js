@@ -6,9 +6,9 @@ import { getPolandAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Prognoza zorzy polarnej w Polsce | Mapa aurory dzisiaj | Magnitca";
+const pageTitle = "Zorza polarna w Polsce dzisiaj — mapa i prognoza po województwach | Magnitca";
 const pageDescription =
-  "Aktualna prognoza zorzy polarnej w Polsce po województwach: mapa szans, Kp-index, zachmurzenie nocne, Księżyc i praktyczne warunki obserwacji dzisiaj.";
+  "Zorza polarna w Polsce dzisiaj: gdzie i kiedy zobaczyć aurorę — prognoza po województwach, Kp-index, zachmurzenie nocne, Księżyc i warunki obserwacji na mapie.";
 const pageUrl = "https://magnitca.com/pl/aurora";
 
 export const metadata: Metadata = {
@@ -17,9 +17,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: pageUrl,
     languages: {
-      uk: "https://magnitca.com/aurora",
       pl: pageUrl,
-      "x-default": "https://magnitca.com/aurora",
+      "x-default": pageUrl,
     },
   },
   openGraph: {
@@ -169,10 +168,10 @@ export default async function PolishAuroraPage() {
                 Aurora watch Poland
               </div>
               <h1 className="font-display text-4xl font-bold leading-tight text-foreground md:text-5xl">
-                Prognoza zorzy polarnej w Polsce
+                Zorza polarna w Polsce
               </h1>
               <p className="max-w-3xl text-base font-medium leading-7 text-muted-foreground">
-                Mapa zorzy polarnej w Polsce na dziś, {forecastDate}, pokazuje,
+                Zorza polarna w Polsce dziś, {forecastDate}: mapa po województwach pokazuje,
                 w których województwach tej nocy jest największa szansa na obserwację aurory.
                 Prognoza uwzględnia Kp-index do {forecast.effectiveKp}, aktywność geomagnetyczną,
                 szerokość geograficzną regionu, ciemny północny horyzont, {cloudCondition} oraz fazę Księżyca:

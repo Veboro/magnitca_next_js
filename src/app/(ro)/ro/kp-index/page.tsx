@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import KpIndexClient from "@/legacy-pages/KpIndex";
+import { resolveLocalizedMetadata } from "@/lib/seo";
 import { getHomePageWeatherData } from "@/lib/space-weather-cache";
 
-export const metadata: Metadata = {
-  title: "Indice Kp astăzi — grafic online și prognoza furtunilor magnetice | Magnitca",
-  description: "Indicele Kp actual, scara furtunilor geomagnetice și prognoza activității geomagnetice pentru Moldova.",
-  alternates: {
-    canonical: "/ro/kp-index",
-    languages: {
-      ro: "/ro/kp-index",
-    },
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return resolveLocalizedMetadata("kp_index", "/kp-index", "ro");
+}
 
 export default async function RomanianKpIndexPage() {
   const { kpData, scales } = await getHomePageWeatherData();

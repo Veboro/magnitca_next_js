@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import CityPageClient from "@/legacy-pages/CityPage";
 import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getCityByRuSlug, getRuCitySlug } from "@/data/cities-ru";
@@ -67,7 +67,7 @@ export default async function CityPage({ params }: Params) {
   if (!city) {
     const ruCity = getCityByRuSlug(slug, ALL_UK_CITIES);
     if (ruCity) {
-      redirect(`/ru/city/${slug}`);
+      permanentRedirect(`/ru/city/${slug}`);
     }
 
     notFound();

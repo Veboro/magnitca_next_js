@@ -4,9 +4,9 @@ import { getHungaryAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Sarki fény előrejelzés Magyarországon | Térkép vármegyék szerint | Magnitca";
+const pageTitle = "Sarki fény Magyarországon ma — térkép és előrejelzés vármegyénként | Magnitca";
 const pageDescription =
-  "Élő sarki fény előrejelzés Magyarországra vármegyék szerint: Kp-index, éjszakai felhőzet, Hold és megfigyelési esélyek.";
+  "Sarki fény Magyarországon ma: hol és mikor látható az északi fény — előrejelzés vármegyénként, Kp-index, éjszakai felhőzet, Hold és megfigyelési esélyek a térképen.";
 const pageUrl = "https://magnitca.com/hu/aurora";
 
 export const metadata: Metadata = {
@@ -98,8 +98,8 @@ export default async function HungaryAuroraPage() {
       homeLabel="Magnitca"
       breadcrumbLabel="Sarki fény"
       badge="Aurora watch Hungary"
-      title="Sarki fény előrejelzés Magyarországon"
-      intro={`A magyarországi sarki fény térkép ${date} dátumra vármegyék szerint mutatja, hol lehet esély az északi fény megfigyelésére ma éjszaka. Az előrejelzés figyelembe veszi a Kp-indexet ${forecast.effectiveKp} értékig, a geomágneses aktivitást, a földrajzi szélességet, ${clouds} értékét és a Hold ${forecast.moonIllumination}%-os megvilágítását.`}
+      title="Sarki fény Magyarországon"
+      intro={`Sarki fény Magyarországon ma, ${date}: a térkép vármegyék szerint mutatja, hol lehet esély az északi fény megfigyelésére ma éjszaka. Az előrejelzés figyelembe veszi a Kp-indexet ${forecast.effectiveKp} értékig, a geomágneses aktivitást, a földrajzi szélességet, ${clouds} értékét és a Hold ${forecast.moonIllumination}%-os megvilágítását.`}
       chanceLabel="Esély a sarki fényre:"
       todayLabel="ma"
       tonightLabel="ma éjjel"

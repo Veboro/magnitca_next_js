@@ -4,9 +4,9 @@ import { getRussianUkraineAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Карта северного сияния в Украине | Полярное сияние сегодня | Magnitca";
+const pageTitle = "Северное сияние в Украине сегодня — карта и прогноз по областям | Magnitca";
 const pageDescription =
-  "Прогноз видимости северного или полярного сияния в Украине по областям: интерактивная карта, Kp-индекс, облачность, Луна и условия для наблюдения сегодня.";
+  "Северное сияние в Украине сегодня: где и когда можно увидеть полярное сияние — прогноз по областям, Kp-индекс, облачность, Луна и условия для наблюдения на карте.";
 const pageUrl = "https://magnitca.com/ru/aurora";
 
 export const metadata: Metadata = {
@@ -17,9 +17,6 @@ export const metadata: Metadata = {
     languages: {
       uk: "https://magnitca.com/aurora",
       ru: pageUrl,
-      pl: "https://magnitca.com/pl/aurora",
-      hu: "https://magnitca.com/hu/aurora",
-      en: "https://magnitca.com/en/aurora",
       "x-default": "https://magnitca.com/aurora",
     },
   },
@@ -111,8 +108,8 @@ export default async function RussianUkraineAuroraPage() {
       homeLabel="Магнитка"
       breadcrumbLabel="Северное сияние"
       badge="Aurora watch Ukraine"
-      title="Карта северного сияния в Украине"
-      intro={`Карта северного сияния в Украине на сегодня, ${date}, показывает, в каких областях этой ночью есть шанс увидеть сияние. Прогноз учитывает Kp-индекс до ${forecast.effectiveKp}, геомагнитную активность, широту области, темный северный горизонт, ${clouds} и освещенность Луны ${forecast.moonIllumination}%.`}
+      title="Северное сияние в Украине"
+      intro={`Северное сияние в Украине сегодня, ${date}: карта по областям показывает, в каких областях этой ночью есть шанс увидеть сияние. Прогноз учитывает Kp-индекс до ${forecast.effectiveKp}, геомагнитную активность, широту области, темный северный горизонт, ${clouds} и освещенность Луны ${forecast.moonIllumination}%.`}
       chanceLabel="Шанс увидеть сияние:"
       todayLabel="сегодня"
       tonightLabel="этой ночью"

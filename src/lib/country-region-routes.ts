@@ -21,17 +21,17 @@ export type CountryRegionRoute = {
 
 const PL_REGIONS: CountryRegionRoute[] = [
   { key: "pl-mazowieckie", locale: "pl", kind: "wojewodztwo", slug: "mazowieckie", title: "Województwo mazowieckie", titleIn: "województwie mazowieckim", country: "Polska", adminLabel: "województwo", citySlugs: ["warszawa", "radom", "plock"] },
-  { key: "pl-malopolskie", locale: "pl", kind: "wojewodztwo", slug: "malopolskie", title: "Województwo małopolskie", titleIn: "województwie małopolskim", country: "Polska", adminLabel: "województwo", citySlugs: ["krakow"] },
-  { key: "pl-dolnoslaskie", locale: "pl", kind: "wojewodztwo", slug: "dolnoslaskie", title: "Województwo dolnośląskie", titleIn: "województwie dolnośląskim", country: "Polska", adminLabel: "województwo", citySlugs: ["wroclaw"] },
-  { key: "pl-wielkopolskie", locale: "pl", kind: "wojewodztwo", slug: "wielkopolskie", title: "Województwo wielkopolskie", titleIn: "województwie wielkopolskim", country: "Polska", adminLabel: "województwo", citySlugs: ["poznan"] },
-  { key: "pl-pomorskie", locale: "pl", kind: "wojewodztwo", slug: "pomorskie", title: "Województwo pomorskie", titleIn: "województwie pomorskim", country: "Polska", adminLabel: "województwo", citySlugs: ["gdansk", "gdynia"] },
+  { key: "pl-malopolskie", locale: "pl", kind: "wojewodztwo", slug: "malopolskie", title: "Województwo małopolskie", titleIn: "województwie małopolskim", country: "Polska", adminLabel: "województwo", citySlugs: ["krakow", "tarnow"] },
+  { key: "pl-dolnoslaskie", locale: "pl", kind: "wojewodztwo", slug: "dolnoslaskie", title: "Województwo dolnośląskie", titleIn: "województwie dolnośląskim", country: "Polska", adminLabel: "województwo", citySlugs: ["wroclaw", "walbrzych", "legnica"] },
+  { key: "pl-wielkopolskie", locale: "pl", kind: "wojewodztwo", slug: "wielkopolskie", title: "Województwo wielkopolskie", titleIn: "województwie wielkopolskim", country: "Polska", adminLabel: "województwo", citySlugs: ["poznan", "kalisz"] },
+  { key: "pl-pomorskie", locale: "pl", kind: "wojewodztwo", slug: "pomorskie", title: "Województwo pomorskie", titleIn: "województwie pomorskim", country: "Polska", adminLabel: "województwo", citySlugs: ["gdansk", "gdynia", "slupsk"] },
   { key: "pl-lodzkie", locale: "pl", kind: "wojewodztwo", slug: "lodzkie", title: "Województwo łódzkie", titleIn: "województwie łódzkim", country: "Polska", adminLabel: "województwo", citySlugs: ["lodz"] },
-  { key: "pl-zachodniopomorskie", locale: "pl", kind: "wojewodztwo", slug: "zachodniopomorskie", title: "Województwo zachodniopomorskie", titleIn: "województwie zachodniopomorskim", country: "Polska", adminLabel: "województwo", citySlugs: ["szczecin"] },
+  { key: "pl-zachodniopomorskie", locale: "pl", kind: "wojewodztwo", slug: "zachodniopomorskie", title: "Województwo zachodniopomorskie", titleIn: "województwie zachodniopomorskim", country: "Polska", adminLabel: "województwo", citySlugs: ["szczecin", "koszalin"] },
   { key: "pl-lubelskie", locale: "pl", kind: "wojewodztwo", slug: "lubelskie", title: "Województwo lubelskie", titleIn: "województwie lubelskim", country: "Polska", adminLabel: "województwo", citySlugs: ["lublin"] },
   { key: "pl-podlaskie", locale: "pl", kind: "wojewodztwo", slug: "podlaskie", title: "Województwo podlaskie", titleIn: "województwie podlaskim", country: "Polska", adminLabel: "województwo", citySlugs: ["bialystok"] },
-  { key: "pl-slaskie", locale: "pl", kind: "wojewodztwo", slug: "slaskie", title: "Województwo śląskie", titleIn: "województwie śląskim", country: "Polska", adminLabel: "województwo", citySlugs: ["katowice", "czestochowa", "bielsko-biala"] },
-  { key: "pl-kujawsko-pomorskie", locale: "pl", kind: "wojewodztwo", slug: "kujawsko-pomorskie", title: "Województwo kujawsko-pomorskie", titleIn: "województwie kujawsko-pomorskim", country: "Polska", adminLabel: "województwo", citySlugs: ["bydgoszcz", "torun"] },
-  { key: "pl-warminsko-mazurskie", locale: "pl", kind: "wojewodztwo", slug: "warminsko-mazurskie", title: "Województwo warmińsko-mazurskie", titleIn: "województwie warmińsko-mazurskim", country: "Polska", adminLabel: "województwo", citySlugs: ["olsztyn"] },
+  { key: "pl-slaskie", locale: "pl", kind: "wojewodztwo", slug: "slaskie", title: "Województwo śląskie", titleIn: "województwie śląskim", country: "Polska", adminLabel: "województwo", citySlugs: ["katowice", "czestochowa", "bielsko-biala", "sosnowiec", "gliwice", "zabrze", "bytom", "ruda-slaska", "rybnik", "tychy", "dabrowa-gornicza", "chorzow"] },
+  { key: "pl-kujawsko-pomorskie", locale: "pl", kind: "wojewodztwo", slug: "kujawsko-pomorskie", title: "Województwo kujawsko-pomorskie", titleIn: "województwie kujawsko-pomorskim", country: "Polska", adminLabel: "województwo", citySlugs: ["bydgoszcz", "torun", "wloclawek", "grudziadz"] },
+  { key: "pl-warminsko-mazurskie", locale: "pl", kind: "wojewodztwo", slug: "warminsko-mazurskie", title: "Województwo warmińsko-mazurskie", titleIn: "województwie warmińsko-mazurskim", country: "Polska", adminLabel: "województwo", citySlugs: ["olsztyn", "elblag"] },
   { key: "pl-podkarpackie", locale: "pl", kind: "wojewodztwo", slug: "podkarpackie", title: "Województwo podkarpackie", titleIn: "województwie podkarpackim", country: "Polska", adminLabel: "województwo", citySlugs: ["rzeszow"] },
   { key: "pl-swietokrzyskie", locale: "pl", kind: "wojewodztwo", slug: "swietokrzyskie", title: "Województwo świętokrzyskie", titleIn: "województwie świętokrzyskim", country: "Polska", adminLabel: "województwo", citySlugs: ["kielce"] },
   { key: "pl-opolskie", locale: "pl", kind: "wojewodztwo", slug: "opolskie", title: "Województwo opolskie", titleIn: "województwie opolskim", country: "Polska", adminLabel: "województwo", citySlugs: ["opole"] },
@@ -184,4 +184,12 @@ export function getCountryRegionCities(region: CountryRegionRoute) {
 
 export function getCountryRegionCityHref(region: CountryRegionRoute, city: Pick<CityConfig, "slug">) {
   return `/${region.locale}/city/${city.slug}`;
+}
+
+// Reverse lookup: which region a given city belongs to. Used to enrich city
+// pages (metadata + body content) with their administrative region.
+export function getRegionForCity(locale: CountryRegionLocale, citySlug: string) {
+  return COUNTRY_REGION_ROUTES.find(
+    (region) => region.locale === locale && region.citySlugs.includes(citySlug)
+  ) ?? null;
 }

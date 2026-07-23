@@ -13,7 +13,7 @@ import { formatApiLocalTime } from "@/lib/city-sun-times";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays, AlertTriangle } from "lucide-react";
+import { Wind, Droplets, Gauge, Sun, Sunrise, Sunset, Cloud, Eye, Activity, MapPin, Info, CalendarDays, AlertTriangle, HelpCircle } from "lucide-react";
 import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import { getCityByMdSlug } from "@/data/cities-md";
@@ -29,6 +29,9 @@ import { CityImpactPanel } from "@/components/city/city-impact-panel";
 import { CityStormFeelingSummary } from "@/components/city/city-storm-feeling-summary";
 import { getOblastPathsByKey, getOblastTitle } from "@/lib/oblast-routes";
 import { getCityGenitive, ruPreposition, ukPreposition } from "@/lib/city-declension";
+import { ruGeoContext, ukGeoContext } from "@/lib/city-geo";
+import { getCitySeoContent, CITY_FAQ_HEADING } from "@/lib/city-content";
+import { getRegionForCity } from "@/lib/country-region-routes";
 import { absoluteUrl } from "@/lib/site";
 
 type LegacyLocale = SiteLocale;
@@ -664,6 +667,34 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
     weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: city.timezone,
   });
 
+  const regionLabel =
+    locale === "uk"
+      ? ukGeoContext(cityBase!.slug)
+      : locale === "ru"
+        ? ruGeoContext(cityBase!.slug)
+        : locale === "pl"
+          ? getRegionForCity("pl", city.slug)?.titleIn ?? "Polsce"
+          : locale === "ro"
+            ? getRegionForCity("ro", city.slug)?.titleIn ?? city.country ?? "Moldova"
+            : locale === "hu"
+              ? getRegionForCity("hu", city.slug)?.titleIn ?? "Magyarországon"
+              : city.country ?? "";
+
+  const seoContent = getCitySeoContent({
+    locale,
+    name: city.name,
+    locative: city.nameGenitive,
+    genitive: cityGenitive,
+    preposition:
+      locale === "uk" ? ukPreposition(city.nameGenitive) : locale === "ru" ? ruPreposition(city.nameGenitive) : "",
+    latLabel: city.latLabel,
+    lonLabel: city.lonLabel,
+    lat: city.lat,
+    utcOffset: city.utcOffset,
+    timezone: city.timezone,
+    regionLabel,
+  });
+
   return (
     <div className="min-h-screen bg-background">
       <main className="official-page-main" role="main">
@@ -1202,6 +1233,45 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
               </p>
             );
           })()}
+          {seoContent.paragraphs.map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+          <div className="not-prose mt-2 rounded-lg border border-border/50 bg-card p-6" aria-label={CITY_FAQ_HEADING[locale]}>
+            <div className="mb-4 flex items-center gap-2">
+              <HelpCircle className="h-4 w-4 text-primary" />
+              <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                {CITY_FAQ_HEADING[locale]}
+              </h2>
+            </div>
+            <div className="space-y-4">
+              {seoContent.faq.map((item, index) => (
+                <details key={index} className="group border-b border-border/20 pb-3 last:border-0">
+                  <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-foreground transition-colors hover:text-primary">
+                    {item.question}
+                    <span className="text-muted-foreground transition-transform group-open:rotate-180">▾</span>
+                  </summary>
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground/80">{item.answer}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: seoContent.faq.map((item) => ({
+                  "@type": "Question",
+                  name: item.question,
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: item.answer,
+                  },
+                })),
+              }),
+            }}
+          />
         </section>
         </div>
       </main>

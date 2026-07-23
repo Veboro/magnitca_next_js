@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import type { SiteLocale } from "@/lib/locale";
 import { getPathForLocale } from "@/lib/locale";
@@ -202,14 +202,14 @@ export async function LocalizedNewsArticlePage({
   if (!article) {
     const fallbackTarget = await getNewsArticleFallbackTargetBySlug(slug, locale).catch(() => null);
     if (fallbackTarget) {
-      redirect(getNewsPath(fallbackTarget.locale, fallbackTarget.slug));
+      permanentRedirect(getNewsPath(fallbackTarget.locale, fallbackTarget.slug));
     }
 
     notFound();
   }
 
   if (article.slug && article.slug !== slug) {
-    redirect(getNewsPath(locale, article.slug));
+    permanentRedirect(getNewsPath(locale, article.slug));
   }
 
   const canonicalPath = getNewsPath(locale, article.slug || article.id);

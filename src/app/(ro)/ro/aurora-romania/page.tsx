@@ -4,9 +4,9 @@ import { getRomaniaAuroraForecast } from "@/lib/aurora-forecast";
 
 export const revalidate = 900;
 
-const pageTitle = "Prognoza aurorei boreale în România | Hartă pe județe | Magnitca";
+const pageTitle = "Aurora boreală în România azi — hartă și prognoză pe județe | Magnitca";
 const pageDescription =
-  "Hartă live pentru șansa de a vedea aurora boreală în România pe județe: Kp-index, nori noaptea, Lună și condiții reale de observare.";
+  "Aurora boreală în România azi: unde și când poți vedea aurora — prognoză pe județe, Kp-index, nori noaptea, Lună și condiții reale de observare pe hartă.";
 const pageUrl = "https://magnitca.com/ro/aurora-romania";
 
 export const metadata: Metadata = {
@@ -98,8 +98,8 @@ export default async function RomaniaAuroraPage() {
       homeLabel="Magnitca"
       breadcrumbLabel="Aurora boreală România"
       badge="Aurora watch Romania"
-      title="Prognoza aurorei boreale în România"
-      intro={`Harta aurorei boreale în România pentru ${date} arată pe județe unde există șanse de observare în această noapte. Prognoza ia în calcul Kp-index până la ${forecast.effectiveKp}, activitatea geomagnetică, latitudinea județului, ${clouds} și iluminarea Lunii de ${forecast.moonIllumination}%.`}
+      title="Aurora boreală în România"
+      intro={`Aurora boreală în România azi, ${date}: harta pe județe arată unde există șanse de observare în această noapte. Prognoza ia în calcul Kp-index până la ${forecast.effectiveKp}, activitatea geomagnetică, latitudinea județului, ${clouds} și iluminarea Lunii de ${forecast.moonIllumination}%.`}
       chanceLabel="Șansa de a vedea aurora:"
       todayLabel="astăzi"
       tonightLabel="în noaptea asta"
