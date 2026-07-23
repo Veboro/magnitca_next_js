@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Eye, Gauge, MapPin, Moon, Newspaper, Search, Sun, Sunrise, Sunset, Wind, X } from "lucide-react";
+import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Eye, Gauge, HeartPulse, MapPin, MessageSquareText, Moon, Newspaper, Search, Sparkles, Sunrise, Sunset, Wind, X } from "lucide-react";
 import { getPathForLocale, getSafeLocaleSwitchPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
@@ -13,65 +13,33 @@ import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
 import { getCountryRegionPath, getCountryRegionsByLocale } from "@/lib/country-region-routes";
 
-const navItems: Record<SiteLocale, Array<{ href: string; label: string; icon: typeof Activity }>> = {
-  uk: [
-    { href: "/", label: "Головна", icon: Activity },
-    { href: "/kp-index", label: "Kp індекс", icon: Gauge },
-    { href: "/solar-wind", label: "Сонячний вітер", icon: Wind },
-    { href: "/moon-calendar", label: "Місячний календар", icon: Moon },
-    { href: "/news", label: "Новини", icon: Newspaper },
-    { href: "/calendar", label: "Календар", icon: CalendarDays },
-    { href: "/test", label: "Тест", icon: ClipboardCheck },
-    { href: "/aurora", label: "Північне сяйво", icon: Eye },
-  ],
-  ru: [
-    { href: "/", label: "Главная", icon: Activity },
-    { href: "/kp-index", label: "Kp индекс", icon: Gauge },
-    { href: "/solar-wind", label: "Солнечный ветер", icon: Wind },
-    { href: "/moon-calendar", label: "Лунный календарь", icon: Moon },
-    { href: "/news", label: "Новости", icon: Newspaper },
-    { href: "/calendar", label: "Календарь", icon: CalendarDays },
-    { href: "/test", label: "Тест", icon: ClipboardCheck },
-    { href: "/aurora", label: "Северное сияние", icon: Eye },
-  ],
-  pl: [
-    { href: "/", label: "Start", icon: Activity },
-    { href: "/kp-index", label: "Indeks Kp", icon: Gauge },
-    { href: "/solar-wind", label: "Wiatr słoneczny", icon: Wind },
-    { href: "/moon-calendar", label: "Kalendarz księżycowy", icon: Moon },
-    { href: "/calendar", label: "Kalendarz", icon: CalendarDays },
-    { href: "/test", label: "Test", icon: ClipboardCheck },
-    { href: "/aurora", label: "Zorza polarna", icon: Eye },
-  ],
-  ro: [
-    { href: "/", label: "Acasă", icon: Activity },
-    { href: "/kp-index", label: "Indice Kp", icon: Gauge },
-    { href: "/solar-wind", label: "Vânt solar", icon: Wind },
-    { href: "/moon-calendar", label: "Calendar lunar", icon: Moon },
-    { href: "/calendar", label: "Calendar", icon: CalendarDays },
-    { href: "/test", label: "Test", icon: ClipboardCheck },
-    { href: "/aurora-romania", label: "Aurora boreală", icon: Eye },
-  ],
-  hu: [
-    { href: "/", label: "Főoldal", icon: Activity },
-    { href: "/kp-index", label: "Kp-index", icon: Gauge },
-    { href: "/solar-wind", label: "Napszél", icon: Wind },
-    { href: "/moon-calendar", label: "Holdnaptár", icon: Moon },
-    { href: "/calendar", label: "Naptár", icon: CalendarDays },
-    { href: "/test", label: "Teszt", icon: ClipboardCheck },
-    { href: "/aurora", label: "Sarki fény", icon: Eye },
-  ],
-  en: [
-    { href: "/", label: "Home", icon: Activity },
-    { href: "/kp-index", label: "Kp index", icon: Gauge },
-    { href: "/solar-wind", label: "Solar wind", icon: Wind },
-    { href: "/moon-calendar", label: "Moon calendar", icon: Moon },
-    { href: "/news", label: "News", icon: Newspaper },
-    { href: "/calendar", label: "Calendar", icon: CalendarDays },
-    { href: "/test", label: "Test", icon: ClipboardCheck },
-    { href: "/aurora", label: "Aurora", icon: Eye },
-  ],
+type NavIcon = typeof Activity;
+type NavLeaf = { href: string; label: string; icon: NavIcon };
+type NavGroup = { key: string; label: string; icon: NavIcon; items: NavLeaf[] };
+type NavEntry = NavLeaf | NavGroup;
+
+function isNavGroup(entry: NavEntry): entry is NavGroup {
+  return "items" in entry;
+}
+
+// Localized labels. Single high-traffic pages stay flat; the rest are grouped
+// into a few dropdowns so the bar stays short (and doesn't scroll on mobile).
+const NAV_TEXT: Record<string, Record<SiteLocale, string>> = {
+  home: { uk: "Головна", ru: "Главная", pl: "Start", ro: "Acasă", hu: "Főoldal", en: "Home" },
+  kp: { uk: "Kp індекс", ru: "Kp индекс", pl: "Indeks Kp", ro: "Indice Kp", hu: "Kp-index", en: "Kp index" },
+  solarWind: { uk: "Сонячний вітер", ru: "Солнечный ветер", pl: "Wiatr słoneczny", ro: "Vânt solar", hu: "Napszél", en: "Solar wind" },
+  stormCalendar: { uk: "Календар бур", ru: "Календарь бурь", pl: "Kalendarz burz", ro: "Calendar furtuni", hu: "Viharnaptár", en: "Storm calendar" },
+  moonCalendar: { uk: "Місячний календар", ru: "Лунный календарь", pl: "Kalendarz księżycowy", ro: "Calendar lunar", hu: "Holdnaptár", en: "Moon calendar" },
+  aurora: { uk: "Північне сяйво", ru: "Северное сияние", pl: "Zorza polarna", ro: "Aurora boreală", hu: "Sarki fény", en: "Aurora" },
+  test: { uk: "Тест", ru: "Тест", pl: "Test", ro: "Test", hu: "Teszt", en: "Test" },
+  reviews: { uk: "Відгуки", ru: "Отзывы", pl: "Opinie", ro: "Recenzii", hu: "Vélemények", en: "Reviews" },
+  groupCalendars: { uk: "Календарі", ru: "Календари", pl: "Kalendarze", ro: "Calendare", hu: "Naptárak", en: "Calendars" },
+  groupSky: { uk: "Небо", ru: "Небо", pl: "Niebo", ro: "Cer", hu: "Égbolt", en: "Sky" },
+  groupWellbeing: { uk: "Самопочуття", ru: "Самочувствие", pl: "Samopoczucie", ro: "Stare de bine", hu: "Közérzet", en: "Wellbeing" },
 };
+
+// News page exists only in these locales.
+const NEWS_LABEL: Partial<Record<SiteLocale, string>> = { uk: "Новини", ru: "Новости", en: "News" };
 
 const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
   uk: {
@@ -148,7 +116,9 @@ function BrandIcon({ locale }: { locale: SiteLocale }) {
   );
 }
 
-const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> = {
+// Sunrise/sunset pages, nested under the "Sky" dropdown. Hrefs are locale-agnostic
+// (prefixed via getPathForLocale at render time) so grouping logic stays uniform.
+const sunItems: Record<SiteLocale, Array<{ href: string; label: string }>> = {
   uk: [
     { href: "/sunrise", label: "Схід сьогодні" },
     { href: "/sunrise-tomorrow", label: "Схід завтра" },
@@ -162,41 +132,76 @@ const sunMenuItems: Record<SiteLocale, Array<{ href: string; label: string }>> =
     { href: "/sunset-tomorrow", label: "Закат завтра" },
   ],
   ro: [
-    { href: "/ro/country/moldova/sunrise", label: "Moldova: răsărit azi" },
-    { href: "/ro/country/moldova/sunrise-tomorrow", label: "Moldova: răsărit mâine" },
-    { href: "/ro/country/moldova/sunset", label: "Moldova: apus azi" },
-    { href: "/ro/country/moldova/sunset-tomorrow", label: "Moldova: apus mâine" },
-    { href: "/ro/country/romania/sunrise", label: "România: răsărit azi" },
-    { href: "/ro/country/romania/sunrise-tomorrow", label: "România: răsărit mâine" },
-    { href: "/ro/country/romania/sunset", label: "România: apus azi" },
-    { href: "/ro/country/romania/sunset-tomorrow", label: "România: apus mâine" },
+    { href: "/country/moldova/sunrise", label: "Moldova: răsărit azi" },
+    { href: "/country/moldova/sunrise-tomorrow", label: "Moldova: răsărit mâine" },
+    { href: "/country/moldova/sunset", label: "Moldova: apus azi" },
+    { href: "/country/moldova/sunset-tomorrow", label: "Moldova: apus mâine" },
+    { href: "/country/romania/sunrise", label: "România: răsărit azi" },
+    { href: "/country/romania/sunrise-tomorrow", label: "România: răsărit mâine" },
+    { href: "/country/romania/sunset", label: "România: apus azi" },
+    { href: "/country/romania/sunset-tomorrow", label: "România: apus mâine" },
   ],
   pl: [
-    { href: "/pl/sunrise", label: "Wschód dzisiaj" },
-    { href: "/pl/sunrise-tomorrow", label: "Wschód jutro" },
-    { href: "/pl/sunset", label: "Zachód dzisiaj" },
-    { href: "/pl/sunset-tomorrow", label: "Zachód jutro" },
+    { href: "/sunrise", label: "Wschód dzisiaj" },
+    { href: "/sunrise-tomorrow", label: "Wschód jutro" },
+    { href: "/sunset", label: "Zachód dzisiaj" },
+    { href: "/sunset-tomorrow", label: "Zachód jutro" },
   ],
   hu: [
-    { href: "/hu/sunrise", label: "Napkelte ma" },
-    { href: "/hu/sunrise-tomorrow", label: "Napkelte holnap" },
-    { href: "/hu/sunset", label: "Napnyugta ma" },
-    { href: "/hu/sunset-tomorrow", label: "Napnyugta holnap" },
+    { href: "/sunrise", label: "Napkelte ma" },
+    { href: "/sunrise-tomorrow", label: "Napkelte holnap" },
+    { href: "/sunset", label: "Napnyugta ma" },
+    { href: "/sunset-tomorrow", label: "Napnyugta holnap" },
   ],
   en: [],
 };
 
-const sunMenuLabels: Record<SiteLocale, string> = {
-  uk: "Сонце",
-  ru: "Солнце",
-  ro: "Soare",
-  pl: "Słońce",
-  hu: "Nap",
-  en: "Sun",
-};
-
 function getSunMenuIcon(href: string) {
   return href.includes("sunrise") ? Sunrise : Sunset;
+}
+
+// Assembles the grouped top navigation for a locale. Groups that end up with a
+// single item (e.g. English "Sky" = only Aurora) collapse to a flat link.
+function buildNavEntries(locale: SiteLocale): NavEntry[] {
+  const auroraHref = locale === "ro" ? "/aurora-romania" : "/aurora";
+  const sky: NavLeaf[] = [
+    { href: auroraHref, label: NAV_TEXT.aurora[locale], icon: Eye },
+    ...sunItems[locale].map((item) => ({ href: item.href, label: item.label, icon: getSunMenuIcon(item.href) })),
+  ];
+
+  const entries: NavEntry[] = [
+    { href: "/", label: NAV_TEXT.home[locale], icon: Activity },
+    { href: "/kp-index", label: NAV_TEXT.kp[locale], icon: Gauge },
+    { href: "/solar-wind", label: NAV_TEXT.solarWind[locale], icon: Wind },
+    {
+      key: "calendars",
+      label: NAV_TEXT.groupCalendars[locale],
+      icon: CalendarDays,
+      items: [
+        { href: "/calendar", label: NAV_TEXT.stormCalendar[locale], icon: CalendarDays },
+        { href: "/moon-calendar", label: NAV_TEXT.moonCalendar[locale], icon: Moon },
+      ],
+    },
+    { key: "sky", label: NAV_TEXT.groupSky[locale], icon: Sparkles, items: sky },
+    {
+      key: "wellbeing",
+      label: NAV_TEXT.groupWellbeing[locale],
+      icon: HeartPulse,
+      items: [
+        { href: "/test", label: NAV_TEXT.test[locale], icon: ClipboardCheck },
+        { href: "/feeling", label: NAV_TEXT.reviews[locale], icon: MessageSquareText },
+      ],
+    },
+  ];
+
+  const news = NEWS_LABEL[locale];
+  if (news) {
+    entries.push({ href: "/news", label: news, icon: Newspaper });
+  }
+
+  return entries
+    .filter((entry) => !(isNavGroup(entry) && entry.items.length === 0))
+    .map((entry) => (isNavGroup(entry) && entry.items.length === 1 ? entry.items[0] : entry));
 }
 
 export function PublicHeader() {
@@ -207,7 +212,7 @@ export function PublicHeader() {
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileLocaleOpen, setMobileLocaleOpen] = useState(false);
-  const [sunMenuOpen, setSunMenuOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
   const mobileSearchOverlayRef = useRef<HTMLDivElement | null>(null);
   const [localeLinks, setLocaleLinks] = useState<Record<SiteLocale, string | null>>({
@@ -430,7 +435,7 @@ export function PublicHeader() {
     setCityQuery("");
     setSearchOpen(false);
     setMobileLocaleOpen(false);
-    setSunMenuOpen(false);
+    setOpenMenu(null);
   }, [pathnameValue]);
 
   useEffect(() => {
@@ -453,7 +458,7 @@ export function PublicHeader() {
   }, [cityQuery]);
 
   useEffect(() => {
-    if (!searchOpen) return;
+    if (!searchOpen && !openMenu) return;
 
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node | null;
@@ -465,7 +470,7 @@ export function PublicHeader() {
       if (clickedInsideHeader || clickedInsideMobileOverlay) return;
 
       setSearchOpen(false);
-      setSunMenuOpen(false);
+      setOpenMenu(null);
     };
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -475,18 +480,17 @@ export function PublicHeader() {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("touchstart", handlePointerDown);
     };
-  }, [searchOpen]);
+  }, [searchOpen, openMenu]);
 
-  const localizedSunMenu = sunMenuItems[locale];
-  const sunMenuLabel = sunMenuLabels[locale];
-  const sunMenuActive =
-    pathnameValue.startsWith("/sunrise") ||
-    pathnameValue.startsWith("/sunset") ||
-    pathnameValue.startsWith("/ru/sunrise") ||
-    pathnameValue.startsWith("/ru/sunset") ||
-    pathnameValue.startsWith("/pl/sun") ||
-    pathnameValue.startsWith("/hu/sun") ||
-    /^\/ro\/country\/[^/]+\/sun/.test(pathnameValue);
+  const navEntries = useMemo(() => buildNavEntries(locale), [locale]);
+  const resolveHref = (href: string) => getPathForLocale(href, locale);
+  const isLeafActive = (href: string) => {
+    const resolved = resolveHref(href);
+    const roots = ["/", "/ru", "/pl", "/ro", "/hu", "/en"];
+    if (roots.includes(resolved)) return pathnameValue === resolved;
+    return pathnameValue === resolved || pathnameValue.startsWith(`${resolved}/`);
+  };
+  const isGroupActive = (group: NavGroup) => group.items.some((item) => isLeafActive(item.href));
 
   return (
     <>
@@ -778,80 +782,96 @@ export function PublicHeader() {
       </div>
       <nav className={`border-t border-border/30 bg-card/30 ${searchOpen ? "max-lg:hidden" : ""}`}>
         <div className="mx-auto flex max-w-[1180px] items-center gap-1 overflow-x-auto px-4 py-2 sm:px-6 lg:px-0 lg:overflow-visible">
-          {navItems[locale].map((item, index) => (
-            <Link
-              key={item.href}
-              href={getPathForLocale(item.href, locale)}
-              className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:bg-card hover:text-foreground ${
-                index === 0 ? "lg:pl-0" : ""
-              }`}
-            >
-              <span className="mr-1 inline-flex items-center">
-                <item.icon className="h-3.5 w-3.5" />
-              </span>
-              {item.label}
-            </Link>
-          ))}
-          {localizedSunMenu.length > 0 && (
-            <div className="relative shrink-0">
-              <button
-                type="button"
-                onClick={() => setSunMenuOpen((value) => !value)}
-                className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition-colors ${
-                  sunMenuActive ? "bg-card text-foreground" : "text-muted-foreground hover:bg-card hover:text-foreground"
-                }`}
-                aria-expanded={sunMenuOpen}
-                aria-haspopup="menu"
-              >
-                <span className="mr-1 inline-flex items-center">
-                  <Sun className="h-3.5 w-3.5" />
-                </span>
-                {sunMenuLabel}
-                <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${sunMenuOpen ? "rotate-180" : ""}`} />
-              </button>
-              {sunMenuOpen && (
-                <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 p-2 shadow-xl lg:block">
-                  <div className="space-y-1">
-                    {localizedSunMenu.map((item) => (
+          {navEntries.map((entry, index) => {
+            if (!isNavGroup(entry)) {
+              const Icon = entry.icon;
+              return (
+                <Link
+                  key={entry.href}
+                  href={resolveHref(entry.href)}
+                  className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition-colors ${
+                    isLeafActive(entry.href)
+                      ? "bg-card text-foreground"
+                      : "text-muted-foreground hover:bg-card hover:text-foreground"
+                  } ${index === 0 ? "lg:pl-0" : ""}`}
+                >
+                  <span className="mr-1 inline-flex items-center">
+                    <Icon className="h-3.5 w-3.5" />
+                  </span>
+                  {entry.label}
+                </Link>
+              );
+            }
+
+            const Icon = entry.icon;
+            const open = openMenu === entry.key;
+            const active = isGroupActive(entry);
+            return (
+              <div key={entry.key} className="relative shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setOpenMenu(open ? null : entry.key)}
+                  className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-1.5 text-[13px] transition-colors ${
+                    open || active ? "bg-card text-foreground" : "text-muted-foreground hover:bg-card hover:text-foreground"
+                  }`}
+                  aria-expanded={open}
+                  aria-haspopup="menu"
+                >
+                  <span className="mr-1 inline-flex items-center">
+                    <Icon className="h-3.5 w-3.5" />
+                  </span>
+                  {entry.label}
+                  <ChevronDown className={`ml-1 h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
+                </button>
+                {open && (
+                  <div className="official-header-dropdown absolute left-0 top-[calc(100%+0.5rem)] z-50 hidden min-w-[220px] rounded-2xl border border-border/50 p-2 shadow-xl lg:block">
+                    <div className="space-y-1">
+                      {entry.items.map((item) => {
+                        const ItemIcon = item.icon;
+                        return (
+                          <Link
+                            key={item.href}
+                            href={resolveHref(item.href)}
+                            onClick={() => setOpenMenu(null)}
+                            className="official-header-dropdown-item flex items-center justify-start gap-3 rounded-xl px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-card"
+                          >
+                            <ItemIcon className="h-4 w-4 shrink-0" />
+                            {item.label}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {openMenu &&
+          (() => {
+            const group = navEntries.find((entry): entry is NavGroup => isNavGroup(entry) && entry.key === openMenu);
+            if (!group) return null;
+            return (
+              <div className="border-t border-border/30 px-4 pb-3 pt-2 lg:hidden">
+                <div className="official-header-dropdown space-y-1 rounded-2xl border border-border/50 p-2 shadow-xl">
+                  {group.items.map((item) => {
+                    const ItemIcon = item.icon;
+                    return (
                       <Link
                         key={item.href}
-                        href={locale === "ru" ? `/ru${item.href}` : item.href}
-                        onClick={() => setSunMenuOpen(false)}
+                        href={resolveHref(item.href)}
+                        onClick={() => setOpenMenu(null)}
                         className="official-header-dropdown-item flex items-center justify-start gap-3 rounded-xl px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-card"
                       >
-                        {(() => {
-                          const Icon = getSunMenuIcon(item.href);
-                          return <Icon className="h-4 w-4 shrink-0" />;
-                        })()}
+                        <ItemIcon className="h-4 w-4 shrink-0" />
                         {item.label}
                       </Link>
-                    ))}
-                  </div>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-        {sunMenuOpen && localizedSunMenu.length > 0 && (
-          <div className="border-t border-border/30 px-4 pb-3 pt-2 lg:hidden">
-            <div className="official-header-dropdown space-y-1 rounded-2xl border border-border/50 p-2 shadow-xl">
-              {localizedSunMenu.map((item) => (
-                <Link
-                  key={item.href}
-                  href={locale === "ru" ? `/ru${item.href}` : item.href}
-                  onClick={() => setSunMenuOpen(false)}
-                  className="official-header-dropdown-item flex items-center justify-start gap-3 rounded-xl px-3 py-2 text-left text-sm text-foreground transition-colors hover:bg-card"
-                >
-                  {(() => {
-                    const Icon = getSunMenuIcon(item.href);
-                    return <Icon className="h-4 w-4 shrink-0" />;
-                  })()}
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            );
+          })()}
       </nav>
     </header>
     </>
