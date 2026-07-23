@@ -105,16 +105,26 @@ export function StormFeelingPoll({ locale, kpNow, kpTodayMax, className }: Storm
 
   async function submitAnswer(score: number) {
     if (!Number.isInteger(score) || score < -3 || score > 3) return;
-    if (isSaving || selected === score) return;
 
     const today = dateKey || getKyivDateKey();
+    const anonymousId = getAnonymousId();
+
     setSelected(score);
     setDraftScore(score);
     window.localStorage.setItem(answerStorageKey(today), String(score));
+
+    // Open the follow-up note dialog immediately — it only needs local data
+    // (score, anonymous id, locale, Kp). Gating it on the network POST made the
+    // popup appear with a long delay on production (cold serverless + Supabase).
+    setAnonId(anonymousId);
+    setNoteScore(score);
+    setNoteOpen(true);
+
+    // Persist the poll answer in the background; the stats update when it lands.
+    if (isSaving || selected === score) return;
     setIsSaving(true);
 
     try {
-      const anonymousId = getAnonymousId();
       const response = await fetch("/api/storm-feelings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -133,17 +143,17 @@ export function StormFeelingPoll({ locale, kpNow, kpTodayMax, className }: Storm
 
       const data: { answer: boolean; feelingScore?: number; stats?: StormFeelingStats } = await response.json();
       const savedScore = typeof data.feelingScore === "number" ? data.feelingScore : score;
-      setSelected(savedScore);
-      setDraftScore(savedScore);
-      window.localStorage.setItem(answerStorageKey(today), String(savedScore));
+      if (savedScore !== score) {
+        setSelected(savedScore);
+        setDraftScore(savedScore);
+        setNoteScore(savedScore);
+        window.localStorage.setItem(answerStorageKey(today), String(savedScore));
+      }
       if (data.stats) {
         window.dispatchEvent(new CustomEvent(STORM_FEELING_STATS_EVENT, { detail: data.stats }));
       }
-      setAnonId(anonymousId);
-      setNoteScore(savedScore);
-      setNoteOpen(true);
     } catch {
-      setSelected(score);
+      // Keep the optimistic selection; the answer will save on the next attempt.
     } finally {
       setIsSaving(false);
     }
