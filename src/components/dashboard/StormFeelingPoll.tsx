@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { HeartPulse } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { StormFeelingNoteDialog } from "@/components/dashboard/StormFeelingNoteDialog";
 import type { SiteLocale } from "@/lib/locale";
 import { cn } from "@/lib/utils";
 
@@ -66,6 +67,9 @@ export function StormFeelingPoll({ locale, kpNow, kpTodayMax, className }: Storm
   const [draftScore, setDraftScore] = useState(0);
   const [isSaving, setIsSaving] = useState(false);
   const [dateKey, setDateKey] = useState("");
+  const [noteOpen, setNoteOpen] = useState(false);
+  const [noteScore, setNoteScore] = useState<number | null>(null);
+  const [anonId, setAnonId] = useState("");
 
   const scaleLabels = useMemo(
     () => ({
@@ -135,6 +139,9 @@ export function StormFeelingPoll({ locale, kpNow, kpTodayMax, className }: Storm
       if (data.stats) {
         window.dispatchEvent(new CustomEvent(STORM_FEELING_STATS_EVENT, { detail: data.stats }));
       }
+      setAnonId(anonymousId);
+      setNoteScore(savedScore);
+      setNoteOpen(true);
     } catch {
       setSelected(score);
     } finally {
@@ -206,6 +213,15 @@ export function StormFeelingPoll({ locale, kpNow, kpTodayMax, className }: Storm
           <span className="text-right text-red-700">{t("feelingPoll.badSide")}</span>
         </div>
       </div>
+
+      <StormFeelingNoteDialog
+        open={noteOpen}
+        onOpenChange={setNoteOpen}
+        feelingScore={noteScore}
+        locale={locale}
+        kpNow={kpNow}
+        anonymousId={anonId}
+      />
     </div>
   );
 }

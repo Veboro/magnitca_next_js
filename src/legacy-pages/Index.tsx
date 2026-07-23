@@ -10,10 +10,10 @@ import { KpForecast3Day } from "@/components/dashboard/KpForecast3Day";
 import { HumanImpact } from "@/components/dashboard/HumanImpact";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import { NewsWidget } from "@/components/dashboard/NewsWidget";
+import { HomeStormNotesPreview } from "@/components/dashboard/HomeStormNotesPreview";
 import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 
 const SolarWindChart = dynamic(() => import("@/components/dashboard/SolarWindChart").then(m => ({ default: m.SolarWindChart })), { ssr: false });
-const BzChart = dynamic(() => import("@/components/dashboard/BzChart").then(m => ({ default: m.BzChart })), { ssr: false });
 import { useKpIndex, useSolarWind, useMagData, useNoaaScales } from "@/hooks/useSpaceWeather";
 import type { KpEntry, SolarWindEntry, MagEntry, NoaaScales } from "@/hooks/useSpaceWeather";
 import type { KpForecastEntry } from "@/hooks/useKpForecast";
@@ -193,7 +193,7 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
             <SolarWindChart className="lg:col-span-2" />
           </div>
           <div className="mt-6 grid gap-6 lg:grid-cols-3">
-            <BzChart className="lg:col-span-2" />
+            <HomeStormNotesPreview locale={locale} className="lg:col-span-2" />
             <NewsWidget className="lg:col-span-1" />
           </div>
         </section>

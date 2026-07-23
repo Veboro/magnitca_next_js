@@ -156,6 +156,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "/en" ? 0.85 : path === "/en/aurora" ? 0.78 : 0.6,
   }));
 
+  // The /feeling reviews hub exists in all six locales; declare hreflang so
+  // Google clusters the translations and picks the right one per user.
+  const feelingPaths = ["/feeling", "/ru/feeling", "/pl/feeling", "/ro/feeling", "/hu/feeling", "/en/feeling"];
+  const feelingLanguages: Record<string, string> = {
+    uk: `${SITE_URL}/feeling`,
+    ru: `${SITE_URL}/ru/feeling`,
+    pl: `${SITE_URL}/pl/feeling`,
+    ro: `${SITE_URL}/ro/feeling`,
+    hu: `${SITE_URL}/hu/feeling`,
+    en: `${SITE_URL}/en/feeling`,
+    "x-default": `${SITE_URL}/feeling`,
+  };
+  const feelingPages: MetadataRoute.Sitemap = feelingPaths.map((path) => ({
+    url: `${SITE_URL}${path}`,
+    lastModified: today,
+    changeFrequency: "daily",
+    priority: path === "/feeling" ? 0.8 : 0.7,
+    alternates: { languages: feelingLanguages },
+  }));
+
   const cityPages: MetadataRoute.Sitemap = ALL_UK_CITIES.map((city) => ({
     url: `${SITE_URL}/city/${city.slug}`,
     lastModified: today,
@@ -336,6 +356,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roStaticPages,
     ...huStaticPages,
     ...enStaticPages,
+    ...feelingPages,
     ...cityPages,
     ...ruCityPages,
     ...plCityPages,
