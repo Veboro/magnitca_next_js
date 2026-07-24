@@ -99,6 +99,10 @@ export function StormFeelingNoteDialog({
         }),
       });
 
+      if (response.status === 429) {
+        setError(t("feelingPoll.noteLimit"));
+        return;
+      }
       if (!response.ok) {
         throw new Error("Failed to save note");
       }

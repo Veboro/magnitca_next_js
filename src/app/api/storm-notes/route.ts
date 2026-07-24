@@ -75,10 +75,27 @@ export async function POST(request: NextRequest) {
     const status = isSpam ? "rejected" : mode === "autopost" ? "approved" : "pending";
 
     const supabase = getSupabaseAdminClient();
-    const { error } = await supabase.from("storm_feeling_notes" as never).upsert(
+    const today = getKyivDateKey();
+    const idHash = hashAnonymousId(anonymousId);
+
+    // Up to 3 notes per anonymous user per Kyiv day.
+    const { count, error: countError } = await supabase
+      .from("storm_feeling_notes" as never)
+      .select("id", { count: "exact", head: true })
+      .eq("response_date", today)
+      .eq("anonymous_id_hash", idHash);
+
+    if (countError) {
+      throw countError;
+    }
+    if ((count ?? 0) >= 3) {
+      return NextResponse.json({ error: "daily_limit" }, { status: 429 });
+    }
+
+    const { error } = await supabase.from("storm_feeling_notes" as never).insert(
       {
-        response_date: getKyivDateKey(),
-        anonymous_id_hash: hashAnonymousId(anonymousId),
+        response_date: today,
+        anonymous_id_hash: idHash,
         locale,
         feeling_score: feelingScore,
         body: text,
@@ -88,7 +105,6 @@ export async function POST(request: NextRequest) {
         kp_now: kpNow,
         status,
       } as never,
-      { onConflict: "response_date,anonymous_id_hash" },
     );
 
     if (error) {

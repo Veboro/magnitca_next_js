@@ -146,6 +146,7 @@ const pl = {
     noteClose: "Zamknij",
     noteError: "Nie udało się wysłać. Spróbuj ponownie.",
     noteViewAll: "Zobacz wszystkie opinie",
+    noteLimit: "Dodałeś już dziś 3 opinie. Wróć jutro!",
   },
   impact: {
     ...uk.impact,

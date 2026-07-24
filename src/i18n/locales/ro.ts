@@ -158,6 +158,7 @@ const ro = {
     noteClose: "Închide",
     noteError: "Nu s-a putut trimite. Încearcă din nou.",
     noteViewAll: "Vezi toate recenziile",
+    noteLimit: "Ai adăugat deja 3 recenzii azi. Revino mâine!",
   },
   impact: {
     ...uk.impact,

@@ -154,6 +154,7 @@ const en = {
     noteClose: "Close",
     noteError: "Could not send. Please try again.",
     noteViewAll: "View all reviews",
+    noteLimit: "You've already added 3 reviews today. Come back tomorrow!",
   },
   impact: {
     ...uk.impact,

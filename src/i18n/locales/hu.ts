@@ -158,6 +158,7 @@ const hu = {
     noteClose: "Bezárás",
     noteError: "Nem sikerült elküldeni. Próbáld újra.",
     noteViewAll: "Összes vélemény megtekintése",
+    noteLimit: "Ma már 3 véleményt beküldtél. Gyere vissza holnap!",
   },
   impact: {
     ...uk.impact,
