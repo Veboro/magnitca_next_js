@@ -704,6 +704,11 @@
     color: hsl(152 14% 88%);
     font-weight: 650;
   }
+  /* Main menu items 25% larger (top-level links + group triggers only). */
+  .official-home-page header.sticky nav > div > a,
+  .official-home-page header.sticky nav > div > div > button {
+    font-size: 1.02rem;
+  }
   .official-home-page header.sticky nav a svg,
   .official-home-page header.sticky nav button svg {
     color: hsl(152 52% 62%);
