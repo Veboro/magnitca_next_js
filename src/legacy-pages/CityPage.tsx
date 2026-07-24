@@ -1023,7 +1023,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                   const maxKp = Math.max(...rows.map((r) => r.kp));
                   const maxKpRound = Math.min(9, Math.max(0, Math.round(maxKp)));
                   return (
-                    <div key={dateLabel} className="rounded-md border border-border/30 bg-muted/10 p-4">
+                    <div key={dateLabel} className="rounded-lg border border-border/50 bg-card p-4">
                       <div className="flex items-center justify-between mb-3">
                         <span className="font-mono text-xs font-medium text-foreground">{dateLabel}</span>
                         <span className={cn(
@@ -1035,18 +1035,18 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                           {t.max} {maxKp.toFixed(1)}
                         </span>
                       </div>
-                      <div className="space-y-1">
+                      <div className="space-y-2.5 sm:space-y-1.5">
                         {rows.map((row, j) => {
                           const kpVal = Math.min(9, Math.max(0, Math.round(row.kp)));
                           return (
-                            <div key={j} className="flex items-center justify-between text-xs">
-                              <span className="text-muted-foreground font-mono">
+                            <div key={j} className="flex items-center gap-2.5 sm:gap-2">
+                              <span className="w-12 sm:w-10 shrink-0 text-[13px] sm:text-[11px] text-muted-foreground font-mono">
                                 {new Date(row.time_tag + "Z").toLocaleTimeString(localeTag, { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: city.timezone })}
                               </span>
-                              <div className="flex-1 mx-2 h-1.5 rounded-full bg-secondary overflow-hidden">
+                              <div className="flex-1 h-5 sm:h-3 rounded-md sm:rounded-sm bg-muted/20 overflow-hidden">
                                 <div
                                   className={cn(
-                                    "h-full rounded-full transition-all",
+                                    "h-full rounded-md sm:rounded-sm transition-all",
                                     kpVal >= 5 ? "bg-storm-severe" :
                                     kpVal >= 4 ? "bg-storm-moderate" :
                                     kpVal >= 2 ? "bg-storm-minor" :
@@ -1056,7 +1056,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                                 />
                               </div>
                               <span className={cn(
-                                "font-mono font-bold w-8 text-right",
+                                "font-mono font-bold w-9 sm:w-7 text-sm sm:text-xs text-right shrink-0",
                                 kpVal >= 5 ? "text-storm-severe" :
                                 kpVal >= 4 ? "text-storm-moderate" :
                                 "text-muted-foreground"
