@@ -34,7 +34,13 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
     return d.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit", timeZone });
   };
 
-  const chartData = (rawData || []).filter((_, i) => i % 3 === 0).map((d) => ({ time: toTime(d.time_tag), speed: d.speed, density: d.density }));
+  // NOAA/DSCOVR marks missing samples with sentinels (e.g. -9999), which would
+  // blow up the Y-axis and flatten the real data. Drop out-of-range values to null.
+  const saneSpeed = (v: number) => (Number.isFinite(v) && v > 0 && v < 3000 ? v : null);
+  const saneDensity = (v: number) => (Number.isFinite(v) && v >= 0 && v < 500 ? v : null);
+  const chartData = (rawData || [])
+    .filter((_, i) => i % 3 === 0)
+    .map((d) => ({ time: toTime(d.time_tag), speed: saneSpeed(d.speed), density: saneDensity(d.density) }));
 
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (!active || !payload) return null;
@@ -59,23 +65,24 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={chartHeight}>
-          <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 4 }}>
+          <AreaChart data={chartData} margin={{ top: 8, right: 4, left: -4, bottom: 4 }}>
             <defs>
               <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(35, 100%, 82%)" stopOpacity={1} />
-                <stop offset="100%" stopColor="hsl(35, 100%, 82%)" stopOpacity={1} />
+                <stop offset="0%" stopColor="hsl(32, 100%, 52%)" stopOpacity={0.35} />
+                <stop offset="100%" stopColor="hsl(32, 100%, 52%)" stopOpacity={0.03} />
               </linearGradient>
               <linearGradient id="densityGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(35, 90%, 82%)" stopOpacity={1} />
-                <stop offset="100%" stopColor="hsl(35, 90%, 82%)" stopOpacity={1} />
+                <stop offset="0%" stopColor="hsl(190, 72%, 42%)" stopOpacity={0.28} />
+                <stop offset="100%" stopColor="hsl(190, 72%, 42%)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsla(200, 40%, 18%, 0.8)" />
-            <XAxis dataKey="time" tick={{ fill: "hsl(36, 20%, 10%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: "hsl(36, 20%, 10%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(160, 14%, 89%)" />
+            <XAxis dataKey="time" tick={{ fill: "hsl(200, 12%, 34%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} />
+            <YAxis yAxisId="speed" tick={{ fill: "hsl(32, 60%, 36%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} width={40} />
+            <YAxis yAxisId="density" orientation="right" tick={{ fill: "hsl(190, 45%, 32%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} width={28} />
             <RechartsTooltip content={<CustomTooltip />} />
-            <Area type="monotone" dataKey="speed" name={t("charts.speed")} stroke="hsl(35, 100%, 50%)" fill="url(#speedGrad)" fillOpacity={1} strokeWidth={2} />
-            <Area type="monotone" dataKey="density" name={t("charts.density")} stroke="hsl(35, 100%, 55%)" fill="url(#densityGrad)" fillOpacity={1} strokeWidth={2} />
+            <Area yAxisId="speed" type="monotone" dataKey="speed" name={t("charts.speed")} stroke="hsl(32, 100%, 50%)" fill="url(#speedGrad)" fillOpacity={1} strokeWidth={2} connectNulls dot={false} />
+            <Area yAxisId="density" type="monotone" dataKey="density" name={t("charts.density")} stroke="hsl(190, 72%, 40%)" fill="url(#densityGrad)" fillOpacity={1} strokeWidth={2} connectNulls dot={false} />
           </AreaChart>
         </ResponsiveContainer>
       )}

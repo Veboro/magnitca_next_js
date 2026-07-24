@@ -403,20 +403,26 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
   const latestWind = windData?.length ? windData[windData.length - 1] : null;
   const latestMag = magData?.length ? magData[magData.length - 1] : null;
 
+  // NOAA/DSCOVR marks missing samples with sentinels (e.g. -9999) that would
+  // wreck the Y-axis scale; drop out-of-range values to null instead of plotting.
+  const saneSpeed = (v: number) => (Number.isFinite(v) && v > 0 && v < 3000 ? v : null);
+  const saneDensity = (v: number) => (Number.isFinite(v) && v >= 0 && v < 500 ? v : null);
+  const saneMag = (v: number) => (Number.isFinite(v) && v > -900 && v < 900 ? v : null);
+
   const speedChartData = (windData || [])
     .filter((_, i) => i % 3 === 0)
     .map((d) => ({
       time: toLocalTime(d.time_tag, localeTag, timeZone),
-      speed: d.speed,
-      density: d.density,
+      speed: saneSpeed(d.speed),
+      density: saneDensity(d.density),
     }));
 
   const magChartData = (magData || [])
     .filter((_, i) => i % 3 === 0)
     .map((d) => ({
       time: toLocalTime(d.time_tag, localeTag, timeZone),
-      bz: d.bz,
-      bt: d.bt,
+      bz: saneMag(d.bz),
+      bt: saneMag(d.bt),
     }));
 
   const faqLd = {
@@ -553,11 +559,12 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                     tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                     interval={Math.floor(speedChartData.length / 6)}
                   />
-                  <YAxis tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis yAxisId="speed" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={40} />
+                  <YAxis yAxisId="density" orientation="right" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} width={30} />
                   <Tooltip content={<CustomTooltip locale={locale} />} />
-                  <ReferenceLine y={500} stroke="hsl(var(--destructive))" strokeDasharray="4 4" label={{ value: `500 ${speedUnit}`, fontSize: 10, fill: "hsl(var(--destructive))" }} />
-                  <Area type="monotone" dataKey="speed" name={t.areaSpeed} stroke="hsl(180, 100%, 50%)" fill="url(#swSpeedGrad)" strokeWidth={2} />
-                  <Area type="monotone" dataKey="density" name={t.areaDensity} stroke="hsl(35, 100%, 55%)" fill="url(#swDensityGrad)" strokeWidth={2} />
+                  <ReferenceLine yAxisId="speed" y={500} stroke="hsl(var(--destructive))" strokeDasharray="4 4" label={{ value: `500 ${speedUnit}`, fontSize: 10, fill: "hsl(var(--destructive))" }} />
+                  <Area yAxisId="speed" type="monotone" dataKey="speed" name={t.areaSpeed} stroke="hsl(180, 100%, 50%)" fill="url(#swSpeedGrad)" strokeWidth={2} connectNulls dot={false} />
+                  <Area yAxisId="density" type="monotone" dataKey="density" name={t.areaDensity} stroke="hsl(35, 100%, 55%)" fill="url(#swDensityGrad)" strokeWidth={2} connectNulls dot={false} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -590,8 +597,8 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                   <Tooltip content={<CustomTooltip locale={locale} />} />
                   <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="2 2" />
                   <ReferenceLine y={-5} stroke="hsl(var(--destructive))" strokeDasharray="4 4" label={{ value: "Bz -5", fontSize: 10, fill: "hsl(var(--destructive))" }} />
-                  <Line type="monotone" dataKey="bz" name="Bz" stroke="hsl(280, 80%, 60%)" strokeWidth={2} dot={false} />
-                  <Line type="monotone" dataKey="bt" name="Bt" stroke="hsl(var(--muted-foreground))" strokeWidth={1} dot={false} strokeDasharray="3 3" />
+                  <Line type="monotone" dataKey="bz" name="Bz" stroke="hsl(280, 80%, 60%)" strokeWidth={2} dot={false} connectNulls />
+                  <Line type="monotone" dataKey="bt" name="Bt" stroke="hsl(var(--muted-foreground))" strokeWidth={1} dot={false} strokeDasharray="3 3" connectNulls />
                 </LineChart>
               </ResponsiveContainer>
             </div>
