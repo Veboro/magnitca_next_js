@@ -195,18 +195,24 @@
     background: hsl(var(--background));
     color: hsl(var(--foreground));
   }
-  /* Outer wrappers are layout only — transparent, so we don't nest frames. */
+  /* Outer wrappers are layout only — transparent and with no horizontal padding,
+     so every block sits on the same 1180 container edge as the menu. The page
+     gutter comes solely from <main> (which matches the header). */
   .official-home-shell {
     border: 0;
     background: transparent;
     border-radius: 0;
     box-shadow: none;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
   .official-home-hero {
     border: 0;
     background: transparent;
     border-radius: 0;
     box-shadow: none;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
   /* Standalone panels stay a single soft card. */
   .official-home-panel {
