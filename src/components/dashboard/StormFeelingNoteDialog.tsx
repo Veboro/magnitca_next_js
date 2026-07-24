@@ -104,6 +104,7 @@ export function StormFeelingNoteDialog({
       }
 
       setIsDone(true);
+      window.dispatchEvent(new Event("storm-notes:refresh"));
     } catch {
       setError(t("feelingPoll.noteError"));
     } finally {

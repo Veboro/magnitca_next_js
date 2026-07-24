@@ -394,43 +394,56 @@ export function StormNotesFeed({
     [country, date, minAge, gender, locale],
   );
 
+  // Fetch page one for the current filters. `showLoading` clears the list first
+  // (used on filter changes); a background refresh keeps the current content on
+  // screen and only swaps it in when fresh data arrives.
+  const refresh = useCallback(
+    (showLoading: boolean) => {
+      const controller = new AbortController();
+      if (showLoading) {
+        setStatus("loading");
+        setNotes(null);
+      }
+      fetch(buildUrl(0), { signal: controller.signal })
+        .then((response) => {
+          if (!response.ok) throw new Error("Failed to load notes");
+          return response.json() as Promise<{ notes: StormNote[]; hasMore: boolean; nextOffset: number }>;
+        })
+        .then((data) => {
+          const list = Array.isArray(data.notes) ? data.notes : [];
+          setNotes(list);
+          setCounts(Object.fromEntries(list.map((note) => [note.id, note.helpful_count ?? 0])));
+          setHasMore(Boolean(data.hasMore));
+          setOffset(typeof data.nextOffset === "number" ? data.nextOffset : list.length);
+          setStatus("ready");
+        })
+        .catch((error) => {
+          if (error?.name === "AbortError") return;
+          // On a background refresh keep the SSR/previous content; only surface
+          // an error when we had nothing to show.
+          if (showLoading) setStatus("error");
+        });
+      return () => controller.abort();
+    },
+    [buildUrl],
+  );
+
   useEffect(() => {
-    // First mount after SSR: state is already seeded from initialNotes, so just
-    // hydrate the client-only "reacted" set and skip re-fetching page one.
-    if (skipInitialFetch.current) {
-      skipInitialFetch.current = false;
-      setReacted(readReactedNotes());
-      return;
-    }
-
-    let cancelled = false;
-    setStatus("loading");
-    setNotes(null);
     setReacted(readReactedNotes());
+    // On first mount we already have SSR notes — refresh quietly in the
+    // background (stale-while-revalidate) so freshly approved notes show up
+    // without waiting for the ISR cache. Filter changes show the loader.
+    const isInitial = skipInitialFetch.current;
+    skipInitialFetch.current = false;
+    return refresh(!isInitial);
+  }, [refresh]);
 
-    fetch(buildUrl(0))
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to load notes");
-        return response.json() as Promise<{ notes: StormNote[]; hasMore: boolean; nextOffset: number }>;
-      })
-      .then((data) => {
-        if (cancelled) return;
-        const list = Array.isArray(data.notes) ? data.notes : [];
-        setNotes(list);
-        setCounts(Object.fromEntries(list.map((note) => [note.id, note.helpful_count ?? 0])));
-        setHasMore(Boolean(data.hasMore));
-        setOffset(typeof data.nextOffset === "number" ? data.nextOffset : list.length);
-        setStatus("ready");
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setStatus("error");
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [buildUrl]);
+  // A submitted note should appear right away, without a reload.
+  useEffect(() => {
+    const onSubmitted = () => refresh(false);
+    window.addEventListener("storm-notes:refresh", onSubmitted);
+    return () => window.removeEventListener("storm-notes:refresh", onSubmitted);
+  }, [refresh]);
 
   const loadMore = useCallback(async () => {
     if (loadingMore || !hasMore) return;

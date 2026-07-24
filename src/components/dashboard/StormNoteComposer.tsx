@@ -100,6 +100,8 @@ export function StormNoteComposer({ locale, kpNow, className }: StormNoteCompose
       }
 
       setIsDone(true);
+      // Nudge any visible feed/preview to pull in the new note right away.
+      window.dispatchEvent(new Event("storm-notes:refresh"));
     } catch {
       setError(t("feelingPoll.noteError"));
     } finally {

@@ -145,17 +145,23 @@ export function HomeStormNotesPreview({ locale, className }: { locale: SiteLocal
 
   useEffect(() => {
     let cancelled = false;
-    const params = new URLSearchParams({ days: "30", limit: "4", priority: locale });
-    fetch(`/api/storm-notes?${params.toString()}`)
-      .then((response) => (response.ok ? response.json() : Promise.reject()))
-      .then((data) => {
-        if (!cancelled) setNotes(Array.isArray(data?.notes) ? data.notes : []);
-      })
-      .catch(() => {
-        if (!cancelled) setNotes([]);
-      });
+    const load = () => {
+      const params = new URLSearchParams({ days: "30", limit: "4", priority: locale });
+      fetch(`/api/storm-notes?${params.toString()}`)
+        .then((response) => (response.ok ? response.json() : Promise.reject()))
+        .then((data) => {
+          if (!cancelled) setNotes(Array.isArray(data?.notes) ? data.notes : []);
+        })
+        .catch(() => {
+          if (!cancelled) setNotes((prev) => (prev === null ? [] : prev));
+        });
+    };
+    load();
+    // Refresh when a note is submitted (e.g. via the poll dialog on this page).
+    window.addEventListener("storm-notes:refresh", load);
     return () => {
       cancelled = true;
+      window.removeEventListener("storm-notes:refresh", load);
     };
   }, [locale]);
 
