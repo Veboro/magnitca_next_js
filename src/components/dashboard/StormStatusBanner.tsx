@@ -136,7 +136,7 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{t("storm.todayForecast")}</p>
           {todayEntries.length > 0 && (
             <>
-              <div className="mt-1 space-y-1.5 sm:hidden">
+              <div className="mt-1 space-y-2.5 sm:hidden">
                 {todayEntries.map((entry, i) => {
                   const hour = new Date(entry.time_tag).toLocaleString(locale, { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Kyiv" });
                   const entryColor = levelColors[getEffectiveLevel(0, entry.kp)] || levelColors[0];
@@ -144,15 +144,15 @@ export const StormStatusBanner = ({ initialKp, initialScales, initialForecast }:
                   const isPast = new Date(entry.time_tag) < now;
 
                   return (
-                    <div key={i} className={`flex items-center gap-2 ${isPast ? "opacity-50" : ""}`}>
-                      <span className="w-11 shrink-0 text-[9px] font-mono text-muted-foreground">{hour}</span>
-                      <div className="h-3 flex-1 overflow-hidden rounded-full bg-muted/30">
+                    <div key={i} className={`flex items-center gap-2.5 ${isPast ? "opacity-50" : ""}`}>
+                      <span className="w-12 shrink-0 text-[13px] font-mono text-muted-foreground">{hour}</span>
+                      <div className="h-5 flex-1 overflow-hidden rounded-full bg-muted/30">
                         <div
                           className="h-full rounded-full transition-all duration-300"
                           style={{ width: `${barWidth}%`, backgroundColor: entryColor }}
                         />
                       </div>
-                      <span className="w-8 shrink-0 text-right text-[9px] font-mono font-medium" style={{ color: entryColor }}>
+                      <span className="w-10 shrink-0 text-right text-sm font-mono font-bold" style={{ color: entryColor }}>
                         {entry.kp.toFixed(1)}
                       </span>
                     </div>

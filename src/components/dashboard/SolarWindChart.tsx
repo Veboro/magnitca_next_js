@@ -1,9 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useSolarWind } from "@/hooks/useSpaceWeather";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip, XAxis, YAxis } from "recharts";
 
 export const SolarWindChart = ({ className }: { className?: string }) => {
   const { t, i18n } = useTranslation();
+  const isMobile = useIsMobile();
+  const chartHeight = isMobile ? 320 : 240;
+  const tickFontSize = isMobile ? 14 : 11;
   const locale = i18n.language.startsWith("ru")
     ? "ru-RU"
     : i18n.language.startsWith("pl")
@@ -50,12 +54,12 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
     <div className={`rounded-lg border border-glow-cyan bg-card p-6 ${className || ""}`} role="img" aria-label={t("charts.solarWind2h")}>
       <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-muted-foreground">{t("charts.solarWind2h")}</h3>
       {isLoading ? (
-        <div className="flex h-[240px] items-center justify-center">
+        <div className="flex items-center justify-center" style={{ height: chartHeight }}>
           <span className="font-mono text-sm text-muted-foreground animate-pulse-glow">{t("common.loading")}</span>
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={chartData}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
+          <AreaChart data={chartData} margin={{ top: 8, right: 8, left: -8, bottom: 4 }}>
             <defs>
               <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(35, 100%, 82%)" stopOpacity={1} />
@@ -67,8 +71,8 @@ export const SolarWindChart = ({ className }: { className?: string }) => {
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="hsla(200, 40%, 18%, 0.8)" />
-            <XAxis dataKey="time" tick={{ fill: "hsl(36, 20%, 10%)", fontSize: 11 }} tickLine={false} axisLine={false} />
-            <YAxis tick={{ fill: "hsl(36, 20%, 10%)", fontSize: 11 }} tickLine={false} axisLine={false} />
+            <XAxis dataKey="time" tick={{ fill: "hsl(36, 20%, 10%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} />
+            <YAxis tick={{ fill: "hsl(36, 20%, 10%)", fontSize: tickFontSize }} tickLine={false} axisLine={false} />
             <RechartsTooltip content={<CustomTooltip />} />
             <Area type="monotone" dataKey="speed" name={t("charts.speed")} stroke="hsl(35, 100%, 50%)" fill="url(#speedGrad)" fillOpacity={1} strokeWidth={2} />
             <Area type="monotone" dataKey="density" name={t("charts.density")} stroke="hsl(35, 100%, 55%)" fill="url(#densityGrad)" fillOpacity={1} strokeWidth={2} />

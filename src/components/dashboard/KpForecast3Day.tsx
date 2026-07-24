@@ -114,16 +114,16 @@ export const KpForecast3Day = ({ className, initialData }: { className?: string;
                     {t("common.max")} Kp {maxKp.toFixed(1)}
                   </span>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-2.5 sm:space-y-1.5">
                   {dayEntries.map((entry, i) => {
                     const barWidth = Math.max((entry.kp / MAX_KP) * 100, 3);
                     return (
-                      <div key={i} className="flex items-center gap-2">
-                        <span className="font-mono text-[11px] text-muted-foreground w-10 shrink-0">{formatHour(entry.time_tag)}</span>
-                        <div className="flex-1 h-3 bg-muted/20 rounded-sm overflow-hidden">
-                          <div className={cn("h-full rounded-sm transition-all", kpBarColor(entry.kp))} style={{ width: `${barWidth}%` }} />
+                      <div key={i} className="flex items-center gap-2.5 sm:gap-2">
+                        <span className="font-mono text-[13px] sm:text-[11px] text-muted-foreground w-12 sm:w-10 shrink-0">{formatHour(entry.time_tag)}</span>
+                        <div className="flex-1 h-5 sm:h-3 bg-muted/20 rounded-md sm:rounded-sm overflow-hidden">
+                          <div className={cn("h-full rounded-md sm:rounded-sm transition-all", kpBarColor(entry.kp))} style={{ width: `${barWidth}%` }} />
                         </div>
-                        <span className={cn("font-mono text-xs font-bold w-7 text-right shrink-0", kpTextColor(entry.kp))}>
+                        <span className={cn("font-mono text-sm sm:text-xs font-bold w-9 sm:w-7 text-right shrink-0", kpTextColor(entry.kp))}>
                           {entry.kp.toFixed(entry.kp % 1 ? 1 : 0)}
                         </span>
                       </div>
