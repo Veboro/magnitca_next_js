@@ -320,7 +320,7 @@ export default async function SamopochuttyaPage({ locale }: { locale: SiteLocale
         faq={copy.faq}
       />
       <div className="official-page-shell space-y-8">
-        <header className="official-page-header space-y-3 p-3 sm:p-4">
+        <header className="official-page-header space-y-3">
           <nav className="official-page-breadcrumb text-sm" aria-label="Breadcrumb">
             <a href={homePath} className="text-primary hover:text-primary/80">
               {copy.homeLabel}
@@ -340,11 +340,11 @@ export default async function SamopochuttyaPage({ locale }: { locale: SiteLocale
           </div>
         </header>
 
-        <section className="px-3 sm:px-4 md:hidden">
+        <section className="md:hidden">
           <MobileAdsenseSlot />
         </section>
 
-        <section className="px-3 sm:px-4">
+        <section>
           <StormNotesFeed
             locale={locale}
             initialNotes={initialNotes}
@@ -353,11 +353,11 @@ export default async function SamopochuttyaPage({ locale }: { locale: SiteLocale
           />
         </section>
 
-        <section className="px-3 sm:px-4">
+        <section>
           <StormNoteComposer locale={locale} kpNow={kpNow} />
         </section>
 
-        <section className="space-y-4 px-3 sm:px-4">
+        <section className="space-y-4">
           <h2 className="font-display text-2xl font-bold text-foreground">{copy.faqTitle}</h2>
           <div className="max-w-3xl divide-y divide-border/50 overflow-hidden rounded-2xl border border-border/50 bg-card">
             {copy.faq.map((item) => (
@@ -371,7 +371,7 @@ export default async function SamopochuttyaPage({ locale }: { locale: SiteLocale
           </div>
         </section>
 
-        <section className="space-y-3 px-3 sm:px-4">
+        <section className="space-y-3">
           <p className="max-w-3xl text-base font-medium leading-7 text-muted-foreground">{copy.seo}</p>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
             <span className="font-semibold text-foreground">{copy.relatedTitle}:</span>
