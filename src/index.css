@@ -214,6 +214,11 @@
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
+  /* Tighten the gap under the sticky menu (drop the space-y top margin + big pad). */
+  .official-home-shell > .official-home-hero {
+    margin-top: 0 !important;
+    padding-top: 4px !important;
+  }
   /* Standalone panels stay a single soft card. */
   .official-home-panel {
     border: 1px solid hsl(220 18% 93%);
@@ -718,14 +723,20 @@
     border-left: 1px solid hsl(0 0% 100% / 0.12);
   }
   .official-home-page header.sticky nav a:hover,
-  .official-home-page header.sticky nav button:hover,
-  .official-home-page header.sticky nav .bg-card {
-    background: hsl(152 48% 42%);
+  .official-home-page header.sticky nav button:hover {
+    background: transparent;
     color: hsl(0 0% 100%);
   }
-  .official-home-page header.sticky nav a:hover svg,
-  .official-home-page header.sticky nav button:hover svg {
+  /* Active item: underline, no background fill. */
+  .official-home-page header.sticky nav .bg-card {
+    background: transparent;
     color: hsl(0 0% 100%);
+    box-shadow: inset 0 -3px 0 0 hsl(152 62% 58%);
+  }
+  .official-home-page header.sticky nav a:hover svg,
+  .official-home-page header.sticky nav button:hover svg,
+  .official-home-page header.sticky nav .bg-card svg {
+    color: hsl(152 62% 62%);
   }
   .official-home-page header.sticky .bg-primary,
   .official-home-page header.sticky .bg-primary\/15 {
