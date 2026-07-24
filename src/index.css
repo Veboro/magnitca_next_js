@@ -231,6 +231,40 @@
   .official-home .border-glow-cyan {
     border-color: hsl(var(--border));
   }
+  /* Mobile: strip nested gutters, tighten padding, minimize card frames. */
+  @media (max-width: 639px) {
+    .official-home-page main {
+      padding-left: 8px;
+      padding-right: 8px;
+    }
+    .official-home-shell {
+      padding-left: 0;
+      padding-right: 0;
+    }
+    .official-home-hero {
+      padding: 0 !important;
+    }
+    .official-home-shell > * + * {
+      margin-top: 12px !important;
+    }
+    .official-home-hero > * + * {
+      margin-top: 12px !important;
+    }
+    .official-home .rounded-lg,
+    .official-home .rounded-xl,
+    .official-home .rounded-2xl,
+    .official-home .official-storm-panel {
+      border-color: transparent !important;
+    }
+    .official-home .official-storm-panel > .relative {
+      padding: 0.95rem !important;
+    }
+    .official-home .bg-card.rounded-lg,
+    .official-home .bg-card.rounded-xl,
+    .official-home .bg-card.rounded-2xl {
+      padding: 0.9rem !important;
+    }
+  }
   .official-home section[aria-label] > div,
   .official-home .bg-card {
     border-color: hsl(42 29% 68%);
