@@ -181,17 +181,17 @@
     --card-foreground: 222 24% 14%;
     --popover: 0 0% 100%;
     --popover-foreground: 222 24% 14%;
-    --primary: 232 72% 56%;
+    --primary: 152 46% 32%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 20% 94%;
-    --secondary-foreground: 232 45% 32%;
-    --muted: 220 20% 95%;
-    --muted-foreground: 222 12% 44%;
-    --accent: 44 96% 52%;
-    --accent-foreground: 222 30% 16%;
-    --border: 220 18% 91%;
-    --input: 220 18% 88%;
-    --ring: 232 72% 56%;
+    --secondary: 150 20% 93%;
+    --secondary-foreground: 152 40% 26%;
+    --muted: 160 16% 95%;
+    --muted-foreground: 200 8% 42%;
+    --accent: 16 78% 56%;
+    --accent-foreground: 0 0% 100%;
+    --border: 160 16% 90%;
+    --input: 160 16% 88%;
+    --ring: 152 46% 32%;
     background: hsl(var(--background));
     color: hsl(var(--foreground));
   }
@@ -294,14 +294,14 @@
     color: hsl(222 24% 16%);
   }
   .official-home .text-primary {
-    color: hsl(232 62% 52%);
+    color: hsl(152 46% 32%);
   }
   .official-home .bg-primary\/10 {
-    background-color: hsl(232 72% 56% / 0.10);
+    background-color: hsl(152 46% 40% / 0.12);
   }
   .official-home .border-primary\/20,
   .official-home .border-primary\/30 {
-    border-color: hsl(232 60% 56% / 0.30);
+    border-color: hsl(152 42% 42% / 0.32);
   }
   .official-home .hover\:scale-\[1\.02\]:hover {
     transform: none;
@@ -613,54 +613,54 @@
     color: hsl(var(--muted-foreground));
   }
   .official-home-page header.sticky {
-    border-bottom-color: hsl(220 18% 90%);
-    background: hsl(220 30% 99% / 0.88);
-    color: hsl(222 24% 14%);
+    border-bottom-color: hsl(152 42% 38%);
+    background: hsl(152 40% 19% / 0.97);
+    color: hsl(0 0% 100%);
   }
   .official-home-page header.sticky .text-foreground,
   .official-home-page header.sticky .hover\:text-foreground:hover {
-    color: hsl(222 24% 14%);
+    color: hsl(0 0% 100%);
   }
   .official-home-page header.sticky .text-muted-foreground {
-    color: hsl(222 12% 46%);
+    color: hsl(152 18% 80%);
   }
   .official-home-page header.sticky .bg-card\/50,
   .official-home-page header.sticky .bg-card\/60,
   .official-home-page header.sticky .bg-background\/85,
   .official-home-page header.sticky input {
-    background-color: hsl(0 0% 100% / 0.9);
+    background-color: hsl(152 34% 15% / 0.9);
   }
   .official-home-page header.sticky input {
-    color: hsl(222 24% 14%);
-    caret-color: hsl(232 72% 56%);
+    color: hsl(0 0% 100%);
+    caret-color: hsl(152 52% 60%);
   }
   .official-home-page header.sticky input::placeholder {
-    color: hsl(222 12% 52%);
+    color: hsl(152 16% 74%);
     opacity: 1;
   }
   .official-home-page header.sticky .lucide-search {
-    color: hsl(222 12% 50%);
+    color: hsl(152 18% 74%);
   }
   .official-home-page header.sticky .official-header-dropdown {
-    background: hsl(0 0% 100%);
-    border-color: hsl(220 18% 90%);
-    color: hsl(222 24% 14%);
-    box-shadow: 0 20px 44px -24px hsl(230 40% 30% / 0.28);
+    background: hsl(152 37% 17%);
+    border-color: hsl(152 26% 30%);
+    color: hsl(0 0% 100%);
+    box-shadow: 0 20px 44px -24px hsl(152 50% 8% / 0.5);
   }
   .official-home-page header.sticky .official-header-dropdown-label {
-    color: hsl(222 12% 48%) !important;
+    color: hsl(152 16% 74%) !important;
   }
   .official-home-page header.sticky .official-header-dropdown-item {
-    color: hsl(222 24% 14%) !important;
+    color: hsl(0 0% 100%) !important;
     justify-content: flex-start !important;
     text-align: left;
   }
   .official-home-page header.sticky .official-header-dropdown-item:hover {
-    background: hsl(220 24% 96%);
-    color: hsl(222 24% 14%) !important;
+    background: hsl(152 30% 24%);
+    color: hsl(0 0% 100%) !important;
   }
   .official-home-page header.sticky .official-header-dropdown-item svg {
-    color: hsl(232 60% 56%) !important;
+    color: hsl(152 52% 62%) !important;
   }
   .official-home-page header.sticky .official-header-dropdown a + a,
   .official-home-page header.sticky .official-header-dropdown a + div,
@@ -669,17 +669,17 @@
     border-left: 0 !important;
   }
   .official-home-page header.sticky .official-header-dropdown .bg-primary {
-    background: hsl(232 72% 56%) !important;
+    background: hsl(152 52% 42%) !important;
     color: hsl(0 0% 100%) !important;
   }
   .official-home-page header.sticky .border-border\/50,
   .official-home-page header.sticky .border-border\/40,
   .official-home-page header.sticky .border-border\/30 {
-    border-color: hsl(220 18% 90%);
+    border-color: hsl(152 26% 32%);
   }
   .official-home-page header.sticky nav {
-    border-top-color: hsl(220 18% 91%);
-    background: hsl(220 30% 99% / 0.8);
+    border-top-color: hsl(152 42% 38%);
+    background: hsl(152 40% 19% / 0.92);
   }
   .official-home-page header.sticky nav > div {
     width: 100%;
@@ -692,12 +692,12 @@
     flex: 1 1 0;
     justify-content: center;
     border-radius: 0;
-    color: hsl(222 16% 34%);
+    color: hsl(152 14% 88%);
     font-weight: 650;
   }
   .official-home-page header.sticky nav a svg,
   .official-home-page header.sticky nav button svg {
-    color: hsl(232 60% 58%);
+    color: hsl(152 52% 62%);
   }
   .official-home-page header.sticky nav > div > div {
     flex: 1 1 0;
@@ -709,44 +709,44 @@
   .official-home-page header.sticky nav a + div,
   .official-home-page header.sticky nav div + a,
   .official-home-page header.sticky nav div + div {
-    border-left: 1px solid hsl(220 18% 92%);
+    border-left: 1px solid hsl(0 0% 100% / 0.12);
   }
   .official-home-page header.sticky nav a:hover,
   .official-home-page header.sticky nav button:hover,
   .official-home-page header.sticky nav .bg-card {
-    background: hsl(232 72% 56% / 0.12);
-    color: hsl(232 58% 42%);
+    background: hsl(152 48% 42%);
+    color: hsl(0 0% 100%);
   }
   .official-home-page header.sticky nav a:hover svg,
   .official-home-page header.sticky nav button:hover svg {
-    color: hsl(232 58% 46%);
+    color: hsl(0 0% 100%);
   }
   .official-home-page header.sticky .bg-primary,
   .official-home-page header.sticky .bg-primary\/15 {
-    background-color: hsl(232 72% 56%);
+    background-color: hsl(152 52% 42%);
     color: hsl(0 0% 100%);
   }
   .official-home-page footer {
-    border-top: 1px solid hsl(220 18% 90%);
-    background: hsl(220 24% 96%);
-    color: hsl(222 20% 24%);
+    border-top: 3px solid hsl(152 48% 42%);
+    background: hsl(152 40% 19%);
+    color: hsl(0 0% 100% / 0.92);
   }
   .official-home-page footer > div {
-    color: hsl(222 14% 40%);
+    color: hsl(152 14% 82%);
   }
   .official-home-page footer a {
-    color: hsl(222 20% 24%);
+    color: hsl(0 0% 100%);
     font-weight: 650;
     transition: color 160ms ease;
   }
   .official-home-page footer a:hover {
-    color: hsl(232 62% 52%);
+    color: hsl(152 55% 64%);
   }
   .official-home-page footer nav a {
-    color: hsl(232 62% 52%);
+    color: hsl(152 55% 64%);
   }
   .official-home-page footer nav a:hover {
-    color: hsl(222 20% 24%);
+    color: hsl(0 0% 100%);
   }
   .official-page-main {
     width: 100%;
