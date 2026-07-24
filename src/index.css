@@ -748,29 +748,43 @@
   .official-home-page footer nav a:hover {
     color: hsl(0 0% 100%);
   }
+  /* Inner pages share the home container: same 1180 width, gutters, and flat
+     transparent wrapper, so every page lines up with the menu edge. */
   .official-page-main {
     width: 100%;
     max-width: 1180px;
     margin-left: auto;
     margin-right: auto;
-    padding: 0.75rem 0.5rem 2.5rem;
+    padding: 0.75rem 8px 2.5rem;
+  }
+  @media (min-width: 640px) {
+    .official-page-main {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .official-page-main {
+      padding-left: 0;
+      padding-right: 0;
+    }
   }
   .official-page-shell {
-    border: 1px solid hsl(42 29% 62%);
-    background: hsl(44 44% 94%);
-    border-radius: 0.375rem;
-    box-shadow: 0 24px 50px -36px hsl(36 20% 10% / 0.42);
-    padding: 0.5rem 0.5rem 1rem;
+    border: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
   }
   .official-page-shell.aurora-page-shell {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-left: 0;
+    padding-right: 0;
   }
   .official-page-header {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    border-bottom: 1px solid hsl(42 29% 68%);
+    border-bottom: 1px solid hsl(160 16% 90%);
     padding-bottom: 1.25rem;
   }
   .official-page-breadcrumb {
@@ -782,10 +796,10 @@
     color: hsl(var(--muted-foreground));
   }
   .official-page-panel {
-    border: 1px solid hsl(42 29% 68%);
-    background: hsl(var(--card));
-    border-radius: 0.375rem;
-    box-shadow: 0 18px 38px -30px hsl(36 20% 10% / 0.28);
+    border: 1px solid hsl(160 18% 92%);
+    background: hsl(0 0% 100%);
+    border-radius: 1.5rem;
+    box-shadow: 0 22px 48px -30px hsl(150 30% 22% / 0.16);
   }
   .official-page-prose {
     color: hsl(var(--muted-foreground));
@@ -795,7 +809,7 @@
     color: hsl(var(--foreground)) !important;
   }
   .official-page-prose a {
-    color: hsl(216 55% 27%);
+    color: hsl(152 46% 32%);
   }
   .aurora-map-popup-link {
     display: inline-flex;
@@ -803,7 +817,7 @@
     justify-content: center;
     margin-top: 0.55rem;
     border-radius: 0.55rem;
-    background: hsl(216 55% 27%);
+    background: hsl(152 46% 32%);
     color: hsl(0 0% 100%) !important;
     font-weight: 800;
     line-height: 1.2;
