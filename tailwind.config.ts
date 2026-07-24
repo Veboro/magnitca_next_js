@@ -15,15 +15,19 @@ export default {
   	extend: {
   		fontFamily: {
   			display: [
-  				'Space Grotesk',
+  				'Manrope',
+  				'ui-sans-serif',
+  				'system-ui',
   				'sans-serif'
   			],
   			body: [
-  				'Space Grotesk',
+  				'Manrope',
+  				'ui-sans-serif',
+  				'system-ui',
   				'sans-serif'
   			],
   			mono: [
-  				'Space Mono',
+  				'JetBrains Mono',
   				'ui-monospace',
   				'SFMono-Regular',
   				'Menlo',
@@ -34,7 +38,7 @@ export default {
   				'monospace'
   			],
   			sans: [
-  				'Inter',
+  				'Manrope',
   				'ui-sans-serif',
   				'system-ui',
   				'-apple-system',

@@ -1,7 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+/* Manrope (display/body/UI) + JetBrains Mono (data) — both ship Cyrillic and
+   Latin-ext, so uk/ru/pl/ro/hu render in the real face, not a system fallback. */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -59,9 +59,9 @@
     --sidebar-border: 140 10% 80%;
     --sidebar-ring: 145 67% 28%;
     --sidebar: 0 0% 100%;
-    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    --font-sans: 'Manrope', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: 'Lora', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
-    --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     --shadow-2xs: 0 1px 2px 0px hsl(160 10% 10% / 0.04);
     --shadow-xs: 0 1px 3px 0px hsl(160 10% 10% / 0.05);
     --shadow-sm: 0 3px 10px 0px hsl(160 10% 10% / 0.06), 0 1px 2px -1px hsl(160 10% 10% / 0.05);
@@ -110,7 +110,7 @@
   }
 
   :root .text-muted-foreground {
-    color: hsl(155 10% 22%);
+    color: hsl(222 11% 40%);
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -263,6 +263,25 @@
     .official-home .bg-card.rounded-xl,
     .official-home .bg-card.rounded-2xl {
       padding: 0.9rem !important;
+    }
+    /* Larger, more legible type on mobile: lift the tiny label tiers. */
+    .official-home-page .text-\[8px\],
+    .official-home-page .text-\[9px\],
+    .official-home-page .text-\[10px\] {
+      font-size: 0.75rem !important;
+      line-height: 1.35 !important;
+    }
+    .official-home-page .text-\[11px\],
+    .official-home-page .text-xs {
+      font-size: 0.82rem !important;
+      line-height: 1.4 !important;
+    }
+    .official-home-page .text-sm {
+      font-size: 0.95rem !important;
+      line-height: 1.5 !important;
+    }
+    .official-home-page .text-base {
+      font-size: 1.05rem !important;
     }
   }
   .official-home section[aria-label] > div,
