@@ -810,6 +810,24 @@
     border-bottom: 1px solid hsl(160 16% 90%);
     padding-bottom: 1.25rem;
   }
+  /* Free-standing page heading/intro text (not inside a card) gets the same
+     left gutter as card content, so it lines up with the text inside cards. */
+  .official-page-header,
+  .official-home-page main > header,
+  .official-home-page main > .official-home-shell > header,
+  .official-home-page main > .official-page-shell > header {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+  }
+  @media (min-width: 640px) {
+    .official-page-header,
+    .official-home-page main > header,
+    .official-home-page main > .official-home-shell > header,
+    .official-home-page main > .official-page-shell > header {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
   .official-page-breadcrumb {
     display: flex;
     flex-wrap: wrap;
