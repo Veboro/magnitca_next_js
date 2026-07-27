@@ -3,6 +3,7 @@ import { Suspense, type PropsWithChildren } from "react";
 import { GoogleAnalytics } from "@/components/next/google-analytics";
 import { AppShell } from "@/components/next/app-shell";
 import { Providers } from "@/components/next/providers";
+import { ScrollToTop } from "@/components/next/scroll-to-top";
 import type { SiteLocale } from "@/lib/locale";
 import {
   SITE_DESCRIPTION,
@@ -66,6 +67,7 @@ export function PublicRootLayoutBody({
 }: PropsWithChildren<{ locale: SiteLocale }>) {
   return (
     <body className="official-home official-home-page">
+      <ScrollToTop />
       <Suspense fallback={null}>
         <GoogleAnalytics />
       </Suspense>
