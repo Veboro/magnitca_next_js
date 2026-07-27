@@ -298,7 +298,7 @@ export default async function SamopochuttyaPage({ locale }: { locale: SiteLocale
   let initialHasMore = false;
   let initialNextOffset = 0;
   try {
-    const first = await fetchApprovedNotes({ days: 30, limit: FEED_PAGE_SIZE, priorityLocale: locale });
+    const first = await fetchApprovedNotes({ days: 30, limit: FEED_PAGE_SIZE });
     initialNotes = first.notes;
     initialHasMore = first.hasMore;
     initialNextOffset = first.nextOffset;

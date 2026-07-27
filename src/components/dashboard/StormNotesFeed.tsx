@@ -386,12 +386,10 @@ export function StormNotesFeed({
       if (date) params.set("date", date);
       if (minAge > 0) params.set("minAge", String(minAge));
       if (gender !== "all") params.set("gender", gender);
-      // Lead with this page's own language unless the reader has narrowed to a
-      // specific country, where an explicit locale filter already applies.
-      if (country === "all") params.set("priority", locale);
+      // Newest first, regardless of language (no locale priority).
       return `/api/storm-notes?${params.toString()}`;
     },
-    [country, date, minAge, gender, locale],
+    [country, date, minAge, gender],
   );
 
   // Fetch page one for the current filters. `showLoading` clears the list first
@@ -530,14 +528,9 @@ export function StormNotesFeed({
     }
     return Array.from(byDate.entries())
       .sort((a, b) => (a[0] < b[0] ? 1 : -1))
-      .map(([date, items]) => ({
-        date,
-        // Within each day, surface notes written in the page's language first.
-        items: [...items].sort(
-          (a, b) => Number(b.locale === locale) - Number(a.locale === locale),
-        ),
-      }));
-  }, [notes, locale]);
+      // Keep the API order within each day (newest created_at first).
+      .map(([date, items]) => ({ date, items }));
+  }, [notes]);
 
   return (
     <div className={cn("space-y-6", className)}>

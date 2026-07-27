@@ -146,7 +146,7 @@ export function HomeStormNotesPreview({ locale, className }: { locale: SiteLocal
   useEffect(() => {
     let cancelled = false;
     const load = () => {
-      const params = new URLSearchParams({ days: "30", limit: "4", priority: locale });
+      const params = new URLSearchParams({ days: "30", limit: "4" });
       fetch(`/api/storm-notes?${params.toString()}`)
         .then((response) => (response.ok ? response.json() : Promise.reject()))
         .then((data) => {
