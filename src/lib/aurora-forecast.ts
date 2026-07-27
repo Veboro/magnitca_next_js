@@ -318,6 +318,13 @@ function getHungarianSummaryLabel(topChance: number) {
   return "Szinte nincs";
 }
 
+function getBulgarianSummaryLabel(topChance: number) {
+  if (topChance >= 75) return "Висок";
+  if (topChance >= 45) return "Умерен";
+  if (topChance >= 18) return "Нисък";
+  return "Почти никакъв";
+}
+
 function getEuropeSummaryLabel(topChance: number) {
   if (topChance >= 75) return "High chance";
   if (topChance >= 45) return "Moderate chance";
@@ -463,6 +470,34 @@ function getHungarianRegionNote(chance: number, effectiveKp: number, nightCloud:
   }
 
   return "a láthatóság nagyon erős geomágneses vihar és tiszta ég nélkül valószínűtlen";
+}
+
+function getBulgarianRegionNote(chance: number, effectiveKp: number, nightCloud: number | null, lat: number, moonIllumination: number) {
+  if (effectiveKp < 5.2) {
+    return "геомагнитната активност засега е твърде слаба за реалистична видимост на сиянието в България";
+  }
+
+  if (nightCloud !== null && nightCloud >= 80) {
+    return "активността може да е повишена, но плътната облачност може почти напълно да скрие сиянието";
+  }
+
+  if (moonIllumination >= 75 && chance < 58) {
+    return "ярката Луна може да намали видимостта на слабото сияние ниско над северния хоризонт";
+  }
+
+  if (chance >= 58) {
+    return "потърсете тъмно място с открит северен хоризонт след пълното мръкване";
+  }
+
+  if (chance >= 38) {
+    return "възможна е слаба дъга или сияние ниско над северния хоризонт, особено извън градовете";
+  }
+
+  if (lat >= 43.5) {
+    return "шансът е нисък, но по-северното разположение помага при по-силни геомагнитни бури";
+  }
+
+  return "видимостта е малко вероятна без много силна геомагнитна буря и ясно небе";
 }
 
 function getEuropeCountryNote(chance: number, effectiveKp: number, nightCloud: number | null, lat: number, moonIllumination: number) {
@@ -869,6 +904,48 @@ export const getHungaryAuroraForecast = unstable_cache(
       note: getHungarianRegionNote,
     }),
   ["hungary-aurora-forecast"],
+  { revalidate: 900 },
+);
+
+export const getBulgariaAuroraForecast = unstable_cache(
+  () =>
+    getGeoJsonAuroraForecast({
+      geoJsonPath: "public/geo/bulgaria-provinces.geojson",
+      timezone: "Europe/Sofia",
+      summaryLabel: getBulgarianSummaryLabel,
+      note: getBulgarianRegionNote,
+      nameOverrides: {
+        "BG-01": "Благоевград",
+        "BG-02": "Бургас",
+        "BG-03": "Варна",
+        "BG-04": "Велико Търново",
+        "BG-05": "Видин",
+        "BG-06": "Враца",
+        "BG-07": "Габрово",
+        "BG-08": "Добрич",
+        "BG-09": "Кърджали",
+        "BG-10": "Кюстендил",
+        "BG-11": "Ловеч",
+        "BG-12": "Монтана",
+        "BG-13": "Пазарджик",
+        "BG-14": "Перник",
+        "BG-15": "Плевен",
+        "BG-16": "Пловдив",
+        "BG-17": "Разград",
+        "BG-18": "Русе",
+        "BG-19": "Силистра",
+        "BG-20": "Сливен",
+        "BG-21": "Смолян",
+        "BG-22": "София-град",
+        "BG-23": "Софийска област",
+        "BG-24": "Стара Загора",
+        "BG-25": "Търговище",
+        "BG-26": "Хасково",
+        "BG-27": "Шумен",
+        "BG-28": "Ямбол",
+      },
+    }),
+  ["bulgaria-aurora-forecast"],
   { revalidate: 900 },
 );
 

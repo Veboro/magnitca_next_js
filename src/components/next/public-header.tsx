@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Eye, Gauge, HeartPulse, MapPin, MessageSquareText, Moon, Newspaper, Search, Sparkles, Sunrise, Sunset, Wind, X } from "lucide-react";
-import { getPathForLocale, getSafeLocaleSwitchPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, getSafeLocaleSwitchPath, isBgPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
 import { CITIES_HU } from "@/data/cities-hu";
+import { CITIES_BG } from "@/data/cities-bg";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
@@ -25,21 +26,33 @@ function isNavGroup(entry: NavEntry): entry is NavGroup {
 // Localized labels. Single high-traffic pages stay flat; the rest are grouped
 // into a few dropdowns so the bar stays short (and doesn't scroll on mobile).
 const NAV_TEXT: Record<string, Record<SiteLocale, string>> = {
-  home: { uk: "Головна", ru: "Главная", pl: "Start", ro: "Acasă", hu: "Főoldal", en: "Home" },
-  kp: { uk: "Kp індекс", ru: "Kp индекс", pl: "Indeks Kp", ro: "Indice Kp", hu: "Kp-index", en: "Kp index" },
-  solarWind: { uk: "Сонячний вітер", ru: "Солнечный ветер", pl: "Wiatr słoneczny", ro: "Vânt solar", hu: "Napszél", en: "Solar wind" },
-  stormCalendar: { uk: "Календар бур", ru: "Календарь бурь", pl: "Kalendarz burz", ro: "Calendar furtuni", hu: "Viharnaptár", en: "Storm calendar" },
-  moonCalendar: { uk: "Місячний календар", ru: "Лунный календарь", pl: "Kalendarz księżycowy", ro: "Calendar lunar", hu: "Holdnaptár", en: "Moon calendar" },
-  aurora: { uk: "Північне сяйво", ru: "Северное сияние", pl: "Zorza polarna", ro: "Aurora boreală", hu: "Sarki fény", en: "Aurora" },
-  test: { uk: "Тест", ru: "Тест", pl: "Test", ro: "Test", hu: "Teszt", en: "Test" },
-  reviews: { uk: "Відгуки", ru: "Отзывы", pl: "Opinie", ro: "Recenzii", hu: "Vélemények", en: "Reviews" },
-  groupCalendars: { uk: "Календарі", ru: "Календари", pl: "Kalendarze", ro: "Calendare", hu: "Naptárak", en: "Calendars" },
-  groupSky: { uk: "Небо", ru: "Небо", pl: "Niebo", ro: "Cer", hu: "Égbolt", en: "Sky" },
-  groupWellbeing: { uk: "Самопочуття", ru: "Самочувствие", pl: "Samopoczucie", ro: "Stare de bine", hu: "Közérzet", en: "Wellbeing" },
+  home: { uk: "Головна", ru: "Главная", pl: "Start", ro: "Acasă", hu: "Főoldal", bg: "Начало", en: "Home" },
+  kp: { uk: "Kp індекс", ru: "Kp индекс", pl: "Indeks Kp", ro: "Indice Kp", hu: "Kp-index", bg: "Kp-индекс", en: "Kp index" },
+  solarWind: { uk: "Сонячний вітер", ru: "Солнечный ветер", pl: "Wiatr słoneczny", ro: "Vânt solar", hu: "Napszél", bg: "Слънчев вятър", en: "Solar wind" },
+  stormCalendar: { uk: "Календар бур", ru: "Календарь бурь", pl: "Kalendarz burz", ro: "Calendar furtuni", hu: "Viharnaptár", bg: "Календар на бурите", en: "Storm calendar" },
+  moonCalendar: { uk: "Місячний календар", ru: "Лунный календарь", pl: "Kalendarz księżycowy", ro: "Calendar lunar", hu: "Holdnaptár", bg: "Лунен календар", en: "Moon calendar" },
+  aurora: { uk: "Північне сяйво", ru: "Северное сияние", pl: "Zorza polarna", ro: "Aurora boreală", hu: "Sarki fény", bg: "Северно сияние", en: "Aurora" },
+  test: { uk: "Тест", ru: "Тест", pl: "Test", ro: "Test", hu: "Teszt", bg: "Тест", en: "Test" },
+  reviews: { uk: "Відгуки", ru: "Отзывы", pl: "Opinie", ro: "Recenzii", hu: "Vélemények", bg: "Отзиви", en: "Reviews" },
+  groupCalendars: { uk: "Календарі", ru: "Календари", pl: "Kalendarze", ro: "Calendare", hu: "Naptárak", bg: "Календари", en: "Calendars" },
+  groupSky: { uk: "Небо", ru: "Небо", pl: "Niebo", ro: "Cer", hu: "Égbolt", bg: "Небе", en: "Sky" },
+  groupWellbeing: { uk: "Самопочуття", ru: "Самочувствие", pl: "Samopoczucie", ro: "Stare de bine", hu: "Közérzet", bg: "Самочувствие", en: "Wellbeing" },
 };
 
 // News page exists only in these locales.
 const NEWS_LABEL: Partial<Record<SiteLocale, string>> = { uk: "Новини", ru: "Новости", en: "News" };
+
+// Language switcher: each language shown by its own autonym.
+const LOCALE_ORDER: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "bg", "en"];
+const LOCALE_LANG: Record<SiteLocale, string> = {
+  uk: "Українська",
+  ru: "Русский",
+  pl: "Polski",
+  ro: "Română",
+  hu: "Magyar",
+  bg: "Български",
+  en: "English",
+};
 
 const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
   uk: {
@@ -62,6 +75,10 @@ const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
     brand: "Magnitca",
     tagline: "Űridőjárás és mágneses viharok",
   },
+  bg: {
+    brand: "Magnitca",
+    tagline: "Космическо време и магнитни бури",
+  },
   en: {
     brand: "Magnitca",
     tagline: "Space weather and magnetic storms",
@@ -78,6 +95,7 @@ const flagIconStops: Partial<Record<SiteLocale, string[]>> = {
   pl: ["#ffffff", "#ffffff", "#dc143c", "#dc143c"],
   ro: ["#002b7f", "#002b7f", "#fcd116", "#ce1126", "#ce1126"],
   hu: ["#ce2939", "#ce2939", "#ffffff", "#477050", "#477050"],
+  bg: ["#ffffff", "#ffffff", "#00966e", "#d62612", "#d62612"],
 };
 
 function BrandIcon({ locale }: { locale: SiteLocale }) {
@@ -153,6 +171,12 @@ const sunItems: Record<SiteLocale, Array<{ href: string; label: string }>> = {
     { href: "/sunset", label: "Napnyugta ma" },
     { href: "/sunset-tomorrow", label: "Napnyugta holnap" },
   ],
+  bg: [
+    { href: "/sunrise", label: "Изгрев днес" },
+    { href: "/sunrise-tomorrow", label: "Изгрев утре" },
+    { href: "/sunset", label: "Залез днес" },
+    { href: "/sunset-tomorrow", label: "Залез утре" },
+  ],
   en: [],
 };
 
@@ -207,7 +231,7 @@ function buildNavEntries(locale: SiteLocale): NavEntry[] {
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isBgPath(pathname) ? "bg" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const pathnameValue = pathname || "/";
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -221,6 +245,7 @@ export function PublicHeader() {
     pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
     ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
     hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
+    bg: getSafeLocaleSwitchPath(pathnameValue, "bg"),
     en: getSafeLocaleSwitchPath(pathnameValue, "en"),
   });
 
@@ -254,6 +279,12 @@ export function PublicHeader() {
       empty: "Nincs találat",
       citySection: "Városoldalak",
       oblastSection: "Régiók",
+    },
+    bg: {
+      placeholder: "Търсене на град или област",
+      empty: "Няма резултати",
+      citySection: "Страници на градове",
+      oblastSection: "Области",
     },
     en: {
       placeholder: "Search pages",
@@ -300,6 +331,14 @@ export function PublicHeader() {
       }));
     }
 
+    if (locale === "bg") {
+      return CITIES_BG.map((city) => ({
+        name: city.name,
+        href: `/bg/city/${city.slug}`,
+        searchText: `${city.name} ${city.slug}`.toLowerCase(),
+      }));
+    }
+
     if (locale === "ru") {
       return ALL_UK_CITIES.map((city) => {
         const localized = CITIES_RU[city.slug];
@@ -325,7 +364,7 @@ export function PublicHeader() {
       return [];
     }
 
-    if (locale === "pl" || locale === "ro" || locale === "hu") {
+    if (locale === "pl" || locale === "ro" || locale === "hu" || locale === "bg") {
       return getCountryRegionsByLocale(locale).map((region) => ({
         name: region.title,
         href: getCountryRegionPath(region),
@@ -376,6 +415,7 @@ export function PublicHeader() {
       pl: getSafeLocaleSwitchPath(pathnameValue, "pl"),
       ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
       hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
+      bg: getSafeLocaleSwitchPath(pathnameValue, "bg"),
       en: getSafeLocaleSwitchPath(pathnameValue, "en"),
     };
 
@@ -384,6 +424,7 @@ export function PublicHeader() {
     const plAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="pl"]');
     const roAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ro"]');
     const huAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="hu"]');
+    const bgAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="bg"]');
     const enAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="en"]');
 
     const toRelativePath = (href: string | null | undefined) => {
@@ -402,6 +443,7 @@ export function PublicHeader() {
     const plPath = toRelativePath(plAlternate?.href);
     const roPath = toRelativePath(roAlternate?.href);
     const huPath = toRelativePath(huAlternate?.href);
+    const bgPath = toRelativePath(bgAlternate?.href);
     const enPath = toRelativePath(enAlternate?.href);
 
     if (ukPath) {
@@ -422,6 +464,10 @@ export function PublicHeader() {
 
     if (huPath) {
       nextLinks.hu = huPath;
+    }
+
+    if (bgPath) {
+      nextLinks.bg = bgPath;
     }
 
     if (enPath) {
@@ -458,7 +504,7 @@ export function PublicHeader() {
   }, [cityQuery]);
 
   useEffect(() => {
-    if (!searchOpen && !openMenu) return;
+    if (!searchOpen && !openMenu && !mobileLocaleOpen) return;
 
     const handlePointerDown = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node | null;
@@ -471,6 +517,7 @@ export function PublicHeader() {
 
       setSearchOpen(false);
       setOpenMenu(null);
+      setMobileLocaleOpen(false);
     };
 
     document.addEventListener("mousedown", handlePointerDown);
@@ -480,13 +527,13 @@ export function PublicHeader() {
       document.removeEventListener("mousedown", handlePointerDown);
       document.removeEventListener("touchstart", handlePointerDown);
     };
-  }, [searchOpen, openMenu]);
+  }, [searchOpen, openMenu, mobileLocaleOpen]);
 
   const navEntries = useMemo(() => buildNavEntries(locale), [locale]);
   const resolveHref = (href: string) => getPathForLocale(href, locale);
   const isLeafActive = (href: string) => {
     const resolved = resolveHref(href);
-    const roots = ["/", "/ru", "/pl", "/ro", "/hu", "/en"];
+    const roots = ["/", "/ru", "/pl", "/ro", "/hu", "/bg", "/en"];
     if (roots.includes(resolved)) return pathnameValue === resolved;
     return pathnameValue === resolved || pathnameValue.startsWith(`${resolved}/`);
   };
@@ -681,23 +728,24 @@ export function PublicHeader() {
           >
             <Search className="h-4 w-4" />
           </button>
-          <div className="relative shrink-0 lg:hidden">
+          <div className="relative shrink-0">
             <button
               type="button"
               onClick={() => {
                 setSearchOpen(false);
                 setMobileLocaleOpen((value) => !value);
               }}
-              className="inline-flex h-10 min-w-[76px] items-center justify-between rounded-full border border-border/50 bg-card/50 px-3 text-xs font-semibold text-foreground transition-colors hover:border-primary/50"
-              aria-label={`${locale.toUpperCase()} — Language switcher`}
+              className="inline-flex h-10 items-center gap-2 rounded-full border border-border/50 bg-card/50 px-3.5 text-sm font-medium text-foreground transition-colors hover:border-primary/50"
+              aria-label="Language switcher"
               aria-expanded={mobileLocaleOpen}
+              aria-haspopup="menu"
             >
-              <span>{locale.toUpperCase()}</span>
-              <ChevronDown className="ml-2 h-3.5 w-3.5 text-muted-foreground" />
+              <span className="whitespace-nowrap">{LOCALE_LANG[locale]}</span>
+              <ChevronDown className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${mobileLocaleOpen ? "rotate-180" : ""}`} />
             </button>
             {mobileLocaleOpen && (
-              <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[88px] rounded-2xl border border-border/50 p-1.5 shadow-xl">
-                {(["uk", "ru", "pl", "ro", "hu", "en"] as SiteLocale[]).map((nextLocale) => {
+              <div className="official-header-dropdown absolute right-0 top-[calc(100%+0.5rem)] z-50 min-w-[184px] rounded-2xl border border-border/50 p-1.5 shadow-xl">
+                {LOCALE_ORDER.map((nextLocale) => {
                   const nextPath = localeLinks[nextLocale] ?? getSafeLocaleSwitchPath(pathnameValue, nextLocale);
                   const isActive = locale === nextLocale;
 
@@ -709,73 +757,15 @@ export function PublicHeader() {
                         setMobileLocaleOpen(false);
                         router.push(nextPath);
                       }}
-                      className={`official-header-dropdown-item flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-semibold transition-colors ${
+                      className={`official-header-dropdown-item flex w-full items-center rounded-xl px-3 py-2 text-sm font-medium transition-colors ${
                         isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-card"
                       }`}
                     >
-                      <span>{nextLocale.toUpperCase()}</span>
+                      <span>{LOCALE_LANG[nextLocale]}</span>
                     </button>
                   );
                 })}
               </div>
-            )}
-          </div>
-          <div className="hidden items-center rounded-full border border-border/50 bg-card/50 p-1 lg:inline-flex">
-            <Link
-              href={localeLinks.uk}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                locale === "uk" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              UA
-            </Link>
-            <Link
-              href={localeLinks.ru}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                locale === "ru" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              RU
-            </Link>
-            {localeLinks.pl && (
-              <Link
-                href={localeLinks.pl}
-                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                  locale === "pl" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                PL
-              </Link>
-            )}
-            {localeLinks.ro && (
-              <Link
-                href={localeLinks.ro}
-                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                  locale === "ro" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                RO
-              </Link>
-            )}
-            {localeLinks.hu && (
-              <Link
-                href={localeLinks.hu}
-                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                  locale === "hu" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                HU
-              </Link>
-            )}
-            {localeLinks.en && (
-              <Link
-                href={localeLinks.en}
-                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                  locale === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                EN
-              </Link>
             )}
           </div>
         </div>

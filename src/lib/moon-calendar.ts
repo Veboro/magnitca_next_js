@@ -26,12 +26,14 @@ export type MoonCalendarDay = {
   phaseLabelPl: string;
   phaseLabelRo: string;
   phaseLabelHu: string;
+  phaseLabelBg: string;
   phaseLabelEn: string;
   weekdayShortUk: string;
   weekdayShortRu: string;
   weekdayShortPl: string;
   weekdayShortRo: string;
   weekdayShortHu: string;
+  weekdayShortBg: string;
   weekdayShortEn: string;
   isToday: boolean;
 };
@@ -49,18 +51,21 @@ export type MoonMonthRoute = {
   slugPl: string;
   slugRo: string;
   slugHu: string;
+  slugBg: string;
   slugEn: string;
   labelUk: string;
   labelRu: string;
   labelPl: string;
   labelRo: string;
   labelHu: string;
+  labelBg: string;
   labelEn: string;
   hrefUk: string;
   hrefRu: string;
   hrefPl: string;
   hrefRo: string;
   hrefHu: string;
+  hrefBg: string;
   hrefEn: string;
 };
 
@@ -139,6 +144,21 @@ const HU_MONTH_SLUGS = [
   "december",
 ];
 
+const BG_MONTH_SLUGS = [
+  "yanuari",
+  "fevruari",
+  "mart",
+  "april",
+  "may",
+  "yuni",
+  "yuli",
+  "avgust",
+  "septemvri",
+  "oktomvri",
+  "noemvri",
+  "dekemvri",
+];
+
 const EN_MONTH_SLUGS = [
   "january",
   "february",
@@ -163,14 +183,14 @@ function getTodayInKyiv() {
   }).format(new Date());
 }
 
-function getWeekdayShort(dateKey: string, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD" | "hu-HU" | "en-US") {
+function getWeekdayShort(dateKey: string, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD" | "hu-HU" | "bg-BG" | "en-US") {
   return new Intl.DateTimeFormat(locale, {
     timeZone: "Europe/Kyiv",
     weekday: "short",
   }).format(new Date(`${dateKey}T12:00:00+03:00`));
 }
 
-function getMonthLabel(date: Date, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD" | "hu-HU" | "en-US") {
+function getMonthLabel(date: Date, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD" | "hu-HU" | "bg-BG" | "en-US") {
   return new Intl.DateTimeFormat(locale, {
     timeZone: "Europe/Kyiv",
     month: "long",
@@ -178,7 +198,7 @@ function getMonthLabel(date: Date, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD"
   }).format(date);
 }
 
-function getFullDateLabel(dateKey: string, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD" | "hu-HU" | "en-US") {
+function getFullDateLabel(dateKey: string, locale: "uk-UA" | "ru-RU" | "pl-PL" | "ro-MD" | "hu-HU" | "bg-BG" | "en-US") {
   return new Intl.DateTimeFormat(locale, {
     timeZone: "Europe/Kyiv",
     day: "numeric",
@@ -192,29 +212,29 @@ function phaseDistance(a: number, b: number) {
   return Math.min(diff, 1 - diff);
 }
 
-function normalizePhaseKind(phase: number): { kind: MoonPhaseKind; emoji: string; uk: string; ru: string; pl: string; ro: string; hu: string; en: string } {
+function normalizePhaseKind(phase: number): { kind: MoonPhaseKind; emoji: string; uk: string; ru: string; pl: string; ro: string; hu: string; bg: string; en: string } {
   if (phase < 0.0625 || phase >= 0.9375) {
-    return { kind: "new", emoji: "🌑", uk: "Молодик", ru: "Новолуние", pl: "Nów", ro: "Lună nouă", hu: "Újhold", en: "New Moon" };
+    return { kind: "new", emoji: "🌑", uk: "Молодик", ru: "Новолуние", pl: "Nów", ro: "Lună nouă", hu: "Újhold", bg: "Новолуние", en: "New Moon" };
   }
   if (phase < 0.1875) {
-    return { kind: "waxing_crescent", emoji: "🌒", uk: "Зростаючий серп", ru: "Растущий серп", pl: "Przybywający sierp", ro: "Semilună în creștere", hu: "Növekvő holdsarló", en: "Waxing crescent" };
+    return { kind: "waxing_crescent", emoji: "🌒", uk: "Зростаючий серп", ru: "Растущий серп", pl: "Przybywający sierp", ro: "Semilună în creștere", hu: "Növekvő holdsarló", bg: "Нарастващ сърп", en: "Waxing crescent" };
   }
   if (phase < 0.3125) {
-    return { kind: "first_quarter", emoji: "🌓", uk: "Перша чверть", ru: "Первая четверть", pl: "Pierwsza kwadra", ro: "Primul pătrar", hu: "Első negyed", en: "First quarter" };
+    return { kind: "first_quarter", emoji: "🌓", uk: "Перша чверть", ru: "Первая четверть", pl: "Pierwsza kwadra", ro: "Primul pătrar", hu: "Első negyed", bg: "Първа четвърт", en: "First quarter" };
   }
   if (phase < 0.4375) {
-    return { kind: "waxing_gibbous", emoji: "🌔", uk: "Зростаючий Місяць", ru: "Растущая Луна", pl: "Przybywający księżyc", ro: "Lună în creștere", hu: "Növekvő Hold", en: "Waxing gibbous" };
+    return { kind: "waxing_gibbous", emoji: "🌔", uk: "Зростаючий Місяць", ru: "Растущая Луна", pl: "Przybywający księżyc", ro: "Lună în creștere", hu: "Növekvő Hold", bg: "Нарастваща луна", en: "Waxing gibbous" };
   }
   if (phase < 0.5625) {
-    return { kind: "full", emoji: "🌕", uk: "Повня", ru: "Полнолуние", pl: "Pełnia", ro: "Lună plină", hu: "Telihold", en: "Full Moon" };
+    return { kind: "full", emoji: "🌕", uk: "Повня", ru: "Полнолуние", pl: "Pełnia", ro: "Lună plină", hu: "Telihold", bg: "Пълнолуние", en: "Full Moon" };
   }
   if (phase < 0.6875) {
-    return { kind: "waning_gibbous", emoji: "🌖", uk: "Спадаючий Місяць", ru: "Убывающая Луна", pl: "Ubywający księżyc", ro: "Lună în descreștere", hu: "Fogyó Hold", en: "Waning gibbous" };
+    return { kind: "waning_gibbous", emoji: "🌖", uk: "Спадаючий Місяць", ru: "Убывающая Луна", pl: "Ubywający księżyc", ro: "Lună în descreștere", hu: "Fogyó Hold", bg: "Намаляваща луна", en: "Waning gibbous" };
   }
   if (phase < 0.8125) {
-    return { kind: "last_quarter", emoji: "🌗", uk: "Остання чверть", ru: "Последняя четверть", pl: "Ostatnia kwadra", ro: "Ultimul pătrar", hu: "Utolsó negyed", en: "Last quarter" };
+    return { kind: "last_quarter", emoji: "🌗", uk: "Остання чверть", ru: "Последняя четверть", pl: "Ostatnia kwadra", ro: "Ultimul pătrar", hu: "Utolsó negyed", bg: "Последна четвърт", en: "Last quarter" };
   }
-  return { kind: "waning_crescent", emoji: "🌘", uk: "Спадаючий серп", ru: "Убывающий серп", pl: "Ubywający sierp", ro: "Semilună în descreștere", hu: "Fogyó holdsarló", en: "Waning crescent" };
+  return { kind: "waning_crescent", emoji: "🌘", uk: "Спадаючий серп", ru: "Убывающий серп", pl: "Ubywający sierp", ro: "Semilună în descreștere", hu: "Fogyó holdsarló", bg: "Намаляващ сърп", en: "Waning crescent" };
 }
 
 function targetPhase(kind: KeyMoonPhaseKind) {
@@ -238,6 +258,7 @@ export function getMoonMonthRoutes2026(): MoonMonthRoute[] {
     const slugPl = `${PL_MONTH_SLUGS[month - 1]}-2026`;
     const slugRo = `${RO_MONTH_SLUGS[month - 1]}-2026`;
     const slugHu = `${HU_MONTH_SLUGS[month - 1]}-2026`;
+    const slugBg = `${BG_MONTH_SLUGS[month - 1]}-2026`;
     const slugEn = `${EN_MONTH_SLUGS[month - 1]}-2026`;
     const date = new Date(Date.UTC(2026, month - 1, 1, 12));
     const labelUk = new Intl.DateTimeFormat("uk-UA", {
@@ -265,6 +286,11 @@ export function getMoonMonthRoutes2026(): MoonMonthRoute[] {
       month: "long",
       year: "numeric",
     }).format(date);
+    const labelBg = new Intl.DateTimeFormat("bg-BG", {
+      timeZone: "Europe/Sofia",
+      month: "long",
+      year: "numeric",
+    }).format(date);
     const labelEn = new Intl.DateTimeFormat("en-US", {
       timeZone: "Europe/Kyiv",
       month: "long",
@@ -279,24 +305,27 @@ export function getMoonMonthRoutes2026(): MoonMonthRoute[] {
       slugPl,
       slugRo,
       slugHu,
+      slugBg,
       slugEn,
       labelUk,
       labelRu,
       labelPl,
       labelRo,
       labelHu,
+      labelBg,
       labelEn,
       hrefUk: `/moon-calendar/${slugUk}`,
       hrefRu: `/ru/moon-calendar/${slugRu}`,
       hrefPl: `/pl/moon-calendar/${slugPl}`,
       hrefRo: `/ro/moon-calendar/${slugRo}`,
       hrefHu: `/hu/moon-calendar/${slugHu}`,
+      hrefBg: `/bg/moon-calendar/${slugBg}`,
       hrefEn: `/en/moon-calendar/${slugEn}`,
     };
   });
 }
 
-export function findMoonMonthRouteBySlug(locale: "uk" | "ru" | "pl" | "ro" | "hu" | "en", slug: string) {
+export function findMoonMonthRouteBySlug(locale: "uk" | "ru" | "pl" | "ro" | "hu" | "bg" | "en", slug: string) {
   return (
     getMoonMonthRoutes2026().find((item) =>
       locale === "ru"
@@ -307,9 +336,11 @@ export function findMoonMonthRouteBySlug(locale: "uk" | "ru" | "pl" | "ro" | "hu
             ? item.slugRo === slug
             : locale === "hu"
               ? item.slugHu === slug
-              : locale === "en"
-                ? item.slugEn === slug
-                : item.slugUk === slug
+              : locale === "bg"
+                ? item.slugBg === slug
+                : locale === "en"
+                  ? item.slugEn === slug
+                  : item.slugUk === slug
     ) ?? null
   );
 }
@@ -341,12 +372,14 @@ export async function getMoonCalendarOverview(year?: number, month?: number) {
       phaseLabelPl: phaseInfo.pl,
       phaseLabelRo: phaseInfo.ro,
       phaseLabelHu: phaseInfo.hu,
+      phaseLabelBg: phaseInfo.bg,
       phaseLabelEn: phaseInfo.en,
       weekdayShortUk: getWeekdayShort(dateKey, "uk-UA"),
       weekdayShortRu: getWeekdayShort(dateKey, "ru-RU"),
       weekdayShortPl: getWeekdayShort(dateKey, "pl-PL"),
       weekdayShortRo: getWeekdayShort(dateKey, "ro-MD"),
       weekdayShortHu: getWeekdayShort(dateKey, "hu-HU"),
+      weekdayShortBg: getWeekdayShort(dateKey, "bg-BG"),
       weekdayShortEn: getWeekdayShort(dateKey, "en-US"),
       isToday: dateKey === todayKey,
     };
@@ -371,12 +404,14 @@ export async function getMoonCalendarOverview(year?: number, month?: number) {
     monthLabelPl: getMonthLabel(monthStart, "pl-PL"),
     monthLabelRo: getMonthLabel(monthStart, "ro-MD"),
     monthLabelHu: getMonthLabel(monthStart, "hu-HU"),
+    monthLabelBg: getMonthLabel(monthStart, "bg-BG"),
     monthLabelEn: getMonthLabel(monthStart, "en-US"),
     todayLabelUk: getFullDateLabel(todayKey, "uk-UA"),
     todayLabelRu: getFullDateLabel(todayKey, "ru-RU"),
     todayLabelPl: getFullDateLabel(todayKey, "pl-PL"),
     todayLabelRo: getFullDateLabel(todayKey, "ro-MD"),
     todayLabelHu: getFullDateLabel(todayKey, "hu-HU"),
+    todayLabelBg: getFullDateLabel(todayKey, "bg-BG"),
     todayLabelEn: getFullDateLabel(todayKey, "en-US"),
     currentPhase,
     keyPhases,
@@ -388,6 +423,7 @@ export async function getMoonCalendarOverview(year?: number, month?: number) {
     absoluteMonthUrlPl: absoluteUrl("/pl/moon-calendar"),
     absoluteMonthUrlRo: absoluteUrl("/ro/moon-calendar"),
     absoluteMonthUrlHu: absoluteUrl("/hu/moon-calendar"),
+    absoluteMonthUrlBg: absoluteUrl("/bg/moon-calendar"),
     absoluteMonthUrlEn: absoluteUrl("/en/moon-calendar"),
   };
 }

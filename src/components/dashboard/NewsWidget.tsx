@@ -13,9 +13,10 @@ export const NewsWidget = ({ className }: { className?: string }) => {
   const isPolish = i18n.language.startsWith("pl");
   const isRomanian = i18n.language.startsWith("ro");
   const isHungarian = i18n.language.startsWith("hu");
+  const isBulgarian = i18n.language.startsWith("bg");
   const isEnglish = i18n.language.startsWith("en");
-  const locale = isRussian ? "ru-RU" : isPolish ? "pl-PL" : isRomanian ? "ro-MD" : isHungarian ? "hu-HU" : isEnglish ? "en-US" : "uk-UA";
-  const langPrefix = isRussian ? "/ru" : isPolish ? "/pl" : isRomanian ? "/ro" : isHungarian ? "/hu" : isEnglish ? "/en" : "";
+  const locale = isRussian ? "ru-RU" : isPolish ? "pl-PL" : isRomanian ? "ro-MD" : isHungarian ? "hu-HU" : isBulgarian ? "bg-BG" : isEnglish ? "en-US" : "uk-UA";
+  const langPrefix = isRussian ? "/ru" : isPolish ? "/pl" : isRomanian ? "/ro" : isHungarian ? "/hu" : isBulgarian ? "/bg" : isEnglish ? "/en" : "";
 
   const formatDate = (dateStr: string) => new Date(dateStr).toLocaleDateString(locale, { day: "numeric", month: "short" });
 
@@ -24,7 +25,7 @@ export const NewsWidget = ({ className }: { className?: string }) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("news")
-        .select("id, title_uk, slug_uk, title_ru, slug_ru, title_pl, slug_pl, title_ro, slug_ro, title_hu, slug_hu, title_en, slug_en, published_at")
+        .select("id, title_uk, slug_uk, title_ru, slug_ru, title_pl, slug_pl, title_ro, slug_ro, title_hu, slug_hu, title_bg, slug_bg, title_en, slug_en, published_at")
         .eq("status", "published")
         .neq("source", "telegram_ai")
         .order("published_at", { ascending: false })
@@ -33,8 +34,8 @@ export const NewsWidget = ({ className }: { className?: string }) => {
       return (data ?? [])
         .map((item) => ({
           id: item.id,
-          title: isRussian ? item.title_ru : isPolish ? item.title_pl : isRomanian ? item.title_ro : isHungarian ? item.title_hu : isEnglish ? item.title_en : item.title_uk,
-          slug: isRussian ? item.slug_ru : isPolish ? item.slug_pl : isRomanian ? item.slug_ro : isHungarian ? item.slug_hu : isEnglish ? item.slug_en : item.slug_uk,
+          title: isRussian ? item.title_ru : isPolish ? item.title_pl : isRomanian ? item.title_ro : isHungarian ? item.title_hu : isBulgarian ? item.title_bg : isEnglish ? item.title_en : item.title_uk,
+          slug: isRussian ? item.slug_ru : isPolish ? item.slug_pl : isRomanian ? item.slug_ro : isHungarian ? item.slug_hu : isBulgarian ? item.slug_bg : isEnglish ? item.slug_en : item.slug_uk,
           published_at: item.published_at,
         }))
         .filter((item) => item.title && item.slug) as NewsItem[];

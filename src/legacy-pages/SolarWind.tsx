@@ -277,6 +277,59 @@ const localizedCopy = {
       { q: "Milyen gyakran frissülnek az adatok?", a: "Az adatok NOAA mérésekből származnak és rendszeresen frissülnek." },
     ],
   },
+  bg: {
+    ...copy.pl,
+    pageTitle: "Слънчев вятър онлайн в реално време — скорост и плътност",
+    pageDescription:
+      "Актуален слънчев вятър в реално време: скорост, плътност и графика за последните 2 часа по данни на NOAA DSCOVR.",
+    heroTitle: "Слънчев вятър днес",
+    heroText:
+      "Скоростта и плътността на слънчевия вятър в реално време. Графика за последните 2 часа и компонентата на междупланетното магнитно поле IMF Bz.",
+    currentAria: "Текущи стойности на слънчевия вятър",
+    speed: "Скорост",
+    density: "Плътност",
+    normal: "Нормална",
+    elevated: "Повишена",
+    stronglySouth: "Силно южен",
+    south: "Южен",
+    weaklySouth: "Слабо южен",
+    north: "Северен",
+    speedChartAria: "Графика на скоростта и плътността на слънчевия вятър",
+    speedChartTitle: "Скорост и плътност — последните 2 часа",
+    bzChartAria: "Графика на IMF Bz",
+    bzChartTitle: "Междупланетно магнитно поле (Bz) — последните 2 часа",
+    loading: "Зареждане...",
+    bzNote:
+      "Отрицателната стойност на Bz (южна) улеснява проникването на слънчевия вятър в магнитосферата на Земята. Под -5 nT рискът от геомагнитна буря значително нараства.",
+    scaleAria: "Скала на скоростта на слънчевия вятър",
+    scaleTitle: "Скала на скоростта на слънчевия вятър (км/с)",
+    seoAria: "За слънчевия вятър",
+    seoHeading: "Какво е слънчевият вятър и защо е важен?",
+    seoText1:
+      "Слънчевият вятър е непрекъснат поток от заредени частици, изтичащ от короната на Слънцето. Скоростта му обикновено е между 300 и над 800 км/с, а плътността може бързо да се променя.",
+    seoText2:
+      "Когато скоростта и плътността на слънчевия вятър нарастват, натискът върху магнитосферата на Земята се увеличава. Особено значение има компонентата Bz: отрицателните стойности повишават вероятността за геомагнитни смущения.",
+    faqAria: "Често задавани въпроси за слънчевия вятър",
+    faqTitle: "Често задавани въпроси",
+    tooltipKyiv: "местно време",
+    areaSpeed: "Скорост",
+    areaDensity: "Плътност",
+    speedLevels: [
+      { range: "< 300", status: "Бавен", color: "bg-storm-quiet", description: "Бавен слънчев вятър, обикновено без значително въздействие." },
+      { range: "300-400", status: "Нормален", color: "bg-storm-quiet", description: "Типична скорост на слънчевия вятър и спокойни геомагнитни условия." },
+      { range: "400-500", status: "Повишен", color: "bg-storm-minor", description: "Може да способства за леки геомагнитни смущения." },
+      { range: "500-600", status: "Висок", color: "bg-storm-moderate", description: "Нараства вероятността за по-осезаеми смущения." },
+      { range: "600-800", status: "Много висок", color: "bg-storm-strong", description: "Може да допринесе за по-силни магнитни бури." },
+      { range: "> 800", status: "Екстремален", color: "bg-storm-severe", description: "Много бърз поток с висок потенциал за геомагнитни смущения." },
+    ],
+    faqItems: [
+      { q: "Какво е слънчевият вятър?", a: "Слънчевият вятър е поток от заредени частици, идващ от Слънцето и движещ се в междупланетното пространство." },
+      { q: "Защо е важна скоростта?", a: "По-високата скорост означава по-силен натиск върху магнитосферата на Земята." },
+      { q: "Какво е плътността?", a: "Плътността показва колко частици се съдържат в даден обем от слънчевия вятър." },
+      { q: "Какво означава Bz?", a: "Bz е вертикалната компонента на междупланетното магнитно поле. Отрицателните стойности повишават вероятността за геомагнитна активност." },
+      { q: "Колко често се обновяват данните?", a: "Данните идват от измерванията на NOAA и се обновяват редовно." },
+    ],
+  },
   en: {
     ...copy.uk,
     pageTitle: "Solar wind online in real time — speed and density",
@@ -333,7 +386,7 @@ const localizedCopy = {
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "en" ? "UTC" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "bg" ? "Europe/Sofia" : locale === "en" ? "UTC" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -369,8 +422,8 @@ const getSpeedStatus = (speed: number, locale: SiteLocale) => {
 const CustomTooltip = ({ active, payload, label, locale = "uk" }: any) => {
   if (!active || !payload) return null;
   const t = localizedCopy[locale as SiteLocale];
-  const speedUnit = locale === "uk" || locale === "ru" ? "км/с" : "km/s";
-  const densityUnit = locale === "uk" ? "p/см³" : locale === "ru" ? "p/см³" : "p/cm³";
+  const speedUnit = locale === "uk" || locale === "ru" || locale === "bg" ? "км/с" : "km/s";
+  const densityUnit = locale === "uk" ? "p/см³" : locale === "ru" ? "p/см³" : locale === "bg" ? "p/см³" : "p/cm³";
   return (
     <div className="rounded-md border border-border bg-card p-3 shadow-lg">
       <p className="mb-1 font-mono text-xs text-muted-foreground">{label} {t.tooltipKyiv}</p>
@@ -391,10 +444,10 @@ interface SolarWindProps {
 
 const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
-  const speedUnit = locale === "uk" || locale === "ru" ? "км/с" : "km/s";
-  const densityUnit = locale === "uk" || locale === "ru" ? "p/см³" : "p/cm³";
+  const speedUnit = locale === "uk" || locale === "ru" || locale === "bg" ? "км/с" : "km/s";
+  const densityUnit = locale === "uk" || locale === "ru" || locale === "bg" ? "p/см³" : "p/cm³";
   const today = todayStr(localeTag, timeZone);
 
   const { data: windData, isLoading: windLoading } = useSolarWind(initialWind ?? undefined);

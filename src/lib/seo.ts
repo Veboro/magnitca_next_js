@@ -221,6 +221,55 @@ const HU_PAGE_META: Record<string, { title: string; description: string }> = {
   },
 };
 
+const BG_PAGE_META: Record<string, { title: string; description: string }> = {
+  home: {
+    title: "Магнитни бури днес — Kp-индекс, слънчев вятър и прогноза | Magnitca",
+    description:
+      "Българската версия на Magnitca следи в реално време магнитните бури, Kp-индекса, слънчевия вятър и прогнозата за космическото време.",
+  },
+  about: {
+    title: "За проекта Magnitca — данни от NOAA и прогноза за магнитни бури",
+    description: "Информация за услугата Magnitca, източниците на данни от NOAA и редакционния подход.",
+  },
+  contacts: {
+    title: "Контакт с Magnitca — въпроси и сътрудничество",
+    description: "Връзка с екипа на Magnitca: въпроси, сътрудничество и сигнали за грешки.",
+  },
+  privacy: {
+    title: "Политика за поверителност на Magnitca",
+    description: "Поверителност, анализи и обработка на данни в услугата Magnitca.",
+  },
+  cookies: {
+    title: "Политика за бисквитките на Magnitca",
+    description: "Информация за бисквитките и аналитичните инструменти, използвани от Magnitca.",
+  },
+  terms: {
+    title: "Условия за ползване на Magnitca",
+    description: "Правила за използване на Magnitca, ограничения на отговорността и информативен характер на съдържанието.",
+  },
+  faq: {
+    title: "Магнитни бури: ЧЗВ за Kp-индекса, слънчевия вятър и въздействието",
+    description: "Често задавани въпроси за магнитните бури, Kp-индекса и влиянието върху организма.",
+  },
+  kp_index: {
+    title: "Kp-индекс днес — онлайн графика и прогноза за магнитни бури",
+    description: "Актуален Kp-индекс, графика и прогноза за геомагнитната активност в българската версия на Magnitca.",
+  },
+  solar_wind: {
+    title: "Слънчев вятър днес — скорост, плътност и IMF Bz онлайн",
+    description: "Скорост и плътност на слънчевия вятър и компонентата IMF Bz в реално време.",
+  },
+  calendar: {
+    title: "Календар на магнитните бури — прогноза за геомагнитната активност",
+    description: "Календар и прогноза за геомагнитната активност през следващите дни.",
+  },
+  news: {
+    title: "Новини за магнитните бури",
+    description:
+      "Ежедневни новини за магнитните бури, геомагнитната активност, прогнозите на NOAA и влиянието на космическото време върху самочувствието.",
+  },
+};
+
 const EN_PAGE_META: Record<string, { title: string; description: string }> = {
   home: {
     title: "Magnetic storms today — Kp index, solar wind and forecast | Magnitca",
@@ -276,6 +325,7 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   pl: "pl_PL",
   ro: "ro_MD",
   hu: "hu_HU",
+  bg: "bg_BG",
   en: "en_US",
 };
 
@@ -290,6 +340,7 @@ export async function resolveLocalizedMetadata(
   const plUrl = getPathForLocale(path, "pl");
   const roUrl = getPathForLocale(path, "ro");
   const huUrl = getPathForLocale(path, "hu");
+  const bgUrl = getPathForLocale(path, "bg");
   const enUrl = getPathForLocale(path, "en");
   const ukMeta = locale === "uk" ? await getPageMeta(pageKey) : null;
   const meta =
@@ -304,9 +355,11 @@ export async function resolveLocalizedMetadata(
           ? RO_PAGE_META[pageKey]
           : locale === "hu"
             ? HU_PAGE_META[pageKey]
-            : locale === "en"
-              ? EN_PAGE_META[pageKey]
-              : PL_PAGE_META[pageKey];
+            : locale === "bg"
+              ? BG_PAGE_META[pageKey]
+              : locale === "en"
+                ? EN_PAGE_META[pageKey]
+                : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
   const description = meta?.description || SITE_DESCRIPTION;
 
@@ -316,6 +369,7 @@ export async function resolveLocalizedMetadata(
     pl: plUrl,
     ro: roUrl,
     hu: huUrl,
+    bg: bgUrl,
     en: enUrl,
   };
 

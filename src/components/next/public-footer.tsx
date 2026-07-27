@@ -3,7 +3,7 @@
 import type { JSX } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getPathForLocale, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, isBgPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { SOCIAL_PROFILES, type SocialKey } from "@/lib/site";
 
 const SOCIAL_ICONS: Record<SocialKey, JSX.Element> = {
@@ -114,6 +114,19 @@ const copy: Record<
     usageNotice:
       "Az oldal minden anyaga, beleértve a szövegeket, grafikákat, oldalelrendezéseket, elemző összeállításokat és szerkesztőségi tartalmakat, jogi védelem alatt áll. Az anyagok újraközlése, másolása, átdolgozása vagy bármilyen egyéb felhasználása csak a magnitca.com oldalra mutató kötelező aktív hivatkozással engedélyezett; a forrásmegjelölés nélküli vagy kereskedelmi célú felhasználás a szerkesztőség írásos engedélye nélkül tilos.",
   },
+  bg: {
+    contacts: "Контакти",
+    about: "За проекта",
+    privacy: "Политика за поверителност",
+    cookies: "Политика за бисквитки",
+    terms: "Условия за ползване",
+    faq: "ЧЗВ",
+    rss: "RSS",
+    follow: "Последвайте ни",
+    copyright: "Magnitca. Всички права запазени.",
+    usageNotice:
+      "Всички материали на сайта, включително текстове, графики, оформление на страниците, аналитични подборки и редакционни публикации, са защитени от закона. Препечатването, копирането, адаптирането или всяко друго използване на материалите е разрешено само със задължителна активна връзка към magnitca.com; използването без посочване на източника или с търговска цел без писменото съгласие на редакцията е забранено.",
+  },
   en: {
     contacts: "Contacts",
     about: "About",
@@ -131,11 +144,16 @@ const copy: Record<
 
 export function PublicFooter() {
   const pathname = usePathname();
-  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isBgPath(pathname) ? "bg" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const regionalSource = locale === "hu"
     ? {
         href: "https://met.hu/",
         label: "HungaroMet",
+      }
+    : locale === "bg"
+    ? {
+        href: "https://www.weather.bg/",
+        label: "НИМХ",
       }
     : locale === "uk"
       ? {

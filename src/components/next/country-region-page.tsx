@@ -129,6 +129,45 @@ const copy = {
     regionNote: "{{title}} ({{country}}): előrejelzés a régióra és a Magnitca katalógusában elérhető városokra.",
     now: "most",
   },
+  bg: {
+    titlePrefix: "Магнитни бури в",
+    today: "днес",
+    intro:
+      "Регионална прогноза за космическото време: актуален Kp-индекс, слънчев вятър, Bz, прогноза за 3 дни и локални страници за градовете в региона.",
+    pollTitle: "Как се чувстват хората днес",
+    currentStatus: "Текуща ситуация",
+    impactTitle: "Влияние върху организма",
+    impactMagnetic: "Магнитни бури",
+    impactWind: "Слънчев вятър",
+    impactTotal: "Общо влияние",
+    gLevel: "Ниво на буря G",
+    kpToday: "Kp днес",
+    wind: "Слънчев вятър",
+    bz: "Bz (IMF)",
+    forecastTitle: "Прогноза за Kp за 3 дни",
+    maxKp: "макс. Kp",
+    cities: "Градове в региона",
+    goToCity: "Към града",
+    hintTitle: "Как да четем прогнозата",
+    hintText:
+      "Ниските стойности на Kp обикновено се усещат слабо. При Kp около 4-5 чувствителните към времето хора може по-често да усещат умора, главоболие или по-слаба концентрация.",
+    faqTitle: "Често задавани въпроси",
+    faqStormQuestion: "Има ли магнитна буря в региона днес?",
+    faqPeakQuestion: "Кога през следващите дни Kp може да е най-висок?",
+    faqCitiesQuestion: "Къде да проверя по-точни локални данни?",
+    faqStormCalm: "Към момента прогнозата не показва силна магнитна буря, но си струва да следите Kp и слънчевия вятър през деня.",
+    faqStormActive: "Да, геомагнитната активност е повишена или се доближава до нивото на магнитна буря.",
+    faqPeakPrefix: "Най-високата прогнозирана стойност на Kp за следващите 3 дни е",
+    faqPeakSuffix: "Това е най-активният период от краткосрочната прогноза.",
+    faqCitiesPrefix: "Подробни локални страници са налични за градовете:",
+    calm: "Спокойно",
+    low: "Ниска активност",
+    moderate: "Умерена буря",
+    strong: "Силна буря",
+    extreme: "Екстремна буря",
+    regionNote: "{{title}} ({{country}}): прогноза за региона и за градовете, налични в каталога на Magnitca.",
+    now: "сега",
+  },
 } as const;
 
 type RegionLocale = keyof typeof copy;
@@ -220,7 +259,7 @@ function aggregateForecastDays(items: KpForecastEntry[] | null, timeZone: string
 }
 
 function formatShortDate(date: string, locale: RegionLocale) {
-  const localeTag = locale === "pl" ? "pl-PL" : locale === "hu" ? "hu-HU" : "ro-RO";
+  const localeTag = locale === "pl" ? "pl-PL" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : "ro-RO";
   return new Intl.DateTimeFormat(localeTag, {
     day: "numeric",
     month: "long",
@@ -231,7 +270,7 @@ export async function CountryRegionPage({ region }: { region: CountryRegionRoute
   const t = copy[region.locale];
   const cities = getCountryRegionCities(region);
   const primaryCity = cities[0];
-  const timeZone = primaryCity?.timezone ?? (region.locale === "hu" ? "Europe/Budapest" : region.locale === "pl" ? "Europe/Warsaw" : "Europe/Bucharest");
+  const timeZone = primaryCity?.timezone ?? (region.locale === "hu" ? "Europe/Budapest" : region.locale === "pl" ? "Europe/Warsaw" : region.locale === "bg" ? "Europe/Sofia" : "Europe/Bucharest");
 
   const { kpData, windData, magData, scales, forecast3Day } = await getHomePageWeatherData().catch(() => ({
     kpData: null,

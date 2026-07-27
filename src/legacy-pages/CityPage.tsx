@@ -18,6 +18,7 @@ import { ALL_UK_CITIES, getCityBySlug } from "@/data/cities";
 import { getLocalizedCity, getRuCitySlug } from "@/data/cities-ru";
 import { getCityByMdSlug } from "@/data/cities-md";
 import { getCityByHuSlug } from "@/data/cities-hu";
+import { getCityByBgSlug } from "@/data/cities-bg";
 import { getCityByPlSlug } from "@/data/cities-pl";
 import { UKRAINE_REGION_GROUPS } from "@/data/ukraine-city-catalog";
 import { StormStatusBanner } from "@/components/dashboard/StormStatusBanner";
@@ -387,6 +388,76 @@ const copy = {
     home: "Főoldal",
     breadcrumbAria: "Oldalnavigáció",
   },
+  bg: {
+    calm: "Спокойно",
+    low: "Ниска активност",
+    moderate: "Умерена буря",
+    strong: "Силна буря",
+    extreme: "Екстремна буря",
+    geoSituation: "Геомагнитна обстановка в",
+    sunriseSunset: "Изгрев / залез на слънцето",
+    sunrise: "Изгрев",
+    sunset: "Залез",
+    dayLength: "Продължителност на деня",
+    coordinates: "Координати",
+    latitude: "Ширина",
+    longitude: "Дължина",
+    timezone: "Часова зона",
+    radiation: "Радиационен фон",
+    normal: "В границите на нормата",
+    forecast3: "Прогноза за Kp индекс за",
+    forecast3suffix: "за 3 дни (на 3-часови интервали)",
+    loading: "Зареждане на прогнозата...",
+    unavailable: "Данните за прогнозата не са налични.",
+    max: "макс. Kp",
+    forecast3Foot1: "Прогноза за Kp индекс за град",
+    forecast3Foot2: "от NOAA Space Weather Prediction Center. Местно време",
+    forecast27: "Прогноза за Kp за 27 дни —",
+    forecast27Foot1: "27-дневна прогноза за Kp индекс за град",
+    forecast27Foot2: "от NOAA SWPC. Точността намалява с всеки ден — използвайте за общо планиране.",
+    airQuality: "Качество на въздуха",
+    currentMetrics: "Текущи показатели",
+    wind: "Вятър",
+    humidity: "Влажност",
+    pressure: "Налягане",
+    cloudiness: "Облачност",
+    uv: "UV индекс",
+    kpIndex: "Kp индекс",
+    high: "Висока",
+    medium: "Умерена",
+    lowHumidity: "Ниска",
+    overcast: "Плътна",
+    variable: "Променлива",
+    clear: "Ясно",
+    uvVeryHigh: "Много висок",
+    uvHigh: "Висок",
+    uvMedium: "Умерен",
+    uvLow: "Нисък",
+    aboutPage: "За страницата",
+    cityNotFound: "Градът не е намерен",
+    srOnlyHeading: "Магнитни бури в",
+    srOnlySuffix: "време и качество на въздуха",
+    geoActivityStatus: "Статус на геомагнитната активност в",
+    forecast3Aria: "Прогноза за Kp индекс за 3 дни",
+    forecast27Aria: "Прогноза за Kp за 27 дни",
+    seoHeading: "Магнитни бури в",
+    today: "днес",
+    currentKp: "Текущ Kp индекс",
+    stormLevel: "ниво на геомагнитната буря",
+    forecastRange: "Прогнозиран диапазон на Kp за денонощие",
+    radioBlackout: "Скала на радиозатъмненията",
+    radiationStorm: "скала на радиационните бури",
+    temperature: "Температура на въздуха",
+    windSpeed: "вятър",
+    airIndex: "Индекс за качество на въздуха AQI",
+    dataSource: "Данни",
+    popularInRegion: "Популярни градове",
+    hydrometWarning: "Предупреждение от метеослужбата",
+    hydrometSource: "Източник: НИМХ",
+    hydrometUnavailable: "Предупреждението временно не е налично",
+    home: "Начало",
+    breadcrumbAria: "Навигация в страницата",
+  },
 } as const;
 
 const getKpStatus = (kp: number, locale: SiteLocale) => {
@@ -489,11 +560,13 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         ? getCityByMdSlug(resolvedSlug)
       : locale === "hu"
         ? getCityByHuSlug(resolvedSlug)
+      : locale === "bg"
+        ? getCityByBgSlug(resolvedSlug)
       : getCityBySlug(resolvedSlug)
     : undefined;
   const city = cityBase ? (locale === "ru" ? getLocalizedCity(cityBase, "ru") : cityBase) : undefined;
   const t = copy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : "uk-UA";
 
   const { data, isLoading } = useCityWeather(city?.lat, city?.lon, city?.timezone, initialWeather ?? undefined, locale);
   const { data: sunTimes } = useCitySunTimes({
@@ -538,7 +611,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         : `${t.popularInRegion} ${regionTitleForHeading}`
     : t.popularInRegion;
   const popularRegionCities =
-    locale === "pl" || locale === "ro" || locale === "hu" || !regionGroup || !cityBase
+    locale === "pl" || locale === "ro" || locale === "hu" || locale === "bg" || !regionGroup || !cityBase
       ? []
       : regionGroup.slugs
           .filter((candidateSlug) => candidateSlug !== cityBase.slug)
@@ -549,7 +622,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             const href = locale === "ru" ? `/ru/city/${getRuCitySlug(candidate)}` : `/city/${candidate.slug}`;
             return { name: localized.name, href };
           });
-  const oblastPaths = regionGroup && locale !== "pl" && locale !== "ro" && locale !== "hu" ? getOblastPathsByKey(regionGroup.key) : null;
+  const oblastPaths = regionGroup && locale !== "pl" && locale !== "ro" && locale !== "hu" && locale !== "bg" ? getOblastPathsByKey(regionGroup.key) : null;
   const oblastHref =
     locale === "ru"
       ? oblastPaths?.ru
@@ -557,11 +630,11 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
         ? oblastPaths?.uk
         : null;
   const oblastName =
-    regionGroup && locale !== "pl" && locale !== "ro" && locale !== "hu"
+    regionGroup && locale !== "pl" && locale !== "ro" && locale !== "hu" && locale !== "bg"
       ? getOblastTitle(locale === "ru" ? "ru" : "uk", regionGroup.key) ?? regionTitle
       : null;
-  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : "/";
-  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : locale === "ro" ? `/ro/city/${city.slug}` : locale === "hu" ? `/hu/city/${city.slug}` : `/city/${city.slug}`;
+  const homeHref = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : locale === "bg" ? "/bg" : "/";
+  const cityHref = locale === "ru" ? `/ru/city/${getRuCitySlug(cityBase)}` : locale === "pl" ? `/pl/city/${city.slug}` : locale === "ro" ? `/ro/city/${city.slug}` : locale === "hu" ? `/hu/city/${city.slug}` : locale === "bg" ? `/bg/city/${city.slug}` : `/city/${city.slug}`;
   const countryName = locale === "ro" ? city.country : null;
   const countryHref = locale === "ro" && city.countrySlug ? `/ro/country/${city.countrySlug}` : null;
   const breadcrumbItems = [
@@ -570,7 +643,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
     ...(oblastHref && oblastName ? [{ name: oblastName, url: absoluteUrl(oblastHref) }] : []),
     { name: city.name, url: absoluteUrl(cityHref) },
   ];
-  const uhmcRegionCode = locale === "pl" || locale === "ro" || locale === "hu" ? null : getUhmcRegionCode(regionGroup?.key);
+  const uhmcRegionCode = locale === "pl" || locale === "ro" || locale === "hu" || locale === "bg" ? null : getUhmcRegionCode(regionGroup?.key);
   const hungaroMetCounty = locale === "hu" ? getHungaroMetCountyForCity(city.slug) : null;
   const { data: uhmcWarning } = useQuery({
     queryKey: ["uhmc-warning", uhmcRegionCode, locale],
@@ -644,6 +717,8 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
           ? `Furtuni magnetice în ${city.nameGenitive}, ${city.country ?? "Moldova"} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Prognoză, vreme și calitatea aerului în timp real.`
         : locale === "hu"
           ? `${city.name} mágneses vihar előrejelzése ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Időjárás, napkelte, napnyugta és levegőminőség valós időben.`
+          : locale === "bg"
+            ? `Магнитни бури в ${city.name} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноза, време и качество на въздуха в реално време.`
           : `Магнітні бурі в ${city.nameGenitive} ${todayDate}: Kp ${Math.round(latestKp)} — ${kpStatus.label.toLowerCase()}. Прогноз, погода, якість повітря в реальному часі.`
     : "";
 
@@ -678,7 +753,9 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
             ? getRegionForCity("ro", city.slug)?.titleIn ?? city.country ?? "Moldova"
             : locale === "hu"
               ? getRegionForCity("hu", city.slug)?.titleIn ?? "Magyarországon"
-              : city.country ?? "";
+              : locale === "bg"
+                ? getRegionForCity("bg", city.slug)?.titleIn ?? "България"
+                : city.country ?? "";
 
   const seoContent = getCitySeoContent({
     locale,
@@ -819,7 +896,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 <span className="font-mono text-foreground">{city.utcOffset}</span>
               </div>
             </div>
-            {locale === "pl" || locale === "ro" ? (
+            {locale === "pl" || locale === "ro" || locale === "bg" ? (
               <div className="space-y-1.5 border-t border-border/30 pt-2">
                 <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
                   <Activity className="h-3.5 w-3.5 text-primary" />
@@ -934,7 +1011,7 @@ const CityPage = ({ slug, locale = "uk", initialWeather, initialSunTimes, initia
                 <span className="font-mono text-foreground">{city.utcOffset}</span>
               </div>
             </div>
-            {locale === "pl" || locale === "ro" ? (
+            {locale === "pl" || locale === "ro" || locale === "bg" ? (
               <div className="space-y-1.5 border-t border-border/30 pt-2">
                 <h3 className="flex items-center gap-2 font-display text-xs font-bold text-foreground">
                   <Activity className="h-3.5 w-3.5 text-primary" />

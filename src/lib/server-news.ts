@@ -26,7 +26,7 @@ export type LocalizedNewsArticle = {
   alternateSlugs: Partial<Record<SiteLocale, string>>;
 };
 
-const NEWS_LOCALES: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "en"];
+const NEWS_LOCALES: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "bg", "en"];
 
 function getNewsField<T extends NewsArticle, K extends "title" | "slug" | "content" | "meta_title" | "meta_description">(
   item: T,
@@ -77,7 +77,7 @@ export async function getLatestNews(limit = 30, locale: SiteLocale = "uk"): Prom
     .from("news")
     .select(
       "id, published_at, image_url, status, title_uk, slug_uk, meta_description_uk, title_ru, slug_ru, meta_description_ru, title_pl, slug_pl, meta_description_pl, title_ro, slug_ro, meta_description_ro, title_hu, slug_hu, meta_description_hu"
-        + ", title_en, slug_en, meta_description_en"
+        + ", title_bg, slug_bg, meta_description_bg, title_en, slug_en, meta_description_en"
     )
     .eq("status", "published")
     .neq("source", "telegram_ai")
@@ -183,7 +183,7 @@ export async function getNewsArticleFallbackTargetBySlug(
   const { data, error } = await supabase
     .from("news")
     .select(
-      "slug_uk, title_uk, content_uk, slug_ru, title_ru, content_ru, slug_pl, title_pl, content_pl, slug_ro, title_ro, content_ro, slug_hu, title_hu, content_hu, slug_en, title_en, content_en",
+      "slug_uk, title_uk, content_uk, slug_ru, title_ru, content_ru, slug_pl, title_pl, content_pl, slug_ro, title_ro, content_ro, slug_hu, title_hu, content_hu, slug_bg, title_bg, content_bg, slug_en, title_en, content_en",
     )
     .or(NEWS_LOCALES.map((itemLocale) => `slug_${itemLocale}.eq.${slug}`).join(","))
     .eq("status", "published")
@@ -196,7 +196,7 @@ export async function getNewsArticleFallbackTargetBySlug(
 
   if (!data) return null;
 
-  const locales = [preferredLocale, "uk", "ru", "en", "pl", "ro", "hu"] satisfies SiteLocale[];
+  const locales = [preferredLocale, "uk", "ru", "en", "pl", "ro", "hu", "bg"] satisfies SiteLocale[];
   for (const itemLocale of locales) {
     const localizedSlug = getNewsField(data as NewsArticle, "slug", itemLocale) as string | null;
     const title = getNewsField(data as NewsArticle, "title", itemLocale) as string | null;

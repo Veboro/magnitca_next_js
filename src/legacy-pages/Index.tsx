@@ -71,10 +71,10 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
     return value;
   };
 
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
   const REFRESH_INTERVAL = 60;
   const [countdown, setCountdown] = useState(REFRESH_INTERVAL);
-  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : locale === "en" ? "/en" : "";
+  const langPrefix = locale === "ru" ? "/ru" : locale === "pl" ? "/pl" : locale === "ro" ? "/ro" : locale === "hu" ? "/hu" : locale === "bg" ? "/bg" : locale === "en" ? "/en" : "";
   const showLocationLinks = locale !== "en";
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
   const latestMag = magData?.length ? magData[magData.length - 1] : null;
   const gLevel = scales?.g?.Scale ?? 0;
 
-  const countryRegionList = locale === "pl" || locale === "ro" || locale === "hu"
+  const countryRegionList = locale === "pl" || locale === "ro" || locale === "hu" || locale === "bg"
     ? getCountryRegionsByLocale(locale).map((region) => ({
         key: region.key,
         name: region.title,
@@ -210,6 +210,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
               ? "Vreme spațială pe județe și raioane"
             : locale === "hu"
               ? "Űridőjárás Magyarország vármegyéiben"
+            : locale === "bg"
+              ? "Космическо време в областите на България"
             : locale === "ru"
               ? "Космическая погода по областям Украины"
               : "Космічна погода по областях України"
@@ -223,6 +225,8 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
                 ? "Vreme spațială pe județe și raioane"
               : locale === "hu"
                 ? "Űridőjárás Magyarország vármegyéiben"
+              : locale === "bg"
+                ? "Космическо време в областите на България"
               : locale === "ru"
                 ? "Космическая погода по областям Украины"
                 : "Космічна погода по областях України"}
@@ -256,7 +260,7 @@ const Index = ({ locale, messages, initialKp, initialWind, initialMag, initialSc
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-x-8 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
-              {(locale === "pl" || locale === "hu" ? countryRegionList : oblastList).map((item) => (
+              {(locale === "pl" || locale === "hu" || locale === "bg" ? countryRegionList : oblastList).map((item) => (
                 <a
                   key={item.key}
                   href={item.href}

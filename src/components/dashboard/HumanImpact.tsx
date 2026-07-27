@@ -32,6 +32,7 @@ const getImpactBarLabel = (key: string, language: string) => {
     pl: { energy: "Energia", focus: "Skupienie", comfort: "Komfort" },
     ro: { energy: "Energie", focus: "Focus", comfort: "Confort" },
     hu: { energy: "Energia", focus: "Fókusz", comfort: "Komfort" },
+    bg: { energy: "Енергия", focus: "Концентрация", comfort: "Комфорт" },
     en: { energy: "Energy", focus: "Focus", comfort: "Comfort" },
   };
 
@@ -43,9 +44,11 @@ const getImpactBarLabel = (key: string, language: string) => {
         ? "ro"
         : language.startsWith("hu")
           ? "hu"
-          : language.startsWith("en")
-            ? "en"
-            : "uk";
+          : language.startsWith("bg")
+            ? "bg"
+            : language.startsWith("en")
+              ? "en"
+              : "uk";
 
   return labels[lang][key] ?? labels.uk[key];
 };
@@ -59,9 +62,11 @@ const getImpactDateLabel = (language: string) => {
         ? "ro-RO"
         : language.startsWith("hu")
           ? "hu-HU"
-          : language.startsWith("en")
-            ? "en-US"
-            : "uk-UA";
+          : language.startsWith("bg")
+            ? "bg-BG"
+            : language.startsWith("en")
+              ? "en-US"
+              : "uk-UA";
 
   return new Intl.DateTimeFormat(locale, {
     day: "numeric",
@@ -131,8 +136,10 @@ export const HumanImpact = ({
         ? "/ro"
         : i18n.language.startsWith("hu")
           ? "/hu"
-          : i18n.language.startsWith("en")
-            ? "/en"
+          : i18n.language.startsWith("bg")
+            ? "/bg"
+            : i18n.language.startsWith("en")
+              ? "/en"
         : "";
 
   const { data: latestResult } = useQuery({

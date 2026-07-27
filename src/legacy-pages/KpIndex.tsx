@@ -260,6 +260,55 @@ const localizedCopy = {
       { q: "Hol látható a Kp-előrejelzés?", a: "Ezen az oldalon látható a 3 napos Kp-előrejelzés, az aktuális érték és az elmúlt órák grafikonja." },
     ],
   },
+  bg: {
+    ...copy.pl,
+    pageTitle: "Kp-индекс онлайн в реално време — прогноза за магнитни бури",
+    pageDescription:
+      "Актуален Kp-индекс в реално време. Текуща стойност, 24-часова графика и 3-дневна прогноза за геомагнитната активност по данни на NOAA.",
+    heroTitle: "Kp-индекс днес",
+    heroText:
+      "Планетарен показател за геомагнитната активност в реално време. Текуща стойност, графика за последните 24 часа и 3-дневна прогноза от NOAA SWPC.",
+    currentKpLabel: "Текущ Kp-индекс",
+    currentState: "Текущо състояние",
+    chartAria: "Графика на Kp-индекса за 24 часа",
+    chartTitle: "Kp-индекс за последните",
+    hours: "ч",
+    forecastAria: "3-дневна прогноза за Kp-индекса",
+    forecastTitle: "Прогноза за Kp-индекса за 3 дни (на 3-часови интервали)",
+    loading: "Зареждане на прогнозата...",
+    unavailable: "Данните за прогнозата не са налични.",
+    maxKp: "макс. Kp",
+    scaleAria: "Скала на Kp-индекса",
+    scaleTitle: "Скала на Kp-индекса (0-9)",
+    seoAria: "За Kp-индекса",
+    seoHeading: "Какво е Kp-индексът и защо е важен?",
+    seoText1:
+      "<strong>Kp-индексът</strong> е глобален показател за геомагнитната активност на Земята по скала от 0 до 9. Стойностите 0-3 означават спокойни условия, 4 показва неустойчиво състояние, а 5 или повече означава геомагнитна буря.",
+    seoText2:
+      "Kp-индексът помага да се разбере как слънчевата активност може да влияе върху комуникациите, навигацията и самочувствието на метеочувствителните хора. На тази страница ще намерите текущата стойност, графиките и 3-дневната прогноза.",
+    faqAria: "Често задавани въпроси за Kp-индекса",
+    faqTitle: "Често задавани въпроси",
+    gScale: "G-скала",
+    rScale: "R-скала",
+    sScale: "S-скала",
+    kpLevels: [
+      { kp: "0-1", status: "Спокойно", color: "bg-storm-quiet", description: "Минимална геомагнитна активност без видимо въздействие." },
+      { kp: "2-3", status: "Ниска активност", color: "bg-storm-quiet", description: "Малки колебания на магнитното поле, обикновено без осезаемо въздействие." },
+      { kp: "4", status: "Неустойчиво", color: "bg-storm-minor", description: "Повишена активност; чувствителните хора може да усетят лек дискомфорт." },
+      { kp: "5 (G1)", status: "Слаба буря", color: "bg-storm-moderate", description: "Слаба геомагнитна буря с незначително технологично и здравно въздействие." },
+      { kp: "6 (G2)", status: "Умерена буря", color: "bg-storm-moderate", description: "По-голяма вероятност за радиосмущения и по-осезаеми реакции." },
+      { kp: "7 (G3)", status: "Силна буря", color: "bg-storm-strong", description: "Силни смущения с въздействие върху навигацията и комуникациите." },
+      { kp: "8 (G4)", status: "Много силна", color: "bg-storm-severe", description: "Тежка буря с повишен технологичен риск." },
+      { kp: "9 (G5)", status: "Екстремална", color: "bg-storm-severe", description: "Екстремална геомагнитна буря с най-голямо потенциално въздействие." },
+    ],
+    faqItems: [
+      { q: "Какво е Kp-индексът?", a: "Kp-индексът е планетарен показател за геомагнитната активност по скала от 0 до 9. Колкото по-висока е стойността, толкова по-силно е смущението на магнитното поле на Земята." },
+      { q: "Кога започва магнитна буря?", a: "Обикновено говорим за геомагнитна буря от Kp 5, което съответства на ниво G1 по скалата на NOAA." },
+      { q: "Колко често се обновява прогнозата?", a: "Прогнозните стойности се обновяват често, а прогнозите на NOAA се актуализират редовно." },
+      { q: "Може ли Kp-индексът да влияе на самочувствието?", a: "При някои чувствителни хора при по-висок Kp може да се появи умора, главоболие или по-неспокоен сън." },
+      { q: "Къде мога да видя прогнозата за Kp?", a: "На тази страница са показани 3-дневната прогноза за Kp, текущата стойност и графиката за последните часове." },
+    ],
+  },
   en: {
     ...copy.uk,
     pageTitle: "Kp index online in real time — magnetic storm forecast",
@@ -312,7 +361,7 @@ const localizedCopy = {
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "en" ? "UTC" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "bg" ? "Europe/Sofia" : locale === "en" ? "UTC" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -330,7 +379,7 @@ interface KpIndexProps {
 
 const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const today = todayStr(localeTag, timeZone);
 

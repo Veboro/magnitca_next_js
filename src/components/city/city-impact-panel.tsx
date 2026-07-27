@@ -44,6 +44,14 @@ const copy = {
     currentPressure: "aktuális nyomás",
     total: "Összhatás",
   },
+  bg: {
+    title: "Влияние върху организма",
+    magnetic: "Магнитни бури",
+    pressure: "Атмосферно налягане",
+    pressureRange: "колебание",
+    currentPressure: "налягане сега",
+    total: "Общо влияние",
+  },
   en: {
     title: "Impact on the body",
     magnetic: "Magnetic storms",

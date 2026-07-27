@@ -77,6 +77,7 @@ const COUNTRY_LOCALES: Record<SiteLocale, string[]> = {
   pl: ["pl"],
   ro: ["ro"],
   hu: ["hu"],
+  bg: ["bg"],
   en: ["en"],
 };
 
@@ -260,6 +261,35 @@ const COPY: Record<SiteLocale, FeedCopy> = {
     gender: { female: "nő", male: "férfi" },
     country: { ua: "Ukrajna", pl: "Lengyelország", md: "Moldova", hu: "Magyarország", intl: "Más ország" },
   },
+  bg: {
+    heading: "Истории за самочувствието",
+    empty: "Тук ще се появят първите истории, след като ги прегледаме. Споделете как се чувствате в ежедневната анкета.",
+    loading: "Зареждане на истории…",
+    error: "Историите не можаха да се заредят.",
+    anonymous: "Анонимен",
+    kpLabel: "Kp",
+    count: "{{count}} истории",
+    sameFeel: "И аз се чувствам така",
+    loadMore: "Покажи още",
+    loadingMore: "Зареждане…",
+    allCountries: "Всички държави",
+    pickDate: "Изберете дата",
+    clearDate: "Всички дати",
+    allAges: "Всяка възраст",
+    ageLabel: "над {{age}}",
+    allGenders: "Всеки пол",
+    scale: {
+      [-3]: "Много добре",
+      [-2]: "Добре",
+      [-1]: "Малко по-добре",
+      [0]: "Неутрално",
+      [1]: "Лек дискомфорт",
+      [2]: "Зле",
+      [3]: "Много зле",
+    },
+    gender: { female: "жена", male: "мъж" },
+    country: { ua: "Украйна", pl: "Полша", md: "Молдова", hu: "Унгария", intl: "Друга държава" },
+  },
   en: {
     heading: "Wellbeing stories",
     empty: "The first stories will appear here once we review them. Share how you feel in the daily poll.",
@@ -297,6 +327,7 @@ const LOCALE_TAG: Record<SiteLocale, string> = {
   pl: "pl-PL",
   ro: "ro-RO",
   hu: "hu-HU",
+  bg: "bg-BG",
   en: "en-US",
 };
 

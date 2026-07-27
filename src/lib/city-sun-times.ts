@@ -22,6 +22,7 @@ export function formatDayLength(sunrise: string, sunset: string, locale: SiteLoc
   if (locale === "ro") return `${h} h ${m} min`;
   if (locale === "hu") return `${h} óra ${m} perc`;
   if (locale === "ru") return `${h} ч ${m} мин`;
+  if (locale === "bg") return `${h} ч ${m} мин`;
   return `${h}год ${m}хв`;
 }
 

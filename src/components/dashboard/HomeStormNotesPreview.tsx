@@ -46,6 +46,7 @@ const FEELING_PATH: Record<SiteLocale, string> = {
   pl: "/pl/feeling",
   ro: "/ro/feeling",
   hu: "/hu/feeling",
+  bg: "/bg/feeling",
   en: "/en/feeling",
 };
 
@@ -110,6 +111,16 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     scale: { [-3]: "Nagyon jó", [-2]: "Jó", [-1]: "Kicsit jobb", [0]: "Semleges", [1]: "Enyhe kellemetlenség", [2]: "Rossz", [3]: "Nagyon rossz" },
     gender: { female: "nő", male: "férfi" },
     country: { ua: "Ukrajna", pl: "Lengyelország", md: "Moldova", hu: "Magyarország", intl: "Más ország" },
+  },
+  bg: {
+    title: "Най-нови отзиви",
+    viewAll: "Всички отзиви",
+    empty: "Все още няма отзиви.",
+    loading: "Зареждане…",
+    anonymous: "Анонимен",
+    scale: { [-3]: "Много добре", [-2]: "Добре", [-1]: "Малко по-добре", [0]: "Неутрално", [1]: "Лек дискомфорт", [2]: "Зле", [3]: "Много зле" },
+    gender: { female: "жена", male: "мъж" },
+    country: { ua: "Украйна", pl: "Полша", md: "Молдова", hu: "Унгария", intl: "Друга държава" },
   },
   en: {
     title: "Latest reviews",

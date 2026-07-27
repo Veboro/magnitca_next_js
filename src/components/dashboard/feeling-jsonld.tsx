@@ -65,7 +65,7 @@ export function FeelingJsonLd({
             "@type": "Comment",
             text: note.body,
             datePublished: note.created_at,
-            author: { "@type": "Person", name: note.display_name?.trim() || anonymousName },
+            author: { "@type": "Person", name: note.display_name?.trim() || anonymousName, url: pageUrl },
             ...(note.helpful_count
               ? {
                   interactionStatistic: {

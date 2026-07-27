@@ -65,6 +65,15 @@ const NEWS_COPY: Record<
     notFound: "A hír nem található",
     publisher: "Magnitca",
   },
+  bg: {
+    dateLocale: "bg-BG",
+    heading: "Новини за магнитните бури",
+    description:
+      "Ежедневни материали за магнитните бури, геомагнитната активност, прогнозите на NOAA и влиянието на космическото време върху самочувствието.",
+    empty: "Новините още не са добавени.",
+    notFound: "Новината не е намерена",
+    publisher: "Magnitca",
+  },
   en: {
     dateLocale: "en-US",
     heading: "Magnetic storm news",

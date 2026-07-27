@@ -16,6 +16,7 @@ export const CITY_FAQ_HEADING: Record<SiteLocale, string> = {
   pl: "Częste pytania",
   ro: "Întrebări frecvente",
   hu: "Gyakori kérdések",
+  bg: "Често задавани въпроси",
   en: "Frequently asked questions",
 };
 
@@ -66,6 +67,11 @@ const AURORA_NOTE: Record<SiteLocale, Record<Band, string>> = {
     high: "51° feletti szélességen a sarki fény itt erős, G2–G3 vagy nagyobb szintű viharok idején látható.",
     mid: "Ezen a szélességen a sarki fény ritkán látható — főként erős, G3–G5 szintű viharok idején.",
     low: "Ezen a szélességen a sarki fény nagyon ritkán, csak szélsőséges G4–G5 viharok idején jelenik meg.",
+  },
+  bg: {
+    high: "На географска ширина над 51° северно сияние тук е възможно по време на силни бури от ниво G2–G3 и по-високо.",
+    mid: "На тази географска ширина северното сияние се вижда рядко — предимно по време на силни бури от ниво G3–G5.",
+    low: "На тази южна географска ширина северното сияние се появява много рядко, само при екстремни бури G4–G5.",
   },
   en: {
     high: "At a latitude above 51°, auroras are possible here during strong G2–G3 storms and above.",
@@ -168,6 +174,29 @@ export function getCitySeoContent(input: CityContentInput): CitySeoContent {
           {
             question: `Honnan származnak a mágneses viharokra vonatkozó adatok ${name} városára?`,
             answer: `A Kp-index és a G/R/S skálák adatait a NOAA Space Weather Prediction Center szolgáltatja, az időjárást és a levegőminőséget az Open-Meteo. Az idő a helyi ${utcOffset} (${timezone}) időzóna szerint van megadva.`,
+          },
+        ],
+      };
+    }
+    case "bg": {
+      const inCity = `в ${name}`;
+      return {
+        paragraphs: [
+          `Град ${name} се намира в ${regionLabel}, на географска ширина ${latLabel} и дължина ${lonLabel} (часова зона ${timezone}, ${utcOffset}). ${aurora}`,
+          `Геомагнитната активност се определя от планетарния Kp-индекс, който е общ за цялата планета, но осезаемостта на магнитните бури зависи от географската ширина. На тази страница показваме Kp-индекса ${inCity}, прогнозата за 3 и 27 дни, нивото на бурята по скалата G, времето, изгрева и залеза на слънцето и качеството на въздуха — в реално време по данни на NOAA SWPC и Open-Meteo.`,
+        ],
+        faq: [
+          {
+            question: `Ще има ли магнитна буря ${inCity} днес?`,
+            answer: `Текущото състояние на геомагнитното поле ${inCity} се обновява в реално време по данни на NOAA SWPC. Текущият Kp-индекс, нивото на бурята по скалата G и прогнозата за следващите 3 дни са показани по-горе на тази страница.`,
+          },
+          {
+            question: `Може ли да се види северно сияние ${inCity}?`,
+            answer: `${aurora} Координати на града: ${latLabel}, ${lonLabel}.`,
+          },
+          {
+            question: `Откъде идват данните за магнитните бури за ${genitive}?`,
+            answer: `Данните за Kp-индекса и скалите G/R/S се предоставят от NOAA Space Weather Prediction Center, а времето и качеството на въздуха — от Open-Meteo. Часовете са показани в местната часова зона ${utcOffset} (${timezone}).`,
           },
         ],
       };

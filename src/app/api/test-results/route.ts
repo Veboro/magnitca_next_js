@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getSupabaseAdminClient } from "@/lib/server-supabase";
 import type { SiteLocale } from "@/lib/locale";
 
-const LOCALES: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "en"];
+const LOCALES: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "bg", "en"];
 
 function getClientIp(request: Request) {
   const forwarded = request.headers.get("x-forwarded-for");

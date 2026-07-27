@@ -6,8 +6,10 @@ import type { CityConfig } from "@/data/cities";
 import type { SunriseOverviewCity } from "@/lib/sunrise-overview";
 import { absoluteUrl } from "@/lib/site";
 
+type SunLocale = "pl" | "hu" | "bg";
+
 type PlSunPageProps = {
-  locale?: "pl" | "hu";
+  locale?: SunLocale;
   kind: "sunrise" | "sunset";
   mode: "today" | "tomorrow";
   dateLabel: string;
@@ -19,21 +21,24 @@ type PlSunPageProps = {
   averageDayLengthLabel: string;
 };
 
-function formatNightLength(minutes: number, locale: "pl" | "hu" = "pl") {
+function formatNightLength(minutes: number, locale: SunLocale = "pl") {
   const nightMinutes = Math.max(0, 24 * 60 - minutes);
   const h = Math.floor(nightMinutes / 60);
   const m = nightMinutes % 60;
   if (locale === "hu") {
     return `${h} óra ${m} perc`;
   }
+  if (locale === "bg") {
+    return `${h} ч ${m} мин`;
+  }
   return `${h} godz. ${m} min`;
 }
 
-function cityHref(city: CityConfig, locale: "pl" | "hu") {
+function cityHref(city: CityConfig, locale: SunLocale) {
   return `/${locale}/city/${city.slug}`;
 }
 
-function pathFor(kind: "sunrise" | "sunset", mode: "today" | "tomorrow", locale: "pl" | "hu") {
+function pathFor(kind: "sunrise" | "sunset", mode: "today" | "tomorrow", locale: SunLocale) {
   return `/${locale}/${mode === "tomorrow" ? `${kind}-tomorrow` : kind}`;
 }
 
@@ -60,7 +65,51 @@ export function PlSunPage({
   const primaryLate = isSunrise ? latestSunrise : latestSunset;
   const primaryEarlyValue = isSunrise ? primaryEarly?.sunriseLabel : primaryEarly?.sunsetLabel;
   const primaryLateValue = isSunrise ? primaryLate?.sunriseLabel : primaryLate?.sunsetLabel;
-  const copy = locale === "hu"
+  const copy = locale === "bg"
+    ? {
+        home: "Начало",
+        countryIn: "в България",
+        countryCities: "България",
+        today: "днес",
+        tomorrow: "утре",
+        sunriseToday: "Изгрев днес",
+        sunriseTomorrow: "Изгрев утре",
+        sunsetToday: "Залез днес",
+        sunsetTomorrow: "Залез утре",
+        sunrise: "Изгрев",
+        sunset: "Залез",
+        earliestSunrise: "Най-ранен изгрев",
+        latestSunrise: "Най-късен изгрев",
+        earliestSunset: "Най-ранен залез",
+        latestSunset: "Най-късен залез",
+        averageDay: "Средна продължителност на деня",
+        averageNight: "Средна продължителност на нощта",
+        dataUpdated: "Данните се обновяват",
+        sourceCities: "Въз основа на наличните градове",
+        tableSunrise: "Изгрев и залез в градовете на България",
+        tableSunset: "Залез, нощ и изгрев в градовете на България",
+        seoSunriseTitle: "Как се променя изгревът в България",
+        seoSunsetTitle: "Как се променят залезът и продължителността на нощта в България",
+        seoSunriseBody:
+          "Часът на изгрева в България зависи от града, датата и географското положение. На тази страница сравняваме зората, изгрева, слънчевото пладне, залеза, здрача и продължителността на деня за наличните градове.",
+        seoSunsetBody:
+          "Часът на залеза в България се променя от ден на ден и се различава между градовете. Таблицата помага да сравните залеза, здрача, продължителността на нощта и следващия изгрев.",
+        intro:
+          `Данни за ${dateLabel}: сравнение на градовете в България по зора, изгрев, слънчево пладне, залез, здрач и продължителност на деня или нощта.`,
+        alsoCheck: "Вижте също:",
+        faqTitle: "Често задавани въпроси",
+        city: "Град",
+        dawn: "Зора",
+        solarNoon: "Слънчево пладне",
+        dusk: "Здрач",
+        dayLength: "Продължителност на деня",
+        nightLength: "Продължителност на нощта",
+        exactHourDepends: `Точният час се различава по градове. На тази страница показваме данните за ${dateLabel}, а в таблицата може да проверите стойностите за всеки наличен град.`,
+        termsQuestion: "Какво означават зора, слънчево пладне и здрач?",
+        termsAnswer:
+          "Зората е светлият период преди изгрева, слънчевото пладне е моментът, в който Слънцето е най-високо на небето, а здрачът е естествената светлина след залеза.",
+      }
+    : locale === "hu"
     ? {
         home: "Főoldal",
         countryIn: "Magyarországon",
@@ -155,7 +204,11 @@ export function PlSunPage({
       ? isSunrise
         ? `Napkelte Magyarországon ${dayWord}`
         : `Napnyugta Magyarországon ${dayWord}`
-      : h1;
+      : locale === "bg"
+        ? isSunrise
+          ? `Изгрев в България ${dayWord}`
+          : `Залез в България ${dayWord}`
+        : h1;
   const tableTitle = isSunrise ? copy.tableSunrise : copy.tableSunset;
   const seoTitle = isSunrise ? copy.seoSunriseTitle : copy.seoSunsetTitle;
   const seoBody = isSunrise ? copy.seoSunriseBody : copy.seoSunsetBody;
@@ -177,27 +230,39 @@ export function PlSunPage({
       q: isSunrise
         ? locale === "hu"
           ? `Mikor van napkelte Magyarországon ${dayWord}?`
-          : `O której jest wschód słońca w Polsce ${dayWord}?`
+          : locale === "bg"
+            ? `Кога е изгревът в България ${dayWord}?`
+            : `O której jest wschód słońca w Polsce ${dayWord}?`
         : locale === "hu"
           ? `Mikor van napnyugta Magyarországon ${dayWord}?`
-          : `O której jest zachód słońca w Polsce ${dayWord}?`,
+          : locale === "bg"
+            ? `Кога е залезът в България ${dayWord}?`
+            : `O której jest zachód słońca w Polsce ${dayWord}?`,
       a: copy.exactHourDepends,
     },
     {
       q: isSunrise
         ? locale === "hu"
           ? "Hol van a legkorábbi és a legkésőbbi napkelte?"
-          : "Gdzie jest najwcześniejszy i najpóźniejszy wschód słońca?"
+          : locale === "bg"
+            ? "Къде е най-ранният и най-късният изгрев?"
+            : "Gdzie jest najwcześniejszy i najpóźniejszy wschód słońca?"
         : locale === "hu"
           ? "Hol van a legkorábbi és a legkésőbbi napnyugta?"
-          : "Gdzie jest najwcześniejszy i najpóźniejszy zachód słońca?",
+          : locale === "bg"
+            ? "Къде е най-ранният и най-късният залез?"
+            : "Gdzie jest najwcześniejszy i najpóźniejszy zachód słońca?",
       a: locale === "hu"
         ? isSunrise
           ? `A legkorábbi napkelte ${primaryEarly?.city.name ?? "az egyik városban"} van, ${primaryEarlyValue ?? "—"} időpontban, a legkésőbbi pedig ${primaryLate?.city.name ?? "egy másik városban"}, ${primaryLateValue ?? "—"} időpontban.`
           : `A legkorábbi napnyugta ${primaryEarly?.city.name ?? "az egyik városban"} van, ${primaryEarlyValue ?? "—"} időpontban, a legkésőbbi pedig ${primaryLate?.city.name ?? "egy másik városban"}, ${primaryLateValue ?? "—"} időpontban.`
-        : isSunrise
-          ? `Najwcześniejszy wschód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`
-          : `Najwcześniejszy zachód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`,
+        : locale === "bg"
+          ? isSunrise
+            ? `Най-ранният изгрев е в ${primaryEarly?.city.name ?? "един от градовете"} в ${primaryEarlyValue ?? "—"}, а най-късният — в ${primaryLate?.city.name ?? "друг град"} в ${primaryLateValue ?? "—"}.`
+            : `Най-ранният залез е в ${primaryEarly?.city.name ?? "един от градовете"} в ${primaryEarlyValue ?? "—"}, а най-късният — в ${primaryLate?.city.name ?? "друг град"} в ${primaryLateValue ?? "—"}.`
+          : isSunrise
+            ? `Najwcześniejszy wschód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`
+            : `Najwcześniejszy zachód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`,
     },
     {
       q: copy.termsQuestion,
@@ -207,17 +272,25 @@ export function PlSunPage({
       q: isSunrise
         ? locale === "hu"
           ? "Hogyan számoljuk a nappal hosszát?"
-          : "Jak obliczana jest długość dnia?"
+          : locale === "bg"
+            ? "Как се изчислява продължителността на деня?"
+            : "Jak obliczana jest długość dnia?"
         : locale === "hu"
           ? "Hogyan számoljuk az éjszaka hosszát?"
-          : "Jak obliczana jest długość nocy?",
+          : locale === "bg"
+            ? "Как се изчислява продължителността на нощта?"
+            : "Jak obliczana jest długość nocy?",
       a: isSunrise
         ? locale === "hu"
           ? `A nappal hossza a napkelte és a napnyugta közötti idő. Az elérhető városok átlaga körülbelül ${averageDayLengthLabel}.`
-          : `Długość dnia to czas między wschodem i zachodem słońca. Średnia dla dostępnych miast wynosi około ${averageDayLengthLabel}.`
+          : locale === "bg"
+            ? `Продължителността на деня е времето между изгрева и залеза. Средната стойност за наличните градове е около ${averageDayLengthLabel}.`
+            : `Długość dnia to czas między wschodem i zachodem słońca. Średnia dla dostępnych miast wynosi około ${averageDayLengthLabel}.`
         : locale === "hu"
           ? `Az éjszaka hossza a napnyugta és a következő napkelte közötti hozzávetőleges idő. Az elérhető városok átlaga körülbelül ${averageNightLengthLabel}.`
-          : `Długość nocy to przybliżony czas między zachodem i kolejnym wschodem słońca. Średnia dla dostępnych miast wynosi około ${averageNightLengthLabel}.`,
+          : locale === "bg"
+            ? `Продължителността на нощта е приблизителното време между залеза и следващия изгрев. Средната стойност за наличните градове е около ${averageNightLengthLabel}.`
+            : `Długość nocy to przybliżony czas między zachodem i kolejnym wschodem słońca. Średnia dla dostępnych miast wynosi około ${averageNightLengthLabel}.`,
     },
   ];
 

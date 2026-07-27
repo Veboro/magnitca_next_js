@@ -72,6 +72,14 @@ const copy: Record<
     neutral: "Semleges {{percent}}%",
     worse: "Rosszul {{percent}}%",
   },
+  bg: {
+    empty: "Първите отговори още се събират",
+    discomfort: "Дискомфорт усещат {{percent}}%",
+    responses: "{{count}} отговора",
+    better: "Добре {{percent}}%",
+    neutral: "Неутрално {{percent}}%",
+    worse: "Зле {{percent}}%",
+  },
   en: {
     empty: "The first answers are still being collected",
     discomfort: "{{percent}}% feel discomfort",

@@ -160,7 +160,7 @@ export async function listNewsAdmin() {
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase
     .from("news")
-    .select("id, title_uk, slug_uk, title_ru, slug_ru, title_pl, slug_pl, title_ro, slug_ro, title_hu, slug_hu, title_en, slug_en, published_at, source, status")
+    .select("id, title_uk, slug_uk, title_ru, slug_ru, title_pl, slug_pl, title_ro, slug_ro, title_hu, slug_hu, title_bg, slug_bg, title_en, slug_en, published_at, source, status")
     .neq("source", "telegram_ai")
     .order("published_at", { ascending: false });
 
@@ -184,6 +184,8 @@ export async function listNewsAdmin() {
         slug_ro: null,
         title_hu: null,
         slug_hu: null,
+        title_bg: null,
+        slug_bg: null,
         title_en: null,
         slug_en: null,
       }));
@@ -222,6 +224,9 @@ export async function createNewsAdmin(input: {
   title_hu: string | null;
   slug_hu: string | null;
   content_hu: string | null;
+  title_bg: string | null;
+  slug_bg: string | null;
+  content_bg: string | null;
   title_en: string | null;
   slug_en: string | null;
   content_en: string | null;
@@ -238,6 +243,8 @@ export async function createNewsAdmin(input: {
   meta_description_ro: string | null;
   meta_title_hu: string | null;
   meta_description_hu: string | null;
+  meta_title_bg: string | null;
+  meta_description_bg: string | null;
   meta_title_en: string | null;
   meta_description_en: string | null;
   source: string;
@@ -281,6 +288,9 @@ export async function updateNewsAdmin(
     title_hu: string | null;
     slug_hu: string | null;
     content_hu: string | null;
+    title_bg: string | null;
+    slug_bg: string | null;
+    content_bg: string | null;
     title_en: string | null;
     slug_en: string | null;
     content_en: string | null;
@@ -297,6 +307,8 @@ export async function updateNewsAdmin(
     meta_description_ro: string | null;
     meta_title_hu: string | null;
     meta_description_hu: string | null;
+    meta_title_bg: string | null;
+    meta_description_bg: string | null;
     meta_title_en: string | null;
     meta_description_en: string | null;
     source: string;

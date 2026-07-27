@@ -19,6 +19,7 @@ export type Database = {
           content: string
           content_en: string | null
           content_hu: string | null
+          content_bg: string | null
           content_pl: string | null
           content_ro: string | null
           content_ru: string | null
@@ -29,6 +30,7 @@ export type Database = {
           meta_description: string | null
           meta_description_en: string | null
           meta_description_hu: string | null
+          meta_description_bg: string | null
           meta_description_pl: string | null
           meta_description_ro: string | null
           meta_description_ru: string | null
@@ -36,6 +38,7 @@ export type Database = {
           meta_title: string | null
           meta_title_en: string | null
           meta_title_hu: string | null
+          meta_title_bg: string | null
           meta_title_pl: string | null
           meta_title_ro: string | null
           meta_title_ru: string | null
@@ -45,6 +48,7 @@ export type Database = {
           slug: string | null
           slug_en: string | null
           slug_hu: string | null
+          slug_bg: string | null
           slug_pl: string | null
           slug_ro: string | null
           slug_ru: string | null
@@ -54,6 +58,7 @@ export type Database = {
           title_en: string | null
           title_ru: string | null
           title_hu: string | null
+          title_bg: string | null
           title_pl: string | null
           title_ro: string | null
           title_uk: string | null
@@ -64,6 +69,7 @@ export type Database = {
           content: string
           content_en?: string | null
           content_hu?: string | null
+          content_bg?: string | null
           content_pl?: string | null
           content_ro?: string | null
           content_ru?: string | null
@@ -74,6 +80,7 @@ export type Database = {
           meta_description?: string | null
           meta_description_en?: string | null
           meta_description_hu?: string | null
+          meta_description_bg?: string | null
           meta_description_pl?: string | null
           meta_description_ro?: string | null
           meta_description_ru?: string | null
@@ -81,6 +88,7 @@ export type Database = {
           meta_title?: string | null
           meta_title_en?: string | null
           meta_title_hu?: string | null
+          meta_title_bg?: string | null
           meta_title_pl?: string | null
           meta_title_ro?: string | null
           meta_title_ru?: string | null
@@ -90,6 +98,7 @@ export type Database = {
           slug?: string | null
           slug_en?: string | null
           slug_hu?: string | null
+          slug_bg?: string | null
           slug_pl?: string | null
           slug_ro?: string | null
           slug_ru?: string | null
@@ -99,6 +108,7 @@ export type Database = {
           title_en?: string | null
           title_ru?: string | null
           title_hu?: string | null
+          title_bg?: string | null
           title_pl?: string | null
           title_ro?: string | null
           title_uk?: string | null
@@ -109,6 +119,7 @@ export type Database = {
           content?: string
           content_en?: string | null
           content_hu?: string | null
+          content_bg?: string | null
           content_pl?: string | null
           content_ro?: string | null
           content_ru?: string | null
@@ -119,6 +130,7 @@ export type Database = {
           meta_description?: string | null
           meta_description_en?: string | null
           meta_description_hu?: string | null
+          meta_description_bg?: string | null
           meta_description_pl?: string | null
           meta_description_ro?: string | null
           meta_description_ru?: string | null
@@ -126,6 +138,7 @@ export type Database = {
           meta_title?: string | null
           meta_title_en?: string | null
           meta_title_hu?: string | null
+          meta_title_bg?: string | null
           meta_title_pl?: string | null
           meta_title_ro?: string | null
           meta_title_ru?: string | null
@@ -135,6 +148,7 @@ export type Database = {
           slug?: string | null
           slug_en?: string | null
           slug_hu?: string | null
+          slug_bg?: string | null
           slug_pl?: string | null
           slug_ro?: string | null
           slug_ru?: string | null
@@ -144,6 +158,7 @@ export type Database = {
           title_en?: string | null
           title_ru?: string | null
           title_hu?: string | null
+          title_bg?: string | null
           title_pl?: string | null
           title_ro?: string | null
           title_uk?: string | null

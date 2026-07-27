@@ -1,10 +1,11 @@
 import type { CityConfig } from "@/data/cities";
+import { CITIES_BG } from "@/data/cities-bg";
 import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_MD } from "@/data/cities-md";
 import { CITIES_PL } from "@/data/cities-pl";
 
-export type CountryRegionLocale = "pl" | "ro" | "hu";
-export type CountryRegionKind = "wojewodztwo" | "judet" | "raion" | "municipiu" | "regiune" | "varmegye";
+export type CountryRegionLocale = "pl" | "ro" | "hu" | "bg";
+export type CountryRegionKind = "wojewodztwo" | "judet" | "raion" | "municipiu" | "regiune" | "varmegye" | "oblast";
 
 export type CountryRegionRoute = {
   key: string;
@@ -144,22 +145,66 @@ const RO_REGIONS: CountryRegionRoute[] = [
   })),
 ];
 
+const BG_REGIONS: CountryRegionRoute[] = ([
+  ["sofia-grad", "Област София-град", "област София-град", ["sofia"]],
+  ["plovdiv", "Област Пловдив", "област Пловдив", ["plovdiv", "asenovgrad", "karlovo"]],
+  ["varna", "Област Варна", "област Варна", ["varna", "provadia"]],
+  ["burgas", "Област Бургас", "област Бургас", ["burgas", "aytos"]],
+  ["ruse", "Област Русе", "област Русе", ["ruse"]],
+  ["stara-zagora", "Област Стара Загора", "област Стара Загора", ["stara-zagora", "kazanlak", "chirpan"]],
+  ["pleven", "Област Плевен", "област Плевен", ["pleven", "cherven-bryag"]],
+  ["sliven", "Област Сливен", "област Сливен", ["sliven", "nova-zagora"]],
+  ["dobrich", "Област Добрич", "област Добрич", ["dobrich"]],
+  ["shumen", "Област Шумен", "област Шумен", ["shumen"]],
+  ["pernik", "Област Перник", "област Перник", ["pernik"]],
+  ["haskovo", "Област Хасково", "област Хасково", ["haskovo", "dimitrovgrad", "harmanli"]],
+  ["yambol", "Област Ямбол", "област Ямбол", ["yambol"]],
+  ["pazardzhik", "Област Пазарджик", "област Пазарджик", ["pazardzhik", "panagyurishte", "peshtera", "velingrad"]],
+  ["blagoevgrad", "Област Благоевград", "област Благоевград", ["blagoevgrad", "petrich", "sandanski"]],
+  ["veliko-tarnovo", "Област Велико Търново", "област Велико Търново", ["veliko-tarnovo", "gorna-oryahovitsa", "svishtov"]],
+  ["vratsa", "Област Враца", "област Враца", ["vratsa"]],
+  ["gabrovo", "Област Габрово", "област Габрово", ["gabrovo", "sevlievo"]],
+  ["vidin", "Област Видин", "област Видин", ["vidin"]],
+  ["kyustendil", "Област Кюстендил", "област Кюстендил", ["kyustendil", "dupnitsa"]],
+  ["kardzhali", "Област Кърджали", "област Кърджали", ["kardzhali"]],
+  ["montana", "Област Монтана", "област Монтана", ["montana", "lom", "berkovitsa"]],
+  ["targovishte", "Област Търговище", "област Търговище", ["targovishte"]],
+  ["silistra", "Област Силистра", "област Силистра", ["silistra"]],
+  ["lovech", "Област Ловеч", "област Ловеч", ["lovech", "troyan"]],
+  ["razgrad", "Област Разград", "област Разград", ["razgrad"]],
+  ["smolyan", "Област Смолян", "област Смолян", ["smolyan"]],
+  ["sofia-oblast", "Софийска област", "Софийска област", ["samokov", "botevgrad"]],
+] as const).map(([slug, title, titleIn, citySlugs]) => ({
+  key: `bg-${slug}`,
+  locale: "bg" as const,
+  kind: "oblast" as const,
+  slug,
+  title,
+  titleIn,
+  country: "България",
+  adminLabel: "област",
+  citySlugs: [...citySlugs],
+}));
+
 export const COUNTRY_REGION_ROUTES: CountryRegionRoute[] = [
   ...PL_REGIONS,
   ...RO_REGIONS,
   ...MD_REGIONS,
   ...HU_REGIONS,
+  ...BG_REGIONS,
 ];
 
 const REGION_CITY_SOURCE: Record<CountryRegionLocale, CityConfig[]> = {
   pl: CITIES_PL,
   ro: CITIES_MD,
   hu: CITIES_HU,
+  bg: CITIES_BG,
 };
 
 export function getCountryRegionPath(region: Pick<CountryRegionRoute, "locale" | "kind" | "slug">) {
   if (region.locale === "pl") return `/pl/wojewodztwo/${region.slug}`;
   if (region.locale === "hu") return `/hu/varmegye/${region.slug}`;
+  if (region.locale === "bg") return `/bg/oblast/${region.slug}`;
   if (region.kind === "municipiu") return `/ro/municipiu/${region.slug}`;
   if (region.kind === "regiune") return `/ro/regiune/${region.slug}`;
   if (region.kind === "raion") return `/ro/raion/${region.slug}`;

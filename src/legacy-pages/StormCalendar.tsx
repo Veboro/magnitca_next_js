@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar } from "@/hooks/useStormCalendar";
 import type { StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
-import { enUS, hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
+import { bg as bgDateLocale, enUS, hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
 
@@ -77,6 +77,13 @@ const levelLabels = {
     moderate: "Moderate storm (Kp5)",
     strong: "Strong storm (Kp6-7)",
     severe: "Extreme storm (Kp8-9)",
+  },
+  bg: {
+    none: "Спокойно",
+    minor: "Слаба буря (Kp4)",
+    moderate: "Умерена буря (Kp5)",
+    strong: "Силна буря (Kp6-7)",
+    severe: "Екстремна буря (Kp8-9)",
   },
 };
 
@@ -213,12 +220,32 @@ const localizedCopy = {
     seo3:
       "The calendar is updated automatically from NOAA Space Weather Prediction Center data and is useful for general planning and wellbeing awareness.",
   },
+  bg: {
+    badge: "КАЛЕНДАР НА МАГНИТНИТЕ БУРИ",
+    pageTitlePrefix: "Календар на магнитните бури",
+    pageTitleSuffix: "— Magnitca България",
+    pageDescriptionPrefix: "Календар на магнитните бури",
+    pageDescriptionSuffix: "Дните с геомагнитни смущения са отбелязани според интензивността.",
+    intro:
+      "Дните с магнитни бури са показани с цвят според интензивността. Пунктираната рамка обозначава прогнозата за следващите дни.",
+    forecast: "Прогноза",
+    disturbanceDays: "Дни с геомагнитни смущения",
+    forecastBadge: "прогноза",
+    seo1Prefix: "На тази страница е показан",
+    seo1StrongPrefix: "календарът на магнитните бури",
+    seo1Rest:
+      "с данни за геомагнитната активност за всеки ден. Дните с повишена активност са отбелязани с цвят: от слаби смущения до екстремни бури.",
+    seo2:
+      "Геомагнитните бури се оценяват по планетарния Kp индекс и G-скалата на NOAA. За геомагнитна буря говорим от Kp 5 нагоре, а при по-високи стойности нараства вероятността за технологично влияние и влияние върху самочувствието.",
+    seo3:
+      "Календарът се обновява автоматично въз основа на данни от NOAA Space Weather Prediction Center и дава практичен преглед на очакваната активност през следващите дни.",
+  },
 };
 
 export default function StormCalendar({ locale = "uk", initialData }: { locale?: LegacyLocale; initialData?: StormDay[] | null }) {
   const t = localizedCopy[locale];
-  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : locale === "en" ? enUS : uk;
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "en" ? "en-US" : "uk-UA";
+  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : locale === "bg" ? bgDateLocale : locale === "en" ? enUS : uk;
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 
@@ -428,7 +455,9 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
                     ? "https://magnetic-storm-hub.lovable.app/ro/calendar"
                     : locale === "hu"
                       ? "https://magnetic-storm-hub.lovable.app/hu/calendar"
-                      : "https://magnetic-storm-hub.lovable.app/calendar",
+                      : locale === "bg"
+                        ? "https://magnetic-storm-hub.lovable.app/bg/calendar"
+                        : "https://magnetic-storm-hub.lovable.app/calendar",
           }),
         }}
       />

@@ -11,6 +11,7 @@ const NEWS_LOCALES = [
   { code: "pl", short: "PL", label: "Польська", deepl: "PL" },
   { code: "ro", short: "RO", label: "Румунська", deepl: "RO" },
   { code: "hu", short: "HU", label: "Угорська", deepl: "HU" },
+  { code: "bg", short: "BG", label: "Болгарська", deepl: "BG" },
   { code: "en", short: "EN", label: "Англійська", deepl: "EN-US" },
 ] as const;
 
