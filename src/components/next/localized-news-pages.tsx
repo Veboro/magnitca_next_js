@@ -6,7 +6,7 @@ import { MobileAdsenseSlot } from "@/components/next/mobile-adsense-slot";
 import type { SiteLocale } from "@/lib/locale";
 import { getPathForLocale } from "@/lib/locale";
 import { resolveLocalizedMetadata } from "@/lib/seo";
-import { absoluteUrl, SOCIAL_PROFILE_URLS } from "@/lib/site";
+import { absoluteUrl, SITE_AUTHOR, SOCIAL_PROFILE_URLS } from "@/lib/site";
 import { getLatestNews, getNewsArticleBySlug, getNewsArticleFallbackTargetBySlug } from "@/lib/server-news";
 
 const NEWS_COPY: Record<
@@ -18,10 +18,12 @@ const NEWS_COPY: Record<
     empty: string;
     notFound: string;
     publisher: string;
+    authorLabel: string;
   }
 > = {
   uk: {
     dateLocale: "uk-UA",
+    authorLabel: "Автор",
     heading: "Новини магнітних бур",
     description:
       "Щоденні матеріали про магнітні бурі, геомагнітну активність, прогнози NOAA та вплив космічної погоди на самопочуття.",
@@ -31,6 +33,7 @@ const NEWS_COPY: Record<
   },
   ru: {
     dateLocale: "ru-RU",
+    authorLabel: "Автор",
     heading: "Новости магнитных бурь",
     description:
       "Ежедневные материалы о магнитных бурях, геомагнитной активности, прогнозах NOAA и влиянии космической погоды на самочувствие.",
@@ -40,6 +43,7 @@ const NEWS_COPY: Record<
   },
   pl: {
     dateLocale: "pl-PL",
+    authorLabel: "Autor",
     heading: "Wiadomości o burzach magnetycznych",
     description:
       "Codzienne materiały o burzach magnetycznych, aktywności geomagnetycznej, prognozach NOAA i wpływie pogody kosmicznej na samopoczucie.",
@@ -49,6 +53,7 @@ const NEWS_COPY: Record<
   },
   ro: {
     dateLocale: "ro-RO",
+    authorLabel: "Autor",
     heading: "Știri despre furtuni magnetice",
     description:
       "Materiale zilnice despre furtuni magnetice, activitate geomagnetică, prognoze NOAA și influența vremii spațiale asupra stării de bine.",
@@ -58,6 +63,7 @@ const NEWS_COPY: Record<
   },
   hu: {
     dateLocale: "hu-HU",
+    authorLabel: "Szerző",
     heading: "Mágneses vihar hírek",
     description:
       "Napi anyagok mágneses viharokról, geomágneses aktivitásról, NOAA-előrejelzésekről és az űridőjárás közérzetre gyakorolt hatásáról.",
@@ -67,6 +73,7 @@ const NEWS_COPY: Record<
   },
   bg: {
     dateLocale: "bg-BG",
+    authorLabel: "Автор",
     heading: "Новини за магнитните бури",
     description:
       "Ежедневни материали за магнитните бури, геомагнитната активност, прогнозите на NOAA и влиянието на космическото време върху самочувствието.",
@@ -74,8 +81,19 @@ const NEWS_COPY: Record<
     notFound: "Новината не е намерена",
     publisher: "Magnitca",
   },
+  cs: {
+    dateLocale: "cs-CZ",
+    authorLabel: "Autor",
+    heading: "Novinky o magnetických bouřích",
+    description:
+      "Denní materiály o magnetických bouřích, geomagnetické aktivitě, předpovědích NOAA a vlivu kosmického počasí na samopočit.",
+    empty: "Novinky zatím nebyly přidány.",
+    notFound: "Novinka nenalezena",
+    publisher: "Magnitca",
+  },
   en: {
     dateLocale: "en-US",
+    authorLabel: "Author",
     heading: "Magnetic storm news",
     description:
       "Daily articles about magnetic storms, geomagnetic activity, NOAA forecasts and how space weather may affect wellbeing.",
@@ -246,7 +264,12 @@ export async function LocalizedNewsArticlePage({
       "@type": "WebPage",
       "@id": canonicalUrl,
     },
-    author: organization,
+    author: {
+      "@type": "Person",
+      name: SITE_AUTHOR.name,
+      url: SITE_AUTHOR.url,
+      sameAs: [SITE_AUTHOR.url],
+    },
     publisher: {
       ...organization,
       logo: {
@@ -298,7 +321,18 @@ export async function LocalizedNewsArticlePage({
             <h1 className="mt-4 font-display text-3xl font-bold leading-tight sm:text-4xl">
               {article.title}
             </h1>
-            <div className="news-article-body official-page-prose prose prose-sm max-w-none">
+            <p className="mt-3 text-xs text-muted-foreground">
+              {copy.authorLabel}:{" "}
+              <a
+                href={SITE_AUTHOR.url}
+                target="_blank"
+                rel="author noopener noreferrer"
+                className="font-medium text-primary hover:underline"
+              >
+                {SITE_AUTHOR.name}
+              </a>
+            </p>
+            <div className="mt-6 news-article-body official-page-prose prose prose-sm max-w-none">
               {article.content.includes("<") && article.content.includes(">") ? (
                 <div dangerouslySetInnerHTML={{ __html: article.content }} />
               ) : (

@@ -330,6 +330,59 @@ const localizedCopy = {
       { q: "Колко често се обновяват данните?", a: "Данните идват от измерванията на NOAA и се обновяват редовно." },
     ],
   },
+  cs: {
+    ...copy.pl,
+    pageTitle: "Sluneční vítr online v reálném čase — rychlost a hustota",
+    pageDescription:
+      "Aktuální sluneční vítr v reálném čase: rychlost, hustota a graf za poslední 2 hodiny podle dat NOAA DSCOVR.",
+    heroTitle: "Sluneční vítr dnes",
+    heroText:
+      "Rychlost a hustota slunečního větru v reálném čase. Graf za poslední 2 hodiny a meziplanetární magnetické pole IMF Bz.",
+    currentAria: "Aktuální hodnoty slunečního větru",
+    speed: "Rychlost",
+    density: "Hustota",
+    normal: "Normální",
+    elevated: "Zvýšená",
+    stronglySouth: "Silně jižní",
+    south: "Jižní",
+    weaklySouth: "Slabě jižní",
+    north: "Severní",
+    speedChartAria: "Graf rychlosti a hustoty slunečního větru",
+    speedChartTitle: "Rychlost a hustota — poslední 2 hodiny",
+    bzChartAria: "Graf IMF Bz",
+    bzChartTitle: "Meziplanetární magnetické pole (Bz) — poslední 2 hodiny",
+    loading: "Načítání...",
+    bzNote:
+      "Záporná hodnota Bz (jižní) usnadňuje pronikání slunečního větru do magnetosféry Země. Když Bz klesne pod -5 nT, riziko geomagnetické bouře výrazně roste.",
+    scaleAria: "Škála rychlosti slunečního větru",
+    scaleTitle: "Škála rychlosti slunečního větru (km/s)",
+    seoAria: "O slunečním větru",
+    seoHeading: "Co je sluneční vítr a proč je důležitý?",
+    seoText1:
+      "Sluneční vítr je nepřetržitý proud nabitých částic vytékající z koróny Slunce. Jeho rychlost se obvykle pohybuje od 300 do více než 800 km/s a hustota se může rychle měnit.",
+    seoText2:
+      "Když rychlost a hustota slunečního větru rostou, zvyšuje se tlak na magnetosféru Země. Zvláštní význam má složka Bz: záporné hodnoty zvyšují pravděpodobnost geomagnetických poruch.",
+    faqAria: "Časté otázky o slunečním větru",
+    faqTitle: "Časté otázky",
+    tooltipKyiv: "místní čas",
+    areaSpeed: "Rychlost",
+    areaDensity: "Hustota",
+    speedLevels: [
+      { range: "< 300", status: "Pomalý", color: "bg-storm-quiet", description: "Pomalý sluneční vítr, obvykle bez významného vlivu na magnetosféru." },
+      { range: "300–400", status: "Normální", color: "bg-storm-quiet", description: "Typická rychlost slunečního větru a klidné geomagnetické podmínky." },
+      { range: "400–500", status: "Zvýšený", color: "bg-storm-minor", description: "Zvýšená rychlost může přispívat k mírným geomagnetickým poruchám." },
+      { range: "500–600", status: "Vysoký", color: "bg-storm-moderate", description: "Rychlejší proud zvyšuje riziko výraznějších poruch." },
+      { range: "600–800", status: "Velmi vysoký", color: "bg-storm-strong", description: "Velmi rychlý sluneční vítr může vést k silnějším magnetickým bouřím." },
+      { range: "> 800", status: "Extrémní", color: "bg-storm-severe", description: "Extrémně rychlý proud s velkým potenciálem geomagnetických poruch." },
+    ],
+    faqItems: [
+      { q: "Co je sluneční vítr?", a: "Je to proud nabitých částic vyzařovaných Sluncem. Když dorazí k Zemi s vyšší rychlostí a hustotou, může zesilovat geomagnetickou aktivitu." },
+      { q: "Jak rychlost slunečního větru ovlivňuje Zemi?", a: "Vyšší rychlost znamená silnější působení na magnetosféru. Ve spojení s nepříznivým magnetickým polem může vést ke geomagnetickým bouřím." },
+      { q: "Co je hustota slunečního větru?", a: "Hustota ukazuje, kolik částic se nachází v jednotce objemu. Vysoká hustota spolu s vysokou rychlostí obvykle zvyšuje vliv na magnetosféru." },
+      { q: "Jak často se data aktualizují?", a: "Data pocházejí z měření satelitu DSCOVR a jsou pravidelně obnovována, takže lze změny sledovat téměř v reálném čase." },
+      { q: "Co znamená složka Bz?", a: "Bz je část meziplanetárního magnetického pole. Záporný Bz zvyšuje šanci, že sluneční vítr účinněji naruší magnetické pole Země." },
+    ],
+  },
   en: {
     ...copy.uk,
     pageTitle: "Solar wind online in real time — speed and density",
@@ -386,7 +439,7 @@ const localizedCopy = {
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "bg" ? "Europe/Sofia" : locale === "en" ? "UTC" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "bg" ? "Europe/Sofia" : locale === "cs" ? "Europe/Prague" : locale === "en" ? "UTC" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -444,7 +497,7 @@ interface SolarWindProps {
 
 const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "cs" ? "cs-CZ" : locale === "en" ? "en-US" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const speedUnit = locale === "uk" || locale === "ru" || locale === "bg" ? "км/с" : "km/s";
   const densityUnit = locale === "uk" || locale === "ru" || locale === "bg" ? "p/см³" : "p/cm³";
@@ -565,7 +618,7 @@ const SolarWind = ({ locale = "uk", initialWind, initialMag }: SolarWindProps) =
                 )}>
                   {latestMag?.bz?.toFixed(1) ?? "—"}
                 </span>
-                <span className="text-muted-foreground text-sm">нТ</span>
+                <span className="text-muted-foreground text-sm">{locale === "uk" || locale === "ru" || locale === "bg" ? "нТ" : "nT"}</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 {(latestMag?.bz ?? 0) < -10 ? t.stronglySouth :

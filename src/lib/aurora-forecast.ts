@@ -325,6 +325,13 @@ function getBulgarianSummaryLabel(topChance: number) {
   return "Почти никакъв";
 }
 
+function getCzechSummaryLabel(topChance: number) {
+  if (topChance >= 75) return "Vysoká";
+  if (topChance >= 45) return "Střední";
+  if (topChance >= 18) return "Nízká";
+  return "Téměř žádná";
+}
+
 function getEuropeSummaryLabel(topChance: number) {
   if (topChance >= 75) return "High chance";
   if (topChance >= 45) return "Moderate chance";
@@ -498,6 +505,34 @@ function getBulgarianRegionNote(chance: number, effectiveKp: number, nightCloud:
   }
 
   return "видимостта е малко вероятна без много силна геомагнитна буря и ясно небе";
+}
+
+function getCzechRegionNote(chance: number, effectiveKp: number, nightCloud: number | null, lat: number, moonIllumination: number) {
+  if (effectiveKp < 5.2) {
+    return "geomagnetická aktivita je zatím příliš slabá pro reálnou viditelnost polární záře v Česku";
+  }
+
+  if (nightCloud !== null && nightCloud >= 80) {
+    return "aktivita může být zvýšená, ale hustá oblačnost může polární záři téměř úplně zakrýt";
+  }
+
+  if (moonIllumination >= 75 && chance < 58) {
+    return "jasný Měsíc může snížit viditelnost slabé záře nízko nad severním obzorem";
+  }
+
+  if (chance >= 58) {
+    return "vyhledejte tmavé místo s otevřeným severním obzorem po úplném setmění";
+  }
+
+  if (chance >= 38) {
+    return "nízko nad severním obzorem se může objevit slabý oblouk nebo záře, zejména mimo města";
+  }
+
+  if (lat >= 50) {
+    return "šance je nízká, ale severnější poloha pomáhá při silnějších geomagnetických bouřích";
+  }
+
+  return "viditelnost je bez velmi silné geomagnetické bouře a jasné oblohy nepravděpodobná";
 }
 
 function getEuropeCountryNote(chance: number, effectiveKp: number, nightCloud: number | null, lat: number, moonIllumination: number) {
@@ -946,6 +981,34 @@ export const getBulgariaAuroraForecast = unstable_cache(
       },
     }),
   ["bulgaria-aurora-forecast"],
+  { revalidate: 900 },
+);
+
+export const getCzechiaAuroraForecast = unstable_cache(
+  () =>
+    getGeoJsonAuroraForecast({
+      geoJsonPath: "public/geo/czechia-regions.geojson",
+      timezone: "Europe/Prague",
+      summaryLabel: getCzechSummaryLabel,
+      note: getCzechRegionNote,
+      nameOverrides: {
+        "CZ-10": "Praha",
+        "CZ-20": "Středočeský kraj",
+        "CZ-31": "Jihočeský kraj",
+        "CZ-32": "Plzeňský kraj",
+        "CZ-41": "Karlovarský kraj",
+        "CZ-42": "Ústecký kraj",
+        "CZ-51": "Liberecký kraj",
+        "CZ-52": "Královéhradecký kraj",
+        "CZ-53": "Pardubický kraj",
+        "CZ-63": "Kraj Vysočina",
+        "CZ-64": "Jihomoravský kraj",
+        "CZ-71": "Olomoucký kraj",
+        "CZ-72": "Zlínský kraj",
+        "CZ-80": "Moravskoslezský kraj",
+      },
+    }),
+  ["czechia-aurora-forecast"],
   { revalidate: 900 },
 );
 

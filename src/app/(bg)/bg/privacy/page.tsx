@@ -85,7 +85,31 @@ export default function BulgarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">6. Съхранение на данни</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">6. Реклами и съгласие</h2>
+          <p>
+            На сайта може да се показва реклама чрез Google AdSense, както и да се използват
+            инструменти за анализ. За показване и измерване на рекламите и за изготвяне на статистика
+            тези услуги могат да задават бисквитки и да обработват данни, включително онлайн
+            идентификатор, с цел доставяне на рекламите и измерване на тяхната ефективност.
+          </p>
+          <p>
+            За посетителите от Европейското икономическо пространство (ЕИП) и Обединеното кралство,
+            преди използването на незадължителни бисквитки се показва банер за съгласие —
+            сертифицирана от Google платформа за управление на съгласието (CMP). Рекламните и
+            аналитичните бисквитки се задават само след вашето съгласие, като по всяко време можете
+            да промените или оттеглите съгласието си чрез същия банер или настройките за
+            поверителност. Извън ЕИП и Обединеното кралство бисквитките могат да се използват в
+            съответствие с местното законодателство. Данните се обработват от Google съгласно неговата
+            политика за поверителност; вижте{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">7. Съхранение на данни</h2>
           <p>
             Съхраняваме данните само толкова дълго, колкото е обосновано за съответната цел.
             Техническите журнали и данните от анализите могат да се запазят по причини, свързани
@@ -99,7 +123,7 @@ export default function BulgarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">7. Международно предаване на данни</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Международно предаване на данни</h2>
           <p>
             Някои технически доставчици могат да обработват данни и извън Европейското
             икономическо пространство. В такива случаи разчитаме на договорните и организационните
@@ -108,7 +132,7 @@ export default function BulgarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. Права на потребителите</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">9. Права на потребителите</h2>
           <p>Ако за вас важат GDPR или подобни правила за защита на данните, може да имате право:</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>да поискате достъп до личните си данни;</li>
@@ -121,7 +145,7 @@ export default function BulgarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Контакт</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Контакт</h2>
           <p>
             При въпроси, свързани със защитата на данните, правата на потребителите или работата
             на сайта, пишете ни:{" "}

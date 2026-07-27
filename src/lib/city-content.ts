@@ -17,6 +17,7 @@ export const CITY_FAQ_HEADING: Record<SiteLocale, string> = {
   ro: "Întrebări frecvente",
   hu: "Gyakori kérdések",
   bg: "Често задавани въпроси",
+  cs: "Časté dotazy",
   en: "Frequently asked questions",
 };
 
@@ -72,6 +73,11 @@ const AURORA_NOTE: Record<SiteLocale, Record<Band, string>> = {
     high: "На географска ширина над 51° северно сияние тук е възможно по време на силни бури от ниво G2–G3 и по-високо.",
     mid: "На тази географска ширина северното сияние се вижда рядко — предимно по време на силни бури от ниво G3–G5.",
     low: "На тази южна географска ширина северното сияние се появява много рядко, само при екстремни бури G4–G5.",
+  },
+  cs: {
+    high: "Na zeměpisné šířce nad 51° je zde polární záře možná během silných bouří úrovně G2–G3 a vyšších.",
+    mid: "Na této zeměpisné šířce je polární záře vidět zřídka — hlavně během silných bouří úrovně G3–G5.",
+    low: "Na této jižnější zeměpisné šířce se polární záře objevuje velmi zřídka, jen při extrémních bouřích G4–G5.",
   },
   en: {
     high: "At a latitude above 51°, auroras are possible here during strong G2–G3 storms and above.",
@@ -197,6 +203,29 @@ export function getCitySeoContent(input: CityContentInput): CitySeoContent {
           {
             question: `Откъде идват данните за магнитните бури за ${genitive}?`,
             answer: `Данните за Kp-индекса и скалите G/R/S се предоставят от NOAA Space Weather Prediction Center, а времето и качеството на въздуха — от Open-Meteo. Часовете са показани в местната часова зона ${utcOffset} (${timezone}).`,
+          },
+        ],
+      };
+    }
+    case "cs": {
+      const inCity = `ve městě ${name}`;
+      return {
+        paragraphs: [
+          `Město ${name} leží v ${regionLabel}, na zeměpisné šířce ${latLabel} a délce ${lonLabel} (časové pásmo ${timezone}, ${utcOffset}). ${aurora}`,
+          `Geomagnetickou aktivitu určuje planetární Kp-index, který je společný pro celou planetu, ale to, jak silně jsou magnetické bouře pociťovány, závisí na zeměpisné šířce. Na této stránce zobrazujeme Kp-index ${inCity}, předpověď na 3 a 27 dní, úroveň bouře na škále G, počasí, východ a západ slunce a kvalitu ovzduší — v reálném čase podle dat NOAA SWPC a Open-Meteo.`,
+        ],
+        faq: [
+          {
+            question: `Bude dnes ${inCity} magnetická bouře?`,
+            answer: `Aktuální stav geomagnetického pole ${inCity} se obnovuje v reálném čase podle dat NOAA SWPC. Aktuální Kp-index, úroveň bouře na škále G a předpověď na následující 3 dny jsou uvedeny výše na této stránce.`,
+          },
+          {
+            question: `Je možné ${inCity} vidět polární záři?`,
+            answer: `${aurora} Souřadnice města: ${latLabel}, ${lonLabel}.`,
+          },
+          {
+            question: `Odkud pocházejí data o magnetických bouřích pro ${genitive}?`,
+            answer: `Data Kp-indexu a škál G/R/S poskytuje NOAA Space Weather Prediction Center, počasí a kvalitu ovzduší Open-Meteo. Časy jsou uvedeny v místním časovém pásmu ${utcOffset} (${timezone}).`,
           },
         ],
       };

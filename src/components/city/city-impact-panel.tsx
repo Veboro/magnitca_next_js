@@ -11,6 +11,7 @@ const copy = {
     pressureRange: "перепад",
     currentPressure: "тиск зараз",
     total: "Загальний вплив",
+    disclaimer: "Інформаційно та не є медичною порадою. Наукові докази впливу геомагнітної активності на самопочуття обмежені й неоднозначні.",
   },
   ru: {
     title: "Влияние на организм",
@@ -19,6 +20,7 @@ const copy = {
     pressureRange: "перепад",
     currentPressure: "давление сейчас",
     total: "Общее влияние",
+    disclaimer: "Информационно и не является медицинской рекомендацией. Научные доказательства влияния геомагнитной активности на самочувствие ограничены и неоднозначны.",
   },
   pl: {
     title: "Wpływ na organizm",
@@ -27,6 +29,7 @@ const copy = {
     pressureRange: "wahanie",
     currentPressure: "ciśnienie teraz",
     total: "Wpływ łączny",
+    disclaimer: "Charakter informacyjny, nie stanowi porady medycznej. Dowody naukowe na wpływ aktywności geomagnetycznej na samopoczucie są ograniczone i niejednoznaczne.",
   },
   ro: {
     title: "Influența asupra organismului",
@@ -35,6 +38,7 @@ const copy = {
     pressureRange: "variație",
     currentPressure: "presiune acum",
     total: "Influență totală",
+    disclaimer: "Caracter informativ, nu constituie sfat medical. Dovezile științifice privind efectul activității geomagnetice asupra stării de bine sunt limitate și neconcludente.",
   },
   hu: {
     title: "Hatás a szervezetre",
@@ -43,6 +47,7 @@ const copy = {
     pressureRange: "ingadozás",
     currentPressure: "aktuális nyomás",
     total: "Összhatás",
+    disclaimer: "Tájékoztató jellegű, nem orvosi tanács. A geomágneses aktivitás közérzetre gyakorolt hatását alátámasztó tudományos bizonyítékok korlátozottak és nem egyértelműek.",
   },
   bg: {
     title: "Влияние върху организма",
@@ -51,6 +56,16 @@ const copy = {
     pressureRange: "колебание",
     currentPressure: "налягане сега",
     total: "Общо влияние",
+    disclaimer: "Информативно и не е медицински съвет. Научните доказателства за влиянието на геомагнитната активност върху самочувствието са ограничени и нееднозначни.",
+  },
+  cs: {
+    title: "Vliv na organismus",
+    magnetic: "Magnetické bouře",
+    pressure: "Atmosférický tlak",
+    pressureRange: "kolísání",
+    currentPressure: "tlak nyní",
+    total: "Celkový vliv",
+    disclaimer: "Informativní charakter, nejde o lékařskou radu. Vědecké důkazy o vlivu geomagnetické aktivity na pohodu jsou omezené a nejednoznačné.",
   },
   en: {
     title: "Impact on the body",
@@ -59,6 +74,7 @@ const copy = {
     pressureRange: "variation",
     currentPressure: "pressure now",
     total: "Overall impact",
+    disclaimer: "For information only, not medical advice. Scientific evidence that geomagnetic activity affects well-being is limited and inconclusive.",
   },
 } as const;
 
@@ -256,6 +272,8 @@ export function CityImpactPanel({
           </div>
         </div>
       </div>
+
+      <p className="mt-3 text-[10px] leading-snug text-muted-foreground/70">{t.disclaimer}</p>
     </div>
   );
 }

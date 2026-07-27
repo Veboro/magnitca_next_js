@@ -202,6 +202,7 @@ const ru = {
     symptomHeadache: "Головная боль",
     symptomIrritability: "Раздражительность",
     symptomSleep: "Нарушения сна",
+    disclaimer: "Информационно и не является медицинской рекомендацией. Научные доказательства влияния геомагнитной активности на самочувствие ограничены и неоднозначны.",
     symptomMigraine: "Мигрень",
     symptomTachycardia: "Тахикардия",
     symptomAnxiety: "Тревожность",

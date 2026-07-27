@@ -202,6 +202,7 @@ const uk = {
     symptomHeadache: "Головний біль",
     symptomIrritability: "Дратівливість",
     symptomSleep: "Порушення сну",
+    disclaimer: "Інформаційно та не є медичною порадою. Наукові докази впливу геомагнітної активності на самопочуття обмежені й неоднозначні.",
     symptomMigraine: "Мігрень",
     symptomTachycardia: "Тахікардія",
     symptomAnxiety: "Тривожність",

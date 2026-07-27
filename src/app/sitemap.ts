@@ -3,6 +3,7 @@ import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD, RO_COUNTRIES } from "@/data/cities-md";
 import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_BG } from "@/data/cities-bg";
+import { CITIES_CS } from "@/data/cities-cs";
 import { CITIES_PL } from "@/data/cities-pl";
 import { getRuCitySlug } from "@/data/cities-ru";
 import { getMoonMonthRoutes2026 } from "@/lib/moon-calendar";
@@ -161,6 +162,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === "/bg" ? 0.85 : path === "/bg/aurora" ? 0.76 : 0.6,
   }));
 
+  const csStaticPages: MetadataRoute.Sitemap = [
+    "/cs",
+    "/cs/test",
+    "/cs/calendar",
+    "/cs/kp-index",
+    "/cs/solar-wind",
+    "/cs/aurora",
+    "/cs/sunrise",
+    "/cs/sunrise-tomorrow",
+    "/cs/sunset",
+    "/cs/sunset-tomorrow",
+    "/cs/moon-calendar",
+    "/cs/faq",
+    "/cs/about",
+    "/cs/contacts",
+    "/cs/privacy",
+    "/cs/cookies",
+    "/cs/terms",
+  ].map((path) => ({
+    url: `${SITE_URL}${path}`,
+    changeFrequency: path === "/cs" || path === "/cs/aurora" ? "hourly" : "daily",
+    priority: path === "/cs" ? 0.85 : path === "/cs/aurora" ? 0.76 : 0.6,
+  }));
+
   const enStaticPages: MetadataRoute.Sitemap = [
     "/en",
     "/en/test",
@@ -183,7 +208,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // The /feeling reviews hub exists in all six locales; declare hreflang so
   // Google clusters the translations and picks the right one per user.
-  const feelingPaths = ["/feeling", "/ru/feeling", "/pl/feeling", "/ro/feeling", "/hu/feeling", "/bg/feeling", "/en/feeling"];
+  const feelingPaths = ["/feeling", "/ru/feeling", "/pl/feeling", "/ro/feeling", "/hu/feeling", "/bg/feeling", "/cs/feeling", "/en/feeling"];
   const feelingLanguages: Record<string, string> = {
     uk: `${SITE_URL}/feeling`,
     ru: `${SITE_URL}/ru/feeling`,
@@ -191,6 +216,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ro: `${SITE_URL}/ro/feeling`,
     hu: `${SITE_URL}/hu/feeling`,
     bg: `${SITE_URL}/bg/feeling`,
+    cs: `${SITE_URL}/cs/feeling`,
     en: `${SITE_URL}/en/feeling`,
     "x-default": `${SITE_URL}/feeling`,
   };
@@ -239,6 +265,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const bgCityPages: MetadataRoute.Sitemap = CITIES_BG.map((city) => ({
     url: `${SITE_URL}/bg/city/${city.slug}`,
+    lastModified: today,
+    changeFrequency: "daily",
+    priority: 0.75,
+  }));
+
+  const csCityPages: MetadataRoute.Sitemap = CITIES_CS.map((city) => ({
+    url: `${SITE_URL}/cs/city/${city.slug}`,
     lastModified: today,
     changeFrequency: "daily",
     priority: 0.75,
@@ -316,6 +349,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.65,
   }));
 
+  const csMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
+    url: `${SITE_URL}${route.hrefCs}`,
+    changeFrequency: "weekly",
+    priority: 0.65,
+  }));
+
   const enMoonCalendarPages: MetadataRoute.Sitemap = moonMonthRoutes.map((route) => ({
     url: `${SITE_URL}${route.hrefEn}`,
     changeFrequency: "weekly",
@@ -388,6 +427,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
     .catch(() => []);
 
+  const csNewsPages = await getLatestNews(1000, "cs")
+    .then((items) =>
+      items.map((item) => ({
+        url: `${SITE_URL}/cs/news/${item.slug || item.id}`,
+        lastModified: item.published_at,
+        changeFrequency: "weekly" as const,
+        priority: 0.7,
+      }))
+    )
+    .catch(() => []);
+
   const enNewsPages = await getLatestNews(1000, "en")
     .then((items) =>
       items.map((item) => ({
@@ -406,6 +456,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roStaticPages,
     ...huStaticPages,
     ...bgStaticPages,
+    ...csStaticPages,
     ...enStaticPages,
     ...feelingPages,
     ...cityPages,
@@ -414,6 +465,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roCityPages,
     ...huCityPages,
     ...bgCityPages,
+    ...csCityPages,
     ...roCountryPages,
     ...roCountrySunPages,
     ...oblastPages,
@@ -425,6 +477,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roMoonCalendarPages,
     ...huMoonCalendarPages,
     ...bgMoonCalendarPages,
+    ...csMoonCalendarPages,
     ...enMoonCalendarPages,
     ...newsPages,
     ...ruNewsPages,
@@ -432,6 +485,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...roNewsPages,
     ...huNewsPages,
     ...bgNewsPages,
+    ...csNewsPages,
     ...enNewsPages,
   ];
 }

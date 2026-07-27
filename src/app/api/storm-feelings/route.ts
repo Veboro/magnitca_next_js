@@ -35,7 +35,7 @@ type StormFeelingStats = {
   averageScore: number;
 };
 
-const LOCALES = new Set<SiteLocale>(["uk", "ru", "pl", "ro", "hu", "bg", "en"]);
+const LOCALES = new Set<SiteLocale>(["uk", "ru", "pl", "ro", "hu", "bg", "cs", "en"]);
 
 function getKyivDateKey(date = new Date()) {
   return new Intl.DateTimeFormat("en-CA", {

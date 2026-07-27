@@ -9,6 +9,7 @@ const ROOT_TITLES: Record<SiteLocale, string> = {
   ro: "Furtuni magnetice astăzi — indice Kp, vânt solar și prognoză | Magnitca",
   hu: "Mágneses viharok ma — Kp-index, napszél és előrejelzés | Magnitca",
   bg: "Магнитни бури днес — Kp-индекс, слънчев вятър и прогноза | Magnitca",
+  cs: "Magnetické bouře dnes — Kp-index, sluneční vítr a předpověď | Magnitca",
   en: "Magnetic storms today — Kp index, solar wind and forecast | Magnitca",
 };
 
@@ -19,6 +20,7 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   ro: "ro_MD",
   hu: "hu_HU",
   bg: "bg_BG",
+  cs: "cs_CZ",
   en: "en_US",
 };
 

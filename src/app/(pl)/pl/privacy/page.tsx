@@ -63,7 +63,29 @@ export default function PolishPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">6. Okres przechowywania</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">6. Reklamy i zgoda</h2>
+          <p>
+            W serwisie mogą być wyświetlane reklamy za pośrednictwem Google AdSense, może też być
+            używana analityka. W celu wyświetlania i pomiaru reklam oraz tworzenia statystyk usługi
+            te mogą zapisywać pliki cookie i przetwarzać dane, w tym identyfikator internetowy, na
+            potrzeby dostarczania reklam i pomiaru ich skuteczności.
+          </p>
+          <p>
+            Dla użytkowników z Europejskiego Obszaru Gospodarczego (EOG) oraz Wielkiej Brytanii,
+            przed użyciem niekoniecznych plików cookie wyświetlany jest baner zgody — certyfikowana
+            przez Google platforma zarządzania zgodą (CMP). Reklamowe i analityczne pliki cookie są
+            zapisywane dopiero po wyrażeniu zgody, a zgodę można w każdej chwili zmienić lub wycofać
+            za pomocą tego samego banera lub ustawień prywatności. Poza EOG i Wielką Brytanią pliki
+            cookie mogą być używane zgodnie z lokalnym prawem. Dane są przetwarzane przez Google
+            zgodnie z jego polityką prywatności; zob.{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">7. Okres przechowywania</h2>
           <p>
             Dane przechowujemy tylko tak długo, jak jest to uzasadnione celem przetwarzania.
             Wiadomości z formularza mogą być przechowywane dłużej, jeśli jest to potrzebne do
@@ -72,7 +94,7 @@ export default function PolishPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">7. Transfer poza EOG</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Transfer poza EOG</h2>
           <p>
             Część dostawców technicznych może przetwarzać dane poza Europejskim Obszarem
             Gospodarczym. W takich przypadkach opieramy się na deklarowanych przez nich mechanizmach
@@ -80,7 +102,7 @@ export default function PolishPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. Twoje prawa</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">9. Twoje prawa</h2>
           <ul className="list-disc space-y-1 pl-5">
             <li>prawo dostępu do danych;</li>
             <li>prawo sprostowania nieprawidłowych danych;</li>
@@ -91,7 +113,7 @@ export default function PolishPrivacyPage() {
           </ul>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Kontakt</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Kontakt</h2>
           <p>
             W sprawach związanych z prywatnością możesz napisać na{" "}
             <a href="mailto:info@magnitca.com" className="text-primary underline">

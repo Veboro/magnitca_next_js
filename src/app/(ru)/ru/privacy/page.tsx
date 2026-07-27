@@ -81,7 +81,31 @@ export default function RussianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">6. Срок хранения данных</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">6. Реклама и согласие</h2>
+          <p>
+            На сайте может показываться реклама через Google AdSense, а также может использоваться
+            аналитика. Для показа и измерения рекламы и формирования статистики эти сервисы могут
+            устанавливать cookie и обрабатывать данные, включая онлайн-идентификатор, для доставки
+            рекламы и измерения её эффективности.
+          </p>
+          <p>
+            Для посетителей из Европейской экономической зоны (ЕЭЗ) и Великобритании перед
+            использованием non-essential cookie показывается баннер согласия — сертифицированная
+            Google платформа управления согласием (CMP). Рекламные и аналитические cookie
+            устанавливаются только после вашего согласия, и вы можете в любой момент изменить или
+            отозвать согласие через тот же баннер или настройки приватности. За пределами ЕЭЗ и
+            Великобритании cookie могут использоваться в соответствии с местным законодательством.
+            Данные обрабатываются компанией Google, как описано в её политике конфиденциальности;
+            см.{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">7. Срок хранения данных</h2>
           <p>
             Мы храним данные только столько, сколько это разумно необходимо для цели обработки.
             Технические журналы и аналитические данные могут храниться в течение срока, нужного для
@@ -95,7 +119,7 @@ export default function RussianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">7. Передача за пределы ЕЭЗ</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Передача за пределы ЕЭЗ</h2>
           <p>
             Часть технических провайдеров может обрабатывать данные за пределами Европейской
             экономической зоны. В таких случаях мы опираемся на договорные и организационные
@@ -105,7 +129,7 @@ export default function RussianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. Ваши права</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">9. Ваши права</h2>
           <p>Если на вас распространяется GDPR или аналогичные правила, вы можете иметь право на:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>доступ к своим персональным данным;</li>
@@ -118,7 +142,7 @@ export default function RussianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Как связаться с нами</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Как связаться с нами</h2>
           <p>
             Если у вас есть вопросы по приватности, правам субъекта данных или работе сайта,
             напишите нам на{" "}

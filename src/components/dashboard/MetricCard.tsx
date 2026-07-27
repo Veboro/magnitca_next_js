@@ -58,7 +58,7 @@ export const MetricCard = ({
             {tooltip && (
               <Popover>
                 <PopoverTrigger asChild>
-                  <button type="button" className="inline-flex" aria-label={`Інформація про ${title}`}>
+                  <button type="button" className="inline-flex" aria-label={title}>
                     <HelpCircle className="h-3 w-3 text-muted-foreground/50 hover:text-primary cursor-help transition-colors" />
                   </button>
                 </PopoverTrigger>

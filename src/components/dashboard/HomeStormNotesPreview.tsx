@@ -20,7 +20,7 @@ type StormNote = {
   created_at: string | null;
 };
 
-type CountryCode = "ua" | "pl" | "md" | "hu" | "intl";
+type CountryCode = "ua" | "pl" | "md" | "hu" | "bg" | "cz" | "intl";
 
 const LOCALE_COUNTRY: Record<string, CountryCode> = {
   uk: "ua",
@@ -28,6 +28,8 @@ const LOCALE_COUNTRY: Record<string, CountryCode> = {
   pl: "pl",
   ro: "md",
   hu: "hu",
+  bg: "bg",
+  cs: "cz",
   en: "intl",
 };
 
@@ -36,6 +38,8 @@ const COUNTRY_FLAG: Record<CountryCode, string> = {
   pl: "🇵🇱",
   md: "🇲🇩",
   hu: "🇭🇺",
+  bg: "🇧🇬",
+  cz: "🇨🇿",
   intl: "🌍",
 };
 
@@ -47,6 +51,7 @@ const FEELING_PATH: Record<SiteLocale, string> = {
   ro: "/ro/feeling",
   hu: "/hu/feeling",
   bg: "/bg/feeling",
+  cs: "/cs/feeling",
   en: "/en/feeling",
 };
 
@@ -70,7 +75,7 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Анонім",
     scale: { [-3]: "Дуже добре", [-2]: "Добре", [-1]: "Трохи краще", [0]: "Нейтрально", [1]: "Легкий дискомфорт", [2]: "Погано", [3]: "Дуже погано" },
     gender: { female: "жінка", male: "чоловік" },
-    country: { ua: "Україна", pl: "Польща", md: "Молдова", hu: "Угорщина", intl: "Інша країна" },
+    country: { ua: "Україна", pl: "Польща", md: "Молдова", hu: "Угорщина", bg: "Болгарія", cz: "Чехія", intl: "Інша країна" },
   },
   ru: {
     title: "Последние отзывы",
@@ -80,7 +85,7 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Аноним",
     scale: { [-3]: "Очень хорошо", [-2]: "Хорошо", [-1]: "Немного лучше", [0]: "Нейтрально", [1]: "Лёгкий дискомфорт", [2]: "Плохо", [3]: "Очень плохо" },
     gender: { female: "женщина", male: "мужчина" },
-    country: { ua: "Украина", pl: "Польша", md: "Молдова", hu: "Венгрия", intl: "Другая страна" },
+    country: { ua: "Украина", pl: "Польша", md: "Молдова", hu: "Венгрия", bg: "Болгария", cz: "Чехия", intl: "Другая страна" },
   },
   pl: {
     title: "Najnowsze opinie",
@@ -90,7 +95,7 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Anonim",
     scale: { [-3]: "Bardzo dobrze", [-2]: "Dobrze", [-1]: "Trochę lepiej", [0]: "Neutralnie", [1]: "Lekki dyskomfort", [2]: "Źle", [3]: "Bardzo źle" },
     gender: { female: "kobieta", male: "mężczyzna" },
-    country: { ua: "Ukraina", pl: "Polska", md: "Mołdawia", hu: "Węgry", intl: "Inny kraj" },
+    country: { ua: "Ukraina", pl: "Polska", md: "Mołdawia", hu: "Węgry", bg: "Bułgaria", cz: "Czechy", intl: "Inny kraj" },
   },
   ro: {
     title: "Cele mai noi recenzii",
@@ -100,7 +105,7 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Anonim",
     scale: { [-3]: "Foarte bine", [-2]: "Bine", [-1]: "Puțin mai bine", [0]: "Neutru", [1]: "Disconfort ușor", [2]: "Rău", [3]: "Foarte rău" },
     gender: { female: "femeie", male: "bărbat" },
-    country: { ua: "Ucraina", pl: "Polonia", md: "Moldova", hu: "Ungaria", intl: "Altă țară" },
+    country: { ua: "Ucraina", pl: "Polonia", md: "Moldova", hu: "Ungaria", bg: "Bulgaria", cz: "Cehia", intl: "Altă țară" },
   },
   hu: {
     title: "Legfrissebb vélemények",
@@ -110,7 +115,7 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Névtelen",
     scale: { [-3]: "Nagyon jó", [-2]: "Jó", [-1]: "Kicsit jobb", [0]: "Semleges", [1]: "Enyhe kellemetlenség", [2]: "Rossz", [3]: "Nagyon rossz" },
     gender: { female: "nő", male: "férfi" },
-    country: { ua: "Ukrajna", pl: "Lengyelország", md: "Moldova", hu: "Magyarország", intl: "Más ország" },
+    country: { ua: "Ukrajna", pl: "Lengyelország", md: "Moldova", hu: "Magyarország", bg: "Bulgária", cz: "Csehország", intl: "Más ország" },
   },
   bg: {
     title: "Най-нови отзиви",
@@ -120,7 +125,17 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Анонимен",
     scale: { [-3]: "Много добре", [-2]: "Добре", [-1]: "Малко по-добре", [0]: "Неутрално", [1]: "Лек дискомфорт", [2]: "Зле", [3]: "Много зле" },
     gender: { female: "жена", male: "мъж" },
-    country: { ua: "Украйна", pl: "Полша", md: "Молдова", hu: "Унгария", intl: "Друга държава" },
+    country: { ua: "Украйна", pl: "Полша", md: "Молдова", hu: "Унгария", bg: "България", cz: "Чехия", intl: "Друга държава" },
+  },
+  cs: {
+    title: "Nejnovější recenze",
+    viewAll: "Všechny recenze",
+    empty: "Zatím žádné recenze.",
+    loading: "Načítání…",
+    anonymous: "Anonym",
+    scale: { [-3]: "Velmi dobře", [-2]: "Dobře", [-1]: "Trochu lépe", [0]: "Neutrálně", [1]: "Mírný diskomfort", [2]: "Špatně", [3]: "Velmi špatně" },
+    gender: { female: "žena", male: "muž" },
+    country: { ua: "Ukrajina", pl: "Polsko", md: "Moldavsko", hu: "Maďarsko", bg: "Bulharsko", cz: "Česko", intl: "Jiná země" },
   },
   en: {
     title: "Latest reviews",
@@ -130,7 +145,7 @@ const COPY: Record<SiteLocale, PreviewCopy> = {
     anonymous: "Anonymous",
     scale: { [-3]: "Very good", [-2]: "Good", [-1]: "A little better", [0]: "Neutral", [1]: "Mild discomfort", [2]: "Bad", [3]: "Very bad" },
     gender: { female: "female", male: "male" },
-    country: { ua: "Ukraine", pl: "Poland", md: "Moldova", hu: "Hungary", intl: "Other country" },
+    country: { ua: "Ukraine", pl: "Poland", md: "Moldova", hu: "Hungary", bg: "Bulgaria", cz: "Czechia", intl: "Other country" },
   },
 };
 

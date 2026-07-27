@@ -80,6 +80,14 @@ const copy: Record<
     neutral: "Неутрално {{percent}}%",
     worse: "Зле {{percent}}%",
   },
+  cs: {
+    empty: "První odpovědi se teprve sbírají",
+    discomfort: "Nepohodu cítí {{percent}}%",
+    responses: "{{count}} odpovědí",
+    better: "Dobře {{percent}}%",
+    neutral: "Neutrálně {{percent}}%",
+    worse: "Špatně {{percent}}%",
+  },
   en: {
     empty: "The first answers are still being collected",
     discomfort: "{{percent}}% feel discomfort",

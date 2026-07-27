@@ -4,11 +4,12 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Activity, CalendarDays, ChevronDown, ClipboardCheck, Eye, Gauge, HeartPulse, MapPin, MessageSquareText, Moon, Newspaper, Search, Sparkles, Sunrise, Sunset, Wind, X } from "lucide-react";
-import { getPathForLocale, getSafeLocaleSwitchPath, isBgPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, getSafeLocaleSwitchPath, isBgPath, isCsPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { ALL_UK_CITIES } from "@/data/cities";
 import { CITIES_MD } from "@/data/cities-md";
 import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_BG } from "@/data/cities-bg";
+import { CITIES_CS } from "@/data/cities-cs";
 import { CITIES_PL } from "@/data/cities-pl";
 import { CITIES_RU, getRuCitySlug } from "@/data/cities-ru";
 import { getOblastTitle, OBLAST_ROUTE_MAP } from "@/lib/oblast-routes";
@@ -26,24 +27,24 @@ function isNavGroup(entry: NavEntry): entry is NavGroup {
 // Localized labels. Single high-traffic pages stay flat; the rest are grouped
 // into a few dropdowns so the bar stays short (and doesn't scroll on mobile).
 const NAV_TEXT: Record<string, Record<SiteLocale, string>> = {
-  home: { uk: "Головна", ru: "Главная", pl: "Start", ro: "Acasă", hu: "Főoldal", bg: "Начало", en: "Home" },
-  kp: { uk: "Kp індекс", ru: "Kp индекс", pl: "Indeks Kp", ro: "Indice Kp", hu: "Kp-index", bg: "Kp-индекс", en: "Kp index" },
-  solarWind: { uk: "Сонячний вітер", ru: "Солнечный ветер", pl: "Wiatr słoneczny", ro: "Vânt solar", hu: "Napszél", bg: "Слънчев вятър", en: "Solar wind" },
-  stormCalendar: { uk: "Календар бур", ru: "Календарь бурь", pl: "Kalendarz burz", ro: "Calendar furtuni", hu: "Viharnaptár", bg: "Календар на бурите", en: "Storm calendar" },
-  moonCalendar: { uk: "Місячний календар", ru: "Лунный календарь", pl: "Kalendarz księżycowy", ro: "Calendar lunar", hu: "Holdnaptár", bg: "Лунен календар", en: "Moon calendar" },
-  aurora: { uk: "Північне сяйво", ru: "Северное сияние", pl: "Zorza polarna", ro: "Aurora boreală", hu: "Sarki fény", bg: "Северно сияние", en: "Aurora" },
-  test: { uk: "Тест", ru: "Тест", pl: "Test", ro: "Test", hu: "Teszt", bg: "Тест", en: "Test" },
-  reviews: { uk: "Відгуки", ru: "Отзывы", pl: "Opinie", ro: "Recenzii", hu: "Vélemények", bg: "Отзиви", en: "Reviews" },
-  groupCalendars: { uk: "Календарі", ru: "Календари", pl: "Kalendarze", ro: "Calendare", hu: "Naptárak", bg: "Календари", en: "Calendars" },
-  groupSky: { uk: "Небо", ru: "Небо", pl: "Niebo", ro: "Cer", hu: "Égbolt", bg: "Небе", en: "Sky" },
-  groupWellbeing: { uk: "Самопочуття", ru: "Самочувствие", pl: "Samopoczucie", ro: "Stare de bine", hu: "Közérzet", bg: "Самочувствие", en: "Wellbeing" },
+  home: { uk: "Головна", ru: "Главная", pl: "Start", ro: "Acasă", hu: "Főoldal", bg: "Начало", cs: "Domů", en: "Home" },
+  kp: { uk: "Kp індекс", ru: "Kp индекс", pl: "Indeks Kp", ro: "Indice Kp", hu: "Kp-index", bg: "Kp-индекс", cs: "Kp-index", en: "Kp index" },
+  solarWind: { uk: "Сонячний вітер", ru: "Солнечный ветер", pl: "Wiatr słoneczny", ro: "Vânt solar", hu: "Napszél", bg: "Слънчев вятър", cs: "Sluneční vítr", en: "Solar wind" },
+  stormCalendar: { uk: "Календар бур", ru: "Календарь бурь", pl: "Kalendarz burz", ro: "Calendar furtuni", hu: "Viharnaptár", bg: "Календар на бурите", cs: "Kalendář bouří", en: "Storm calendar" },
+  moonCalendar: { uk: "Місячний календар", ru: "Лунный календарь", pl: "Kalendarz księżycowy", ro: "Calendar lunar", hu: "Holdnaptár", bg: "Лунен календар", cs: "Lunární kalendář", en: "Moon calendar" },
+  aurora: { uk: "Північне сяйво", ru: "Северное сияние", pl: "Zorza polarna", ro: "Aurora boreală", hu: "Sarki fény", bg: "Северно сияние", cs: "Polární záře", en: "Aurora" },
+  test: { uk: "Тест", ru: "Тест", pl: "Test", ro: "Test", hu: "Teszt", bg: "Тест", cs: "Test", en: "Test" },
+  reviews: { uk: "Відгуки", ru: "Отзывы", pl: "Opinie", ro: "Recenzii", hu: "Vélemények", bg: "Отзиви", cs: "Recenze", en: "Reviews" },
+  groupCalendars: { uk: "Календарі", ru: "Календари", pl: "Kalendarze", ro: "Calendare", hu: "Naptárak", bg: "Календари", cs: "Kalendáře", en: "Calendars" },
+  groupSky: { uk: "Небо", ru: "Небо", pl: "Niebo", ro: "Cer", hu: "Égbolt", bg: "Небе", cs: "Obloha", en: "Sky" },
+  groupWellbeing: { uk: "Самопочуття", ru: "Самочувствие", pl: "Samopoczucie", ro: "Stare de bine", hu: "Közérzet", bg: "Самочувствие", cs: "Pohoda", en: "Wellbeing" },
 };
 
 // News page exists only in these locales.
 const NEWS_LABEL: Partial<Record<SiteLocale, string>> = { uk: "Новини", ru: "Новости", en: "News" };
 
 // Language switcher: each language shown by its own autonym.
-const LOCALE_ORDER: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "bg", "en"];
+const LOCALE_ORDER: SiteLocale[] = ["uk", "ru", "pl", "ro", "hu", "bg", "cs", "en"];
 const LOCALE_LANG: Record<SiteLocale, string> = {
   uk: "Українська",
   ru: "Русский",
@@ -51,6 +52,7 @@ const LOCALE_LANG: Record<SiteLocale, string> = {
   ro: "Română",
   hu: "Magyar",
   bg: "Български",
+  cs: "Čeština",
   en: "English",
 };
 
@@ -79,6 +81,10 @@ const copy: Record<SiteLocale, { brand: string; tagline: string }> = {
     brand: "Magnitca",
     tagline: "Космическо време и магнитни бури",
   },
+  cs: {
+    brand: "Magnitca",
+    tagline: "Kosmické počasí a magnetické bouře",
+  },
   en: {
     brand: "Magnitca",
     tagline: "Space weather and magnetic storms",
@@ -96,6 +102,7 @@ const flagIconStops: Partial<Record<SiteLocale, string[]>> = {
   ro: ["#002b7f", "#002b7f", "#fcd116", "#ce1126", "#ce1126"],
   hu: ["#ce2939", "#ce2939", "#ffffff", "#477050", "#477050"],
   bg: ["#ffffff", "#ffffff", "#00966e", "#d62612", "#d62612"],
+  cs: ["#11457e", "#11457e", "#ffffff", "#d7141a", "#d7141a"],
 };
 
 function BrandIcon({ locale }: { locale: SiteLocale }) {
@@ -177,6 +184,12 @@ const sunItems: Record<SiteLocale, Array<{ href: string; label: string }>> = {
     { href: "/sunset", label: "Залез днес" },
     { href: "/sunset-tomorrow", label: "Залез утре" },
   ],
+  cs: [
+    { href: "/sunrise", label: "Východ dnes" },
+    { href: "/sunrise-tomorrow", label: "Východ zítra" },
+    { href: "/sunset", label: "Západ dnes" },
+    { href: "/sunset-tomorrow", label: "Západ zítra" },
+  ],
   en: [],
 };
 
@@ -231,7 +244,7 @@ function buildNavEntries(locale: SiteLocale): NavEntry[] {
 export function PublicHeader() {
   const pathname = usePathname();
   const router = useRouter();
-  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isBgPath(pathname) ? "bg" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isCsPath(pathname) ? "cs" : pathname && isBgPath(pathname) ? "bg" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const pathnameValue = pathname || "/";
   const [cityQuery, setCityQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -246,6 +259,7 @@ export function PublicHeader() {
     ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
     hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
     bg: getSafeLocaleSwitchPath(pathnameValue, "bg"),
+    cs: getSafeLocaleSwitchPath(pathnameValue, "cs"),
     en: getSafeLocaleSwitchPath(pathnameValue, "en"),
   });
 
@@ -285,6 +299,12 @@ export function PublicHeader() {
       empty: "Няма резултати",
       citySection: "Страници на градове",
       oblastSection: "Области",
+    },
+    cs: {
+      placeholder: "Hledat město nebo kraj",
+      empty: "Žádné výsledky",
+      citySection: "Stránky měst",
+      oblastSection: "Kraje",
     },
     en: {
       placeholder: "Search pages",
@@ -339,6 +359,14 @@ export function PublicHeader() {
       }));
     }
 
+    if (locale === "cs") {
+      return CITIES_CS.map((city) => ({
+        name: city.name,
+        href: `/cs/city/${city.slug}`,
+        searchText: `${city.name} ${city.slug}`.toLowerCase(),
+      }));
+    }
+
     if (locale === "ru") {
       return ALL_UK_CITIES.map((city) => {
         const localized = CITIES_RU[city.slug];
@@ -364,7 +392,7 @@ export function PublicHeader() {
       return [];
     }
 
-    if (locale === "pl" || locale === "ro" || locale === "hu" || locale === "bg") {
+    if (locale === "pl" || locale === "ro" || locale === "hu" || locale === "bg" || locale === "cs") {
       return getCountryRegionsByLocale(locale).map((region) => ({
         name: region.title,
         href: getCountryRegionPath(region),
@@ -416,6 +444,7 @@ export function PublicHeader() {
       ro: getSafeLocaleSwitchPath(pathnameValue, "ro"),
       hu: getSafeLocaleSwitchPath(pathnameValue, "hu"),
       bg: getSafeLocaleSwitchPath(pathnameValue, "bg"),
+      cs: getSafeLocaleSwitchPath(pathnameValue, "cs"),
       en: getSafeLocaleSwitchPath(pathnameValue, "en"),
     };
 
@@ -425,6 +454,7 @@ export function PublicHeader() {
     const roAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="ro"]');
     const huAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="hu"]');
     const bgAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="bg"]');
+    const csAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="cs"]');
     const enAlternate = document.querySelector<HTMLLinkElement>('link[rel="alternate"][hreflang="en"]');
 
     const toRelativePath = (href: string | null | undefined) => {
@@ -444,6 +474,7 @@ export function PublicHeader() {
     const roPath = toRelativePath(roAlternate?.href);
     const huPath = toRelativePath(huAlternate?.href);
     const bgPath = toRelativePath(bgAlternate?.href);
+    const csPath = toRelativePath(csAlternate?.href);
     const enPath = toRelativePath(enAlternate?.href);
 
     if (ukPath) {
@@ -468,6 +499,10 @@ export function PublicHeader() {
 
     if (bgPath) {
       nextLinks.bg = bgPath;
+    }
+
+    if (csPath) {
+      nextLinks.cs = csPath;
     }
 
     if (enPath) {
@@ -533,7 +568,7 @@ export function PublicHeader() {
   const resolveHref = (href: string) => getPathForLocale(href, locale);
   const isLeafActive = (href: string) => {
     const resolved = resolveHref(href);
-    const roots = ["/", "/ru", "/pl", "/ro", "/hu", "/bg", "/en"];
+    const roots = ["/", "/ru", "/pl", "/ro", "/hu", "/bg", "/cs", "/en"];
     if (roots.includes(resolved)) return pathnameValue === resolved;
     return pathnameValue === resolved || pathnameValue.startsWith(`${resolved}/`);
   };

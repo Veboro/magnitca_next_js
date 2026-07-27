@@ -24,6 +24,7 @@ const LOCALE_FLAG: Record<string, string> = {
   ro: "🇲🇩",
   hu: "🇭🇺",
   bg: "🇧🇬",
+  cs: "🇨🇿",
   en: "🌍",
 };
 

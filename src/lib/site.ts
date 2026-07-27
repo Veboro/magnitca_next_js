@@ -3,6 +3,16 @@ export const SITE_NAME = "Магнітка";
 export const SITE_DESCRIPTION =
   "Моніторинг магнітних бур, Kp-індексу, сонячного вітру та космічної погоди в реальному часі.";
 
+// The named person responsible for the site's editorial content. A real,
+// identifiable author/editor is an E-E-A-T trust signal (accountability).
+// Andrew Orobets is the founder and editor — NOT a medical professional, so
+// content stays informational (see the on-page disclaimers) and must never be
+// framed as "medically reviewed".
+export const SITE_AUTHOR = {
+  name: "Andrew Orobets",
+  url: "https://www.facebook.com/golovne",
+} as const;
+
 export function absoluteUrl(path = "/") {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   return `${SITE_URL}${normalized}`;

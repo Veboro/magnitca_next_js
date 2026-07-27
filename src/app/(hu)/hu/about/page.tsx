@@ -72,9 +72,28 @@ export default function HungarianAboutPage() {
           </p>
         </section>
         <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">Módszertan és tudományos korlátok</h2>
+          <p>
+            A „közérzetre gyakorolt hatás” és az „érzékenységi szint” mutatók heurisztikus becslések,
+            amelyek nyilvános adatokon alapulnak (a Kp-indexen és a geomágneses aktivitáson, ahol
+            pedig megjelenik, a légnyomás változásain). Ezek általános tájékozódást szolgálnak, nem
+            orvosi diagnózist vagy személyre szabott előrejelzést; mindenki másképp reagál.
+          </p>
+          <p>
+            A geomágneses aktivitás és az emberi közérzet közötti kapcsolat tudományosan nincs
+            szilárdan bizonyítva — a rendelkezésre álló kutatások korlátozottak és ellentmondásosak.
+            A tartalom tájékoztató jellegű, és nem helyettesíti a szakszerű orvosi tanácsot.
+            Egészségügyi panaszok esetén fordulj képzett orvoshoz.
+          </p>
+        </section>
+        <section className="space-y-3">
           <h2 className="font-display text-xl font-bold text-foreground">Kapcsolat és felelősség</h2>
           <p>
-            A Magnitca nyilvános részét a projekt csapata tartja karban. Szerkesztőségi, jogi,
+            A projekt alapítója és szerkesztője{" "}
+            <a href="https://www.facebook.com/golovne" target="_blank" rel="author noopener noreferrer" className="text-primary underline">
+              Andrew Orobets
+            </a>
+            . A Magnitca nyilvános részét a projekt csapata tartja karban. Szerkesztőségi, jogi,
             partneri vagy technikai kérdésekkel a kapcsolat oldalon vagy emailben lehet elérni
             minket:{" "}
             <a href="mailto:info@magnitca.com" className="text-primary underline">

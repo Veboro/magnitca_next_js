@@ -87,7 +87,29 @@ export default function RomanianPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">6. Perioada de păstrare</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">6. Publicitate și consimțământ</h2>
+          <p>
+            Pe site pot fi afișate reclame prin Google AdSense și pot fi folosite instrumente de
+            analiză. Pentru difuzarea și măsurarea reclamelor și pentru statistici, aceste servicii
+            pot seta cookie-uri și pot prelucra date, inclusiv un identificator online, în scopul
+            livrării reclamelor și al măsurării eficienței acestora.
+          </p>
+          <p>
+            Pentru vizitatorii din Spațiul Economic European (SEE) și Regatul Unit, înainte de
+            utilizarea cookie-urilor neesențiale se afișează un banner de consimțământ — o platformă
+            de gestionare a consimțământului (CMP) certificată de Google. Cookie-urile de publicitate
+            și de analiză sunt setate doar după ce îți dai acordul, iar consimțământul poate fi
+            modificat sau retras oricând prin același banner sau prin setările de confidențialitate.
+            În afara SEE și a Regatului Unit, cookie-urile pot fi folosite conform legislației locale.
+            Datele sunt prelucrate de Google conform politicii sale de confidențialitate; vezi{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">7. Perioada de păstrare</h2>
           <p>
             Păstrăm datele doar atât timp cât este necesar pentru scopul pentru care au fost
             colectate. Mesajele trimise prin formular pot fi păstrate pe durata corespondenței, iar
@@ -101,7 +123,7 @@ export default function RomanianPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">7. Transferuri internaționale</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Transferuri internaționale</h2>
           <p>
             Unii furnizori tehnici pot prelucra date în afara Republicii Moldova sau a Spațiului
             Economic European. În astfel de cazuri ne bazăm pe mecanismele de protecție declarate de
@@ -115,7 +137,7 @@ export default function RomanianPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. Drepturile utilizatorului</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">9. Drepturile utilizatorului</h2>
           <ul className="list-disc space-y-1 pl-5">
             <li>dreptul de acces la datele personale;</li>
             <li>dreptul de rectificare a datelor incorecte;</li>
@@ -131,7 +153,7 @@ export default function RomanianPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Securitatea datelor</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Securitatea datelor</h2>
           <p>
             Folosim măsuri tehnice și organizatorice rezonabile pentru a proteja site-ul și datele
             prelucrate prin serviciu. Niciun sistem online nu poate garanta securitate absolută, dar
@@ -144,7 +166,7 @@ export default function RomanianPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">10. Modificarea politicii</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">11. Modificarea politicii</h2>
           <p>
             Putem actualiza această politică atunci când schimbăm funcționalități, furnizori tehnici
             sau modul de prelucrare a datelor. Versiunea actuală este publicată pe această pagină,
@@ -152,7 +174,7 @@ export default function RomanianPrivacyPage() {
           </p>
         </section>
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">11. Contact</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">12. Contact</h2>
           <p>
             Pentru întrebări despre confidențialitate scrie-ne la{" "}
             <a href="mailto:info@magnitca.com" className="text-primary underline">

@@ -23,7 +23,7 @@ function getMinutesDiff(startIso: string, endIso: string) {
 
 function formatTimeInZone(value: Date, timezone: string, locale: SiteLocale = "uk") {
   const localeTag =
-    locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : "uk-UA";
+    locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "cs" ? "cs-CZ" : "uk-UA";
   return new Intl.DateTimeFormat(localeTag, {
     timeZone: timezone,
     hour: "2-digit",

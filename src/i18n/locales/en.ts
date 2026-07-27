@@ -182,6 +182,7 @@ const en = {
     symptomHeadache: "Headache",
     symptomIrritability: "Irritability",
     symptomSleep: "Sleep problems",
+    disclaimer: "For information only, not medical advice. Scientific evidence that geomagnetic activity affects well-being is limited and inconclusive.",
     symptomMigraine: "Migraine",
     symptomTachycardia: "Tachycardia",
     symptomAnxiety: "Anxiety",

@@ -172,6 +172,34 @@ const weatherCodeLabels: Record<SiteLocale, Record<number, string>> = {
     96: "Гръмотевична буря с градушка",
     99: "Силна гръмотевична буря с градушка",
   },
+  cs: {
+    0: "Jasno",
+    1: "Převážně jasno",
+    2: "Polojasno",
+    3: "Zataženo",
+    45: "Mlha",
+    48: "Námraza",
+    51: "Mrholení",
+    53: "Mírné mrholení",
+    55: "Silné mrholení",
+    61: "Slabý déšť",
+    63: "Mírný déšť",
+    65: "Silný déšť",
+    66: "Mrznoucí déšť",
+    67: "Silný mrznoucí déšť",
+    71: "Slabé sněžení",
+    73: "Mírné sněžení",
+    75: "Silné sněžení",
+    77: "Sněhová zrna",
+    80: "Přeháňky",
+    81: "Mírné přeháňky",
+    82: "Silné přeháňky",
+    85: "Sněhové přeháňky",
+    86: "Silné sněhové přeháňky",
+    95: "Bouřka",
+    96: "Bouřka s krupobitím",
+    99: "Silná bouřka s krupobitím",
+  },
   en: {
     0: "Clear",
     1: "Mostly clear",
@@ -203,7 +231,7 @@ const weatherCodeLabels: Record<SiteLocale, Record<number, string>> = {
 };
 
 export const getWeatherLabel = (code: number, locale: SiteLocale = "uk") =>
-  weatherCodeLabels[locale][code] ?? (locale === "en" ? "Unknown" : locale === "hu" ? "Ismeretlen" : locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : locale === "bg" ? "Неизвестно" : "Невідомо");
+  weatherCodeLabels[locale][code] ?? (locale === "en" ? "Unknown" : locale === "hu" ? "Ismeretlen" : locale === "ro" ? "Necunoscut" : locale === "pl" ? "Nieznane" : locale === "ru" ? "Неизвестно" : locale === "bg" ? "Неизвестно" : locale === "cs" ? "Neznámo" : "Невідомо");
 
 export const getWeatherEmoji = (code: number) => {
   if (code === 0) return "☀️";

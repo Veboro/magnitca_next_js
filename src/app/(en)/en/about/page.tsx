@@ -90,9 +90,29 @@ export default function EnglishAboutPage() {
         </section>
 
         <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">Methodology &amp; scientific limitations</h2>
+          <p>
+            The “impact on well-being” and “sensitivity level” indicators are heuristic estimates
+            derived from public data — the Kp index and geomagnetic activity, and where shown, changes
+            in air pressure. They are meant as general orientation, not a medical diagnosis or a
+            personalized prediction, and every person reacts differently.
+          </p>
+          <p>
+            The link between geomagnetic activity and human well-being is not firmly established: the
+            scientific evidence is limited and mixed. This content is informational and does not
+            replace professional medical advice. If you have health concerns, consult a qualified
+            doctor.
+          </p>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="font-display text-xl font-bold text-foreground">Contact</h2>
           <p>
-            Questions, corrections and cooperation inquiries can be sent to{" "}
+            The project's founder and editor is{" "}
+            <a href="https://www.facebook.com/golovne" target="_blank" rel="author noopener noreferrer" className="text-primary underline">
+              Andrew Orobets
+            </a>
+            . Questions, corrections and cooperation inquiries can be sent to{" "}
             <a href="mailto:info@magnitca.com" className="text-primary underline">
               info@magnitca.com
             </a>

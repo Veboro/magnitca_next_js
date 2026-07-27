@@ -12,6 +12,7 @@ const SHARE_LABEL: Record<SiteLocale, string> = {
   ro: "Distribuie",
   hu: "Megosztás",
   bg: "Споделяне",
+  cs: "Sdílet",
   en: "Share",
 };
 

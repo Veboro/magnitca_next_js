@@ -22,6 +22,7 @@ const LOCALE_PREFIX: Record<SiteLocale, string> = {
   ro: "/ro",
   hu: "/hu",
   bg: "/bg",
+  cs: "/cs",
   en: "/en",
 };
 
@@ -32,6 +33,7 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   ro: "ro_RO",
   hu: "hu_HU",
   bg: "bg_BG",
+  cs: "cs_CZ",
   en: "en_US",
 };
 
@@ -247,6 +249,39 @@ const COPY: Record<SiteLocale, PageCopy> = {
       {
         q: "Какво помага да преминете по-леко през магнитна буря?",
         a: "Обикновено се препоръчва достатъчно сън, пиене на вода, намаляване на натоварването и кофеина, както и престой на чист въздух. При трайни или силни симптоми потърсете лекар.",
+      },
+    ],
+  },
+  cs: {
+    metaTitle: "Vliv magnetických bouří na pohodu — reálné příběhy lidí",
+    metaDescription:
+      "Jak se lidé cítí během magnetických bouří: reálné příběhy o bolestech hlavy, krevním tlaku, únavě a náladě. Každý příběh je propojen s hodnocením pohody a Kp-indexem daného dne.",
+    homeLabel: "Magnitca",
+    breadcrumbCurrent: "Pohoda",
+    badge: "Příběhy o pohodě",
+    h1: "Vliv magnetických bouří na pohodu",
+    seo: "Zde jsme shromáždili reálné příběhy lidí o tom, jak se cítí během magnetických bouří: bolesti hlavy, změny krevního tlaku, únava, úzkost nebo naopak klidné dny. Každý příběh je propojen s hodnocením pohody a Kp-indexem daného dne, takže můžete vidět, jak různí lidé prožívají stejnou geomagnetickou situaci. Jde o osobní zkušenost, nikoli o lékařskou radu.",
+    anonymous: "Anonym",
+    relatedTitle: "Podívejte se také",
+    relatedKp: "Kp-index dnes",
+    relatedCalendar: "Kalendář magnetických bouří",
+    faqTitle: "Často kladené otázky",
+    faq: [
+      {
+        q: "Ovlivňují magnetické bouře opravdu pohodu?",
+        a: "Někteří lidé hlásí bolesti hlavy, výkyvy krevního tlaku, únavu nebo úzkost ve dnech s geomagnetickými poruchami. Vědecké údaje jsou rozporuplné, proto jsou tyto příběhy osobní zkušeností, nikoli lékařskou radou.",
+      },
+      {
+        q: "Které příznaky se během magnetických bouří zmiňují nejčastěji?",
+        a: "Nejčastěji bolesti hlavy a pocit tlaku ve spáncích, únava a ospalost, výkyvy krevního tlaku, podrážděnost, úzkost a poruchy spánku.",
+      },
+      {
+        q: "Jak souvisí Kp-index s pohodou?",
+        a: "Kp-index ukazuje sílu geomagnetické aktivity. Každý příběh v kanálu je propojen s Kp-indexem daného dne, takže můžete porovnat, jak se různí lidé cítí při stejné úrovni bouře.",
+      },
+      {
+        q: "Co pomáhá zvládnout magnetickou bouři snáze?",
+        a: "Obvykle se doporučuje dostatek spánku, dostatečný pitný režim, omezení zátěže a kofeinu a pobyt na čerstvém vzduchu. Při trvalých nebo silných příznacích vyhledejte lékaře.",
       },
     ],
   },

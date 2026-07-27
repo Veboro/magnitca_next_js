@@ -174,6 +174,7 @@ const pl = {
     symptomHeadache: "Bol glowy",
     symptomIrritability: "Rozdraznienie",
     symptomSleep: "Gorszy sen",
+    disclaimer: "Charakter informacyjny, nie stanowi porady medycznej. Dowody naukowe na wpływ aktywności geomagnetycznej na samopoczucie są ograniczone i niejednoznaczne.",
     symptomMigraine: "Migrena",
     symptomTachycardia: "Tachykardia",
     symptomAnxiety: "Niepokoj",

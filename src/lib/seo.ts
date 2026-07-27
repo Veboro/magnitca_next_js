@@ -270,6 +270,55 @@ const BG_PAGE_META: Record<string, { title: string; description: string }> = {
   },
 };
 
+const CS_PAGE_META: Record<string, { title: string; description: string }> = {
+  home: {
+    title: "Magnetické bouře dnes — Kp-index, sluneční vítr a předpověď | Magnitca",
+    description:
+      "Česká verze Magnitca sleduje v reálném čase magnetické bouře, Kp-index, sluneční vítr a předpověď kosmického počasí.",
+  },
+  about: {
+    title: "O projektu Magnitca — data z NOAA a předpověď magnetických bouří",
+    description: "Informace o službě Magnitca, zdrojích dat z NOAA a redakčním přístupu.",
+  },
+  contacts: {
+    title: "Kontakt na Magnitca — dotazy a spolupráce",
+    description: "Spojení s týmem Magnitca: dotazy, spolupráce a hlášení chyb.",
+  },
+  privacy: {
+    title: "Zásady ochrany osobních údajů Magnitca",
+    description: "Soukromí, analytika a zpracování dat ve službě Magnitca.",
+  },
+  cookies: {
+    title: "Zásady používání cookies Magnitca",
+    description: "Informace o cookies a analytických nástrojích, které Magnitca používá.",
+  },
+  terms: {
+    title: "Podmínky používání Magnitca",
+    description: "Pravidla používání Magnitca, omezení odpovědnosti a informativní povaha obsahu.",
+  },
+  faq: {
+    title: "Magnetické bouře: časté dotazy o Kp-indexu, slunečním větru a vlivu",
+    description: "Často kladené otázky o magnetických bouřích, Kp-indexu a vlivu na organismus.",
+  },
+  kp_index: {
+    title: "Kp-index dnes — online graf a předpověď magnetických bouří",
+    description: "Aktuální Kp-index, graf a předpověď geomagnetické aktivity v české verzi Magnitca.",
+  },
+  solar_wind: {
+    title: "Sluneční vítr dnes — rychlost, hustota a IMF Bz online",
+    description: "Rychlost a hustota slunečního větru a složka IMF Bz v reálném čase.",
+  },
+  calendar: {
+    title: "Kalendář magnetických bouří — předpověď geomagnetické aktivity",
+    description: "Kalendář a předpověď geomagnetické aktivity na nadcházející dny.",
+  },
+  news: {
+    title: "Novinky o magnetických bouřích",
+    description:
+      "Denní zprávy o magnetických bouřích, geomagnetické aktivitě, předpovědích NOAA a vlivu kosmického počasí na samopočit.",
+  },
+};
+
 const EN_PAGE_META: Record<string, { title: string; description: string }> = {
   home: {
     title: "Magnetic storms today — Kp index, solar wind and forecast | Magnitca",
@@ -326,6 +375,7 @@ const OG_LOCALE: Record<SiteLocale, string> = {
   ro: "ro_MD",
   hu: "hu_HU",
   bg: "bg_BG",
+  cs: "cs_CZ",
   en: "en_US",
 };
 
@@ -341,6 +391,7 @@ export async function resolveLocalizedMetadata(
   const roUrl = getPathForLocale(path, "ro");
   const huUrl = getPathForLocale(path, "hu");
   const bgUrl = getPathForLocale(path, "bg");
+  const csUrl = getPathForLocale(path, "cs");
   const enUrl = getPathForLocale(path, "en");
   const ukMeta = locale === "uk" ? await getPageMeta(pageKey) : null;
   const meta =
@@ -357,9 +408,11 @@ export async function resolveLocalizedMetadata(
             ? HU_PAGE_META[pageKey]
             : locale === "bg"
               ? BG_PAGE_META[pageKey]
-              : locale === "en"
-                ? EN_PAGE_META[pageKey]
-                : PL_PAGE_META[pageKey];
+              : locale === "cs"
+                ? CS_PAGE_META[pageKey]
+                : locale === "en"
+                  ? EN_PAGE_META[pageKey]
+                  : PL_PAGE_META[pageKey];
   const title = meta?.title ?? SITE_NAME;
   const description = meta?.description || SITE_DESCRIPTION;
 
@@ -370,6 +423,7 @@ export async function resolveLocalizedMetadata(
     ro: roUrl,
     hu: huUrl,
     bg: bgUrl,
+    cs: csUrl,
     en: enUrl,
   };
 

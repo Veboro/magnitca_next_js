@@ -778,6 +778,114 @@ const localizedCopy: Record<LegacyLocale, (typeof copy)["uk"]> = {
       },
     ],
   },
+  cs: {
+    metaTitle: "Časté dotazy — Magnitca Česko | Otázky o magnetických bouřích",
+    metaDescription:
+      "Jednoduché odpovědi na otázky o magnetických bouřích, Kp-indexu, slunečním větru, předpovědích a možném vlivu na pohodu.",
+    heading: "Často kladené dotazy",
+    intro:
+      "Vše, co potřebujete vědět o magnetických bouřích, sluneční aktivitě a jejich možném vlivu na vaši pohodu, vysvětlené srozumitelným jazykem.",
+    sections: [
+      {
+        title: "Základy magnetických bouří",
+        icon: Zap,
+        items: [
+          {
+            q: "Co je to magnetická bouře?",
+            a: "Magnetická bouře je dočasné narušení magnetického pole Země způsobené nabitými částicemi ze Slunce. Často následuje po výronu koronální hmoty nebo po rychlejším proudu slunečního větru.",
+          },
+          {
+            q: "Co je to Kp-index?",
+            a: "Kp-index je globální ukazatel geomagnetické aktivity na stupnici od 0 do 9. Hodnoty od 0 do 3 jsou obvykle klidné, Kp 4 znamená neklid a Kp 5 nebo vyšší už signalizuje geomagnetickou bouři.",
+          },
+          {
+            q: "Co znamená stupnice G1-G5?",
+            a: "G-škála NOAA klasifikuje geomagnetické bouře od G1 do G5. G1 je slabá, zatímco G5 je extrémní. Vyšší úrovně znamenají silnější možný vliv na navigaci, komunikaci, energetické systémy a citlivé osoby.",
+          },
+          {
+            q: "Závisí magnetické bouře na městě nebo zemi?",
+            a: "Geomagnetická aktivita je globální. Místní rozdíly souvisejí především se zeměpisnou šířkou, počasím a podmínkami pozorování, nikoli se samostatnou hodnotou Kp pro každé město.",
+          },
+        ],
+      },
+      {
+        title: "Sluneční aktivita",
+        icon: Sun,
+        items: [
+          {
+            q: "Co je to sluneční vítr?",
+            a: "Sluneční vítr je proud nabitých částic proudících ze Slunce. Když se jeho rychlost, hustota nebo magnetické pole prudce změní, může se geomagnetická aktivita v okolí Země zvýšit.",
+          },
+          {
+            q: "Co je to IMF Bz?",
+            a: "Bz je severojižní složka meziplanetárního magnetického pole. Záporné, tedy jižně orientované Bz usnadňuje energii slunečního větru pronikat do magnetosféry Země.",
+          },
+          {
+            q: "Co je to výron koronální hmoty?",
+            a: "Výron koronální hmoty, neboli CME, je velký oblak sluneční plazmy a magnetického pole uvolněný ze Slunce. Pokud míří k Zemi, může spustit magnetickou bouři.",
+          },
+        ],
+      },
+      {
+        title: "Vliv na pohodu",
+        icon: Heart,
+        items: [
+          {
+            q: "Mohou lidé magnetické bouře pociťovat?",
+            a: "Vědecké poznatky jsou nejednoznačné, ale mnoho lidí citlivých na počasí uvádí během aktivních geomagnetických období únavu, bolesti hlavy, podrážděnost, změny tlaku nebo horší spánek.",
+          },
+          {
+            q: "Co dělat v aktivních dnech?",
+            a: "Udržujte klidnější tempo, pijte dostatek vody, vyhýbejte se zbytečné zátěži a sledujte předpověď. Magnitca má informativní charakter a nenahrazuje lékařskou radu.",
+          },
+          {
+            q: "Kdo může být citlivější?",
+            a: "Starší lidé, osoby s kardiovaskulárními nebo chronickými onemocněními a ti, kdo jsou už tak citliví na změny počasí, mohou aktivní dny pociťovat častěji. Individuální reakce se výrazně liší.",
+          },
+        ],
+      },
+      {
+        title: "Technika",
+        icon: Wifi,
+        items: [
+          {
+            q: "Mohou magnetické bouře ovlivnit GPS?",
+            a: "Během silnějších bouří mohou poruchy ionosféry snížit přesnost satelitní navigace. Pro běžné uživatele to může být nepatrné, ale profesionální systémy to pečlivě sledují.",
+          },
+          {
+            q: "Může bouře poškodit můj telefon?",
+            a: "Běžné telefony magnetické bouře přímo nepoškozují. Silné bouře mohou ovlivnit některé navigační a komunikační systémy, ale domácí elektronika je zpravidla v bezpečí.",
+          },
+          {
+            q: "Proč energetické systémy sledují kosmické počasí?",
+            a: "Velmi silné geomagnetické bouře mohou indukovat proudy v dlouhých vodičích, jako jsou elektrická vedení. Proto energetický sektor sleduje bouřkové škály NOAA.",
+          },
+        ],
+      },
+      {
+        title: "Data a předpovědi",
+        icon: Activity,
+        items: [
+          {
+            q: "Odkud Magnitca bere data?",
+            a: "Data o kosmickém počasí pocházejí z otevřených zdrojů NOAA Space Weather Prediction Center. Magnitca je prezentuje v přehlednější a srozumitelnější podobě.",
+          },
+          {
+            q: "Jak často se data aktualizují?",
+            a: "Ukazatele se aktualizují v průběhu dne v závislosti na dostupnosti zdrojů. Data o slunečním větru se obnovují často, zatímco oficiální předpovědi aktualizuje NOAA podle vlastního harmonogramu.",
+          },
+          {
+            q: "Proč se aktuální Kp a dnešní maximum mohou lišit?",
+            a: "Aktuální Kp ukazuje současný stav, zatímco dnešní maximum je nejvyšší hodnota naměřená nebo očekávaná během dne. Aktivita může vrcholit dříve a později se zklidnit.",
+          },
+          {
+            q: "Lze Magnitcu použít pro kritická rozhodnutí?",
+            a: "U kritických technických, leteckých, energetických nebo lékařských rozhodnutí vždy ověřujte primární oficiální zdroje a profesionální protokoly. Magnitca je určena k obecné informovanosti veřejnosti.",
+          },
+        ],
+      },
+    ],
+  },
   en: {
     metaTitle: "FAQ — Magnitca | Magnetic storm questions",
     metaDescription:

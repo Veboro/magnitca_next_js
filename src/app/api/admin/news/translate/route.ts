@@ -16,10 +16,11 @@ const DEEPL_LANG: Record<SiteLocale, string> = {
   ro: "RO",
   hu: "HU",
   bg: "BG",
+  cs: "CS",
   en: "EN-US",
 };
 
-const ALLOWED_LOCALES = new Set<SiteLocale>(["uk", "ru", "pl", "ro", "hu", "bg", "en"]);
+const ALLOWED_LOCALES = new Set<SiteLocale>(["uk", "ru", "pl", "ro", "hu", "bg", "cs", "en"]);
 
 function normalizeLocale(value: unknown): SiteLocale | null {
   return typeof value === "string" && ALLOWED_LOCALES.has(value as SiteLocale)

@@ -50,7 +50,7 @@ type FeedCopy = {
   country: Record<CountryCode, string>;
 };
 
-type CountryCode = "ua" | "pl" | "md" | "hu" | "intl";
+type CountryCode = "ua" | "pl" | "md" | "hu" | "bg" | "cz" | "intl";
 
 // The flag is derived from the note language. Ukrainian and Russian both map to Ukraine.
 const LOCALE_COUNTRY: Record<string, CountryCode> = {
@@ -59,6 +59,8 @@ const LOCALE_COUNTRY: Record<string, CountryCode> = {
   pl: "pl",
   ro: "md",
   hu: "hu",
+  bg: "bg",
+  cs: "cz",
   en: "intl",
 };
 
@@ -67,6 +69,8 @@ const COUNTRY_FLAG: Record<CountryCode, string> = {
   pl: "🇵🇱",
   md: "🇲🇩",
   hu: "🇭🇺",
+  bg: "🇧🇬",
+  cz: "🇨🇿",
   intl: "🌍",
 };
 
@@ -78,6 +82,7 @@ const COUNTRY_LOCALES: Record<SiteLocale, string[]> = {
   ro: ["ro"],
   hu: ["hu"],
   bg: ["bg"],
+  cs: ["cs"],
   en: ["en"],
 };
 
@@ -87,11 +92,13 @@ const COUNTRY_FILTER_LOCALES: Record<CountryCode, string[]> = {
   pl: ["pl"],
   md: ["ro"],
   hu: ["hu"],
+  bg: ["bg"],
+  cz: ["cs"],
   intl: ["en"],
 };
 
 // Order of flag chips in the top toolbar.
-const COUNTRY_ORDER: CountryCode[] = ["ua", "pl", "md", "hu", "intl"];
+const COUNTRY_ORDER: CountryCode[] = ["ua", "pl", "md", "hu", "bg", "cz", "intl"];
 
 // Age thresholds offered in the dropdown (0 = no filter).
 const AGE_OPTIONS = [0, 18, 20, 30, 40, 50, 60, 70, 80] as const;
@@ -143,7 +150,7 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Дуже погано",
     },
     gender: { female: "жінка", male: "чоловік" },
-    country: { ua: "Україна", pl: "Польща", md: "Молдова", hu: "Угорщина", intl: "Інша країна" },
+    country: { ua: "Україна", pl: "Польща", md: "Молдова", hu: "Угорщина", bg: "Болгарія", cz: "Чехія", intl: "Інша країна" },
   },
   ru: {
     heading: "Истории самочувствия",
@@ -172,7 +179,7 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Очень плохо",
     },
     gender: { female: "женщина", male: "мужчина" },
-    country: { ua: "Украина", pl: "Польша", md: "Молдова", hu: "Венгрия", intl: "Другая страна" },
+    country: { ua: "Украина", pl: "Польша", md: "Молдова", hu: "Венгрия", bg: "Болгария", cz: "Чехия", intl: "Другая страна" },
   },
   pl: {
     heading: "Historie samopoczucia",
@@ -201,7 +208,7 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Bardzo źle",
     },
     gender: { female: "kobieta", male: "mężczyzna" },
-    country: { ua: "Ukraina", pl: "Polska", md: "Mołdawia", hu: "Węgry", intl: "Inny kraj" },
+    country: { ua: "Ukraina", pl: "Polska", md: "Mołdawia", hu: "Węgry", bg: "Bułgaria", cz: "Czechy", intl: "Inny kraj" },
   },
   ro: {
     heading: "Povești despre stare",
@@ -230,7 +237,7 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Foarte rău",
     },
     gender: { female: "femeie", male: "bărbat" },
-    country: { ua: "Ucraina", pl: "Polonia", md: "Moldova", hu: "Ungaria", intl: "Altă țară" },
+    country: { ua: "Ucraina", pl: "Polonia", md: "Moldova", hu: "Ungaria", bg: "Bulgaria", cz: "Cehia", intl: "Altă țară" },
   },
   hu: {
     heading: "Közérzet történetek",
@@ -259,7 +266,7 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Nagyon rosszul",
     },
     gender: { female: "nő", male: "férfi" },
-    country: { ua: "Ukrajna", pl: "Lengyelország", md: "Moldova", hu: "Magyarország", intl: "Más ország" },
+    country: { ua: "Ukrajna", pl: "Lengyelország", md: "Moldova", hu: "Magyarország", bg: "Bulgária", cz: "Csehország", intl: "Más ország" },
   },
   bg: {
     heading: "Истории за самочувствието",
@@ -288,7 +295,36 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Много зле",
     },
     gender: { female: "жена", male: "мъж" },
-    country: { ua: "Украйна", pl: "Полша", md: "Молдова", hu: "Унгария", intl: "Друга държава" },
+    country: { ua: "Украйна", pl: "Полша", md: "Молдова", hu: "Унгария", bg: "България", cz: "Чехия", intl: "Друга държава" },
+  },
+  cs: {
+    heading: "Příběhy o zdraví",
+    empty: "První příběhy se zde objeví, jakmile je zkontrolujeme. Podělte se o to, jak se cítíte, v denní anketě.",
+    loading: "Načítání příběhů…",
+    error: "Příběhy se nepodařilo načíst.",
+    anonymous: "Anonym",
+    kpLabel: "Kp",
+    count: "{{count}} příběhů",
+    sameFeel: "Cítím se stejně",
+    loadMore: "Zobrazit více",
+    loadingMore: "Načítání…",
+    allCountries: "Všechny země",
+    pickDate: "Vyberte datum",
+    clearDate: "Všechna data",
+    allAges: "Jakýkoli věk",
+    ageLabel: "nad {{age}}",
+    allGenders: "Jakékoli pohlaví",
+    scale: {
+      [-3]: "Velmi dobře",
+      [-2]: "Dobře",
+      [-1]: "Trochu lépe",
+      [0]: "Neutrálně",
+      [1]: "Mírné nepohodlí",
+      [2]: "Špatně",
+      [3]: "Velmi špatně",
+    },
+    gender: { female: "žena", male: "muž" },
+    country: { ua: "Ukrajina", pl: "Polsko", md: "Moldavsko", hu: "Maďarsko", bg: "Bulharsko", cz: "Česko", intl: "Jiná země" },
   },
   en: {
     heading: "Wellbeing stories",
@@ -317,7 +353,7 @@ const COPY: Record<SiteLocale, FeedCopy> = {
       [3]: "Very bad",
     },
     gender: { female: "female", male: "male" },
-    country: { ua: "Ukraine", pl: "Poland", md: "Moldova", hu: "Hungary", intl: "Other country" },
+    country: { ua: "Ukraine", pl: "Poland", md: "Moldova", hu: "Hungary", bg: "Bulgaria", cz: "Czechia", intl: "Other country" },
   },
 };
 
@@ -328,6 +364,7 @@ const LOCALE_TAG: Record<SiteLocale, string> = {
   ro: "ro-RO",
   hu: "hu-HU",
   bg: "bg-BG",
+  cs: "cs-CZ",
   en: "en-US",
 };
 

@@ -12,6 +12,7 @@ const NEWS_LOCALES = [
   { code: "ro", short: "RO", label: "Румунська", deepl: "RO" },
   { code: "hu", short: "HU", label: "Угорська", deepl: "HU" },
   { code: "bg", short: "BG", label: "Болгарська", deepl: "BG" },
+  { code: "cs", short: "CS", label: "Чеська", deepl: "CS" },
   { code: "en", short: "EN", label: "Англійська", deepl: "EN-US" },
 ] as const;
 
@@ -106,6 +107,8 @@ export function NewsEditorForm({
   const [sourceLocale, setSourceLocale] = useState<NewsLocale>("uk");
   const [loading, setLoading] = useState(false);
   const [translatingLocale, setTranslatingLocale] = useState<NewsLocale | null>(null);
+  const [autoTranslate, setAutoTranslate] = useState(mode === "create");
+  const [translatingAll, setTranslatingAll] = useState(false);
   const [error, setError] = useState("");
   const [slugTouched, setSlugTouched] = useState<Record<NewsLocale, boolean>>(() =>
     NEWS_LOCALES.reduce(
@@ -206,6 +209,56 @@ export function NewsEditorForm({
     }
   };
 
+  // Auto-translate: take the Ukrainian version and translate it into every other
+  // language via DeepL, generating a language-appropriate slug for each. Returns a
+  // fully populated form (does not rely on async state) so submit can use it directly.
+  const translateAllFromUk = async (): Promise<NewsEditorInitial> => {
+    const source: NewsLocale = "uk";
+    const srcFields: TranslationPayload = {
+      title: form[localizedKey("title", source)],
+      content: form[localizedKey("content", source)],
+      meta_title: form[localizedKey("meta_title", source)],
+      meta_description: form[localizedKey("meta_description", source)],
+    };
+
+    if (!srcFields.title || !srcFields.content) {
+      throw new Error("Спочатку заповни українську версію (заголовок і контент).");
+    }
+
+    const targets = NEWS_LOCALES.filter((locale) => locale.code !== source);
+    const results = await Promise.all(
+      targets.map(async (locale) => {
+        const response = await fetch("/api/admin/news/translate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ sourceLocale: source, targetLocale: locale.code, fields: srcFields }),
+        });
+        const data = (await response.json().catch(() => null)) as
+          | { translation?: TranslationPayload; error?: string }
+          | null;
+        if (!response.ok) {
+          throw new Error(data?.error || `Не вдалося перекласти (${locale.short}).`);
+        }
+        return { code: locale.code, translation: data?.translation ?? {} };
+      }),
+    );
+
+    let next: NewsEditorInitial = { ...form };
+    for (const { code, translation } of results) {
+      const title = translation.title ?? next[localizedKey("title", code)];
+      next = {
+        ...next,
+        [localizedKey("title", code)]: title,
+        [localizedKey("content", code)]: translation.content ?? next[localizedKey("content", code)],
+        [localizedKey("meta_title", code)]: translation.meta_title ?? next[localizedKey("meta_title", code)],
+        [localizedKey("meta_description", code)]:
+          translation.meta_description ?? next[localizedKey("meta_description", code)],
+        [localizedKey("slug", code)]: transliterate(title),
+      };
+    }
+    return next;
+  };
+
   return (
     <form
       className="space-y-5"
@@ -215,10 +268,18 @@ export function NewsEditorForm({
         setError("");
 
         try {
+          let payload = form;
+          if (autoTranslate) {
+            setTranslatingAll(true);
+            payload = await translateAllFromUk();
+            setForm(payload);
+            setTranslatingAll(false);
+          }
+
           const res = await fetch(endpoint, {
             method,
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(form),
+            body: JSON.stringify(payload),
           });
 
           if (!res.ok) {
@@ -233,6 +294,7 @@ export function NewsEditorForm({
           setError(saveError instanceof Error ? saveError.message : "Помилка збереження.");
         } finally {
           setLoading(false);
+          setTranslatingAll(false);
         }
       }}
     >
@@ -337,6 +399,20 @@ export function NewsEditorForm({
         <div className="space-y-5">
           <div className="rounded-2xl border border-border/50 bg-card p-6 shadow-sm">
             <h2 className="font-display text-xl font-bold">Публікація</h2>
+            <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-xl border border-primary/40 bg-primary/5 p-3">
+              <input
+                type="checkbox"
+                checked={autoTranslate}
+                onChange={(event) => setAutoTranslate(event.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
+              />
+              <span className="text-sm">
+                <span className="font-medium">Автопереклад з української на всі мови</span>
+                <span className="mt-0.5 block text-xs text-muted-foreground">
+                  При збереженні DeepL перекладе українську версію на решту мов і згенерує slug (URL) для кожної. Зніміть галочку для ручного перекладу.
+                </span>
+              </span>
+            </label>
             <div className="mt-4 space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium">Дата публікації</label>
@@ -409,7 +485,13 @@ export function NewsEditorForm({
           disabled={loading}
           className="rounded-full bg-primary px-5 py-3 text-sm font-medium text-primary-foreground disabled:opacity-50"
         >
-          {loading ? "Збереження..." : mode === "create" ? "Створити новину" : "Зберегти зміни"}
+          {translatingAll
+            ? "Перекладаю всі мови..."
+            : loading
+              ? "Збереження..."
+              : mode === "create"
+                ? "Створити новину"
+                : "Зберегти зміни"}
         </button>
         <button
           type="button"

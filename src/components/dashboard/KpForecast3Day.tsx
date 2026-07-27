@@ -32,6 +32,8 @@ const getForecastLocale = (language: string) => {
   if (language.startsWith("pl")) return "pl-PL";
   if (language.startsWith("ro")) return "ro-MD";
   if (language.startsWith("hu")) return "hu-HU";
+  if (language.startsWith("bg")) return "bg-BG";
+  if (language.startsWith("cs")) return "cs-CZ";
   if (language.startsWith("en")) return "en-US";
   return "uk-UA";
 };
@@ -40,6 +42,8 @@ const getForecastTimeZone = (language: string) => {
   if (language.startsWith("pl")) return "Europe/Warsaw";
   if (language.startsWith("ro")) return "Europe/Chisinau";
   if (language.startsWith("hu")) return "Europe/Budapest";
+  if (language.startsWith("bg")) return "Europe/Sofia";
+  if (language.startsWith("cs")) return "Europe/Prague";
   return "Europe/Kyiv";
 };
 

@@ -3,7 +3,7 @@
 import type { JSX } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { getPathForLocale, isBgPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
+import { getPathForLocale, isBgPath, isCsPath, isEnPath, isHuPath, isPlPath, isRoPath, isRuPath, type SiteLocale } from "@/lib/locale";
 import { SOCIAL_PROFILES, type SocialKey } from "@/lib/site";
 
 const SOCIAL_ICONS: Record<SocialKey, JSX.Element> = {
@@ -127,6 +127,19 @@ const copy: Record<
     usageNotice:
       "Всички материали на сайта, включително текстове, графики, оформление на страниците, аналитични подборки и редакционни публикации, са защитени от закона. Препечатването, копирането, адаптирането или всяко друго използване на материалите е разрешено само със задължителна активна връзка към magnitca.com; използването без посочване на източника или с търговска цел без писменото съгласие на редакцията е забранено.",
   },
+  cs: {
+    contacts: "Kontakty",
+    about: "O projektu",
+    privacy: "Zásady ochrany osobních údajů",
+    cookies: "Zásady používání cookies",
+    terms: "Podmínky používání",
+    faq: "Časté dotazy",
+    rss: "RSS",
+    follow: "Sledujte nás",
+    copyright: "Magnitca. Všechna práva vyhrazena.",
+    usageNotice:
+      "Veškeré materiály webu, včetně textů, grafiky, rozvržení stránek, analytických přehledů a redakčních publikací, jsou chráněny zákonem. Přetisk, kopírování, úpravy nebo jakékoli jiné použití materiálů jsou povoleny pouze s povinným aktivním odkazem na magnitca.com; použití bez uvedení zdroje nebo ke komerčním účelům bez písemného souhlasu redakce je zakázáno.",
+  },
   en: {
     contacts: "Contacts",
     about: "About",
@@ -144,7 +157,7 @@ const copy: Record<
 
 export function PublicFooter() {
   const pathname = usePathname();
-  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isBgPath(pathname) ? "bg" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
+  const locale: SiteLocale = pathname && isEnPath(pathname) ? "en" : pathname && isCsPath(pathname) ? "cs" : pathname && isBgPath(pathname) ? "bg" : pathname && isHuPath(pathname) ? "hu" : pathname && isRoPath(pathname) ? "ro" : pathname && isPlPath(pathname) ? "pl" : pathname && isRuPath(pathname) ? "ru" : "uk";
   const regionalSource = locale === "hu"
     ? {
         href: "https://met.hu/",
@@ -154,6 +167,11 @@ export function PublicFooter() {
     ? {
         href: "https://www.weather.bg/",
         label: "НИМХ",
+      }
+    : locale === "cs"
+    ? {
+        href: "https://www.chmi.cz/",
+        label: "ČHMÚ",
       }
     : locale === "uk"
       ? {

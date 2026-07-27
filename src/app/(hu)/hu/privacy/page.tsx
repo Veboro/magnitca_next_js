@@ -85,7 +85,32 @@ export default function HungarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">6. Adatmegőrzés</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">6. Hirdetések és hozzájárulás</h2>
+          <p>
+            A webhelyen a Google AdSense szolgáltatáson keresztül hirdetések jelenhetnek meg, és
+            analitikai eszközök is használhatók. A hirdetések megjelenítéséhez és méréséhez, valamint
+            statisztikák készítéséhez ezek a szolgáltatások cookie-kat állíthatnak be, és adatokat –
+            köztük online azonosítót – kezelhetnek a hirdetések kézbesítése és hatékonyságuk mérése
+            céljából.
+          </p>
+          <p>
+            Az Európai Gazdasági Térségből (EGT) és az Egyesült Királyságból érkező látogatók számára
+            a nem szükséges cookie-k használata előtt hozzájárulási banner jelenik meg, amelyet a
+            Google által tanúsított hozzájárulás-kezelő platform (CMP) biztosít. A hirdetési és
+            analitikai cookie-k csak a hozzájárulásod után kerülnek beállításra, és a hozzájárulást
+            bármikor módosíthatod vagy visszavonhatod ugyanezen a banneren vagy az adatvédelmi
+            beállításokban. Az EGT-n és az Egyesült Királyságon kívül a cookie-k a helyi
+            jogszabályoknak megfelelően használhatók. Az adatokat a Google a saját adatvédelmi
+            szabályzata szerint kezeli; lásd{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">7. Adatmegőrzés</h2>
           <p>
             Az adatokat csak addig őrizzük meg, ameddig az adott célhoz indokolt. Technikai naplók
             és analitikai adatok a biztonság, statisztika és karbantartás miatt maradhatnak meg.
@@ -99,7 +124,7 @@ export default function HungarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">7. Nemzetközi adattovábbítás</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Nemzetközi adattovábbítás</h2>
           <p>
             Egyes technikai szolgáltatók az Európai Gazdasági Térségen kívül is kezelhetnek
             adatokat. Ilyen esetekben a szolgáltató által biztosított szerződéses és szervezési
@@ -108,7 +133,7 @@ export default function HungarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. Felhasználói jogok</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">9. Felhasználói jogok</h2>
           <p>Ha rád a GDPR vagy hasonló adatvédelmi szabályok vonatkoznak, jogosult lehetsz:</p>
           <ul className="list-disc space-y-1 pl-5">
             <li>hozzáférést kérni a személyes adataidhoz;</li>
@@ -121,7 +146,7 @@ export default function HungarianPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Kapcsolat</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Kapcsolat</h2>
           <p>
             Adatvédelemmel, felhasználói jogokkal vagy a webhely működésével kapcsolatos kérdés
             esetén írj nekünk:{" "}

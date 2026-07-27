@@ -184,6 +184,7 @@ const hu = {
     symptomHeadache: "Fejfájás",
     symptomIrritability: "Ingerlékenység",
     symptomSleep: "Nyugtalan alvás",
+    disclaimer: "Tájékoztató jellegű, nem orvosi tanács. A geomágneses aktivitás közérzetre gyakorolt hatását alátámasztó tudományos bizonyítékok korlátozottak és nem egyértelműek.",
   },
   charts: {
     ...uk.charts,

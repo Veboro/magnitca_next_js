@@ -23,6 +23,7 @@ const copy = {
     impactMagnetic: "Burze magnetyczne",
     impactWind: "Wiatr słoneczny",
     impactTotal: "Wpływ łączny",
+    impactDisclaimer: "Charakter informacyjny, nie stanowi porady medycznej. Dowody naukowe na wpływ aktywności geomagnetycznej na samopoczucie są ograniczone i niejednoznaczne.",
     gLevel: "Poziom burzy G",
     kpToday: "Kp dzisiaj",
     wind: "Wiatr słoneczny",
@@ -62,6 +63,7 @@ const copy = {
     impactMagnetic: "Furtuni magnetice",
     impactWind: "Vânt solar",
     impactTotal: "Influență totală",
+    impactDisclaimer: "Caracter informativ, nu constituie sfat medical. Dovezile științifice privind efectul activității geomagnetice asupra stării de bine sunt limitate și neconcludente.",
     gLevel: "Nivelul furtunii G",
     kpToday: "Kp astăzi",
     wind: "Vânt solar",
@@ -101,6 +103,7 @@ const copy = {
     impactMagnetic: "Mágneses viharok",
     impactWind: "Napszél",
     impactTotal: "Összhatás",
+    impactDisclaimer: "Tájékoztató jellegű, nem orvosi tanács. A geomágneses aktivitás közérzetre gyakorolt hatását alátámasztó tudományos bizonyítékok korlátozottak és nem egyértelműek.",
     gLevel: "G vihar szint",
     kpToday: "Mai Kp",
     wind: "Napszél",
@@ -140,6 +143,7 @@ const copy = {
     impactMagnetic: "Магнитни бури",
     impactWind: "Слънчев вятър",
     impactTotal: "Общо влияние",
+    impactDisclaimer: "Информативно и не е медицински съвет. Научните доказателства за влиянието на геомагнитната активност върху самочувствието са ограничени и нееднозначни.",
     gLevel: "Ниво на буря G",
     kpToday: "Kp днес",
     wind: "Слънчев вятър",
@@ -167,6 +171,46 @@ const copy = {
     extreme: "Екстремна буря",
     regionNote: "{{title}} ({{country}}): прогноза за региона и за градовете, налични в каталога на Magnitca.",
     now: "сега",
+  },
+  cs: {
+    titlePrefix: "Magnetické bouře v",
+    today: "dnes",
+    intro:
+      "Regionální předpověď kosmického počasí: aktuální Kp-index, sluneční vítr, Bz, předpověď na 3 dny a lokální stránky pro města v regionu.",
+    pollTitle: "Jak se lidé dnes cítí",
+    currentStatus: "Aktuální situace",
+    impactTitle: "Vliv na organismus",
+    impactMagnetic: "Magnetické bouře",
+    impactWind: "Sluneční vítr",
+    impactTotal: "Celkový vliv",
+    impactDisclaimer: "Informativní charakter, nejde o lékařskou radu. Vědecké důkazy o vlivu geomagnetické aktivity na pohodu jsou omezené a nejednoznačné.",
+    gLevel: "Úroveň bouře G",
+    kpToday: "Kp dnes",
+    wind: "Sluneční vítr",
+    bz: "Bz (IMF)",
+    forecastTitle: "Předpověď Kp na 3 dny",
+    maxKp: "max. Kp",
+    cities: "Města v regionu",
+    goToCity: "Přejít na město",
+    hintTitle: "Jak číst předpověď",
+    hintText:
+      "Nízké hodnoty Kp jsou obvykle sotva znatelné. Při Kp kolem 4-5 mohou lidé citliví na počasí častěji pociťovat únavu, bolesti hlavy nebo horší soustředění.",
+    faqTitle: "Často kladené otázky",
+    faqStormQuestion: "Je dnes v regionu magnetická bouře?",
+    faqPeakQuestion: "Kdy může být Kp v následujících dnech nejvyšší?",
+    faqCitiesQuestion: "Kde najdu přesnější místní údaje?",
+    faqStormCalm: "V tuto chvíli předpověď neukazuje silnou magnetickou bouři, ale během dne stojí za to sledovat Kp a sluneční vítr.",
+    faqStormActive: "Ano, geomagnetická aktivita je zvýšená nebo se blíží úrovni magnetické bouře.",
+    faqPeakPrefix: "Nejvyšší předpovídaná hodnota Kp pro následující 3 dny je",
+    faqPeakSuffix: "Toto je nejaktivnější období krátkodobé předpovědi.",
+    faqCitiesPrefix: "Podrobné místní stránky jsou dostupné pro města:",
+    calm: "Klid",
+    low: "Nízká aktivita",
+    moderate: "Mírná bouře",
+    strong: "Silná bouře",
+    extreme: "Extrémní bouře",
+    regionNote: "{{title}} ({{country}}): předpověď pro region a města dostupná v katalogu Magnitca.",
+    now: "teď",
   },
 } as const;
 
@@ -259,7 +303,7 @@ function aggregateForecastDays(items: KpForecastEntry[] | null, timeZone: string
 }
 
 function formatShortDate(date: string, locale: RegionLocale) {
-  const localeTag = locale === "pl" ? "pl-PL" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : "ro-RO";
+  const localeTag = locale === "pl" ? "pl-PL" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "cs" ? "cs-CZ" : "ro-RO";
   return new Intl.DateTimeFormat(localeTag, {
     day: "numeric",
     month: "long",
@@ -270,7 +314,7 @@ export async function CountryRegionPage({ region }: { region: CountryRegionRoute
   const t = copy[region.locale];
   const cities = getCountryRegionCities(region);
   const primaryCity = cities[0];
-  const timeZone = primaryCity?.timezone ?? (region.locale === "hu" ? "Europe/Budapest" : region.locale === "pl" ? "Europe/Warsaw" : region.locale === "bg" ? "Europe/Sofia" : "Europe/Bucharest");
+  const timeZone = primaryCity?.timezone ?? (region.locale === "hu" ? "Europe/Budapest" : region.locale === "pl" ? "Europe/Warsaw" : region.locale === "bg" ? "Europe/Sofia" : region.locale === "cs" ? "Europe/Prague" : "Europe/Bucharest");
 
   const { kpData, windData, magData, scales, forecast3Day } = await getHomePageWeatherData().catch(() => ({
     kpData: null,
@@ -434,6 +478,7 @@ export async function CountryRegionPage({ region }: { region: CountryRegionRoute
                   </div>
                 </div>
               </div>
+              <p className="mt-4 text-[10px] leading-snug text-muted-foreground/70">{t.impactDisclaimer}</p>
             </section>
 
             <section className="rounded-lg border border-border/50 bg-card p-6">

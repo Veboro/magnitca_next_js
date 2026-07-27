@@ -61,9 +61,30 @@ export default function PolishAboutPage() {
         </section>
 
         <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">Metodologia i ograniczenia naukowe</h2>
+          <p>
+            Wskaźniki „wpływ na samopoczucie” i „poziom wrażliwości” to szacunki heurystyczne oparte
+            na danych publicznych (indeksie Kp i aktywności geomagnetycznej, a tam, gdzie są pokazane,
+            zmianach ciśnienia atmosferycznego). Stanowią one ogólną orientację, a nie diagnozę
+            medyczną czy spersonalizowaną prognozę; każdy człowiek reaguje inaczej.
+          </p>
+          <p>
+            Związek między aktywnością geomagnetyczną a samopoczuciem człowieka nie jest naukowo
+            jednoznacznie potwierdzony — dostępne badania są ograniczone i dają niejednoznaczne
+            wyniki. Treści mają charakter informacyjny i nie zastępują profesjonalnej porady
+            medycznej. W razie problemów zdrowotnych należy skonsultować się z wykwalifikowanym
+            lekarzem.
+          </p>
+        </section>
+
+        <section className="space-y-3">
           <h2 className="font-display text-xl font-bold text-foreground">Kto odpowiada za serwis</h2>
           <p>
-            Publiczną część serwisu rozwija zespół projektu Magnitca. W sprawach redakcyjnych,
+            Założycielem i redaktorem projektu jest{" "}
+            <a href="https://www.facebook.com/golovne" target="_blank" rel="author noopener noreferrer" className="text-primary underline">
+              Andrew Orobets
+            </a>
+            . Publiczną część serwisu rozwija zespół projektu Magnitca. W sprawach redakcyjnych,
             prawnych lub partnerskich można skontaktować się przez stronę kontaktową albo przez{" "}
             <a href="mailto:info@magnitca.com" className="text-primary underline">
               info@magnitca.com

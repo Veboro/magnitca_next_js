@@ -5,7 +5,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { useStormCalendar } from "@/hooks/useStormCalendar";
 import type { StormDay, StormLevel } from "@/hooks/useStormCalendar";
 import { CalendarDays, Info } from "lucide-react";
-import { bg as bgDateLocale, enUS, hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
+import { bg as bgDateLocale, cs as csDateLocale, enUS, hu as huDateLocale, pl, ro as roDateLocale, ru, uk } from "date-fns/locale";
 import { Forecast27Day } from "@/components/dashboard/Forecast27Day";
 import type { SiteLocale } from "@/lib/locale";
 
@@ -84,6 +84,13 @@ const levelLabels = {
     moderate: "Умерена буря (Kp5)",
     strong: "Силна буря (Kp6-7)",
     severe: "Екстремна буря (Kp8-9)",
+  },
+  cs: {
+    none: "Klid",
+    minor: "Slabá bouře (Kp4)",
+    moderate: "Mírná bouře (Kp5)",
+    strong: "Silná bouře (Kp6-7)",
+    severe: "Extrémní bouře (Kp8-9)",
   },
 };
 
@@ -240,12 +247,32 @@ const localizedCopy = {
     seo3:
       "Календарът се обновява автоматично въз основа на данни от NOAA Space Weather Prediction Center и дава практичен преглед на очакваната активност през следващите дни.",
   },
+  cs: {
+    badge: "KALENDÁŘ MAGNETICKÝCH BOUŘÍ",
+    pageTitlePrefix: "Kalendář magnetických bouří",
+    pageTitleSuffix: "— Magnitca Česko",
+    pageDescriptionPrefix: "Kalendář magnetických bouří",
+    pageDescriptionSuffix: "Dny s geomagnetickými poruchami jsou označeny podle intenzity.",
+    intro:
+      "Dny s magnetickými bouřemi jsou zobrazeny barevně podle intenzity. Přerušovaný rámeček označuje předpověď na následující dny.",
+    forecast: "Předpověď",
+    disturbanceDays: "Dny s geomagnetickými poruchami",
+    forecastBadge: "předpověď",
+    seo1Prefix: "Na této stránce je zobrazen",
+    seo1StrongPrefix: "kalendář magnetických bouří",
+    seo1Rest:
+      "s údaji o geomagnetické aktivitě pro každý den. Dny se zvýšenou aktivitou jsou označeny barvou: od slabých poruch až po extrémní bouře.",
+    seo2:
+      "Geomagnetické bouře se hodnotí podle planetárního indexu Kp a stupnice G organizace NOAA. O geomagnetické bouři hovoříme od Kp 5 výše a při vyšších hodnotách roste pravděpodobnost technologického vlivu i vlivu na pohodu.",
+    seo3:
+      "Kalendář se automaticky aktualizuje na základě dat z NOAA Space Weather Prediction Center a poskytuje praktický přehled očekávané aktivity v následujících dnech.",
+  },
 };
 
 export default function StormCalendar({ locale = "uk", initialData }: { locale?: LegacyLocale; initialData?: StormDay[] | null }) {
   const t = localizedCopy[locale];
-  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : locale === "bg" ? bgDateLocale : locale === "en" ? enUS : uk;
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
+  const dateLocale = locale === "ru" ? ru : locale === "pl" ? pl : locale === "ro" ? roDateLocale : locale === "hu" ? huDateLocale : locale === "bg" ? bgDateLocale : locale === "cs" ? csDateLocale : locale === "en" ? enUS : uk;
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "cs" ? "cs-CZ" : locale === "en" ? "en-US" : "uk-UA";
   const now = new Date();
   const monthName = now.toLocaleDateString(localeTag, { month: "long", year: "numeric" });
 
@@ -457,7 +484,9 @@ export default function StormCalendar({ locale = "uk", initialData }: { locale?:
                       ? "https://magnetic-storm-hub.lovable.app/hu/calendar"
                       : locale === "bg"
                         ? "https://magnetic-storm-hub.lovable.app/bg/calendar"
-                        : "https://magnetic-storm-hub.lovable.app/calendar",
+                        : locale === "cs"
+                          ? "https://magnetic-storm-hub.lovable.app/cs/calendar"
+                          : "https://magnetic-storm-hub.lovable.app/calendar",
           }),
         }}
       />

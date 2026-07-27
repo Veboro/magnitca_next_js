@@ -184,6 +184,7 @@ const ro = {
     symptomHeadache: "Durere de cap",
     symptomIrritability: "Iritabilitate",
     symptomSleep: "Somn agitat",
+    disclaimer: "Caracter informativ, nu constituie sfat medical. Dovezile științifice privind efectul activității geomagnetice asupra stării de bine sunt limitate și neconcludente.",
   },
   charts: {
     ...uk.charts,

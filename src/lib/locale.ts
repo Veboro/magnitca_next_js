@@ -1,4 +1,4 @@
-export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl", "ro", "hu", "bg", "en"] as const;
+export const SUPPORTED_SITE_LOCALES = ["uk", "ru", "pl", "ro", "hu", "bg", "cs", "en"] as const;
 
 export type SiteLocale = (typeof SUPPORTED_SITE_LOCALES)[number];
 
@@ -11,6 +11,10 @@ export function getLocaleFromPathname(pathname?: string | null): SiteLocale {
 
   if (normalized === "bg") {
     return "bg";
+  }
+
+  if (normalized === "cs") {
+    return "cs";
   }
 
   if (normalized === "en") {
@@ -35,6 +39,10 @@ export function getLocaleFromPathname(pathname?: string | null): SiteLocale {
 
   if (normalized === "/bg" || normalized.startsWith("/bg/")) {
     return "bg";
+  }
+
+  if (normalized === "/cs" || normalized.startsWith("/cs/")) {
+    return "cs";
   }
 
   if (normalized === "/en" || normalized.startsWith("/en/")) {
@@ -79,6 +87,10 @@ export function getPathForLocale(path: string, locale: SiteLocale) {
     return normalized === "/" ? "/bg" : `/bg${normalized}`;
   }
 
+  if (locale === "cs") {
+    return normalized === "/" ? "/cs" : `/cs${normalized}`;
+  }
+
   if (locale === "en") {
     return normalized === "/" ? "/en" : `/en${normalized}`;
   }
@@ -106,14 +118,18 @@ export function isBgPath(pathname: string) {
   return pathname === "/bg" || pathname.startsWith("/bg/");
 }
 
+export function isCsPath(pathname: string) {
+  return pathname === "/cs" || pathname.startsWith("/cs/");
+}
+
 export function isEnPath(pathname: string) {
   return pathname === "/en" || pathname.startsWith("/en/");
 }
 
 export function switchPathLocale(pathname: string, locale: SiteLocale) {
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized) || isBgPath(normalized) || isEnPath(normalized)
-    ? normalized.replace(/^\/(ru|pl|ro|hu|bg|en)(?=\/|$)/, "") || "/"
+  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized) || isBgPath(normalized) || isCsPath(normalized) || isEnPath(normalized)
+    ? normalized.replace(/^\/(ru|pl|ro|hu|bg|cs|en)(?=\/|$)/, "") || "/"
     : normalized;
 
   return getPathForLocale(basePath, locale);
@@ -121,9 +137,9 @@ export function switchPathLocale(pathname: string, locale: SiteLocale) {
 
 export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
   const normalized = pathname === "/" ? "/" : pathname.replace(/\/$/, "");
-  const currentLocale: SiteLocale = isEnPath(normalized) ? "en" : isBgPath(normalized) ? "bg" : isHuPath(normalized) ? "hu" : isRoPath(normalized) ? "ro" : isPlPath(normalized) ? "pl" : isRuPath(normalized) ? "ru" : "uk";
-  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized) || isBgPath(normalized) || isEnPath(normalized)
-    ? normalized.replace(/^\/(ru|pl|ro|hu|bg|en)(?=\/|$)/, "") || "/"
+  const currentLocale: SiteLocale = isEnPath(normalized) ? "en" : isCsPath(normalized) ? "cs" : isBgPath(normalized) ? "bg" : isHuPath(normalized) ? "hu" : isRoPath(normalized) ? "ro" : isPlPath(normalized) ? "pl" : isRuPath(normalized) ? "ru" : "uk";
+  const basePath = isRuPath(normalized) || isPlPath(normalized) || isRoPath(normalized) || isHuPath(normalized) || isBgPath(normalized) || isCsPath(normalized) || isEnPath(normalized)
+    ? normalized.replace(/^\/(ru|pl|ro|hu|bg|cs|en)(?=\/|$)/, "") || "/"
     : normalized;
 
   const auroraSwitchPaths: Record<SiteLocale, string> = {
@@ -133,6 +149,7 @@ export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
     ro: "/ro/aurora-romania",
     hu: "/hu/aurora",
     bg: "/bg/aurora",
+    cs: "/cs/aurora",
     en: "/en/aurora",
   };
 
@@ -147,7 +164,7 @@ export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
   const isCityPage = basePath.startsWith("/city/");
   const isCitiesCatalogPage = basePath === "/cities" || basePath.startsWith("/cities/");
   const isUnsupportedCityLocale = (itemLocale: SiteLocale) =>
-    itemLocale === "pl" || itemLocale === "ro" || itemLocale === "hu" || itemLocale === "bg" || itemLocale === "en";
+    itemLocale === "pl" || itemLocale === "ro" || itemLocale === "hu" || itemLocale === "bg" || itemLocale === "cs" || itemLocale === "en";
 
   if (isCityPage && (isUnsupportedCityLocale(currentLocale) || isUnsupportedCityLocale(locale))) {
     return getPathForLocale("/", locale);
@@ -189,6 +206,7 @@ export function getSafeLocaleSwitchPath(pathname: string, locale: SiteLocale) {
     basePath.startsWith("/regiune/") ||
     basePath.startsWith("/raion/") ||
     basePath.startsWith("/judet/") ||
+    basePath.startsWith("/kraj/") ||
     (basePath.startsWith("/oblast/") && currentLocale === "bg");
   if (isExclusiveRegionPage && locale !== currentLocale) {
     return getPathForLocale("/", locale);

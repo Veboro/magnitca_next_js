@@ -37,6 +37,7 @@ const FEELING_PATH: Record<SiteLocale, string> = {
   ro: "/ro/feeling",
   hu: "/hu/feeling",
   bg: "/bg/feeling",
+  cs: "/cs/feeling",
   en: "/en/feeling",
 };
 

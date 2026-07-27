@@ -132,7 +132,28 @@ export default function EnglishPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. International transfers</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Advertising and consent</h2>
+          <p>
+            Magnitca shows advertising through Google AdSense and may use analytics services. To
+            deliver and measure ads and to produce usage statistics, these services may set cookies
+            and process data, including an online identifier, for ad delivery and measurement.
+          </p>
+          <p>
+            For visitors in the European Economic Area (EEA) and the United Kingdom, a consent banner
+            provided by a Google-certified consent management platform (CMP) is shown before any
+            non-essential cookies are used. Advertising and analytics cookies are set only after you
+            agree, and you can change or withdraw your consent at any time through the same banner or
+            privacy settings. Outside the EEA and the UK, cookies may be used in line with applicable
+            local law. This data is processed by Google as described in Google's privacy policy; see{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">9. International transfers</h2>
           <p>
             Some technical providers may process data outside your country or outside the European
             Economic Area. Where applicable, such transfers are handled through the safeguards made
@@ -142,7 +163,7 @@ export default function EnglishPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Retention</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Retention</h2>
           <p>
             We keep personal data only for as long as reasonably necessary for the purposes described
             in this policy. Server logs and security data may be kept for a limited period needed to
@@ -157,7 +178,7 @@ export default function EnglishPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">10. Your rights</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">11. Your rights</h2>
           <p>
             Depending on your location and applicable law, you may have the right to request access
             to your personal data, correction, deletion, restriction of processing, objection to
@@ -175,7 +196,7 @@ export default function EnglishPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">11. Children</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">12. Children</h2>
           <p>
             Magnitca is not directed to children and does not knowingly collect personal data from
             children. If you believe that a child has provided personal data to us, please contact
@@ -184,7 +205,7 @@ export default function EnglishPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">12. Security</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">13. Security</h2>
           <p>
             We use reasonable technical and organizational measures to protect the site and the data
             we process. No online service can be guaranteed to be completely secure, but we work to
@@ -193,7 +214,7 @@ export default function EnglishPrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">13. Changes to this policy</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">14. Changes to this policy</h2>
           <p>
             We may update this policy when the site changes, when new features are added or when
             legal requirements evolve. The current version is published on this page with the date

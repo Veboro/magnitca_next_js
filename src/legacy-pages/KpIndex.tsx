@@ -309,6 +309,55 @@ const localizedCopy = {
       { q: "Къде мога да видя прогнозата за Kp?", a: "На тази страница са показани 3-дневната прогноза за Kp, текущата стойност и графиката за последните часове." },
     ],
   },
+  cs: {
+    ...copy.pl,
+    pageTitle: "Index Kp online v reálném čase — předpověď magnetických bouří",
+    pageDescription:
+      "Aktuální index Kp v reálném čase. Aktuální hodnota, 24hodinový graf a 3denní předpověď geomagnetické aktivity podle dat NOAA.",
+    heroTitle: "Index Kp dnes",
+    heroText:
+      "Planetární index geomagnetické aktivity v reálném čase. Aktuální hodnota, graf za posledních 24 hodin a 3denní předpověď NOAA SWPC.",
+    currentKpLabel: "Aktuální index Kp",
+    currentState: "Aktuální stav",
+    chartAria: "Graf indexu Kp za 24 hodin",
+    chartTitle: "Index Kp za posledních",
+    hours: "h",
+    forecastAria: "3denní předpověď indexu Kp",
+    forecastTitle: "Předpověď indexu Kp na 3 dny (po 3hodinových intervalech)",
+    loading: "Načítání předpovědi...",
+    unavailable: "Data předpovědi nejsou k dispozici.",
+    maxKp: "max. Kp",
+    scaleAria: "Škála indexu Kp",
+    scaleTitle: "Škála indexu Kp (0–9)",
+    seoAria: "O indexu Kp",
+    seoHeading: "Co je index Kp a proč je důležitý?",
+    seoText1:
+      "<strong>Index Kp</strong> je globální ukazatel geomagnetické aktivity Země na škále od 0 do 9. Vzniká na základě měření ze sítě magnetometrů rozmístěných po celém světě a slouží k posouzení síly poruch magnetického pole.",
+    seoText2:
+      "Čím vyšší je index Kp, tím větší je pravděpodobnost rušení komunikace, satelitní navigace a zhoršeného stavu u lidí citlivých na počasí. Na této stránce najdete aktuální hodnotu indexu Kp, graf jeho změn a 3denní předpověď NOAA.",
+    faqAria: "Časté otázky o indexu Kp",
+    faqTitle: "Časté otázky",
+    gScale: "Škála G",
+    rScale: "Škála R",
+    sScale: "Škála S",
+    kpLevels: [
+      { kp: "0–1", status: "Klid", color: "bg-storm-quiet", description: "Minimální geomagnetická aktivita bez znatelného vlivu na technologie a zdraví." },
+      { kp: "2–3", status: "Nízká aktivita", color: "bg-storm-quiet", description: "Malé výkyvy magnetického pole. Obvykle bez znatelných účinků pro většinu lidí." },
+      { kp: "4", status: "Nestabilně", color: "bg-storm-minor", description: "Zvýšená geomagnetická aktivita. Lidé citliví na počasí mohou pociťovat mírné nepohodlí." },
+      { kp: "5 (G1)", status: "Slabá bouře", color: "bg-storm-moderate", description: "Slabá magnetická bouře. Možné drobné rušení GPS a horší stav u některých lidí." },
+      { kp: "6 (G2)", status: "Střední bouře", color: "bg-storm-moderate", description: "Střední bouře. Riziko rušení rádia a většího vlivu na citlivé osoby." },
+      { kp: "7 (G3)", status: "Silná bouře", color: "bg-storm-strong", description: "Silná bouře. Možné výraznější problémy s navigací, komunikací a energetikou." },
+      { kp: "8 (G4)", status: "Velmi silná", color: "bg-storm-severe", description: "Velmi silná bouře se zvýšeným rizikem technologických poruch." },
+      { kp: "9 (G5)", status: "Extrémní", color: "bg-storm-severe", description: "Extrémní geomagnetická bouře s největším možným dopadem na infrastrukturu." },
+    ],
+    faqItems: [
+      { q: "Co je index Kp?", a: "Index Kp je planetární ukazatel geomagnetické aktivity od 0 do 9. Čím vyšší je hodnota, tím silnější je porucha magnetického pole Země." },
+      { q: "Jak často se index Kp aktualizuje?", a: "Oficiální index Kp se zveřejňuje každé 3 hodiny, ale na stránce se mohou objevovat i odhadované hodnoty aktualizované častěji." },
+      { q: "Jak index Kp ovlivňuje zdraví?", a: "Při zvýšeném Kp mohou někteří lidé pociťovat bolest hlavy, únavu, podrážděnost nebo problémy se spánkem. Netýká se to všech, ale souvislost bývá znatelná." },
+      { q: "Co znamená škála G?", a: "Škála G od NOAA popisuje sílu geomagnetické bouře od G1 do G5. Každý stupeň odpovídá určitému rozmezí hodnot Kp." },
+      { q: "Kde najdu předpověď indexu Kp?", a: "Na této stránce najdete 3denní předpověď Kp od NOAA i aktuální hodnotu a graf změn za poslední hodiny." },
+    ],
+  },
   en: {
     ...copy.uk,
     pageTitle: "Kp index online in real time — magnetic storm forecast",
@@ -361,7 +410,7 @@ const localizedCopy = {
 };
 
 const getPageTimeZone = (locale: LegacyLocale) =>
-  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "bg" ? "Europe/Sofia" : locale === "en" ? "UTC" : "Europe/Kyiv";
+  locale === "pl" ? "Europe/Warsaw" : locale === "ro" ? "Europe/Chisinau" : locale === "hu" ? "Europe/Budapest" : locale === "bg" ? "Europe/Sofia" : locale === "cs" ? "Europe/Prague" : locale === "en" ? "UTC" : "Europe/Kyiv";
 
 const todayStr = (localeTag: string, timeZone: string) =>
   new Date().toLocaleDateString(localeTag, {
@@ -379,7 +428,7 @@ interface KpIndexProps {
 
 const KpIndex = ({ locale = "uk", initialKp, initialScales }: KpIndexProps) => {
   const t = localizedCopy[locale];
-  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "en" ? "en-US" : "uk-UA";
+  const localeTag = locale === "ru" ? "ru-RU" : locale === "pl" ? "pl-PL" : locale === "ro" ? "ro-MD" : locale === "hu" ? "hu-HU" : locale === "bg" ? "bg-BG" : locale === "cs" ? "cs-CZ" : locale === "en" ? "en-US" : "uk-UA";
   const timeZone = getPageTimeZone(locale);
   const today = todayStr(localeTag, timeZone);
 

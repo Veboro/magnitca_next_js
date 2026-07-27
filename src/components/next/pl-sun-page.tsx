@@ -6,7 +6,7 @@ import type { CityConfig } from "@/data/cities";
 import type { SunriseOverviewCity } from "@/lib/sunrise-overview";
 import { absoluteUrl } from "@/lib/site";
 
-type SunLocale = "pl" | "hu" | "bg";
+type SunLocale = "pl" | "hu" | "bg" | "cs";
 
 type PlSunPageProps = {
   locale?: SunLocale;
@@ -30,6 +30,9 @@ function formatNightLength(minutes: number, locale: SunLocale = "pl") {
   }
   if (locale === "bg") {
     return `${h} ч ${m} мин`;
+  }
+  if (locale === "cs") {
+    return `${h} h ${m} min`;
   }
   return `${h} godz. ${m} min`;
 }
@@ -65,7 +68,51 @@ export function PlSunPage({
   const primaryLate = isSunrise ? latestSunrise : latestSunset;
   const primaryEarlyValue = isSunrise ? primaryEarly?.sunriseLabel : primaryEarly?.sunsetLabel;
   const primaryLateValue = isSunrise ? primaryLate?.sunriseLabel : primaryLate?.sunsetLabel;
-  const copy = locale === "bg"
+  const copy = locale === "cs"
+    ? {
+        home: "Domů",
+        countryIn: "v Česku",
+        countryCities: "Česka",
+        today: "dnes",
+        tomorrow: "zítra",
+        sunriseToday: "Východ dnes",
+        sunriseTomorrow: "Východ zítra",
+        sunsetToday: "Západ dnes",
+        sunsetTomorrow: "Západ zítra",
+        sunrise: "Východ",
+        sunset: "Západ",
+        earliestSunrise: "Nejčasnější východ",
+        latestSunrise: "Nejpozdější východ",
+        earliestSunset: "Nejčasnější západ",
+        latestSunset: "Nejpozdější západ",
+        averageDay: "Průměrná délka dne",
+        averageNight: "Průměrná délka noci",
+        dataUpdated: "Data se aktualizují",
+        sourceCities: "Na základě dostupných měst",
+        tableSunrise: "Východ a západ slunce ve městech Česka",
+        tableSunset: "Západ, noc a východ slunce ve městech Česka",
+        seoSunriseTitle: "Jak se mění východ slunce v Česku",
+        seoSunsetTitle: "Jak se mění západ slunce a délka noci v Česku",
+        seoSunriseBody:
+          "Čas východu slunce v Česku závisí na městě, datu a zeměpisné poloze. Na této stránce porovnáváme svítání, východ, sluneční poledne, západ, soumrak a délku dne pro dostupná města.",
+        seoSunsetBody:
+          "Čas západu slunce v Česku se mění den ode dne a liší se mezi městy. Tabulka pomáhá porovnat západ, soumrak, délku noci a následující východ slunce.",
+        intro:
+          `Data pro ${dateLabel}: porovnání měst v Česku podle svítání, východu, slunečního poledne, západu, soumraku a délky dne nebo noci.`,
+        alsoCheck: "Zkontrolujte také:",
+        faqTitle: "Časté dotazy",
+        city: "Město",
+        dawn: "Svítání",
+        solarNoon: "Sluneční poledne",
+        dusk: "Soumrak",
+        dayLength: "Délka dne",
+        nightLength: "Délka noci",
+        exactHourDepends: `Přesný čas se liší podle měst. Na této stránce zobrazujeme data pro ${dateLabel} a v tabulce si můžete ověřit hodnoty pro každé dostupné město.`,
+        termsQuestion: "Co znamenají svítání, sluneční poledne a soumrak?",
+        termsAnswer:
+          "Svítání je světlé období před východem slunce, sluneční poledne je okamžik, kdy je Slunce nejvýše na obloze, a soumrak je přirozené světlo po západu slunce.",
+      }
+    : locale === "bg"
     ? {
         home: "Начало",
         countryIn: "в България",
@@ -208,7 +255,11 @@ export function PlSunPage({
         ? isSunrise
           ? `Изгрев в България ${dayWord}`
           : `Залез в България ${dayWord}`
-        : h1;
+        : locale === "cs"
+          ? isSunrise
+            ? `Východ slunce v Česku ${dayWord}`
+            : `Západ slunce v Česku ${dayWord}`
+          : h1;
   const tableTitle = isSunrise ? copy.tableSunrise : copy.tableSunset;
   const seoTitle = isSunrise ? copy.seoSunriseTitle : copy.seoSunsetTitle;
   const seoBody = isSunrise ? copy.seoSunriseBody : copy.seoSunsetBody;
@@ -232,12 +283,16 @@ export function PlSunPage({
           ? `Mikor van napkelte Magyarországon ${dayWord}?`
           : locale === "bg"
             ? `Кога е изгревът в България ${dayWord}?`
-            : `O której jest wschód słońca w Polsce ${dayWord}?`
+            : locale === "cs"
+              ? `Kdy je východ slunce v Česku ${dayWord}?`
+              : `O której jest wschód słońca w Polsce ${dayWord}?`
         : locale === "hu"
           ? `Mikor van napnyugta Magyarországon ${dayWord}?`
           : locale === "bg"
             ? `Кога е залезът в България ${dayWord}?`
-            : `O której jest zachód słońca w Polsce ${dayWord}?`,
+            : locale === "cs"
+              ? `Kdy je západ slunce v Česku ${dayWord}?`
+              : `O której jest zachód słońca w Polsce ${dayWord}?`,
       a: copy.exactHourDepends,
     },
     {
@@ -246,12 +301,16 @@ export function PlSunPage({
           ? "Hol van a legkorábbi és a legkésőbbi napkelte?"
           : locale === "bg"
             ? "Къде е най-ранният и най-късният изгрев?"
-            : "Gdzie jest najwcześniejszy i najpóźniejszy wschód słońca?"
+            : locale === "cs"
+              ? "Kde je nejčasnější a nejpozdější východ slunce?"
+              : "Gdzie jest najwcześniejszy i najpóźniejszy wschód słońca?"
         : locale === "hu"
           ? "Hol van a legkorábbi és a legkésőbbi napnyugta?"
           : locale === "bg"
             ? "Къде е най-ранният и най-късният залез?"
-            : "Gdzie jest najwcześniejszy i najpóźniejszy zachód słońca?",
+            : locale === "cs"
+              ? "Kde je nejčasnější a nejpozdější západ slunce?"
+              : "Gdzie jest najwcześniejszy i najpóźniejszy zachód słońca?",
       a: locale === "hu"
         ? isSunrise
           ? `A legkorábbi napkelte ${primaryEarly?.city.name ?? "az egyik városban"} van, ${primaryEarlyValue ?? "—"} időpontban, a legkésőbbi pedig ${primaryLate?.city.name ?? "egy másik városban"}, ${primaryLateValue ?? "—"} időpontban.`
@@ -260,9 +319,13 @@ export function PlSunPage({
           ? isSunrise
             ? `Най-ранният изгрев е в ${primaryEarly?.city.name ?? "един от градовете"} в ${primaryEarlyValue ?? "—"}, а най-късният — в ${primaryLate?.city.name ?? "друг град"} в ${primaryLateValue ?? "—"}.`
             : `Най-ранният залез е в ${primaryEarly?.city.name ?? "един от градовете"} в ${primaryEarlyValue ?? "—"}, а най-късният — в ${primaryLate?.city.name ?? "друг град"} в ${primaryLateValue ?? "—"}.`
-          : isSunrise
-            ? `Najwcześniejszy wschód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`
-            : `Najwcześniejszy zachód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`,
+          : locale === "cs"
+            ? isSunrise
+              ? `Nejčasnější východ je v ${primaryEarly?.city.name ?? "jednom z měst"} v ${primaryEarlyValue ?? "—"} a nejpozdější v ${primaryLate?.city.name ?? "jiném městě"} v ${primaryLateValue ?? "—"}.`
+              : `Nejčasnější západ je v ${primaryEarly?.city.name ?? "jednom z měst"} v ${primaryEarlyValue ?? "—"} a nejpozdější v ${primaryLate?.city.name ?? "jiném městě"} v ${primaryLateValue ?? "—"}.`
+            : isSunrise
+              ? `Najwcześniejszy wschód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`
+              : `Najwcześniejszy zachód jest w ${primaryEarly?.city.name ?? "jednym z miast"} o ${primaryEarlyValue ?? "—"}, a najpóźniejszy w ${primaryLate?.city.name ?? "innym mieście"} o ${primaryLateValue ?? "—"}.`,
     },
     {
       q: copy.termsQuestion,
@@ -274,23 +337,31 @@ export function PlSunPage({
           ? "Hogyan számoljuk a nappal hosszát?"
           : locale === "bg"
             ? "Как се изчислява продължителността на деня?"
-            : "Jak obliczana jest długość dnia?"
+            : locale === "cs"
+              ? "Jak se počítá délka dne?"
+              : "Jak obliczana jest długość dnia?"
         : locale === "hu"
           ? "Hogyan számoljuk az éjszaka hosszát?"
           : locale === "bg"
             ? "Как се изчислява продължителността на нощта?"
-            : "Jak obliczana jest długość nocy?",
+            : locale === "cs"
+              ? "Jak se počítá délka noci?"
+              : "Jak obliczana jest długość nocy?",
       a: isSunrise
         ? locale === "hu"
           ? `A nappal hossza a napkelte és a napnyugta közötti idő. Az elérhető városok átlaga körülbelül ${averageDayLengthLabel}.`
           : locale === "bg"
             ? `Продължителността на деня е времето между изгрева и залеза. Средната стойност за наличните градове е около ${averageDayLengthLabel}.`
-            : `Długość dnia to czas między wschodem i zachodem słońca. Średnia dla dostępnych miast wynosi około ${averageDayLengthLabel}.`
+            : locale === "cs"
+              ? `Délka dne je čas mezi východem a západem slunce. Průměr pro dostupná města je přibližně ${averageDayLengthLabel}.`
+              : `Długość dnia to czas między wschodem i zachodem słońca. Średnia dla dostępnych miast wynosi około ${averageDayLengthLabel}.`
         : locale === "hu"
           ? `Az éjszaka hossza a napnyugta és a következő napkelte közötti hozzávetőleges idő. Az elérhető városok átlaga körülbelül ${averageNightLengthLabel}.`
           : locale === "bg"
             ? `Продължителността на нощта е приблизителното време между залеза и следващия изгрев. Средната стойност за наличните градове е около ${averageNightLengthLabel}.`
-            : `Długość nocy to przybliżony czas między zachodem i kolejnym wschodem słońca. Średnia dla dostępnych miast wynosi około ${averageNightLengthLabel}.`,
+            : locale === "cs"
+              ? `Délka noci je přibližný čas mezi západem slunce a následujícím východem. Průměr pro dostupná města je přibližně ${averageNightLengthLabel}.`
+              : `Długość nocy to przybliżony czas między zachodem i kolejnym wschodem słońca. Średnia dla dostępnych miast wynosi około ${averageNightLengthLabel}.`,
     },
   ];
 

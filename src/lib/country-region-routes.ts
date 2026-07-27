@@ -1,11 +1,12 @@
 import type { CityConfig } from "@/data/cities";
 import { CITIES_BG } from "@/data/cities-bg";
+import { CITIES_CS } from "@/data/cities-cs";
 import { CITIES_HU } from "@/data/cities-hu";
 import { CITIES_MD } from "@/data/cities-md";
 import { CITIES_PL } from "@/data/cities-pl";
 
-export type CountryRegionLocale = "pl" | "ro" | "hu" | "bg";
-export type CountryRegionKind = "wojewodztwo" | "judet" | "raion" | "municipiu" | "regiune" | "varmegye" | "oblast";
+export type CountryRegionLocale = "pl" | "ro" | "hu" | "bg" | "cs";
+export type CountryRegionKind = "wojewodztwo" | "judet" | "raion" | "municipiu" | "regiune" | "varmegye" | "oblast" | "kraj";
 
 export type CountryRegionRoute = {
   key: string;
@@ -186,12 +187,40 @@ const BG_REGIONS: CountryRegionRoute[] = ([
   citySlugs: [...citySlugs],
 }));
 
+const CS_REGIONS: CountryRegionRoute[] = ([
+  ["praha", "Hlavní město Praha", "Praze", ["praha"]],
+  ["stredocesky", "Středočeský kraj", "Středočeském kraji", ["kladno", "mlada-boleslav", "pribram", "kolin", "kutna-hora"]],
+  ["jihocesky", "Jihočeský kraj", "Jihočeském kraji", ["ceske-budejovice", "tabor", "pisek"]],
+  ["plzensky", "Plzeňský kraj", "Plzeňském kraji", ["plzen", "klatovy"]],
+  ["karlovarsky", "Karlovarský kraj", "Karlovarském kraji", ["karlovy-vary", "cheb", "sokolov"]],
+  ["ustecky", "Ústecký kraj", "Ústeckém kraji", ["usti-nad-labem", "most", "decin", "teplice", "chomutov", "litomerice"]],
+  ["liberecky", "Liberecký kraj", "Libereckém kraji", ["liberec", "jablonec-nad-nisou", "ceska-lipa"]],
+  ["kralovehradecky", "Královéhradecký kraj", "Královéhradeckém kraji", ["hradec-kralove", "trutnov"]],
+  ["pardubicky", "Pardubický kraj", "Pardubickém kraji", ["pardubice", "chrudim"]],
+  ["vysocina", "Kraj Vysočina", "Kraji Vysočina", ["jihlava", "trebic", "havlickuv-brod"]],
+  ["jihomoravsky", "Jihomoravský kraj", "Jihomoravském kraji", ["brno", "znojmo", "breclav", "hodonin", "vyskov"]],
+  ["olomoucky", "Olomoucký kraj", "Olomouckém kraji", ["olomouc", "prostejov", "prerov", "sumperk"]],
+  ["zlinsky", "Zlínský kraj", "Zlínském kraji", ["zlin", "kromeriz", "vsetin", "uherske-hradiste"]],
+  ["moravskoslezsky", "Moravskoslezský kraj", "Moravskoslezském kraji", ["ostrava", "havirov", "opava", "frydek-mistek", "karvina", "trinec", "novy-jicin", "krnov"]],
+] as const).map(([slug, title, titleIn, citySlugs]) => ({
+  key: `cs-${slug}`,
+  locale: "cs" as const,
+  kind: "kraj" as const,
+  slug,
+  title,
+  titleIn,
+  country: "Česko",
+  adminLabel: "kraj",
+  citySlugs: [...citySlugs],
+}));
+
 export const COUNTRY_REGION_ROUTES: CountryRegionRoute[] = [
   ...PL_REGIONS,
   ...RO_REGIONS,
   ...MD_REGIONS,
   ...HU_REGIONS,
   ...BG_REGIONS,
+  ...CS_REGIONS,
 ];
 
 const REGION_CITY_SOURCE: Record<CountryRegionLocale, CityConfig[]> = {
@@ -199,12 +228,14 @@ const REGION_CITY_SOURCE: Record<CountryRegionLocale, CityConfig[]> = {
   ro: CITIES_MD,
   hu: CITIES_HU,
   bg: CITIES_BG,
+  cs: CITIES_CS,
 };
 
 export function getCountryRegionPath(region: Pick<CountryRegionRoute, "locale" | "kind" | "slug">) {
   if (region.locale === "pl") return `/pl/wojewodztwo/${region.slug}`;
   if (region.locale === "hu") return `/hu/varmegye/${region.slug}`;
   if (region.locale === "bg") return `/bg/oblast/${region.slug}`;
+  if (region.locale === "cs") return `/cs/kraj/${region.slug}`;
   if (region.kind === "municipiu") return `/ro/municipiu/${region.slug}`;
   if (region.kind === "regiune") return `/ro/regiune/${region.slug}`;
   if (region.kind === "raion") return `/ro/raion/${region.slug}`;

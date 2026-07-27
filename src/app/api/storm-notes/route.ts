@@ -8,7 +8,7 @@ import type { SiteLocale } from "@/lib/locale";
 
 export const dynamic = "force-dynamic";
 
-const LOCALES = new Set<SiteLocale>(["uk", "ru", "pl", "ro", "hu", "bg", "en"]);
+const LOCALES = new Set<SiteLocale>(["uk", "ru", "pl", "ro", "hu", "bg", "cs", "en"]);
 const GENDERS = new Set(["female", "male"]);
 
 // Cached feed pages to refresh when an approved note appears.

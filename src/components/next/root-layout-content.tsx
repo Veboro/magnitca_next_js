@@ -42,9 +42,37 @@ const SITE_STRUCTURED_DATA = {
   ],
 };
 
+// Google Consent Mode v2 defaults. This MUST execute before any Google tag
+// (AdSense loader + GA) so cookies/ad signals are withheld until consent. In the
+// EEA + UK everything defaults to "denied" and the Google-certified CMP (enabled
+// in the AdSense account) updates it after the user chooses; everywhere else it
+// defaults to "granted" so non-EEA locales (e.g. uk/ru) work without a banner.
+const EEA_UK_REGIONS = [
+  "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU",
+  "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES",
+  "SE", "IS", "LI", "NO", "GB",
+];
+
+const CONSENT_MODE_DEFAULT = `
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+window.gtag = window.gtag || gtag;
+gtag('consent','default',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});
+gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',region:${JSON.stringify(
+  EEA_UK_REGIONS,
+)},wait_for_update:500});
+gtag('set','ads_data_redaction',true);
+gtag('set','url_passthrough',true);
+`;
+
 export function RootHeadAssets() {
   return (
     <>
+      {/* Consent Mode v2 default — beforeInteractive guarantees it runs before
+          the afterInteractive Google tags (AdSense loader + GA) below. */}
+      <Script id="google-consent-default" strategy="beforeInteractive">
+        {CONSENT_MODE_DEFAULT}
+      </Script>
       <link rel="preconnect" href="https://xdysdmtwhhnkvdbaaflm.supabase.co" />
       <link rel="preload" as="image" href="/hero-bg.jpg" fetchPriority="high" />
       <script

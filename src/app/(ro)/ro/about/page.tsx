@@ -125,9 +125,28 @@ export default function RomanianAboutPage() {
           </p>
         </section>
         <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">Metodologie și limite științifice</h2>
+          <p>
+            Indicatorii „impact asupra stării de bine” și „nivel de sensibilitate” sunt estimări
+            euristice bazate pe date publice (indicele Kp și activitatea geomagnetică, iar acolo unde
+            este afișată, variațiile presiunii atmosferice). Ei oferă o orientare generală, nu un
+            diagnostic medical sau o predicție personalizată; fiecare persoană reacționează diferit.
+          </p>
+          <p>
+            Legătura dintre activitatea geomagnetică și starea de bine a omului nu este confirmată
+            ferm din punct de vedere științific — dovezile disponibile sunt limitate și neconcludente.
+            Conținutul are caracter informativ și nu înlocuiește consultul medical de specialitate.
+            Dacă ai probleme de sănătate, adresează-te unui medic calificat.
+          </p>
+        </section>
+        <section className="space-y-3">
           <h2 className="font-display text-xl font-bold text-foreground">Contact și dezvoltare</h2>
           <p>
-            Proiectul este dezvoltat treptat: adăugăm orașe, secțiuni informative și instrumente
+            Fondatorul și redactorul proiectului este{" "}
+            <a href="https://www.facebook.com/golovne" target="_blank" rel="author noopener noreferrer" className="text-primary underline">
+              Andrew Orobets
+            </a>
+            . Proiectul este dezvoltat treptat: adăugăm orașe, secțiuni informative și instrumente
             utile pentru cititori. Dacă ai observat o eroare, ai o propunere sau vrei să discuți
             despre colaborare, ne poți scrie la{" "}
             <a href="mailto:info@magnitca.com" className="text-primary underline">

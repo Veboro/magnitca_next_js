@@ -79,7 +79,30 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">6. Зберігання даних</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">6. Реклама та згода</h2>
+          <p>
+            На сайті може показуватися реклама через Google AdSense, а також може використовуватися
+            аналітика. Для показу й вимірювання реклами та формування статистики ці сервіси можуть
+            встановлювати cookie й обробляти дані, зокрема онлайн-ідентифікатор, для доставки реклами
+            та вимірювання її ефективності.
+          </p>
+          <p>
+            Для відвідувачів із Європейської економічної зони (ЄЕЗ) та Великої Британії перед
+            використанням non-essential cookie показується банер згоди — сертифікована Google
+            платформа керування згодою (CMP). Рекламні та аналітичні cookie встановлюються лише після
+            вашої згоди, і ви можете будь-коли змінити або відкликати згоду через той самий банер чи
+            налаштування приватності. За межами ЄЕЗ та Великої Британії cookie можуть використовуватися
+            відповідно до місцевого законодавства. Дані обробляються компанією Google, як описано в її
+            політиці конфіденційності; дивіться{" "}
+            <a href="https://www.google.com/policies/privacy" className="text-primary underline">
+              google.com/policies/privacy
+            </a>
+            .
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-display text-xl font-bold text-foreground">7. Зберігання даних</h2>
           <p>
             Ми зберігаємо дані лише стільки, скільки це обґрунтовано потрібно для мети обробки.
             Технічні журнали та аналітичні дані можуть зберігатися протягом строку, потрібного для
@@ -93,7 +116,7 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">7. Передача за межі ЄЕЗ</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">8. Передача за межі ЄЕЗ</h2>
           <p>
             Частина технічних провайдерів може обробляти дані за межами Європейської економічної
             зони. У таких випадках ми покладаємося на договірні та організаційні механізми, які
@@ -102,7 +125,7 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">8. Ваші права</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">9. Ваші права</h2>
           <p>Якщо на вас поширюється GDPR або подібні правила, ви можете мати право на:</p>
           <ul className="list-disc pl-5 space-y-1">
             <li>доступ до своїх персональних даних;</li>
@@ -115,7 +138,7 @@ export default function PrivacyPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="font-display text-xl font-bold text-foreground">9. Як зв’язатися з нами</h2>
+          <h2 className="font-display text-xl font-bold text-foreground">10. Як зв’язатися з нами</h2>
           <p>
             Якщо у вас є питання щодо приватності, прав суб’єкта даних або роботи сайту, напишіть
             нам на
