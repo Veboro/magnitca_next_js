@@ -17,19 +17,18 @@ export default function AppleIcon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "linear-gradient(135deg, rgba(14,165,233,0.18), rgba(14,165,233,0.08))",
+          background: "#1E9E63",
           borderRadius: 40,
-          border: "8px solid rgba(14,165,233,0.22)",
           position: "relative",
         }}
       >
         <svg
-          width="108"
-          height="108"
+          width="112"
+          height="112"
           viewBox="0 0 24 24"
           fill="none"
-          stroke="#0EA5E9"
-          strokeWidth="2.2"
+          stroke="#FFFFFF"
+          strokeWidth="2.4"
           strokeLinecap="round"
           strokeLinejoin="round"
         >
