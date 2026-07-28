@@ -17,6 +17,9 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+// ISR: cache the page; the hydromet-warning fetch revalidates on its own (10 min).
+export const revalidate = 600;
+
 export function generateStaticParams() {
   return OBLAST_ROUTE_MAP.map((route) => ({ slug: route.slugUk }));
 }
