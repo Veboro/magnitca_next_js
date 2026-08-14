@@ -40,6 +40,21 @@ function isNonEmptyPayload(cacheKey: SpaceWeatherCacheKey, payload: unknown) {
   return payload !== null && payload !== undefined;
 }
 
+// NOAA/SWPC real-time feeds occasionally emit bare `NaN`/`Infinity` literals when
+// a sensor has a data gap (e.g. `"proton_speed": NaN`). Those are invalid JSON, so
+// `response.json()` throws a SyntaxError that would otherwise bubble up and 500 the
+// page during ISR revalidation. Read as text, neutralise the offending tokens, and
+// never throw — return null on any parse failure so callers degrade gracefully.
+async function safeNoaaJson(response: Response): Promise<any | null> {
+  try {
+    const text = await response.text();
+    const sanitized = text.replace(/\b-?NaN\b/g, "null").replace(/\b-?Infinity\b/g, "null");
+    return JSON.parse(sanitized);
+  } catch {
+    return null;
+  }
+}
+
 async function fetchFirstNonEmptySolarWindProduct(products: readonly string[]) {
   for (const product of products) {
     const controller = new AbortController();
@@ -52,7 +67,7 @@ async function fetchFirstNonEmptySolarWindProduct(products: readonly string[]) {
       });
       if (!response.ok) continue;
 
-      const data: string[][] = await response.json();
+      const data: string[][] | null = await safeNoaaJson(response);
       if (Array.isArray(data) && data.length > 1) {
         return data;
       }
@@ -73,7 +88,7 @@ function sortByTime<T extends { time_tag: string }>(rows: T[]) {
 async function fetchRtswSolarWind() {
   const response = await fetch(RTSW_WIND_URL, { next: { revalidate: 300 } });
   if (!response.ok) return null;
-  const data = await response.json();
+  const data = await safeNoaaJson(response);
   if (!Array.isArray(data) || data.length === 0) return null;
 
   const rows = data
@@ -91,7 +106,7 @@ async function fetchRtswSolarWind() {
 async function fetchRtswMagData() {
   const response = await fetch(RTSW_MAG_URL, { next: { revalidate: 300 } });
   if (!response.ok) return null;
-  const data = await response.json();
+  const data = await safeNoaaJson(response);
   if (!Array.isArray(data) || data.length === 0) return null;
 
   const rows = data
@@ -147,7 +162,8 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
         next: { revalidate: 300 },
       });
       if (!response.ok) return null;
-      const data = await response.json();
+      const data = await safeNoaaJson(response);
+      if (!Array.isArray(data)) return null;
       return data.map((d: any) => ({
         time_tag: d.time_tag,
         kp: parseFloat(d.estimated_kp ?? d.kp_index ?? d.kp ?? 0),
@@ -183,7 +199,8 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
         next: { revalidate: 300 },
       });
       if (!response.ok) return null;
-      const data = await response.json();
+      const data = await safeNoaaJson(response);
+      if (!data) return null;
       return {
         r: data["-1"]?.R ?? { Scale: 0, Text: "none" },
         s: data["-1"]?.S ?? { Scale: 0, Text: "none" },
@@ -195,7 +212,8 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
         next: { revalidate: 300 },
       });
       if (!response.ok) return null;
-      const data = await response.json();
+      const data = await safeNoaaJson(response);
+      if (!Array.isArray(data)) return null;
       return (data as any[]).map((d) => ({
         time_tag: d.time_tag,
         kp: parseFloat(d.kp) || 0,
@@ -207,8 +225,9 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
         fetch(`${SWPC_BASE}/products/noaa-scales.json`, { next: { revalidate: 300 } }),
       ]);
       if (!kpRes.ok || !scalesRes.ok) return null;
-      const kpRaw: Array<{ time_tag: string; Kp: number }> = await kpRes.json();
-      const scales = await scalesRes.json();
+      const kpRaw: Array<{ time_tag: string; Kp: number }> | null = await safeNoaaJson(kpRes);
+      const scales = await safeNoaaJson(scalesRes);
+      if (!Array.isArray(kpRaw) || !scales) return null;
 
       function kpToLevel(kp: number) {
         if (kp >= 8) return "severe";
@@ -254,7 +273,14 @@ async function fetchSpaceWeatherFallback<T>(cacheKey: SpaceWeatherCacheKey): Pro
 async function getSpaceWeatherCacheOrFallback<T>(cacheKey: SpaceWeatherCacheKey): Promise<T | null> {
   const cached = await getSpaceWeatherCache<T>(cacheKey);
   if (cached !== null) return cached;
-  return fetchSpaceWeatherFallback<T>(cacheKey);
+  // Never let a live-fetch failure (network, timeout, malformed NOAA JSON) throw:
+  // the space-weather widgets must degrade to "no data" instead of 500-ing the page
+  // during ISR revalidation.
+  try {
+    return await fetchSpaceWeatherFallback<T>(cacheKey);
+  } catch {
+    return null;
+  }
 }
 
 export interface HomePageWeatherData {
